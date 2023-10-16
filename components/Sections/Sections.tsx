@@ -1,8 +1,6 @@
 import Blog from '../Blog';
-import Brands from '../Home/Brands';
 import Features from '../Home/Features';
 import Hero from '../Home/Hero';
-import Pricing from '../Home/Pricing';
 import Testimonials from '../Home/Testimonials';
 import Video from '../Home/Video';
 import DetailSection from '../Home/Detail/DetailSection';
@@ -15,8 +13,6 @@ import AboutIntro from '../About/AboutIntro';
 import {
   AboutIntroRecord,
   AllPostsSectionRecord,
-  BrandSectionRecord,
-  ChangelogSectionRecord,
   CollectionMetadata,
   DetailSectionRecord,
   FaqSectionRecord,
@@ -40,15 +36,10 @@ import { redirect } from 'next/navigation';
 import RightImageHero from '../Home/Hero/RightImageHero';
 import BackgroundImageHero from '../Home/Hero/BackgroundImage';
 import SplitImage from '../Home/Hero/SplitImage';
-import GradientCards from '../Home/Pricing/GradientCards';
-import Minimal from '../Home/Pricing/Minimal';
-import FeatureListSelector from '../Home/Pricing/FeatureListSelector';
-import SmallCards from '../Home/Pricing/SmallCards';
 import Carrousel from '../Home/Testimonials/Carrousel';
 import ModernCarrousel from '../Home/Testimonials/ModernCarrousel';
 import MinimalCarrousel from '../Home/Testimonials/MinimalCarrousel';
 import MinimalReviewCards from '../Home/Testimonials/MinimalReviewCards';
-import BrandCards from '../Home/Brands/BrandCards';
 import ModernPostCards from '../Home/Featured Posts/ModernPostCards';
 import CarrouselFeaturedPosts from '../Home/Featured Posts/CarrouselFeaturedPosts';
 import MinimalistFeaturedPostsGrid from '../Home/Featured Posts/MinimalistFeaturedPostsGrid';
@@ -184,14 +175,6 @@ export default function Section({ sections, locale, posts, postMeta }: Props) {
                 videoProvider={videoSectionRecord.video?.provider}
               />
             );
-          case 'brand_section':
-            const brandSectionRecord = section as BrandSectionRecord;
-            switch (brandSectionRecord.displayOptions) {
-              case 'brand_cards':
-                return <BrandCards brandShowcase={brandSectionRecord.brand} />;
-              default:
-                return <Brands brandShowcase={brandSectionRecord.brand} />;
-            }
           case 'detail_section':
             const detailSectionRecord = section as DetailSectionRecord;
             return (
@@ -242,51 +225,6 @@ export default function Section({ sections, locale, posts, postMeta }: Props) {
                     header={reviewSectionRecord.reviewSectionHeader}
                     subheader={reviewSectionRecord.reviewSectionSubheader}
                     reviews={reviewSectionRecord.reviews}
-                  />
-                );
-            }
-
-          case 'pricing_section':
-            const pricingSectionRecord = section as PricingSectionRecord;
-            switch (pricingSectionRecord.displayOption) {
-              case 'cards_gradient':
-                return (
-                  <GradientCards
-                    header={pricingSectionRecord.pricingSectionHeader}
-                    subheader={pricingSectionRecord.pricingSectionSubheader}
-                    plans={pricingSectionRecord.plans}
-                  />
-                );
-              case 'minimal':
-                return (
-                  <Minimal
-                    header={pricingSectionRecord.pricingSectionHeader}
-                    subheader={pricingSectionRecord.pricingSectionSubheader}
-                    plans={pricingSectionRecord.plans}
-                  />
-                );
-              case 'feature_list':
-                return (
-                  <FeatureListSelector
-                    header={pricingSectionRecord.pricingSectionHeader}
-                    subheader={pricingSectionRecord.pricingSectionSubheader}
-                    plans={pricingSectionRecord.plans}
-                  />
-                );
-              case 'mini_cards':
-                return (
-                  <SmallCards
-                    header={pricingSectionRecord.pricingSectionHeader}
-                    subheader={pricingSectionRecord.pricingSectionSubheader}
-                    plans={pricingSectionRecord.plans}
-                  />
-                );
-              default:
-                return (
-                  <Pricing
-                    header={pricingSectionRecord.pricingSectionHeader}
-                    subheader={pricingSectionRecord.pricingSectionSubheader}
-                    plans={pricingSectionRecord.plans}
                   />
                 );
             }

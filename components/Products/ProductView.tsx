@@ -187,12 +187,16 @@ const ProductView = ({ data, lng }: Props) => {
                     ) {
                       if (selectedSize === size)
                         return (
-                          <span className="border-primary/90-500 flex h-8 w-12 cursor-default items-center justify-center rounded-md border bg-primary/90 text-center text-sm font-semibold text-white">
+                          <span
+                            key={size}
+                            className="border-primary/90-500 flex h-8 w-12 cursor-default items-center justify-center rounded-md border bg-primary/90 text-center text-sm font-semibold text-white"
+                          >
                             {size.toUpperCase()}
                           </span>
                         );
                       return (
                         <button
+                          key={size}
                           type="button"
                           className="flex h-8 w-12 items-center justify-center rounded-md border bg-white text-center text-sm font-semibold text-gray-800 transition duration-100 hover:bg-gray-100 active:bg-gray-200"
                           onClick={() => {
@@ -204,7 +208,10 @@ const ProductView = ({ data, lng }: Props) => {
                       );
                     }
                     return (
-                      <span className="flex h-8 w-12 cursor-not-allowed items-center justify-center rounded-md border bg-white text-center text-sm font-semibold text-gray-400">
+                      <span
+                        key={size}
+                        className="flex h-8 w-12 cursor-not-allowed items-center justify-center rounded-md border bg-white text-center text-sm font-semibold text-gray-400"
+                      >
                         {size.toUpperCase()}
                       </span>
                     );

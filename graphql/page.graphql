@@ -138,20 +138,6 @@ query Page($locale: SiteLocale, $fallbackLocale: [SiteLocale!], $slug: String) {
           reviewerTitle
         }
       }
-      ... on BrandSectionRecord {
-        _modelApiKey
-        id
-        displayOptions
-        brand {
-          _modelApiKey
-          brandName
-          brandUrl
-          id
-          brandLogo {
-            url
-          }
-        }
-      }
       ... on FeaturedPostsSectionRecord {
         _modelApiKey
         id

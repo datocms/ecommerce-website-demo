@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import SvgRenderer from '../Common/SvgRenderer';
 import {
-  ChangeLogRecord,
   FooterQuery,
   LegalPageRecord,
   SiteLocale,

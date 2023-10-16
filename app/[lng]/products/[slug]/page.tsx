@@ -1,10 +1,12 @@
 import { getFallbackLocale } from '@/app/i18n/settings';
-import DocumentaitonPageRenderer from '@/components/Documentaiton/DocumentationPageRenderer';
-import RealTimeDocumentationPage from '@/components/Documentaiton/RealTimeDocumentationPage';
-import { DocumentationPageDocument, SiteLocale } from '@/graphql/generated';
+import Product from '@/components/Products/Product';
+import {
+  LegalDocument,
+  ProductDocument,
+  SiteLocale,
+} from '@/graphql/generated';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
-import { notFound } from 'next/navigation';
 
 type Params = {
   params: {
@@ -13,12 +15,12 @@ type Params = {
   };
 };
 
-const DocumentaitonPage = async ({ params: { slug, lng } }: Params) => {
+const ProductsPage = async ({ params: { slug, lng } }: Params) => {
   const fallbackLng = await getFallbackLocale();
   const { isEnabled } = draftMode();
 
   const data = await queryDatoCMS(
-    DocumentationPageDocument,
+    ProductDocument,
     {
       slug,
       locale: lng,
@@ -27,22 +29,20 @@ const DocumentaitonPage = async ({ params: { slug, lng } }: Params) => {
     isEnabled
   );
 
-  if (!data || !data.documentationPage) notFound();
-
   return (
     <>
-      {!isEnabled && <DocumentaitonPageRenderer data={data} />}
-      {isEnabled && (
-        <RealTimeDocumentationPage
+      {!isEnabled && <Product data={data} lng={lng} />}
+      {/* {isEnabled && (
+        <RealTimeLegal
           initialData={data}
           locale={lng}
           token={process.env.DATOCMS_READONLY_API_TOKEN || ''}
-          query={DocumentationPageDocument}
+          query={LegalDocument}
           variables={{ slug, locale: lng, fallbackLocale: [fallbackLng] }}
         />
-      )}
+      )} */}
     </>
   );
 };
 
-export default DocumentaitonPage;
+export default ProductsPage;

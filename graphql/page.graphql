@@ -21,19 +21,6 @@ query Page($locale: SiteLocale, $fallbackLocale: [SiteLocale!], $slug: String) {
           }
         }
       }
-      ... on ChangelogSectionRecord {
-        id
-        _modelApiKey
-        subtitle
-        title
-        featuredVersions {
-          timeOfRelease
-          versionName
-          slug
-          id
-          _modelApiKey
-        }
-      }
       ... on StatsSectionRecord {
         _modelApiKey
         id
@@ -149,24 +136,6 @@ query Page($locale: SiteLocale, $fallbackLocale: [SiteLocale!], $slug: String) {
             }
           }
           reviewerTitle
-        }
-      }
-      ... on PricingSectionRecord {
-        _modelApiKey
-        id
-        pricingSectionHeader
-        pricingSectionSubheader
-        displayOption
-        plans {
-          id
-          yearlyPrice
-          monthlyPrice
-          tierName
-          tierDescription {
-            value
-          }
-          slug
-          planFeatures
         }
       }
       ... on BrandSectionRecord {

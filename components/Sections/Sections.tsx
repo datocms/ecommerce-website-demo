@@ -56,7 +56,6 @@ import FullImageFeaturedPosts from '../Home/Featured Posts/FullImageFeaturedPost
 import MinimalCardsFeature from '../Home/Features/MinimalCardsFeature';
 import BigImageHorizontalFeatures from '../Home/Features/BigImageHorizontalFeatures';
 import BigImageVerticalFeatures from '../Home/Features/BigImageVerticalFeatures';
-import Changelog from '../Changelog';
 
 type Props = {
   sections: Array<PageModelSectionsField>;
@@ -70,16 +69,6 @@ export default function Section({ sections, locale, posts, postMeta }: Props) {
     <>
       {sections.map((section) => {
         switch (section._modelApiKey) {
-          case 'changelog_section':
-            const changeLogSection = section as ChangelogSectionRecord;
-            return (
-              <Changelog
-                title={changeLogSection.title}
-                subtitle={changeLogSection.subtitle}
-                featuredChangeLogs={changeLogSection.featuredVersions}
-                locale={locale}
-              />
-            );
           case 'hero_section':
             const heroSectionRecord = section as HeroSectionRecord;
             switch (heroSectionRecord.displayOptions) {

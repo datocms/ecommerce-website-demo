@@ -1,0 +1,60 @@
+query Product(
+  $slug: String
+  $locale: SiteLocale
+  $fallbackLocale: [SiteLocale!]
+) {
+  product(
+    filter: { slug: { eq: $slug } }
+    locale: $locale
+    fallbackLocales: $fallbackLocale
+  ) {
+    name
+    price
+    sale
+    salePrice
+    description {
+      value
+    }
+    id
+    productImages {
+      id
+      responsiveImage {
+        ...DatoImage_responsiveImage
+      }
+    }
+    brand {
+      name
+    }
+    productVariations {
+      id
+      color {
+        hex
+      }
+      availableSizes
+    }
+    relatedProducts {
+      id
+      name
+      price
+      sale
+      salePrice
+      slug
+      productImages {
+        id
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+      }
+    }
+  }
+}
+
+fragment DatoImage_responsiveImage on ResponsiveImage {
+  src
+  srcSet
+  base64
+  width
+  height
+  alt
+  title
+}

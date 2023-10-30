@@ -12,8 +12,46 @@ query Product(
     price
     sale
     salePrice
+    reviewAverage
+    numberOfReviews
+    featuredReviews {
+      id
+      reviewerName
+			reviewDate
+      reviewScore
+      review
+    }
+    material {
+      name
+      slug
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+      }
+    }
     description {
       value
+      blocks {
+        ... on ProductFeatureSectionRecord {
+          id
+          _modelApiKey
+          material
+          occasions
+          style
+          weather
+        }
+        ... on FeaturedQuestionsSectionRecord {
+          id
+          questions {
+            id
+            _modelApiKey
+            question
+            answer
+          }
+          _modelApiKey
+        }
+      }
     }
     id
     productImages {
@@ -39,6 +77,9 @@ query Product(
       sale
       salePrice
       slug
+      brand {
+        name
+      }
       productImages {
         id
         responsiveImage {

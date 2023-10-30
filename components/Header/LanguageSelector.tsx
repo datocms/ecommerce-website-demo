@@ -32,7 +32,7 @@ const LanguageSelector = ({ lng, languages }: Props) => {
         }
         className="ml-4 inline-flex w-28 items-center overflow-hidden rounded-md bg-white transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300"
       >
-        <button className="inline-flex cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-gray-800">
+        <button className="inline-flex text-center w-full cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-gray-800">
           {getLangNameFromCode(currentLocale)?.name || currentLocale}
         </button>
       </div>
@@ -48,14 +48,14 @@ const LanguageSelector = ({ lng, languages }: Props) => {
           return (
             <div
               key={locale}
-              className="inline-flex w-full cursor-pointer items-end justify-start rounded-lg text-sm font-medium text-gray-900 hover:bg-gray-100"
+              className="inline-flex text-center w-full cursor-pointer items-end justify-start rounded-lg text-sm font-medium text-gray-900 hover:bg-gray-100"
             >
               <Link
                 href={'/' + locale + '/' + pathString}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                className="block text-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
               >
-                <div className="inline-flex">
+                <div className="text-center w-full">
                   {getLangNameFromCode(locale)?.name || currentLocale}
                 </div>
               </Link>

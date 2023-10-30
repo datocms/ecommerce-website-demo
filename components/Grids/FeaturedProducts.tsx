@@ -12,12 +12,6 @@ const FeaturedProducts = ({ products, lng }: PropTypes) => {
     <>
       <div className="bg-white py-6 sm:py-8 lg:mx-56 lg:py-12">
         <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
-          <div className="mb-10 md:mb-16">
-            <h2 className="mb-4 text-2xl font-bold text-gray-800 md:mb-6 lg:text-3xl">
-              You might also like:
-            </h2>
-          </div>
-
           <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 md:gap-x-6 lg:grid-cols-3 xl:grid-cols-3">
             {products.map((product) => {
               const isOnSale = product?.sale === 'on_sale';
@@ -27,7 +21,7 @@ const FeaturedProducts = ({ products, lng }: PropTypes) => {
                     href={`/${lng}/products/${product.slug}`}
                     className="group relative mb-2 block h-96 overflow-hidden rounded-lg bg-gray-100 shadow-lg lg:mb-3"
                   >
-                    <div className="h-full w-full object-cover object-center transition duration-200 group-hover:scale-110">
+                    <div className="h-full w-full object-cover object-center transition duration-200 group-hover:scale-105">
                       <DatoImage
                         data={
                           product.productImages[0]

@@ -6,31 +6,6 @@ query Menu($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
         ...DatoImage_responsiveImage
       }
     }
-    menu {
-      ... on MenuItemRecord {
-        id
-        title
-        _modelApiKey
-        page {
-          slug
-        }
-      }
-      ... on MenuDropdownRecord {
-        id
-        title
-        _modelApiKey
-        items {
-          ... on MenuItemRecord {
-            id
-            title
-            _modelApiKey
-            page {
-              slug
-            }
-          }
-        }
-      }
-    }
     notification {
       value
     }

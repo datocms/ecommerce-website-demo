@@ -1,6 +1,11 @@
 import {
+  FeaturedQuestionsSectionRecord,
+  FeaturedReviewRecord,
+  MaterialRecord,
+  ProductFeatureSectionRecord,
   ProductModelDescriptionField,
   ProductQuery,
+  ProductQuestionRecord,
   ProductRecord,
   SiteLocale,
 } from '@/graphql/generated';
@@ -10,6 +15,9 @@ import ProductView from './ProductView';
 import { isHeading, isList, isListItem } from 'datocms-structured-text-utils';
 import Reviews from './Reviews';
 import FeaturedProducts from '../Grids/FeaturedProducts';
+import QuestionsSection from './QuestionsSection';
+import ProductInfoSection from './ProductInfoSection';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 type Props = {
   data: ProductQuery;
@@ -20,15 +28,34 @@ const Product = ({ data, lng }: Props) => {
   if (!data.product) notFound();
 
   return (
-    <div className="mt-16">
+    <div className="mx-auto max-w-[1480px]">
       <ProductView data={data} lng={lng} />
       <div className="mx-12 mt-8 sm:mx-24 lg:mx-64">
         <div className="text-gray-500">
           {data.product.description && (
             <StructuredText
-              data={
-                (data.product.description as ProductModelDescriptionField).value
-              }
+              data={data.product.description as any}
+              renderBlock={({ record }) => {
+                switch (record._modelApiKey) {
+                  case 'product_feature_section':
+                    return (
+                      <ProductInfoSection
+                        features={record as ProductFeatureSectionRecord}
+                        material={data.product!.material as MaterialRecord}
+                      />
+                    );
+                  case 'featured_questions_section':
+                    return (
+                      <QuestionsSection
+                        questions={
+                          record.questions as Array<ProductQuestionRecord>
+                        }
+                      />
+                    );
+                  default:
+                    return <></>;
+                }
+              }}
               customNodeRules={[
                 renderNodeRule(isHeading, ({ children, key }) => {
                   return (
@@ -69,7 +96,11 @@ const Product = ({ data, lng }: Props) => {
         products={data.product.relatedProducts as ProductRecord[]}
         lng={lng}
       />
-      <Reviews />
+      <Reviews
+        reviews={data.product.featuredReviews as Array<FeaturedReviewRecord>}
+        reviewNumber={data.product.numberOfReviews}
+        reviewAverage={data.product.reviewAverage}
+      />
     </div>
   );
 };

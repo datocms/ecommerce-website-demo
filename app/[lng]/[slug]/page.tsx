@@ -3,10 +3,7 @@ import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
 import RealTimeSections from '@/components/Sections/RealTimeSections';
 import {
-  CollectionMetadata,
   PageDocument,
-  PageModelSectionsField,
-  PostRecord,
   SiteLocale,
 } from '@/graphql/generated';
 import { notFound } from 'next/navigation';
@@ -40,9 +37,7 @@ export default async function Home({ params: { lng, slug } }: Params) {
       {!isEnabled && (
         <Sections
           locale={lng}
-          sections={data.page.sections as Array<PageModelSectionsField>}
-          posts={data.allPosts as PostRecord[]}
-          postMeta={data._allPostsMeta as CollectionMetadata}
+          sections={data.page.sections as any} //TODO TYPE LATER
         />
       )}
       {isEnabled && (

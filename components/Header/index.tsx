@@ -6,14 +6,13 @@ import { useEffect, useState } from 'react';
 import LanguageSelector from './LanguageSelector';
 import {
   LayoutModelNotificationField,
-  MenuDropdownRecord,
-  MenuItemRecord,
   MenuQuery,
   SiteLocale,
 } from '@/graphql/generated';
 import NotificationStrip from './NotificationStrip';
 import { Menu } from './HeaderRenderer';
 import { isEmptyDocument } from 'datocms-structured-text-utils';
+import CategoryHeader from './CategoryHeader';
 
 type Props = {
   lng: SiteLocale;
@@ -23,55 +22,10 @@ type Props = {
 const Header = ({ lng, data }: Props) => {
   const menuData: Menu[] = [];
 
-  data.layout!.menu.map((item) => {
-    if (item._modelApiKey === 'menu_dropdown') {
-      const dropdownItem = item as MenuDropdownRecord;
-      menuData.push({
-        id: '1',
-        title: dropdownItem.title || 'Other Items',
-        newTab: false,
-        submenu: dropdownItem.items.map((item) => {
-          return {
-            id: item.id,
-            title: item.title,
-            path: `/${item.page.slug}`,
-            newTab: true,
-          };
-        }),
-      });
-    } else {
-      const menuItem = item as MenuItemRecord;
-      menuData.push({
-        id: menuItem.id,
-        title: menuItem.title,
-        path: `/${menuItem.page.slug}`,
-        newTab: false,
-      });
-    }
-  });
-
   // Navbar toggle
-  const [navbarOpen, setNavbarOpen] = useState(false);
   const [notificationStrip, setNotificationStrip] = useState(
     !isEmptyDocument(data.layout?.notification)
   );
-
-  const navbarToggleHandler = () => {
-    setNavbarOpen(!navbarOpen);
-  };
-
-  // Sticky Navbar
-  const [sticky, setSticky] = useState(false);
-  const handleStickyNavbar = () => {
-    if (window.scrollY >= 80) {
-      setSticky(true);
-    } else {
-      setSticky(false);
-    }
-  };
-  useEffect(() => {
-    window.addEventListener('scroll', handleStickyNavbar);
-  });
 
   // submenu handler
   const [openIndex, setOpenIndex] = useState(-1);
@@ -94,7 +48,10 @@ const Header = ({ lng, data }: Props) => {
           setNotificationStrip={setNotificationStrip}
         />
       )}
-      <header
+
+      <CategoryHeader lng={lng} languages={data._site.locales} />
+
+      {/* <header
         className={`header left-0 z-40 flex w-full items-center bg-transparent ${
           sticky
             ? 'fixed top-0 z-50 bg-white bg-opacity-80 shadow-sticky backdrop-blur-sm transition'
@@ -201,13 +158,11 @@ const Header = ({ lng, data }: Props) => {
                   </ul>
                 </nav>
               </div>
-              <div className="flex items-center justify-end pr-16 lg:pr-0">
-                <LanguageSelector lng={lng} languages={data._site.locales} />
-              </div>
+              
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
     </>
   );
 };

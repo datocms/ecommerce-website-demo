@@ -32,7 +32,7 @@ const ProductView = ({ data, lng }: Props) => {
   return (
     <div className="flex w-full items-center justify-center">
       <div className="flex w-full justify-center bg-white py-6 sm:py-8 lg:py-12">
-        <div className="mx-8 w-full md:ml-20 lg:ml-56">
+        <div className="mx-8 w-full md:ml-20 lg:ml-56 max-w-[1080px]">
           <div className="grid w-full items-center gap-8 md:ml-4 md:grid-cols-2">
             <div className="grid flex-shrink-0 gap-4 lg:h-full lg:grid-cols-5">
               <div className="order-last flex gap-4 lg:order-none lg:flex-col">
@@ -56,7 +56,7 @@ const ProductView = ({ data, lng }: Props) => {
                   return (
                     <div
                       key={image.id}
-                      className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 hover:cursor-pointer"
+                      className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 transition duration-200 hover:scale-105 hover:cursor-pointer"
                       onClick={() => {
                         setSelectedImage(image);
                       }}
@@ -124,7 +124,7 @@ const ProductView = ({ data, lng }: Props) => {
 
               <div className="mb-6 flex items-center gap-3 md:mb-10">
                 <div className="flex h-7 items-center gap-1 rounded-full bg-primary/90 px-2 text-white">
-                  <span className="text-sm">4.2</span>
+                  <span className="text-sm">{data.product.reviewAverage}</span>
 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +137,7 @@ const ProductView = ({ data, lng }: Props) => {
                 </div>
 
                 <span className="text-sm text-gray-500 transition duration-100">
-                  56 ratings
+                  {data.product.numberOfReviews} ratings
                 </span>
               </div>
 

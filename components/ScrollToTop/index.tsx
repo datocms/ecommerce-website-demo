@@ -55,7 +55,7 @@ export default function ScrollToTop({ lng, isDraft }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed bottom-8 right-8 z-[99]"
+            className="fixed bottom-4 right-4 z-[99]"
           >
             <AnimatePresence>
               {successToast && (

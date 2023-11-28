@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import '@/styles/global.css';
 import { draftMode } from 'next/headers';
 import {

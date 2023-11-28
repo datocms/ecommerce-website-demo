@@ -18,7 +18,7 @@ const FeaturedProducts = ({ products, lng }: PropTypes) => {
               return (
                 <div key={product.id}>
                   <Link
-                    href={`/${lng}/products/${product.slug}`}
+                    href={`/${lng}/product/${product.slug}`}
                     className="group relative mb-2 block h-96 overflow-hidden rounded-lg bg-gray-100 shadow-lg lg:mb-3"
                   >
                     <div className="h-full w-full object-cover object-center transition duration-200 group-hover:scale-105">

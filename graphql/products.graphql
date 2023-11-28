@@ -1,0 +1,54 @@
+query Products(
+  $locale: SiteLocale
+  $fallbackLocale: [SiteLocale!]
+  $skip: IntType
+  $orderBy: [ProductModelOrderBy]
+  $collections: [ItemId]
+  $brands: [ItemId]
+  $materials: [ItemId]
+) {
+  allProducts(
+    first: 12
+    locale: $locale
+    fallbackLocales: $fallbackLocale
+    skip: $skip
+    orderBy: $orderBy
+    filter: {
+      collections: { anyIn: $collections }
+      AND: { brand: { in: $brands }, AND: { material: { in: $materials } } }
+    }
+  ) {
+    id
+    slug
+    sale
+    salePrice
+    productImages {
+      responsiveImage {
+        ...DatoImage_responsiveImage
+      }
+    }
+    price
+    name
+    brand {
+      name
+    }
+  }
+  _allProductsMeta(
+    filter: {
+      collections: { anyIn: $collections }
+      AND: { brand: { in: $brands }, AND: { material: { in: $materials } } }
+    }
+  ) {
+    count
+  }
+}
+
+fragment DatoImage_responsiveImage on ResponsiveImage {
+  src
+  srcSet
+  base64
+  width
+  height
+  alt
+  title
+}

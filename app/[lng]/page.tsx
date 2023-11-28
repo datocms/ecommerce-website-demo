@@ -2,10 +2,7 @@ import Sections from '@/components/Sections/Sections';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
 import RealTimeSections from '@/components/Sections/RealTimeSections';
-import {
-  PageDocument,
-  SiteLocale,
-} from '@/graphql/generated';
+import { HomeDocument, SiteLocale } from '@/graphql/generated';
 import { notFound } from 'next/navigation';
 import { getFallbackLocale } from '@/app/i18n/settings';
 
@@ -21,7 +18,7 @@ export default async function Home({ params: { lng, slug } }: Params) {
   const { isEnabled } = draftMode();
 
   const data = await queryDatoCMS(
-    PageDocument,
+    HomeDocument,
     {
       locale: lng,
       fallbackLocale: [fallbackLng],
@@ -30,14 +27,14 @@ export default async function Home({ params: { lng, slug } }: Params) {
     isEnabled
   );
 
-  if (!data.page) notFound();
+  if (!data.home) notFound();
 
   return (
     <>
       {!isEnabled && (
         <Sections
           locale={lng}
-          sections={data.page.sections as any} //TODO TYPE LATER
+          sections={data.home.sections as any} //TODO TYPE LATER
         />
       )}
       {isEnabled && (
@@ -45,8 +42,8 @@ export default async function Home({ params: { lng, slug } }: Params) {
           initialData={data}
           locale={lng}
           token={process.env.DATOCMS_READONLY_API_TOKEN || ''}
-          query={PageDocument}
-          variables={{ locale: lng, fallbackLocale: [fallbackLng], slug }}
+          query={HomeDocument}
+          variables={{ locale: lng, fallbackLocale: [fallbackLng] }}
         />
       )}
     </>

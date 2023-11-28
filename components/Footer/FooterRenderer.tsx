@@ -17,7 +17,7 @@ type Props = {
 
 const Footer = ({ data, lng }: Props) => {
   return (
-    <footer className="bg-white pt-4 sm:pt-6 lg:pt-8">
+    <footer className="bg-white pt-4 sm:pt-6 lg:pt-8 max-w-7xl mx-auto">
     <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
       <div className="flex flex-col items-center justify-between gap-2 border-b border-t py-6 md:flex-row">
         <div className="mb-3 text-center md:mb-0 md:text-left">

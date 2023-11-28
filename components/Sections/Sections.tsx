@@ -1,12 +1,11 @@
 import Hero from '../Home/Hero';
 import {
-  CollectionMetadata,
-
+  CollectionShowcaseRecord,
   HeroSectionRecord,
-
   SiteLocale,
 } from '@/graphql/generated';
-import { redirect } from 'next/navigation';
+import ProductShowcase from '../Showcases/ProductShowcase';
+import CollectionShowcaseLargeImage from '../Showcases/CollectionShowcaseLargeImage';
 
 type Props = {
   sections: any;
@@ -16,11 +15,12 @@ type Props = {
 export default function Section({ sections, locale }: Props) {
   return (
     <>
-      {sections.map((section: any) => { //TODO TYPE LATER
+      {sections.map((section: any) => {
+        //TODO TYPE LATER
         switch (section._modelApiKey) {
           case 'hero_section':
             const heroSectionRecord = section as HeroSectionRecord;
-            switch (heroSectionRecord.displayOptions) {
+            switch (heroSectionRecord) {
               default:
                 return (
                   <Hero
@@ -31,6 +31,34 @@ export default function Section({ sections, locale }: Props) {
                   />
                 );
             }
+          case 'collection_showcase':
+            const collectionShowcaseSectionRecord =
+              section as CollectionShowcaseRecord;
+            switch (collectionShowcaseSectionRecord.displayVariation) {
+              case 'minimal_cards':
+                return (
+                  <ProductShowcase
+                    title={collectionShowcaseSectionRecord.heading}
+                    subtitle={collectionShowcaseSectionRecord.subheading}
+                    buttonLabel={collectionShowcaseSectionRecord.buttonLabel}
+                    buttonURL={collectionShowcaseSectionRecord.buttonUrl}
+                    products={collectionShowcaseSectionRecord.featuredProducts}
+                    lng={locale}
+                  />
+                );
+              default:
+                return (
+                  <CollectionShowcaseLargeImage
+                    title={collectionShowcaseSectionRecord.heading}
+                    subtitle={collectionShowcaseSectionRecord.subheading}
+                    buttonLabel={collectionShowcaseSectionRecord.buttonLabel}
+                    buttonURL={collectionShowcaseSectionRecord.buttonUrl}
+                    products={collectionShowcaseSectionRecord.featuredProducts}
+                    lng={locale}
+                  />
+                );
+            }
+
           default:
             return <></>;
         }

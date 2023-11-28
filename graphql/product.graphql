@@ -22,6 +22,7 @@ query Product(
       review
     }
     material {
+      id
       name
       slug
       image {

@@ -26,12 +26,5 @@ export default async function RootLayout({
 }: Params) {
   const { isEnabled } = draftMode();
 
-  return (
-    <>
-      <HeaderRenderer lng={lng} isDraft={isEnabled} />
-      {children}
-      <Footer lng={lng} />
-      <ScrollToTop lng={lng} isDraft={isEnabled} />
-    </>
-  );
+  return <>{children}</>;
 }

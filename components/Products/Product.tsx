@@ -1,9 +1,7 @@
 import {
-  FeaturedQuestionsSectionRecord,
   FeaturedReviewRecord,
   MaterialRecord,
   ProductFeatureSectionRecord,
-  ProductModelDescriptionField,
   ProductQuery,
   ProductQuestionRecord,
   ProductRecord,
@@ -17,7 +15,6 @@ import Reviews from './Reviews';
 import FeaturedProducts from '../Grids/FeaturedProducts';
 import QuestionsSection from './QuestionsSection';
 import ProductInfoSection from './ProductInfoSection';
-import { Maybe } from 'graphql/jsutils/Maybe';
 
 type Props = {
   data: ProductQuery;
@@ -42,6 +39,7 @@ const Product = ({ data, lng }: Props) => {
                       <ProductInfoSection
                         features={record as ProductFeatureSectionRecord}
                         material={data.product!.material as MaterialRecord}
+                        lng={lng}
                       />
                     );
                   case 'featured_questions_section':
@@ -71,7 +69,7 @@ const Product = ({ data, lng }: Props) => {
                   return (
                     <div
                       key={key}
-                      className="mb-5 flex items-center text-lg font-medium text-body-color"
+                      className="rounded-full bg-primary/80 px-4 py-2 text-sm font-medium text-white"
                     >
                       <div>{children}</div>
                     </div>
@@ -79,10 +77,7 @@ const Product = ({ data, lng }: Props) => {
                 }),
                 renderNodeRule(isList, ({ children, key }) => {
                   return (
-                    <div
-                      key={key}
-                      className="mb-6 mt-6 grid w-full grid-cols-2 items-center justify-center gap-4 text-center lg:ml-0"
-                    >
+                    <div key={key} className="flex justify-center gap-4 py-8">
                       {children}
                     </div>
                   );

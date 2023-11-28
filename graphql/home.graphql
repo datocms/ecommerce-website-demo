@@ -1,0 +1,52 @@
+query Home($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+  home(locale: $locale, fallbackLocales: $fallbackLocale) {
+    sections {
+      ... on HeroSectionRecord {
+        _modelApiKey
+        id
+        heroSubtitle
+        heroTitle
+        heroImage {
+          responsiveImage {
+            ...DatoImage_responsiveImage
+          }
+        }
+        additionalImage {
+          responsiveImage {
+            ...DatoImage_responsiveImage
+          }
+        }
+      }
+      ... on CollectionShowcaseRecord {
+        id
+        _modelApiKey
+        heading
+        subheading
+        buttonUrl
+        displayVariation
+        buttonLabel
+        featuredProducts {
+          id
+          name
+          slug
+          price
+          productImages {
+            responsiveImage {
+              ...DatoImage_responsiveImage
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+fragment DatoImage_responsiveImage on ResponsiveImage {
+  src
+  srcSet
+  base64
+  width
+  height
+  alt
+  title
+}

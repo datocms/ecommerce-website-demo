@@ -3,6 +3,7 @@ import {
   MaterialRecord,
   ProductFeatureSectionRecord,
   ProductQuestionRecord,
+  SiteLocale,
 } from '@/graphql/generated';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
@@ -11,11 +12,12 @@ import { Image as DatoImage } from 'react-datocms';
 type PropTypes = {
   features: ProductFeatureSectionRecord;
   material: MaterialRecord;
+  lng: SiteLocale;
 };
 
-const ProductInfoSection = ({ features, material }: PropTypes) => {
+const ProductInfoSection = ({ features, material, lng }: PropTypes) => {
   return (
-    <div className="bg-white pt-12">
+    <div className="bg-white pt-2">
       <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
         <div className="hidden w-full overflow-hidden rounded-lg border bg-gray-50 shadow-sm lg:block">
           <div className="mx-auto flex max-w-screen-lg items-center gap-8 p-8">
@@ -57,8 +59,8 @@ const ProductInfoSection = ({ features, material }: PropTypes) => {
                     <path
                       fill="none"
                       stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       stroke-miterlimit="10"
                       stroke-width="2"
                       d="M15,3H6v26h20V14C19.925,14,15,9.075,15,3z"
@@ -70,16 +72,16 @@ const ProductInfoSection = ({ features, material }: PropTypes) => {
                       y2="25"
                       fill="none"
                       stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       stroke-miterlimit="10"
                       stroke-width="2"
                     ></line>
                     <path
                       fill="none"
                       stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       stroke-miterlimit="10"
                       stroke-width="2"
                       d="M19.922 16.713c.668.297 1.362.547 2.078.745V19M14.342 12.429c.506.624 1.06 1.206 1.658 1.742M11.541 7c.193.695.434 1.37.72 2.021"
@@ -103,8 +105,8 @@ const ProductInfoSection = ({ features, material }: PropTypes) => {
                     stroke="currentColor"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                       stroke-width="2"
                       d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
                     />
@@ -139,7 +141,7 @@ const ProductInfoSection = ({ features, material }: PropTypes) => {
             </div>
 
             <div className="w-1/3 overflow-hidden rounded-lg border">
-              <div className="h-48 bg-gray-100 relative">
+              <div className="relative h-48 bg-gray-100">
                 <DatoImage
                   data={material.image.responsiveImage}
                   className="h-full w-full object-cover object-center"
@@ -152,7 +154,7 @@ const ProductInfoSection = ({ features, material }: PropTypes) => {
                 <p className="text-sm text-gray-500">{material.name}</p>
 
                 <Link
-                  href={'#'}
+                  href={`/${lng}/products/?materials=${material.id}`}
                   className="inline-block shrink-0 rounded-lg border bg-white px-3 py-1 text-sm font-semibold text-primary outline-none ring-indigo-300 transition duration-100 hover:bg-gray-50 focus-visible:ring active:bg-gray-100"
                 >
                   More

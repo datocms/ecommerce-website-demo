@@ -5,6 +5,8 @@ import { CustomColorDocument, SiteLocale } from '@/graphql/generated';
 import getAvailableLocales from '@/app/i18n/settings';
 import CustomColor from '@/components/Common/CustomColor';
 import queryDatoCMS from '@/utils/queryDatoCMS';
+import Footer from '@/components/Footer';
+import HeaderRenderer from '@/components/Header/HeaderRenderer';
 
 type Params = {
   children: React.ReactNode;
@@ -29,12 +31,14 @@ export default async function RootLayout({
 
   return (
     <>
+      <HeaderRenderer lng={lng} isDraft={isEnabled} />
       <CustomColor
         r={data.layout?.mainColor.red || 74}
         g={data.layout?.mainColor.green || 247}
         b={data.layout?.mainColor.blue || 108}
       />
       {children}
+      <Footer lng={lng} />
       <ScrollToTop lng={lng} isDraft={isEnabled} />
     </>
   );

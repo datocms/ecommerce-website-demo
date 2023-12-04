@@ -16,13 +16,12 @@ query Footer($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
         width
       }
     }
-    footerLinks {
-      ... on LegalPageRecord {
-        id
-        slug
-        title
-        id
-      }
-    }
+  }
+  generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+    newsletter
+    subscribeToOurNewsletter
+    newsletterButton
+    emailPlaceholder
+    displayNewsletterFooter
   }
 }

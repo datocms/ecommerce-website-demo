@@ -16,7 +16,21 @@ query Home($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
             ...DatoImage_responsiveImage
           }
         }
+        socialLabel
+        socials {
+          id
+          name
+          url
+          icon {
+            url
+          }
+        }
+        featuredCollections {
+          id
+          name
+        }
       }
+      
       ... on CollectionShowcaseRecord {
         id
         _modelApiKey

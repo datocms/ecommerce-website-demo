@@ -1,5 +1,6 @@
 import {
   FeaturedQuestionsSectionRecord,
+  GeneralInterfaceRecord,
   MaterialRecord,
   ProductFeatureSectionRecord,
   ProductQuestionRecord,
@@ -8,14 +9,21 @@ import {
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { Image as DatoImage } from 'react-datocms';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 type PropTypes = {
   features: ProductFeatureSectionRecord;
   material: MaterialRecord;
   lng: SiteLocale;
+  interfaceStrings: GeneralInterfaceRecord;
 };
 
-const ProductInfoSection = ({ features, material, lng }: PropTypes) => {
+const ProductInfoSection = ({
+  features,
+  material,
+  lng,
+  interfaceStrings,
+}: PropTypes) => {
   return (
     <div className="bg-white pt-2">
       <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
@@ -42,7 +50,7 @@ const ProductInfoSection = ({ features, material, lng }: PropTypes) => {
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">Material</div>
+                  <div className="mb-1 font-semibold">{interfaceStrings.materials}</div>
                   <p className="text-sm text-gray-500">{features.material}</p>
                 </div>
               </div>
@@ -90,7 +98,7 @@ const ProductInfoSection = ({ features, material, lng }: PropTypes) => {
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">Style</div>
+                  <div className="mb-1 font-semibold">{interfaceStrings.style}</div>
                   <p className="text-sm text-gray-500">{features.style}</p>
                 </div>
               </div>
@@ -114,7 +122,7 @@ const ProductInfoSection = ({ features, material, lng }: PropTypes) => {
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">Weather</div>
+                  <div className="mb-1 font-semibold">{interfaceStrings.weather}</div>
                   <p className="text-sm text-gray-500">{features.weather}</p>
                 </div>
               </div>
@@ -134,7 +142,7 @@ const ProductInfoSection = ({ features, material, lng }: PropTypes) => {
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">Occasions</div>
+                  <div className="mb-1 font-semibold">{interfaceStrings.occasions}</div>
                   <p className="text-sm text-gray-500">{features.occasions}</p>
                 </div>
               </div>
@@ -157,7 +165,7 @@ const ProductInfoSection = ({ features, material, lng }: PropTypes) => {
                   href={`/${lng}/products/?materials=${material.id}`}
                   className="inline-block shrink-0 rounded-lg border bg-white px-3 py-1 text-sm font-semibold text-primary outline-none ring-indigo-300 transition duration-100 hover:bg-gray-50 focus-visible:ring active:bg-gray-100"
                 >
-                  More
+                  {interfaceStrings.more}
                 </Link>
               </div>
             </div>

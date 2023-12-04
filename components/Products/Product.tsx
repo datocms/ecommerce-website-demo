@@ -1,5 +1,6 @@
 import {
   FeaturedReviewRecord,
+  GeneralInterfaceRecord,
   MaterialRecord,
   ProductFeatureSectionRecord,
   ProductQuery,
@@ -39,6 +40,9 @@ const Product = ({ data, lng }: Props) => {
                       <ProductInfoSection
                         features={record as ProductFeatureSectionRecord}
                         material={data.product!.material as MaterialRecord}
+                        interfaceStrings={
+                          data.generalInterface as GeneralInterfaceRecord
+                        }
                         lng={lng}
                       />
                     );
@@ -90,11 +94,16 @@ const Product = ({ data, lng }: Props) => {
       <FeaturedProducts
         products={data.product.relatedProducts as ProductRecord[]}
         lng={lng}
+        sale={data.generalInterface?.sale}
+        currencySymbol={data.generalInterface?.currencySymbol}
       />
       <Reviews
         reviews={data.product.featuredReviews as Array<FeaturedReviewRecord>}
         reviewNumber={data.product.numberOfReviews}
         reviewAverage={data.product.reviewAverage}
+        reviewsString={data.generalInterface?.reviews}
+        reviewButton={data.generalInterface?.reviewButton}
+        lng={lng}
       />
     </div>
   );

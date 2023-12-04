@@ -26,7 +26,7 @@ const ProductShowcase = ({
 }: PropTypes) => {
   return (
     <section>
-      <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8  mx-auto">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-stretch">
           <div className="grid place-content-center rounded bg-primary/20 p-6 sm:p-8">
             <div className="mx-auto max-w-md text-center lg:text-left">

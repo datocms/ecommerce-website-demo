@@ -26,7 +26,7 @@ const SvgRenderer = ({ url }: Props) => {
 
   return (
     <div
-      className="fill-current [&>*]:text-primary"
+      className="fill-current [&>*]:text-gray-400"
       dangerouslySetInnerHTML={{ __html: svgContent }}
     />
   );

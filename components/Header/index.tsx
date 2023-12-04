@@ -49,7 +49,7 @@ const Header = ({ lng, data }: Props) => {
         />
       )}
 
-      <CategoryHeader lng={lng} languages={data._site.locales} />
+      <CategoryHeader lng={lng} languages={data._site.locales} data={data} />
 
       {/* <header
         className={`header left-0 z-40 flex w-full items-center bg-transparent ${

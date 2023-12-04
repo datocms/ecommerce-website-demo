@@ -7,6 +7,7 @@ import {
   BrandRecord,
   CollectionModelDescriptionField,
   CollectionRecord,
+  GeneralInterfaceRecord,
   ImageFileField,
   InitialParamsDocument,
   MaterialModelDescriptionField,
@@ -116,7 +117,7 @@ export default async function Products({
     <>
       {singleFilter && (
         <FilterDetail
-          type={singleFilter._modelApiKey}
+          type={(data.generalInterface as any)[singleFilter._modelApiKey]}
           name={singleFilter.name}
           subtitle={singleFilter.subtitle ?? ''}
           description={
@@ -129,7 +130,12 @@ export default async function Products({
           image={singleFilter.image as ImageFileField}
         />
       )}
-      <div className="mx-auto grid max-w-7xl grid-cols-5 border-t-2 bg-white pt-8">
+      <div
+        className={
+          'mx-auto grid max-w-7xl grid-cols-5 bg-white pt-8' +
+          (singleFilter ? ' border-t-2' : '')
+        }
+      >
         <div className="col-span-1 ml-4 p-4">
           <SideFilter
             collections={initialParams.allCollections as CollectionRecord[]}
@@ -138,6 +144,7 @@ export default async function Products({
             paramaterCollections={collections}
             parameterBrands={brands}
             parameterMaterials={materials}
+            generalInterface={data.generalInterface as GeneralInterfaceRecord}
           />
         </div>
         <div className="col-span-4 bg-white">
@@ -167,12 +174,12 @@ export default async function Products({
 
                       {isOnSale && (
                         <span className="absolute left-0 top-3 rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
-                          SALE
+                          {data.generalInterface?.sale}
                         </span>
                       )}
                     </Link>
 
-                    <div className="flex h-24 items-center justify-between gap-2 rounded-b-lg bg-primary/10 p-4">
+                    <div className="ml-2 flex h-24 items-center justify-between gap-2 overflow-hidden rounded-b-lg bg-primary/10 p-4">
                       <div className="flex flex-col justify-center">
                         <a
                           href="#"
@@ -186,12 +193,14 @@ export default async function Products({
                       </div>
 
                       {isOnSale && (
-                        <div className="flex items-end gap-2">
+                        <div className="flex flex-col items-end gap-2">
                           <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            ${product.salePrice}
+                            {data.generalInterface?.currencySymbol}
+                            {product.salePrice}
                           </span>
                           <span className="mb-0.5 text-red-500 line-through">
-                            ${product.price}
+                            {data.generalInterface?.currencySymbol}
+                            {product.price}
                           </span>
                         </div>
                       )}
@@ -199,7 +208,8 @@ export default async function Products({
                       {!isOnSale && (
                         <div className="flex items-end gap-2">
                           <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            ${product.price}
+                            {data.generalInterface?.currencySymbol}
+                            {product.price}
                           </span>
                         </div>
                       )}

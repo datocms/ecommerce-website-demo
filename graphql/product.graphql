@@ -17,7 +17,7 @@ query Product(
     featuredReviews {
       id
       reviewerName
-			reviewDate
+      reviewDate
       reviewScore
       review
     }
@@ -63,6 +63,7 @@ query Product(
     }
     brand {
       name
+      id
     }
     productVariations {
       id
@@ -88,6 +89,23 @@ query Product(
         }
       }
     }
+  }
+  generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+    currencySymbol
+    weather
+    style
+    size
+    shippingText
+    secondaryButton
+    sale
+    reviews
+    reviewButton
+    primaryButton
+    priceUndertext
+    occasions
+    more
+    materials
+    color
   }
 }
 

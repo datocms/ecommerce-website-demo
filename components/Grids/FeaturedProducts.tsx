@@ -1,13 +1,21 @@
 import { ProductRecord, SiteLocale } from '@/graphql/generated';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import Link from 'next/link';
 import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {
   products: ProductRecord[];
   lng: SiteLocale;
+  currencySymbol: Maybe<string>;
+  sale: Maybe<string>;
 };
 
-const FeaturedProducts = ({ products, lng }: PropTypes) => {
+const FeaturedProducts = ({
+  products,
+  lng,
+  currencySymbol,
+  sale,
+}: PropTypes) => {
   return (
     <>
       <div className="bg-white py-6 sm:py-8 lg:mx-56 lg:py-12">
@@ -37,7 +45,7 @@ const FeaturedProducts = ({ products, lng }: PropTypes) => {
                     {isOnSale && (
                       <div className="absolute bottom-2 left-0 flex gap-2">
                         <span className="rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
-                          SALE
+                          {sale}
                         </span>
                       </div>
                     )}
@@ -52,17 +60,19 @@ const FeaturedProducts = ({ products, lng }: PropTypes) => {
                         {product.name}
                       </a>
                       <span className="text-gray-500">
-                        by {product.brand?.name}
+                        {product.brand?.name}
                       </span>
                     </div>
 
                     <div className="flex flex-col items-end">
                       <span className="font-bold text-gray-600 lg:text-lg">
-                        ${isOnSale ? product.salePrice : product.price}
+                        {currencySymbol}
+                        {isOnSale ? product.salePrice : product.price}
                       </span>
                       {isOnSale && (
                         <span className="text-sm text-red-500 line-through">
-                          ${product.price}
+                          {currencySymbol}
+                          {product.price}
                         </span>
                       )}
                     </div>

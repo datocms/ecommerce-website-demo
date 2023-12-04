@@ -9,9 +9,129 @@ query Menu($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
     notification {
       value
     }
+    menu {
+      ... on DropdownMenuRecord {
+        id
+        label
+        _modelApiKey
+        column {
+          label
+          id
+          item {
+            ... on ProductRecord {
+              slug
+              _modelApiKey
+              id
+              name
+            }
+            ... on MaterialRecord {
+              slug
+              id
+              _modelApiKey
+              name
+            }
+            ... on CollectionRecord {
+              slug
+              id
+              _modelApiKey
+              name
+            }
+            ... on BrandRecord {
+              slug
+              id
+              _modelApiKey
+              name
+            }
+          }
+        }
+        trending {
+          ... on MaterialRecord {
+            id
+            name
+            slug
+            _modelApiKey
+            image {
+              responsiveImage {
+                ...DatoImage_responsiveImage
+              }
+            }
+          }
+          ... on CollectionRecord {
+            id
+            name
+            slug
+            _modelApiKey
+            image {
+              responsiveImage {
+                ...DatoImage_responsiveImage
+              }
+            }
+          }
+          ... on BrandRecord {
+            id
+            name
+            slug
+            _modelApiKey
+            image {
+              responsiveImage {
+                ...DatoImage_responsiveImage
+              }
+            }
+          }
+        }
+        newArrival {
+          ... on MaterialRecord {
+            id
+            name
+            slug
+            _modelApiKey
+            image {
+              responsiveImage {
+                ...DatoImage_responsiveImage
+              }
+            }
+          }
+          ... on CollectionRecord {
+            id
+            name
+            slug
+            _modelApiKey
+            image {
+              responsiveImage {
+                ...DatoImage_responsiveImage
+              }
+            }
+          }
+          ... on BrandRecord {
+            id
+            name
+            slug
+            _modelApiKey
+            image {
+              responsiveImage {
+                ...DatoImage_responsiveImage
+              }
+            }
+          }
+        }
+      }
+
+      ... on LinkItemRecord {
+        id
+        label
+        slug
+        _modelApiKey
+      }
+    }
   }
   _site {
     locales
+  }
+  generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+    currencySymbol
+    trending
+    new
+    shopNow
   }
 }
 

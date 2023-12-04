@@ -1,17 +1,4 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/aspect-ratio'),
-    ],
-  }
-  ```
-*/
+import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
 import { Fragment, useState } from 'react';
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react';
 import {
@@ -20,15 +7,23 @@ import {
   ShoppingBagIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { SiteLocale } from '@/graphql/generated';
+import {
+  DropdownMenuRecord,
+  LinkItemRecord,
+  MenuQuery,
+  SiteLocale,
+} from '@/graphql/generated';
 import LanguageSelector from './LanguageSelector';
+import Link from 'next/link';
 
 type PropTypes = {
   lng: SiteLocale;
   languages: SiteLocale[];
+  data: MenuQuery;
 };
 
 const navigation = {
+  //TODO: fix mobile
   categories: [
     {
       id: 'collections',
@@ -162,8 +157,16 @@ function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function CategoryHeader({ lng, languages }: PropTypes) {
+export default function CategoryHeader({ lng, languages, data }: PropTypes) {
   const [open, setOpen] = useState(false);
+
+  const links = data.layout?.menu.filter(
+    (item) => item._modelApiKey === 'link_item'
+  ) as LinkItemRecord[];
+
+  const categories = data.layout?.menu.filter(
+    (item) => item._modelApiKey === 'dropdown_menu'
+  ) as DropdownMenuRecord[];
 
   return (
     <div className={'bg-white'}>
@@ -305,7 +308,7 @@ export default function CategoryHeader({ lng, languages }: PropTypes) {
                   ))}
                 </div>
 
-                <div className="space-y-6 border-t border-gray-200 px-4 py-6">
+                {/* <div className="space-y-6 border-t border-gray-200 px-4 py-6">
                   <div className="flow-root">
                     <a
                       href="#"
@@ -322,7 +325,7 @@ export default function CategoryHeader({ lng, languages }: PropTypes) {
                       Create account
                     </a>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="border-t border-gray-200 px-4 py-6">
                   <a href="#" className="-m-2 flex items-center p-2">
@@ -361,23 +364,24 @@ export default function CategoryHeader({ lng, languages }: PropTypes) {
               </button>
 
               {/* Logo */}
-              <div className="ml-4 flex lg:ml-0">
-                <a href="#">
-                  <span className="sr-only">Your Company</span>
-                  <img
-                    className="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                    alt=""
-                  />
-                </a>
-              </div>
+              <Link
+                href={`/${lng}/`}
+                className="relative -m-2 ml-4 flex w-12 lg:ml-0"
+              >
+                <DatoImage
+                  data={
+                    data.layout?.logo.responsiveImage as ResponsiveImageType
+                  }
+                  className="object-contain"
+                />
+              </Link>
 
               {/* Flyout menus */}
               <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch">
                 <div className="flex h-full space-x-8">
-                  {navigation.categories.map((category) => (
-                    <Popover key={category.name} className="flex">
-                      {({ open }) => (
+                  {categories?.map((category) => (
+                    <Popover key={category.label} className="flex">
+                      {({ open, close }) => (
                         <>
                           <div className="relative flex">
                             <Popover.Button
@@ -388,7 +392,7 @@ export default function CategoryHeader({ lng, languages }: PropTypes) {
                                 'relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out'
                               )}
                             >
-                              {category.name}
+                              {category.label}
                             </Popover.Button>
                           </div>
 
@@ -412,62 +416,104 @@ export default function CategoryHeader({ lng, languages }: PropTypes) {
                                 <div className="mx-auto max-w-7xl px-8">
                                   <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-16">
                                     <div className="col-start-2 grid grid-cols-2 gap-x-8">
-                                      {category.featured.map((item) => (
-                                        <div
-                                          key={item.name}
-                                          className="group relative text-base sm:text-sm"
-                                        >
-                                          <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                            <img
-                                              src={item.imageSrc}
-                                              alt={item.imageAlt}
-                                              className="object-cover object-center"
-                                            />
-                                          </div>
-                                          <a
-                                            href={item.href}
-                                            className="mt-6 block font-medium text-gray-900"
-                                          >
-                                            <span
-                                              className="absolute inset-0 z-10"
-                                              aria-hidden="true"
-                                            />
-                                            {item.name}
-                                          </a>
-                                          <p
-                                            aria-hidden="true"
-                                            className="mt-1"
-                                          >
-                                            Shop now
-                                          </p>
+                                      <Link
+                                        onClick={close}
+                                        href={`/${lng}/products?${category.newArrival._modelApiKey}s=${category.newArrival.id}`}
+                                        className="group relative text-base sm:text-sm"
+                                      >
+                                        <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                          <DatoImage
+                                            data={
+                                              category.newArrival.image
+                                                .responsiveImage as ResponsiveImageType
+                                            }
+                                            className="h-full w-full object-contain"
+                                            layout="fill"
+                                            objectFit="cover"
+                                            objectPosition="50% 50%"
+                                          />
                                         </div>
-                                      ))}
+                                        <p
+                                          aria-hidden="true"
+                                          className="text-md mt-6 font-bold text-primary/80"
+                                        >
+                                          {data.generalInterface?.trending}
+                                        </p>
+                                        <a
+                                          href={'item.href'} //change
+                                          className="6 mt-1 block font-medium text-gray-900"
+                                        >
+                                          <span
+                                            className="absolute inset-0 z-10"
+                                            aria-hidden="true"
+                                          />
+                                          {category.newArrival?.name}
+                                        </a>
+                                        <p aria-hidden="true" className="mt-1">
+                                          {data.generalInterface?.shopNow}
+                                        </p>
+                                      </Link>
+                                      <Link
+                                        onClick={close}
+                                        href={`/${lng}/products?${category.trending._modelApiKey}s=${category.trending.id}`}
+                                        className="group relative text-base sm:text-sm"
+                                      >
+                                        <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                          <DatoImage
+                                            data={
+                                              category.trending.image
+                                                .responsiveImage as ResponsiveImageType
+                                            }
+                                            className="h-full w-full object-contain"
+                                            layout="fill"
+                                            objectFit="cover"
+                                            objectPosition="50% 50%"
+                                          />
+                                        </div>
+                                        <p
+                                          aria-hidden="true"
+                                          className="text-md mt-6 font-bold text-primary/80"
+                                        >
+                                          {data.generalInterface?.new}
+                                        </p>
+                                        <div className="mt-1 block font-medium text-gray-900">
+                                          <span
+                                            className="absolute inset-0 z-10"
+                                            aria-hidden="true"
+                                          />
+                                          {category.trending?.name}
+                                        </div>
+                                        <p aria-hidden="true" className="mt-1">
+                                          {data.generalInterface?.shopNow}
+                                        </p>
+                                      </Link>
                                     </div>
                                     <div className="row-start-1 grid grid-cols-3 gap-x-8 gap-y-10 text-sm">
-                                      {category.sections.map((section) => (
-                                        <div key={section.name}>
+                                      {category.column.map((section) => (
+                                        <div key={section.label}>
                                           <p
-                                            id={`${section.name}-heading`}
+                                            id={`${section.label}-heading`}
                                             className="font-medium text-gray-900"
                                           >
-                                            {section.name}
+                                            {section.label}
                                           </p>
                                           <ul
                                             role="list"
-                                            aria-labelledby={`${section.name}-heading`}
+                                            aria-labelledby={`${section.label}-heading`}
                                             className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
                                           >
-                                            {section.items.map((item) => (
+                                            {section.item.map((item) => (
                                               <li
                                                 key={item.name}
                                                 className="flex"
                                               >
-                                                <a
-                                                  href={item.href}
+                                                <Link
+                                                  href={`/${lng}/products?${item._modelApiKey}s=${item.id}`}
                                                   className="hover:text-gray-800"
+                                                  onClick={close}
                                                 >
                                                   {item.name}
-                                                </a>
+                                                </Link>
                                               </li>
                                             ))}
                                           </ul>
@@ -484,20 +530,20 @@ export default function CategoryHeader({ lng, languages }: PropTypes) {
                     </Popover>
                   ))}
 
-                  {navigation.pages.map((page) => (
-                    <a
-                      key={page.name}
-                      href={page.href}
+                  {links?.map((link) => (
+                    <Link
+                      key={link.label}
+                      href={`/${lng}/${link.slug}`}
                       className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800"
                     >
-                      {page.name}
-                    </a>
+                      {link.label}
+                    </Link>
                   ))}
                 </div>
               </Popover.Group>
 
               <div className="ml-auto flex items-center">
-                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
+                {/* <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
                   <a
                     href="#"
                     className="text-sm font-medium text-gray-700 hover:text-gray-800"
@@ -511,10 +557,14 @@ export default function CategoryHeader({ lng, languages }: PropTypes) {
                   >
                     Create account
                   </a>
-                </div>
+                </div> */}
 
                 <div className="hidden lg:ml-8 lg:flex">
-                  <LanguageSelector lng={lng} languages={languages} />
+                  <LanguageSelector
+                    lng={lng}
+                    languages={languages}
+                    currencySymbol={data.generalInterface?.currencySymbol}
+                  />
 
                   {/* <a
                     href="#"

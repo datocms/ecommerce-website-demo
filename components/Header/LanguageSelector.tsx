@@ -2,20 +2,23 @@
 
 import { SiteLocale } from '@/graphql/generated';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 import { getLangNameFromCode } from 'language-name-map';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 type Props = {
   lng: SiteLocale;
   languages: SiteLocale[];
+  currencySymbol: Maybe<string>;
 };
 
-const LanguageSelector = ({ lng, languages }: Props) => {
+const LanguageSelector = ({ lng, languages, currencySymbol }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const pathArray = pathname.split('/');
   const currentLocale = pathArray[1] as SiteLocale; //will be a SiteLocale because of the middleware redirect rules
+  const searchParams = useSearchParams()!;
 
   const pathString = pathArray.splice(2, pathArray.length).join('/');
 
@@ -30,10 +33,10 @@ const LanguageSelector = ({ lng, languages }: Props) => {
             setIsOpen(false);
           }, 100)
         }
-        className="ml-4 inline-flex w-28 items-center overflow-hidden rounded-md bg-white transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300"
+        className="ml-4 inline-flex w-full items-center overflow-hidden rounded-md bg-white transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300"
       >
-        <button className="inline-flex text-center w-full cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-gray-800">
-          {getLangNameFromCode(currentLocale)?.name || currentLocale}
+        <button className="inline-flex w-full cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-center text-sm font-medium text-gray-800">
+          {getLangNameFromCode(currentLocale)?.name || currentLocale} ({currencySymbol})
         </button>
       </div>
 
@@ -48,14 +51,21 @@ const LanguageSelector = ({ lng, languages }: Props) => {
           return (
             <div
               key={locale}
-              className="inline-flex text-center w-full cursor-pointer items-end justify-start rounded-lg text-sm font-medium text-gray-900 hover:bg-gray-100"
+              className="inline-flex w-full cursor-pointer items-end justify-start rounded-lg text-center text-sm font-medium text-gray-900 hover:bg-gray-100"
             >
               <Link
-                href={'/' + locale + '/' + pathString}
-                className="block text-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
+                href={
+                  '/' +
+                  locale +
+                  '/' +
+                  pathString +
+                  '?' +
+                  searchParams.toString()
+                }
+                className="block w-full px-4 py-2 text-center text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
               >
-                <div className="text-center w-full">
+                <div className="w-full text-center">
                   {getLangNameFromCode(locale)?.name || currentLocale}
                 </div>
               </Link>
@@ -68,8 +78,3 @@ const LanguageSelector = ({ lng, languages }: Props) => {
 };
 
 export default LanguageSelector;
-
-//if the current dir is /posts/ or /legal/
-//if the current page has a slug
-//try to fetch the slug in the new locale, if it doesn't return any, redirect the user to a 404
-//if it does return one, redirect the user to it

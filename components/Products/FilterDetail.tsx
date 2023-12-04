@@ -1,6 +1,7 @@
 import {
   BrandModelDescriptionField,
   CollectionModelDescriptionField,
+  GeneralInterfaceRecord,
   ImageFileField,
   MaterialModelDescriptionField,
 } from '@/graphql/generated';
@@ -27,7 +28,7 @@ import Highlighter from '../Common/Highlighter';
 type PropTypes = {
   name: string;
   subtitle: string;
-  type: string;
+  type: Maybe<string>;
   image: ImageFileField;
   description: Maybe<
     | CollectionModelDescriptionField
@@ -44,7 +45,7 @@ const FilterDetail = ({
   subtitle,
 }: PropTypes) => {
   return (
-    <div className="relative isolate overflow-hidden bg-white px-6 py-16 lg:overflow-visible lg:px-0">
+    <div className="relative isolate mx-auto max-w-7xl overflow-hidden bg-white px-6 py-16 lg:overflow-visible lg:px-0">
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <svg
           className="absolute left-[max(50%,25rem)] top-0 h-[64rem] w-[128rem] -translate-x-1/2 stroke-gray-200 [mask-image:radial-gradient(64rem_64rem_at_top,white,transparent)]"
@@ -80,7 +81,7 @@ const FilterDetail = ({
         <div className="mb-8 w-full lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-16">
           <div className="lg:pr-4">
             <p className="text-base font-semibold leading-7 text-primary">
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+              {type}
             </p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               {name}

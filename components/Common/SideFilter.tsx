@@ -3,18 +3,12 @@
 import {
   BrandRecord,
   CollectionRecord,
+  GeneralInterfaceRecord,
   MaterialRecord,
 } from '@/graphql/generated';
 import { Disclosure } from '@headlessui/react';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useRouter, useSearchParams } from 'next/navigation';
-
-const sortOptions = [
-  { label: 'New Arrivals', value: '_publishedAt_DESC' },
-  { label: 'Most Popular', value: 'numberOfReviews_DESC' },
-  { label: 'Top Rated', value: 'reviewAverage_DESC' },
-  { label: 'Price', value: 'price_DESC' },
-];
 
 type PropTypes = {
   collections: CollectionRecord[];
@@ -23,6 +17,7 @@ type PropTypes = {
   paramaterCollections: String[];
   parameterBrands: String[];
   parameterMaterials: String[];
+  generalInterface: GeneralInterfaceRecord;
 };
 
 const SideFilter = ({
@@ -32,6 +27,7 @@ const SideFilter = ({
   paramaterCollections,
   parameterBrands,
   parameterMaterials,
+  generalInterface,
 }: PropTypes) => {
   const router = useRouter();
   const searchParams = useSearchParams()!;
@@ -48,25 +44,32 @@ const SideFilter = ({
   const filters = [
     {
       id: 'collections',
-      name: 'Collections',
+      name: generalInterface.collection,
       options: collections.map((collection) => {
         return { id: collection.id, name: collection.name, checked: true };
       }),
     },
     {
       id: 'materials',
-      name: 'Materials',
+      name: generalInterface.material,
       options: materials.map((material) => {
         return { id: material.id, name: material.name, checked: true };
       }),
     },
     {
       id: 'brands',
-      name: 'Brands',
+      name: generalInterface.brand,
       options: brands.map((brands) => {
         return { id: brands.id, name: brands.name, checked: true };
       }),
     },
+  ];
+
+  const sortOptions = [
+    { label: generalInterface.newArrivals, value: '_publishedAt_DESC' },
+    { label: generalInterface.mostPopular, value: 'numberOfReviews_DESC' },
+    { label: generalInterface.topRated, value: 'reviewAverage_DESC' },
+    { label: generalInterface.price, value: 'price_DESC' },
   ];
 
   function exportQueryParameters(key: string, value: string) {

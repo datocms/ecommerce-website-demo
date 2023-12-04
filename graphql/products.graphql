@@ -41,6 +41,17 @@ query Products(
   ) {
     count
   }
+  generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+    currencySymbol
+    sale
+    newArrivals
+    mostPopular
+    topRated
+    price
+    collection
+    material
+    brand
+  }
 }
 
 fragment DatoImage_responsiveImage on ResponsiveImage {

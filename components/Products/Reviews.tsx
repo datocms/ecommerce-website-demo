@@ -1,17 +1,13 @@
-import {
-  FeaturedReviewRecord,
-  Maybe,
-  ProductQuery,
-  SiteLocale,
-} from '@/graphql/generated';
-import { notFound } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
+import { FeaturedReviewRecord, SiteLocale } from '@/graphql/generated';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 type PropTypes = {
   reviews: Array<FeaturedReviewRecord>;
   reviewNumber: number;
   reviewAverage: number;
+  reviewsString: Maybe<string>;
+  reviewButton: Maybe<string>;
+  lng: SiteLocale;
 };
 
 import React, { FC } from 'react';
@@ -54,7 +50,14 @@ const StarRating: FC<StarRatingProps> = ({ rating }) => {
   );
 };
 
-const Reviews = ({ reviews, reviewNumber, reviewAverage }: PropTypes) => {
+const Reviews = ({
+  reviews,
+  reviewNumber,
+  reviewAverage,
+  lng,
+  reviewsString,
+  reviewButton,
+}: PropTypes) => {
   return (
     <div className="bg-white py-6 sm:py-8 lg:py-12">
       <div className="mx-auto max-w-screen-md px-4 md:px-8">
@@ -76,7 +79,7 @@ const Reviews = ({ reviews, reviewNumber, reviewAverage }: PropTypes) => {
             </div>
 
             <span className="block text-sm text-gray-500">
-              {reviewNumber} reviews
+              {reviewNumber} {reviewsString}
             </span>
           </div>
 
@@ -84,14 +87,14 @@ const Reviews = ({ reviews, reviewNumber, reviewAverage }: PropTypes) => {
             href="#"
             className="inline-block rounded-lg border bg-white px-4 py-2 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base"
           >
-            Review
+            {reviewButton}
           </a>
         </div>
 
         <div className="divide-y">
           {reviews.map((review) => {
             const date = new Date(review.reviewDate);
-            const formattedDate = new Intl.DateTimeFormat('en-US', {
+            const formattedDate = new Intl.DateTimeFormat(lng, {
               year: 'numeric',
               month: 'long',
               day: 'numeric',

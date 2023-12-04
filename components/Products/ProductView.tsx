@@ -1,6 +1,7 @@
 'use client';
 
 import { ProductQuery, SiteLocale } from '@/graphql/generated';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
@@ -32,7 +33,7 @@ const ProductView = ({ data, lng }: Props) => {
   return (
     <div className="flex w-full items-center justify-center">
       <div className="flex w-full justify-center bg-white py-6 sm:py-8 lg:py-12">
-        <div className="mx-8 w-full md:ml-20 lg:ml-56 max-w-[1080px]">
+        <div className="mx-8 w-full max-w-[1080px] md:ml-20 lg:ml-56">
           <div className="grid w-full items-center gap-8 md:ml-4 md:grid-cols-2">
             <div className="grid flex-shrink-0 gap-4 lg:h-full lg:grid-cols-5">
               <div className="order-last flex gap-4 lg:order-none lg:flex-col">
@@ -86,7 +87,7 @@ const ProductView = ({ data, lng }: Props) => {
 
                 {isOnSale && (
                   <span className="absolute left-0 top-0 rounded-br-lg bg-red-500 px-3 py-1.5 text-sm uppercase tracking-wider text-white">
-                    sale
+                    {data.generalInterface?.sale}
                   </span>
                 )}
 
@@ -112,11 +113,11 @@ const ProductView = ({ data, lng }: Props) => {
               </div>
             </div>
 
-            <div className="w-80 md:py-8">
+            <div className="w-80">
               <div className="mb-2 md:mb-3">
-                <span className="mb-0.5 inline-block text-gray-500">
+                <Link href={`/${lng}/products?brands=${data.product.brand.id}`} className="mb-0.5 inline-block text-gray-500 cursor-pointer hover:underline">
                   {data.product.brand?.name}
-                </span>
+                </Link>
                 <h2 className="text-2xl font-bold text-gray-800 lg:text-3xl">
                   {data.product.name}
                 </h2>
@@ -137,13 +138,14 @@ const ProductView = ({ data, lng }: Props) => {
                 </div>
 
                 <span className="text-sm text-gray-500 transition duration-100">
-                  {data.product.numberOfReviews} reviews
+                  {data.product.numberOfReviews}{' '}
+                  {data.generalInterface?.reviews}
                 </span>
               </div>
 
               <div className="mb-4 md:mb-6">
                 <span className="mb-3 inline-block text-sm font-semibold text-gray-500 md:text-base">
-                  Color
+                  {data.generalInterface?.color}
                 </span>
 
                 <div className="flex flex-wrap gap-2">
@@ -173,7 +175,7 @@ const ProductView = ({ data, lng }: Props) => {
 
               <div className="mb-8 md:mb-10">
                 <span className="mb-3 inline-block text-sm font-semibold text-gray-500 md:text-base">
-                  Size
+                  {data.generalInterface?.size}
                 </span>
 
                 <div className="flex flex-wrap gap-3">
@@ -223,10 +225,12 @@ const ProductView = ({ data, lng }: Props) => {
                 {isOnSale && (
                   <div className="flex items-end gap-2">
                     <span className="text-xl font-bold text-gray-800 md:text-2xl">
-                      ${data.product.salePrice}
+                      {data.generalInterface?.currencySymbol}{' '}
+                      {data.product.salePrice}
                     </span>
                     <span className="mb-0.5 text-red-500 line-through">
-                      ${data.product.price}
+                      {data.generalInterface?.currencySymbol}{' '}
+                      {data.product.price}
                     </span>
                   </div>
                 )}
@@ -234,13 +238,14 @@ const ProductView = ({ data, lng }: Props) => {
                 {!isOnSale && (
                   <div className="flex items-end gap-2">
                     <span className="text-xl font-bold text-gray-800 md:text-2xl">
-                      ${data.product.price}
+                      {data.generalInterface?.currencySymbol}{' '}
+                      {data.product.price}
                     </span>
                   </div>
                 )}
 
                 <span className="text-sm text-gray-500">
-                  incl. VAT plus shipping
+                  {data.generalInterface?.priceUndertext}
                 </span>
               </div>
 
@@ -261,22 +266,24 @@ const ProductView = ({ data, lng }: Props) => {
                   />
                 </svg>
 
-                <span className="text-sm">2-4 day shipping</span>
+                <span className="text-sm">
+                  {data.generalInterface?.shippingText}
+                </span>
               </div>
 
-              <div className="flex gap-2.5">
+              <div className="flex flex-col gap-2.5 w-[90%]">
                 <a
                   href="#"
                   className="inline-block flex-1 rounded-lg bg-primary/90 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary/40 transition duration-100 hover:bg-primary focus-visible:ring active:bg-primary/50 sm:flex-none md:text-base"
                 >
-                  Add to cart
+                  {data.generalInterface?.primaryButton}
                 </a>
 
                 <a
                   href="#"
                   className="inline-block rounded-lg bg-gray-200 px-8 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-300 focus-visible:ring active:text-gray-700 md:text-base"
                 >
-                  Buy now
+                  {data.generalInterface?.secondaryButton}
                 </a>
               </div>
             </div>

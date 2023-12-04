@@ -28,6 +28,10 @@ export default function Section({ sections, locale }: Props) {
                     heroSubtitle={heroSectionRecord.heroSubtitle}
                     image={heroSectionRecord.heroImage}
                     additionalImage={heroSectionRecord.additionalImage}
+                    socialsLabel={heroSectionRecord.socialLabel ?? 'SOCIALS'}
+                    collections={heroSectionRecord.featuredCollections}
+                    lng={locale}
+                    socials={heroSectionRecord.socials}
                   />
                 );
             }

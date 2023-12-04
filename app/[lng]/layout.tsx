@@ -33,9 +33,9 @@ export default async function RootLayout({
     <>
       <HeaderRenderer lng={lng} isDraft={isEnabled} />
       <CustomColor
-        r={data.layout?.mainColor.red || 74}
-        g={data.layout?.mainColor.green || 247}
-        b={data.layout?.mainColor.blue || 108}
+        r={data.layout?.mainColor.red || 135}
+        g={data.layout?.mainColor.green || 235}
+        b={data.layout?.mainColor.blue || 206}
       />
       {children}
       <Footer lng={lng} />

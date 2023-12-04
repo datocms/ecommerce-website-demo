@@ -75,6 +75,7 @@ const Hero = ({
                 <Link
                   href={`/${lng}/products?collections=${collection.id}`}
                   className="flex w-1/3 items-center justify-center text-gray-500 transition duration-100 hover:bg-gray-100 active:bg-gray-200"
+                  key={collection.id}
                 >
                   {collection.name}
                 </Link>
@@ -92,6 +93,7 @@ const Hero = ({
                   <Link
                     className="text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600"
                     href={social.url}
+                    key={social.id}
                   >
                     <SvgRenderer url={social.icon.url} />
                   </Link>

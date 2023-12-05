@@ -58,7 +58,7 @@ const PopUpBanner = ({ setPopUp, popup, lng }: PropTypes) => {
               onClick={() => {
                 setPopUp(false);
               }}
-              className="mt-8 inline-block w-full bg-black py-4 text-sm font-bold uppercase tracking-widest text-white"
+              className="mt-8 inline-block w-full bg-primary py-4 text-sm font-bold uppercase tracking-widest text-white"
               href={`/${lng}/${popup.button[0].slug}`}
             >
               {popup.button[0].label}

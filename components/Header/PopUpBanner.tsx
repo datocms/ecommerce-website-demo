@@ -26,7 +26,7 @@ const PopUpBanner = ({ setPopUp, popup, lng }: PropTypes) => {
       >
         <section
           onClick={(e) => e.stopPropagation()}
-          className="z-50 mx-auto my-auto w-3/4  overflow-hidden rounded-lg bg-white shadow-2xl md:grid md:grid-cols-3"
+          className="z-50 mx-auto my-auto w-3/4 2xl:w-3/5  overflow-hidden rounded-lg bg-white shadow-2xl md:grid md:grid-cols-3"
         >
           <div className="relative h-32 w-full object-cover md:h-full">
             <DatoImage

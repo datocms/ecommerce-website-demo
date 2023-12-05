@@ -70,6 +70,7 @@ const SideFilter = ({
     { label: generalInterface.mostPopular, value: 'numberOfReviews_DESC' },
     { label: generalInterface.topRated, value: 'reviewAverage_DESC' },
     { label: generalInterface.price, value: 'price_DESC' },
+    { label: generalInterface.sales, value: 'sale_DESC' }
   ];
 
   function exportQueryParameters(key: string, value: string) {

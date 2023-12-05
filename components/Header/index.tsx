@@ -5,14 +5,18 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import LanguageSelector from './LanguageSelector';
 import {
+  CookieNoticeRecord,
   LayoutModelNotificationField,
   MenuQuery,
+  PopupRecord,
   SiteLocale,
 } from '@/graphql/generated';
 import NotificationStrip from './NotificationStrip';
 import { Menu } from './HeaderRenderer';
 import { isEmptyDocument } from 'datocms-structured-text-utils';
 import CategoryHeader from './CategoryHeader';
+import PopUpBanner from './PopUpBanner';
+import CookiesNotice from './CookiesNotice';
 
 type Props = {
   lng: SiteLocale;
@@ -27,18 +31,27 @@ const Header = ({ lng, data }: Props) => {
     !isEmptyDocument(data.layout?.notification)
   );
 
-  // submenu handler
-  const [openIndex, setOpenIndex] = useState(-1);
-  const handleSubmenu = (index: number) => {
-    if (openIndex === index) {
-      setOpenIndex(-1);
-    } else {
-      setOpenIndex(index);
-    }
-  };
+  const [popUp, setPopUp] = useState(!!data.layout?.popup.length);
+
+  const [cookies, setCookies] = useState(!!data.layout?.cookieNotice.length);
 
   return (
     <>
+      {popUp && (
+        <PopUpBanner
+          lng={lng}
+          setPopUp={setPopUp}
+          popup={data.layout!.popup[0] as PopupRecord}
+        />
+      )}
+
+      {cookies && (
+        <CookiesNotice
+          cookieNotice={data.layout?.cookieNotice[0] as CookieNoticeRecord}
+          setCookies={setCookies}
+        />
+      )}
+
       {notificationStrip && (
         <NotificationStrip
           notification={

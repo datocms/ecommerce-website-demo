@@ -48,6 +48,7 @@ query Products(
     mostPopular
     topRated
     price
+    sales
     collection
     material
     brand

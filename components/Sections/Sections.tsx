@@ -1,11 +1,13 @@
 import Hero from '../Home/Hero';
 import {
   CollectionShowcaseRecord,
+  DividerSectionRecord,
   HeroSectionRecord,
   SiteLocale,
 } from '@/graphql/generated';
 import ProductShowcase from '../Showcases/ProductShowcase';
 import CollectionShowcaseLargeImage from '../Showcases/CollectionShowcaseLargeImage';
+import DividerSection from './DividerSection';
 
 type Props = {
   sections: any;
@@ -38,30 +40,18 @@ export default function Section({ sections, locale }: Props) {
           case 'collection_showcase':
             const collectionShowcaseSectionRecord =
               section as CollectionShowcaseRecord;
-            switch (collectionShowcaseSectionRecord.displayVariation) {
-              case 'minimal_cards':
-                return (
-                  <ProductShowcase
-                    title={collectionShowcaseSectionRecord.heading}
-                    subtitle={collectionShowcaseSectionRecord.subheading}
-                    buttonLabel={collectionShowcaseSectionRecord.buttonLabel}
-                    buttonURL={collectionShowcaseSectionRecord.buttonUrl}
-                    products={collectionShowcaseSectionRecord.featuredProducts}
-                    lng={locale}
-                  />
-                );
-              default:
-                return (
-                  <CollectionShowcaseLargeImage
-                    title={collectionShowcaseSectionRecord.heading}
-                    subtitle={collectionShowcaseSectionRecord.subheading}
-                    buttonLabel={collectionShowcaseSectionRecord.buttonLabel}
-                    buttonURL={collectionShowcaseSectionRecord.buttonUrl}
-                    products={collectionShowcaseSectionRecord.featuredProducts}
-                    lng={locale}
-                  />
-                );
-            }
+            return (
+              <ProductShowcase
+                collectionCards={collectionShowcaseSectionRecord.collectionCard}
+                lng={locale}
+              />
+            );
+
+          case 'divider_section':
+            const dividerSectionRecord = section as DividerSectionRecord;
+            return (
+              <DividerSection lng={locale} divider={dividerSectionRecord} />
+            );
 
           default:
             return <></>;

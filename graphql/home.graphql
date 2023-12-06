@@ -30,23 +30,31 @@ query Home($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
           name
         }
       }
-      
+
+      ... on DividerSectionRecord {
+        id
+        _modelApiKey
+        title
+        subtitle
+        preTitle
+        button {
+          label
+          slug
+        }
+      }
+
       ... on CollectionShowcaseRecord {
         id
         _modelApiKey
-        heading
-        subheading
-        buttonUrl
-        displayVariation
-        buttonLabel
-        featuredProducts {
+        collectionCard {
+          subtitle
+          title
           id
-          name
-          slug
-          price
-          productImages {
-            responsiveImage {
-              ...DatoImage_responsiveImage
+          collection {
+            image {
+              responsiveImage {
+                ...DatoImage_responsiveImage
+              }
             }
           }
         }

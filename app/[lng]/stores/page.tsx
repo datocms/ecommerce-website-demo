@@ -27,7 +27,14 @@ const Stores = async ({ params: { lng, slug } }: Params) => {
 
   if (!data.allStores.length) notFound();
 
-  return <StoreShowcase translationString={data.generalInterface?.findOnMaps} allStores={data.allStores as StoreRecord[]} />;
+  return (
+    <>
+    {!isEnabled && <StoreShowcase
+      translationString={data.generalInterface?.findOnMaps}
+      allStores={data.allStores as StoreRecord[]}
+    />}
+    </>
+  );
 };
 
 export default Stores;

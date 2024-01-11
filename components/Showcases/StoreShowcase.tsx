@@ -14,7 +14,7 @@ const StoreShowcase = ({ allStores, translationString }: PropTypes) => {
   const [currentStore, setCurrentStore] = useState(0);
 
   return (
-    <div className="-mb-8 -mt-24 flex w-full flex-wrap lg:h-screen lg:pt-24">
+    <div className="-mb-8 -mt-24 flex w-full flex-wrap lg:h-screen lg:pt-24 max-w-7xl mx-auto">
       <div className="flex h-screen w-full items-center justify-center lg:h-full lg:w-1/2">
         <div className="max-w-xl px-12 lg:px-32">
           <p className="mb-4 font-sans text-xs uppercase tracking-wide text-gray-600">
@@ -26,7 +26,7 @@ const StoreShowcase = ({ allStores, translationString }: PropTypes) => {
           </h1>
 
           <div className="">
-            <div className="mb-6 pr-6 text-xs leading-normal text-gray-900 md:pr-0 md:leading-loose">
+            <div className="mb-6 pr-6 text-xs leading-normal text-gray-900 md:pr-0 md:leading-loose h-64">
               {allStores[currentStore].storeDescription}
             </div>
 

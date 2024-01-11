@@ -1,0 +1,20 @@
+query Stores($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+  allStores(locale: $locale, fallbackLocales: $fallbackLocale) {
+    country
+    id
+    storeDescription
+    storeName
+    storeLocation {
+      latitude
+      longitude
+    }
+    storeImage {
+      responsiveImage {
+        src
+      }
+    }
+  }
+   generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+    findOnMaps
+  }
+}

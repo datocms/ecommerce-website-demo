@@ -23,7 +23,6 @@ export default async function RootLayout({
   children,
   params: { lng },
 }: Params) {
-  const { isEnabled } = draftMode();
 
   return <>{children}</>;
 }

@@ -1,0 +1,66 @@
+query Showcase($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+   generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+    currencySymbol
+  }
+  showcase(locale: $locale, fallbackLocales: $fallbackLocale) {
+    title
+    newProductsTitle
+    newProducts {
+      id
+      slug
+      sale
+      salePrice
+      name
+      productImages {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+        copyright
+      }
+      price
+    }
+    materialsTitle
+    materialsDisplay {
+      responsiveImage {
+        ...DatoImage_responsiveImage
+      }
+    }
+    materialsDescription
+    description
+    displays {
+      responsiveImage {
+        ...DatoImage_responsiveImage
+      }
+    }
+    cta {
+      id
+      label
+      slug
+    }
+    collections {
+      name
+      slug
+      id
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+      }
+    }
+    collectionsCta {
+      label
+      slug
+      id
+    }
+  }
+}
+
+fragment DatoImage_responsiveImage on ResponsiveImage {
+  src
+  srcSet
+  base64
+  width
+  height
+  alt
+  title
+}

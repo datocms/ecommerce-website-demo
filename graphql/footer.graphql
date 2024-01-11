@@ -1,19 +1,28 @@
 query Footer($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
   layout(locale: $locale, fallbackLocales: $fallbackLocale) {
-    footerSubtitle
-    footerLogo {
-      url
-      height
-      width
-    }
+    copyrightText
     socialMediaLinks {
-      url
-      name
       id
+      name
+      url
       icon {
         url
-        height
-        width
+      }
+    }
+    footerSubtitle
+    footerTitle
+    footerLogo {
+      responsiveImage {
+        src
+      }
+    }
+    footerColumns {
+      id
+      label
+      footerItem {
+        id
+        label
+        slug
       }
     }
   }

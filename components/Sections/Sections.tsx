@@ -1,13 +1,17 @@
 import Hero from '../Home/Hero';
 import {
-  CollectionShowcaseRecord,
+  CollectionCardShowcaseSectionRecord,
   DividerSectionRecord,
   HeroSectionRecord,
+  MaterialShowcaseSectionRecord,
   SiteLocale,
+  TestimonialSectionRecord,
 } from '@/graphql/generated';
 import ProductShowcase from '../Showcases/ProductShowcase';
 import CollectionShowcaseLargeImage from '../Showcases/CollectionShowcaseLargeImage';
 import DividerSection from './DividerSection';
+import TestimonialsSection from './TestimonialsSection';
+import MaterialShowcase from '../Showcases/MaterialShowcase';
 
 type Props = {
   sections: any;
@@ -37,12 +41,12 @@ export default function Section({ sections, locale }: Props) {
                   />
                 );
             }
-          case 'collection_showcase':
+          case 'collection_card_showcase_section':
             const collectionShowcaseSectionRecord =
-              section as CollectionShowcaseRecord;
+              section as CollectionCardShowcaseSectionRecord;
             return (
               <ProductShowcase
-                collectionCards={collectionShowcaseSectionRecord.collectionCard}
+                collectionCards={collectionShowcaseSectionRecord}
                 lng={locale}
               />
             );
@@ -51,6 +55,23 @@ export default function Section({ sections, locale }: Props) {
             const dividerSectionRecord = section as DividerSectionRecord;
             return (
               <DividerSection lng={locale} divider={dividerSectionRecord} />
+            );
+
+          case 'testimonial_section':
+            const testimonialSectionRecord =
+              section as TestimonialSectionRecord;
+            return (
+              <TestimonialsSection testimonials={testimonialSectionRecord} />
+            );
+
+          case 'material_showcase_section':
+            const materialShowcaseSection =
+              section as MaterialShowcaseSectionRecord;
+            return (
+              <MaterialShowcase
+                lng={locale}
+                materialSection={materialShowcaseSection}
+              />
             );
 
           default:

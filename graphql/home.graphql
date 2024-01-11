@@ -43,18 +43,53 @@ query Home($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
         }
       }
 
-      ... on CollectionShowcaseRecord {
+      ... on TestimonialSectionRecord {
         id
         _modelApiKey
-        collectionCard {
-          subtitle
-          title
+        title
+        testimonial {
           id
-          collection {
-            image {
-              responsiveImage {
-                ...DatoImage_responsiveImage
-              }
+          testimonial
+          author
+        }
+      }
+
+      ... on CollectionCardShowcaseSectionRecord {
+        id
+        _modelApiKey
+        title
+        pretitle
+        direction
+        button {
+          label
+          slug
+          id
+        }
+        collection {
+          name
+          slug
+          image {
+            responsiveImage {
+              ...DatoImage_responsiveImage
+            }
+            id
+          }
+        }
+        description
+      }
+      ... on MaterialShowcaseSectionRecord {
+        id
+        _modelApiKey
+        title
+        subDescription
+        description
+        materials {
+          id
+          name
+          slug
+          image {
+            responsiveImage {
+              ...DatoImage_responsiveImage
             }
           }
         }

@@ -155,7 +155,7 @@ export default async function Products({
                 return (
                   <div
                     key={product.id}
-                    className="group opacity-90 transition duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-100"
+                    className="group opacity-95 transition duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-100 shadow-lg rounded-lg"
                   >
                     <Link
                       href={`/${lng}/product/${product.slug}`}
@@ -179,7 +179,7 @@ export default async function Products({
                       )}
                     </Link>
 
-                    <div className="ml-2 flex h-24 items-center justify-between gap-2 overflow-hidden rounded-b-lg bg-primary/10 p-4">
+                    <div className="flex h-24 items-center justify-between gap-2 overflow-hidden rounded-b-lg bg-primary/5 p-4 w-full">
                       <div className="flex flex-col justify-center">
                         <a
                           href="#"

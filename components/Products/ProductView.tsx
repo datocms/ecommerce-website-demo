@@ -75,7 +75,7 @@ const ProductView = ({ data, lng }: Props) => {
               </div>
 
               <div className="relative w-full overflow-hidden rounded-lg bg-gray-100 md:h-80 lg:col-span-4 lg:h-full">
-                <div className="h-80 md:h-full">
+                <div className="h-[500px] sm:h-[650px] md:h-full">
                   <DatoImage
                     data={selectedImage?.responsiveImage as ResponsiveImageType}
                     className="h-full w-full object-contain"
@@ -113,7 +113,7 @@ const ProductView = ({ data, lng }: Props) => {
               </div>
             </div>
 
-            <div className="w-80">
+            <div className="w-80 mx-auto md:mx-0 flex flex-col items-center justify-center text-center md:block md:text-left">
               <div className="mb-2 md:mb-3">
                 <Link href={`/${lng}/products?brands=${data.product.brand.id}`} className="mb-0.5 inline-block text-gray-500 cursor-pointer hover:underline">
                   {data.product.brand?.name}
@@ -236,7 +236,7 @@ const ProductView = ({ data, lng }: Props) => {
                 )}
 
                 {!isOnSale && (
-                  <div className="flex items-end gap-2">
+                  <div className="">
                     <span className="text-xl font-bold text-gray-800 md:text-2xl">
                       {data.generalInterface?.currencySymbol}{' '}
                       {data.product.price}

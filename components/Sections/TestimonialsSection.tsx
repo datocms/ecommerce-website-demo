@@ -7,7 +7,7 @@ type PropTypes = {
 
 const TestimonialsSection = ({ testimonials }: PropTypes) => {
   return (
-    <div className="container mx-auto px-6 py-12 max-w-7xl">
+    <div className="container mx-auto px-16 py-12 max-w-7xl">
       <h2 className="font-display text-3xl font-semibold">
         {testimonials.title}
       </h2>

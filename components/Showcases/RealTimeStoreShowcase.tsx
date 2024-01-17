@@ -2,24 +2,23 @@
 
 import { useQuerySubscription } from 'react-datocms/use-query-subscription';
 import {
-  ProductQuery,
-  ProductQueryVariables,
-  ProductsQueryVariables,
   SiteLocale,
+  StoresQuery,
+  StoresQueryVariables,
 } from '@/graphql/generated';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import Product from './Product';
+import StoreShowcase from './StoreShowcase';
 
-export default function RealTimeProducts({
+export default function RealTimeStoreShowcase({
   initialData,
   token,
   query,
   variables,
   locale,
 }: {
-  initialData: ProductQuery;
-  variables: ProductQueryVariables;
-  query: TypedDocumentNode<ProductQuery, ProductQueryVariables>;
+  initialData: StoresQuery;
+  variables: StoresQueryVariables;
+  query: TypedDocumentNode<StoresQuery, StoresQueryVariables>;
   locale: SiteLocale;
   token: string;
 }) {
@@ -31,7 +30,7 @@ export default function RealTimeProducts({
     preview: true,
   });
 
-  if (!data || !data.product) return <></>;
+  if (!data || !data.allStores.length) return <></>;
 
-  return <Product data={data} lng={locale} />;
+  return <StoreShowcase data={data} />;
 }

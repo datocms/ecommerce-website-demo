@@ -47,6 +47,7 @@ export default async function Products({
   const fallbackLng = await getFallbackLocale();
   const pageNumber = parseInt((searchParams?.page as string) ?? '1');
   const orderBy = (searchParams?.orderBy as string) ?? '_publishedAt_DESC';
+  const nameSearch = (searchParams?.productName as string) ?? '';
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -93,6 +94,7 @@ export default async function Products({
       collections,
       brands,
       materials,
+      nameSearch,
     },
     isEnabled
   );
@@ -155,7 +157,7 @@ export default async function Products({
                 return (
                   <div
                     key={product.id}
-                    className="group opacity-95 transition duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-100 shadow-lg rounded-lg"
+                    className="group rounded-lg opacity-95 shadow-lg transition duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-100"
                   >
                     <Link
                       href={`/${lng}/product/${product.slug}`}
@@ -179,7 +181,7 @@ export default async function Products({
                       )}
                     </Link>
 
-                    <div className="flex h-24 items-center justify-between gap-2 overflow-hidden rounded-b-lg bg-primary/5 p-4 w-full">
+                    <div className="flex h-24 w-full items-center justify-between gap-2 overflow-hidden rounded-b-lg bg-primary/5 p-4">
                       <div className="flex flex-col justify-center">
                         <a
                           href="#"

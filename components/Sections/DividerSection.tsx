@@ -8,8 +8,8 @@ type PropTypes = {
 
 export default function DividerSection({ divider, lng }: PropTypes) {
   return (
-    <div className="container mx-auto mb-8 flex max-w-7xl flex-wrap items-center px-20 py-16">
-      <div className="w-full text-right lg:flex-1">
+    <div className="container mx-auto mb-8 flex max-w-7xl flex-wrap items-center px-20 py-16 text-center lg:text-left">
+      <div className="w-full lg:text-right lg:flex-1">
         <div className="text-sm uppercase tracking-widest text-gray-700">
           {divider.preTitle}
         </div>

@@ -43,8 +43,8 @@ const Footer = ({ data, lng }: Props) => {
 
       <div className="pt-12">
         <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
-          <div className="mb-16 grid grid-cols-2 gap-12 md:grid-cols-4 lg:grid-cols-6 lg:gap-8">
-            <div className="col-span-full lg:col-span-2">
+          <div className="mb-16 grid grid-cols-2 gap-y-12 md:grid-cols-4 lg:grid-cols-6 lg:gap-8">
+            <div className="col-span-full lg:col-span-2 flex flex-col items-center justify-center text-center md:block md:my-auto">
               <div className="mb-4 flex items-center lg:-mt-2">
                 <Link
                   href="/"
@@ -62,12 +62,12 @@ const Footer = ({ data, lng }: Props) => {
                     objectPosition="50% 50%"
                   />
                 </Link>
-                <span className="relative inline-flex w-64 items-center gap-2 pl-2 text-lg font-semibold text-black md:text-2xl">
+                <span className="relative inline-flex items-center gap-2 pl-2 text-lg font-semibold text-black md:text-2xl">
                   {data.layout?.footerTitle}
                 </span>
               </div>
 
-              <p className="mb-6 text-gray-500 sm:pr-8">
+              <p className="mb-6 text-gray-500 md:pr-8">
                 {data.layout?.footerSubtitle}
               </p>
 
@@ -91,11 +91,11 @@ const Footer = ({ data, lng }: Props) => {
             {data.layout?.footerColumns.map((column) => {
               return (
                 <div key={column.id}>
-                  <div className="mb-4 font-bold uppercase tracking-widest text-gray-800">
+                  <div className="mb-4 font-bold uppercase tracking-widest text-gray-800 text-center md:text-start -ml-4">
                     {column.label}
                   </div>
 
-                  <nav className="flex flex-col gap-4">
+                  <nav className="flex flex-col gap-4 items-center md:items-start -ml-4">
                     {column.footerItem.map((item) => {
                       return (
                         <div key={item.id}>

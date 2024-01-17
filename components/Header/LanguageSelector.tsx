@@ -42,7 +42,7 @@ const LanguageSelector = ({ lng, languages, currencySymbol }: Props) => {
 
       <div
         className={
-          'absolute end-0 z-10 ml-4 mt-1 w-28 rounded-md border border-gray-100 bg-white shadow-lg' +
+          'absolute left-5 end-0 z-10 mt-1 w-28 rounded-md border border-gray-100 bg-white shadow-lg' +
           (isOpen ? '' : ' hidden')
         }
         role="menu"

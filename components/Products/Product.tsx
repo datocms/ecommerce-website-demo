@@ -73,7 +73,7 @@ const Product = ({ data, lng }: Props) => {
                   return (
                     <div
                       key={key}
-                      className="rounded-full bg-primary/80 px-4 py-2 text-sm font-medium text-white"
+                      className="rounded-full bg-primary/80 px-4 py-2 text-sm font-medium text-white whitespace-nowrap text-center"
                     >
                       <div>{children}</div>
                     </div>
@@ -81,7 +81,7 @@ const Product = ({ data, lng }: Props) => {
                 }),
                 renderNodeRule(isList, ({ children, key }) => {
                   return (
-                    <div key={key} className="flex justify-center gap-4 py-8">
+                    <div key={key} className="justify-center gap-2 sm:gap-4 py-8 flex items-center">
                       {children}
                     </div>
                   );

@@ -18,28 +18,31 @@ const ProductShowcase = ({ collectionCards, lng }: PropTypes) => {
 
   return (
     <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-4 md:h-screen md:grid-cols-4 md:grid-rows-2">
-      {left && (
-        <div className="flex items-center justify-center text-center text-gray-700 md:col-span-2">
-          <div className="relative z-10 p-12">
-            <div className="text-sm uppercase tracking-widest text-gray-700">
-              {collectionCards.pretitle}
-            </div>
-            <h3 className="font-display mt-2 text-3xl font-semibold">
-              {collectionCards.title}
-            </h3>
-            <div className="mx-auto mt-3 max-w-md">
-              {collectionCards.description}
-            </div>
-            <Link
-              href={`/${lng}/${collectionCards.button[0].slug}`}
-              className="font-heading mt-6 inline-block rounded-lg bg-primary/80 px-8 py-4 text-sm tracking-widest text-white"
-            >
-              {collectionCards.button[0].label}
-            </Link>
+      <div
+        className={`hidden items-center justify-center text-center text-gray-700 md:col-span-2 ${
+          left && 'md:flex'
+        }`}
+      >
+        <div className="relative z-10 p-12">
+          <div className="text-sm uppercase tracking-widest text-gray-700">
+            {collectionCards.pretitle}
           </div>
+          <h3 className="font-display mt-2 text-3xl font-semibold">
+            {collectionCards.title}
+          </h3>
+          <div className="mx-auto mt-3 max-w-md">
+            {collectionCards.description}
+          </div>
+          <Link
+            href={`/${lng}/${collectionCards.button[0].slug}`}
+            className="font-heading mt-6 inline-block rounded-lg bg-primary/80 px-8 py-4 text-sm tracking-widest text-white"
+          >
+            {collectionCards.button[0].label}
+          </Link>
         </div>
-      )}
-      <div className="relative h-64 md:col-span-2 md:row-span-2 md:h-auto">
+      </div>
+
+      <div className="relative h-[700px] md:col-span-2 md:row-span-2 md:h-auto">
         <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
           <DatoImage
             data={
@@ -53,28 +56,25 @@ const ProductShowcase = ({ collectionCards, lng }: PropTypes) => {
           />
         </div>
       </div>
-      {!left && (
-        <div className="flex items-center justify-center text-center text-gray-700 md:col-span-2">
-          <div className="relative z-10 p-12">
-            <div className="text-sm uppercase tracking-widest text-gray-700">
-              {collectionCards.pretitle}
-            </div>
-            <h3 className="font-display mt-2 text-3xl font-semibold">
-              {collectionCards.title}
-            </h3>
-            <p className="mx-auto mt-3 max-w-md">
-              {collectionCards.description}
-            </p>
-            <Link
-              href={`/${lng}/${collectionCards.button[0].slug}`}
-              className="font-heading mt-6 inline-block rounded-lg bg-primary/80 px-8 py-4 text-sm tracking-widest text-white"
-            >
-              {collectionCards.button[0].label}
-            </Link>
+
+      <div className={`items-center justify-center text-center text-gray-700 md:col-span-2 flex ${left && "md:hidden"}`}>
+        <div className="relative z-10 p-12">
+          <div className="text-sm uppercase tracking-widest text-gray-700">
+            {collectionCards.pretitle}
           </div>
+          <h3 className="font-display mt-2 text-3xl font-semibold">
+            {collectionCards.title}
+          </h3>
+          <p className="mx-auto mt-3 max-w-md">{collectionCards.description}</p>
+          <Link
+            href={`/${lng}/${collectionCards.button[0].slug}`}
+            className="font-heading mt-6 inline-block rounded-lg bg-primary/80 px-8 py-4 text-sm tracking-widest text-white"
+          >
+            {collectionCards.button[0].label}
+          </Link>
         </div>
-      )}
-      <div className="relative col-span-1 row-span-1 h-64 md:h-auto">
+      </div>
+      <div className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto">
         <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
           <DatoImage
             data={
@@ -88,7 +88,7 @@ const ProductShowcase = ({ collectionCards, lng }: PropTypes) => {
           />
         </div>
       </div>
-      <div className="relative col-span-1 row-span-1 h-64 md:h-auto">
+      <div className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto">
         <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
           <DatoImage
             data={

@@ -1,0 +1,13 @@
+query Meta($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+  _site(locale: $locale, fallbackLocales: $fallbackLocale) {
+    globalSeo {
+      fallbackSeo {
+        title
+        description
+      }
+    }
+    favicon {
+      url
+    }
+  }
+}

@@ -432,24 +432,6 @@ export type CreatedAtFilter = {
   neq?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
-/** Specifies how to filter DateTime fields */
-export type DateTimeFilter = {
-  /** Filter records with a value that's within the specified minute range. Seconds and milliseconds are truncated from the argument. */
-  eq?: InputMaybe<Scalars['DateTime']['input']>;
-  /** Filter records with the specified field defined (i.e. with any value) or not */
-  exists?: InputMaybe<Scalars['BooleanType']['input']>;
-  /** Filter records with a value that's strictly greater than the one specified. Seconds and milliseconds are truncated from the argument. */
-  gt?: InputMaybe<Scalars['DateTime']['input']>;
-  /** Filter records with a value that's greater than or equal to than the one specified. Seconds and milliseconds are truncated from the argument. */
-  gte?: InputMaybe<Scalars['DateTime']['input']>;
-  /** Filter records with a value that's less than the one specified. Seconds and milliseconds are truncated from the argument. */
-  lt?: InputMaybe<Scalars['DateTime']['input']>;
-  /** Filter records with a value that's less or equal than the one specified. Seconds and milliseconds are truncated from the argument. */
-  lte?: InputMaybe<Scalars['DateTime']['input']>;
-  /** Filter records with a value that's outside the specified minute range. Seconds and milliseconds are truncated from the argument. */
-  neq?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
 /** Block of type ➗Divider Section (divider_section) */
 export type DividerSectionRecord = RecordInterface & {
   __typename?: 'DividerSectionRecord';
@@ -3704,7 +3686,6 @@ export type ProductModelFilter = {
   brand?: InputMaybe<LinkFilter>;
   collections?: InputMaybe<LinksFilter>;
   description?: InputMaybe<StructuredTextFilter>;
-  endOfSale?: InputMaybe<DateTimeFilter>;
   id?: InputMaybe<ItemIdFilter>;
   material?: InputMaybe<LinkFilter>;
   name?: InputMaybe<StringFilter>;
@@ -3738,8 +3719,6 @@ export enum ProductModelOrderBy {
   UnpublishingScheduledAtDesc = '_unpublishingScheduledAt_DESC',
   UpdatedAtAsc = '_updatedAt_ASC',
   UpdatedAtDesc = '_updatedAt_DESC',
-  EndOfSaleAsc = 'endOfSale_ASC',
-  EndOfSaleDesc = 'endOfSale_DESC',
   IdAsc = 'id_ASC',
   IdDesc = 'id_DESC',
   NameAsc = 'name_ASC',
@@ -3835,7 +3814,6 @@ export type ProductRecord = RecordInterface & {
   brand: BrandRecord;
   collections: Array<CollectionRecord>;
   description?: Maybe<ProductModelDescriptionField>;
-  endOfSale?: Maybe<Scalars['DateTime']['output']>;
   featuredReviews: Array<FeaturedReviewRecord>;
   id: Scalars['ItemId']['output'];
   material: MaterialRecord;

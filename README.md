@@ -1,4 +1,4 @@
-# A Company Website Demo using Next.js 13 and DatoCMS
+# An Ecommerce Website Demo using Next.js 13 and DatoCMS
 
 This example showcases a TypeScript Next.js 13 website with App Router (app) — using [DatoCMS](https://www.datocms.com/) as the data source.
 
@@ -8,7 +8,7 @@ It uses GraphQL CodeGen to type all of the requests comming from Dato automatica
 
 Have a look at the end result live:
 
-### [https://company-website-demo-preview.vercel.app/](https://company-website-demo-preview.vercel.app/)
+### [https://ecommerce-website-demo-blond.vercel.app/](https://ecommerce-website-demo-blond.vercel.app/)
 
 ## How to use
 

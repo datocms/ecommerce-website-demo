@@ -159,6 +159,7 @@ query Menu($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
     trending
     new
     shopNow
+    searchPlaceholder
   }
 }
 

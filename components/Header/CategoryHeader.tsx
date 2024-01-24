@@ -443,7 +443,10 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                       ref={searchBar}
                       value={searchValue}
                       onChange={(e) => setSearchValue(e.target.value)}
-                      placeholder="Search a clothing piece"
+                      placeholder={
+                        data.generalInterface?.searchPlaceholder ||
+                        'Search a clothing piece'
+                      }
                       className="h-10 rounded-full border-slate-300 bg-white px-5 pr-10 text-sm outline-none focus:outline-none focus:ring-0"
                       onKeyDown={(event) => {
                         if (event.key === 'Enter') {

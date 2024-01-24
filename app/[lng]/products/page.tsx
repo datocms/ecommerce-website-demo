@@ -138,7 +138,7 @@ export default async function Products({
           (singleFilter ? ' border-t-2' : '')
         }
       >
-        <div className="col-span-1 ml-4 hidden p-4 lg:block">
+        <div className="col-span-1 ml-4  p-4">
           <SideFilter
             collections={initialParams.allCollections as CollectionRecord[]}
             brands={initialParams.allBrands as BrandRecord[]}
@@ -149,7 +149,7 @@ export default async function Products({
             generalInterface={data.generalInterface as GeneralInterfaceRecord}
           />
         </div>
-        <div className="col-span-4 bg-white px-16 md:px-0">
+        <div className="col-span-4 bg-white px-16 md:px-0 ml-4 lg:ml-0">
           <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {data.allProducts.map((product) => {
@@ -227,17 +227,6 @@ export default async function Products({
         numberOfProducts={data._allProductsMeta.count}
         currentPage={pageNumber}
       />
-      <div className="col-span-1 border-t-2 p-4 lg:hidden w-full">
-        <SideFilter
-          collections={initialParams.allCollections as CollectionRecord[]}
-          brands={initialParams.allBrands as BrandRecord[]}
-          materials={initialParams.allMaterials as MaterialRecord[]}
-          paramaterCollections={collections}
-          parameterBrands={brands}
-          parameterMaterials={materials}
-          generalInterface={data.generalInterface as GeneralInterfaceRecord}
-        />
-      </div>
     </>
   );
 }

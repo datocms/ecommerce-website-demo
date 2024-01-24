@@ -108,7 +108,7 @@ const SideFilter = ({
 
       {filters.map((section) => (
         <Disclosure
-          defaultOpen={true}
+          defaultOpen={false}
           as="div"
           key={section.id}
           className="border-b border-gray-200 py-6"

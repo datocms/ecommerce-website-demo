@@ -81,7 +81,7 @@ const Product = ({ data, lng }: Props) => {
                 }),
                 renderNodeRule(isList, ({ children, key }) => {
                   return (
-                    <div key={key} className="justify-center gap-2 sm:gap-4 py-8 flex items-center">
+                    <div key={key} className="justify-center -mb-4 md:mb-0 gap-4 py-8 flex items-center md:flex-row flex-col ">
                       {children}
                     </div>
                   );

@@ -18,7 +18,7 @@ const NotificationStrip = ({
 }: Props) => {
   return (
     <div className="bg-white pb-1">
-      <div className="relative flex flex-nowrap items-center justify-center bg-primary/80 px-4 py-4 sm:flex-nowrap sm:gap-3 sm:pr-8 md:px-8">
+      <div className="relative flex flex-nowrap items-center justify-center bg-primary/80 px-4 py-2 sm:py-4 sm:flex-nowrap sm:gap-3 sm:pr-8 md:px-8">
         <div className="order-1 mb-2 mt-2 flex text-sm h-full w-auto max-w-screen-sm items-center justify-center text-white sm:order-none sm:mb-0 sm:mt-0 md:text-base">
           <StructuredText
             data={notification.value}

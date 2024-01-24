@@ -27,9 +27,9 @@ const ProductInfoSection = ({
   return (
     <div className="bg-white pt-2">
       <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
-        <div className="hidden w-full overflow-hidden rounded-lg border bg-gray-50 shadow-sm lg:block">
-          <div className="mx-auto flex max-w-screen-lg items-center gap-8 p-8">
-            <div className="grid w-2/3 grid-cols-2 gap-8">
+        <div className="w-full overflow-hidden rounded-lg border bg-gray-50 shadow-sm">
+          <div className="mx-auto flex max-w-screen-lg flex-col  items-center gap-8 p-8 lg:flex-row">
+            <div className=" flex flex-col justify-center ml-6 lg:ml-0 md:grid w-2/3 grid-cols-2 gap-8">
               <div className="group flex gap-4">
                 <div className="group-hover:bg- primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/80 text-white shadow-lg transition duration-100 md:h-12 md:w-12">
                   <svg
@@ -50,7 +50,9 @@ const ProductInfoSection = ({
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">{interfaceStrings.materials}</div>
+                  <div className="mb-1 font-semibold">
+                    {interfaceStrings.materials}
+                  </div>
                   <p className="text-sm text-gray-500">{features.material}</p>
                 </div>
               </div>
@@ -98,7 +100,9 @@ const ProductInfoSection = ({
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">{interfaceStrings.style}</div>
+                  <div className="mb-1 font-semibold">
+                    {interfaceStrings.style}
+                  </div>
                   <p className="text-sm text-gray-500">{features.style}</p>
                 </div>
               </div>
@@ -122,7 +126,9 @@ const ProductInfoSection = ({
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">{interfaceStrings.weather}</div>
+                  <div className="mb-1 font-semibold">
+                    {interfaceStrings.weather}
+                  </div>
                   <p className="text-sm text-gray-500">{features.weather}</p>
                 </div>
               </div>
@@ -142,13 +148,15 @@ const ProductInfoSection = ({
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">{interfaceStrings.occasions}</div>
+                  <div className="mb-1 font-semibold">
+                    {interfaceStrings.occasions}
+                  </div>
                   <p className="text-sm text-gray-500">{features.occasions}</p>
                 </div>
               </div>
             </div>
 
-            <div className="w-1/3 overflow-hidden rounded-lg border">
+            <div className="lg:w-1/3 overflow-hidden rounded-lg border md:w-1/2">
               <div className="relative h-48 bg-gray-100">
                 <DatoImage
                   data={material.image.responsiveImage}

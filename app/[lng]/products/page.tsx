@@ -48,7 +48,6 @@ export default async function Products({
   const pageNumber = parseInt((searchParams?.page as string) ?? '1');
   const orderBy = (searchParams?.orderBy as string) ?? '_publishedAt_DESC';
   const nameSearch = (searchParams?.productName as string) ?? '';
-  
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -135,11 +134,11 @@ export default async function Products({
       )}
       <div
         className={
-          'mx-auto lg:grid max-w-7xl grid-cols-5 bg-white pt-8' +
+          'mx-auto max-w-7xl grid-cols-5 bg-white pt-8 lg:grid' +
           (singleFilter ? ' border-t-2' : '')
         }
       >
-        <div className="col-span-1 ml-4 p-4">
+        <div className="col-span-1 ml-4 hidden p-4 lg:block">
           <SideFilter
             collections={initialParams.allCollections as CollectionRecord[]}
             brands={initialParams.allBrands as BrandRecord[]}
@@ -228,6 +227,17 @@ export default async function Products({
         numberOfProducts={data._allProductsMeta.count}
         currentPage={pageNumber}
       />
+      <div className="col-span-1 border-t-2 p-4 lg:hidden w-full">
+        <SideFilter
+          collections={initialParams.allCollections as CollectionRecord[]}
+          brands={initialParams.allBrands as BrandRecord[]}
+          materials={initialParams.allMaterials as MaterialRecord[]}
+          paramaterCollections={collections}
+          parameterBrands={brands}
+          parameterMaterials={materials}
+          generalInterface={data.generalInterface as GeneralInterfaceRecord}
+        />
+      </div>
     </>
   );
 }

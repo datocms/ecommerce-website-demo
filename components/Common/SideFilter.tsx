@@ -41,24 +41,6 @@ const SideFilter = ({
   const parameterMaterialsFiltered = parameterMaterials.filter(
     (parameter) => parameter !== ''
   );
-  const [viewport, setViewport] = useState('lg');
-
-  useEffect(() => {
-    const setVP = () => {
-      const w = window.innerWidth;
-      if (w >= 1024) {
-        setViewport('lg');
-      } else {
-        setViewport('sm');
-      }
-    };
-    setVP();
-    window.addEventListener('resize', setVP);
-
-    return () => {
-      window.removeEventListener('resize', setVP);
-    };
-  }, []);
 
   const filters = [
     {
@@ -132,9 +114,6 @@ const SideFilter = ({
           className="border-b border-gray-200 py-6"
         >
           {({ open, close }) => {
-            useEffect(() => {
-              if (viewport === 'sm') close();
-            }, [viewport]);
             return (
               <>
                 <h3 className="-my-3 flow-root">

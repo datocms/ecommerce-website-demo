@@ -45,7 +45,7 @@ const FilterDetail = ({
   subtitle,
 }: PropTypes) => {
   return (
-    <div className="relative isolate mx-auto max-w-7xl overflow-hidden bg-white px-6 py-16 lg:overflow-visible lg:px-0">
+    <div className="relative isolate mx-auto max-w-7xl overflow-hidden bg-white px-6 py-12 lg:overflow-visible lg:px-0">
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <svg
           className="absolute left-[max(50%,25rem)] top-0 h-[64rem] w-[128rem] -translate-x-1/2 stroke-gray-200 [mask-image:radial-gradient(64rem_64rem_at_top,white,transparent)]"
@@ -77,21 +77,21 @@ const FilterDetail = ({
           />
         </svg>
       </div>
-      <div className="gap-t-16 lg:gap-t-10 mx-auto grid w-full max-w-2xl gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:items-start">
+      <div className="-mt-4 lg:mt-0 gap-t-16 lg:gap-t-10 mx-auto grid w-full max-w-2xl gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:items-start">
         <div className="mb-8 w-full lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-16">
           <div className="lg:pr-4">
-            <p className="text-base font-semibold leading-7 text-primary">
+            <p className="text-base font-semibold leading-7 text-primary text-center lg:text-left">
               {type}
             </p>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center lg:text-left">
               {name}
             </h1>
-            <div className="mt-6 text-xl leading-8 text-gray-700">
+            <div className="mt-6 text-xl leading-8 text-gray-700 text-center lg:text-left">
               <ReactMarkdown>{subtitle || ''}</ReactMarkdown>
             </div>
           </div>
         </div>
-        <div className="-ml-12 mr-12  h-full p-12 lg:sticky lg:top-32  lg:row-span-5 lg:row-start-1 lg:overflow-hidden">
+        <div className="relative mb-8 h-96 p-12 lg:sticky lg:top-32 lg:row-span-5 lg:row-start-1 lg:-ml-12 lg:mb-0 lg:mr-12 lg:h-full lg:overflow-hidden mx-8 lg:mx-0">
           <DatoImage
             data={image.responsiveImage as ResponsiveImageType}
             className="relative h-full w-[48rem] max-w-none rounded-xl bg-gray-900 object-contain shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"

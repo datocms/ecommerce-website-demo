@@ -48,6 +48,7 @@ export default async function Products({
   const pageNumber = parseInt((searchParams?.page as string) ?? '1');
   const orderBy = (searchParams?.orderBy as string) ?? '_publishedAt_DESC';
   const nameSearch = (searchParams?.productName as string) ?? '';
+  
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -134,7 +135,7 @@ export default async function Products({
       )}
       <div
         className={
-          'mx-auto grid max-w-7xl grid-cols-5 bg-white pt-8' +
+          'mx-auto lg:grid max-w-7xl grid-cols-5 bg-white pt-8' +
           (singleFilter ? ' border-t-2' : '')
         }
       >
@@ -149,7 +150,7 @@ export default async function Products({
             generalInterface={data.generalInterface as GeneralInterfaceRecord}
           />
         </div>
-        <div className="col-span-4 bg-white">
+        <div className="col-span-4 bg-white px-16 md:px-0">
           <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {data.allProducts.map((product) => {

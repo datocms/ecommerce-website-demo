@@ -45,30 +45,8 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
       : numberOfProducts;
 
   return (
-    <div className="mx-auto flex max-w-7xl items-center justify-between border-gray-200 bg-white px-4 pt-12 sm:px-6">
-      <div className="flex flex-1 justify-between sm:hidden">
-        {currentPage !== 1 && (
-          <button
-            onClick={() => {
-              exportQueryParameters('page', (currentPage - 1).toString());
-            }}
-            className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Previous
-          </button>
-        )}
-        {!(lastProductIndex === numberOfProducts) && (
-          <button
-            onClick={() => {
-              exportQueryParameters('page', (currentPage + 1).toString());
-            }}
-            className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Next
-          </button>
-        )}
-      </div>
-      <div className="hidden gap-8 sm:flex sm:flex-1 sm:items-center sm:justify-end">
+    <div className="mx-auto flex max-w-7xl items-center justify-center border-gray-200 bg-white px-4 pt-12 sm:px-6 mb-8 sm:mb-0">
+      <div className="gap-8 sm:flex sm:flex-1 justify-center sm:items-center md:justify-end">
         <div>
           <p className="text-sm text-gray-700">
             Showing <span className="font-medium">{firstProductIndex}</span> to{' '}

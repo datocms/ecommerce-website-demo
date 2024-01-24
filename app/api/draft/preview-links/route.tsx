@@ -14,30 +14,22 @@ const generatePreviewUrl = ({
   locale,
 }: generatePreviewUrlParams) => {
   switch (itemType.attributes.api_key) {
-    case 'page':
-      return `/${locale}/${item.attributes.slug}`;
-    case 'post':
-      return `/${locale}/posts/${item.attributes.slug}`;
-    case 'tag':
-      return `/${locale}/posts/tag/${item.attributes.slug}`;
-    case 'author':
-      return `/${locale}/posts/author/${item.attributes.slug}`;
+    case 'home':
+      return `/${locale}/`;
+    case 'showcase':
+      return `/${locale}/showcase`;
+    case 'store':
+      return `/${locale}/stores`;
+    case 'product':
+      return `/${locale}/product/${item.attributes.slug}`;
     case 'legal_page':
       return `/${locale}/legal/${item.attributes.slug}`;
-    case 'header':
-      return `/${locale}/home`;
-    case 'documentation_home':
-      return `/${locale}/docs`;
-    case 'documentation_page':
-      return `/${locale}/docs/${item.attributes.slug}`;
-    case 'layout':
-      return `/${locale}/home`;
-    case 'footer':
-      return `/${locale}/home`;
-    case 'pricing_tier':
-      return `/${locale}/pricing`;
-    case 'change_log':
-      return `/${locale}/changelog`;
+    case 'brand':
+      return `/${locale}/products?brands=${item.id}`;
+    case 'material':
+      return `/${locale}/products?materials=${item.id}`;
+    case 'collection':
+      return `/${locale}/products?collections=${item.id}`;
   }
 };
 

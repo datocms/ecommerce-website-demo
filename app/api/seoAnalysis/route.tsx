@@ -9,11 +9,14 @@ const findSlugAndPermalink = async (
   locale: string
 ) => {
   switch (itemTypeApiKey) {
-    case 'page':
-      if (item.slug === 'home') return [item.slug, `/${locale}/`]; //special case for default home page
-      return [item.slug, `/${locale}/${item.slug}`];
-    case 'post':
-      return [item.slug, `/${locale}/posts/${item.slug}`];
+    case 'home':
+      return [item.slug, `/${locale}/`];
+    case 'showcase':
+      return [item.slug, `/${locale}/showcase`];
+    case 'store':
+      return [item.slug, `/${locale}/stores`];
+    case 'product':
+      return [item.slug, `/${locale}/product/${item.slug}`];
     default:
       return [null, null];
   }

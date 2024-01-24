@@ -67,7 +67,7 @@ export default function Cart({ open, setOpen }: PropTypes) {
                   This is a DatoCMS Demo
                 </h1>
                 <p className="text-md">
-                  To use the cart, and enable purchases, and integration with
+                  To use the cart, and enable purchases, an integration with
                   Shopify or Commercelayer is necessary{' '}
                 </p>
               </div>

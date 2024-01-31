@@ -24,23 +24,25 @@ const MaterialShowcase = ({ materialSection, lng }: PropTypes) => {
         </p>
       </div>
 
-      <div className="-mx-2 flex flex-wrap flex-col lg:flex-row">
+      <div className="-mx-2 flex flex-col flex-wrap lg:flex-row">
         {materialSection.materials.map((material) => {
           return (
             <Link
               href={`/${lng}/products?materials=${material.id}`}
-              className="lg:w-1/3 p-2 transition-all hover:scale-95"
+              className="p-2 transition-all hover:scale-95 lg:w-1/3"
               key={material.id}
             >
-              <div className="opacity-85 relative mb-8 block h-[300px] md:h-[500px] rounded-lg bg-black hover:bg-gray-700">
-                <DatoImage
-                  data={material.image.responsiveImage as ResponsiveImageType}
-                  className="h-full w-full rounded-lg object-contain"
-                  layout="fill"
-                  objectFit="cover"
-                  objectPosition="50% 50%"
-                />
-              </div>
+              {material.details.image.responsiveImage && (
+                <div className="opacity-85 relative mb-8 block h-[300px] rounded-lg bg-black hover:bg-gray-700 md:h-[500px]">
+                  <DatoImage
+                    data={material.details.image.responsiveImage}
+                    className="h-full w-full rounded-lg object-contain"
+                    layout="fill"
+                    objectFit="cover"
+                    objectPosition="50% 50%"
+                  />
+                </div>
+              )}
               <div className="block text-center text-xl font-medium">
                 {material.name}
               </div>

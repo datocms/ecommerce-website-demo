@@ -25,9 +25,11 @@ query Product(
       id
       name
       slug
-      image {
-        responsiveImage {
-          ...DatoImage_responsiveImage
+      details {
+        image {
+          responsiveImage {
+            ...DatoImage_responsiveImage
+          }
         }
       }
     }

@@ -43,21 +43,24 @@ const ProductShowcase = ({ collectionCards, lng }: PropTypes) => {
       </div>
 
       <div className="relative h-[700px] md:col-span-2 md:row-span-2 md:h-auto">
-        <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
-          <DatoImage
-            data={
-              collectionCards.collection[0].image
-                .responsiveImage as ResponsiveImageType
-            }
-            className="h-full w-full rounded-lg object-contain"
-            layout="fill"
-            objectFit="cover"
-            objectPosition="50% 50%"
-          />
-        </div>
+        {collectionCards.collection[0].details.image.responsiveImage && (
+          <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
+            <DatoImage
+              data={collectionCards.collection[0].details.image.responsiveImage}
+              className="h-full w-full rounded-lg object-contain"
+              layout="fill"
+              objectFit="cover"
+              objectPosition="50% 50%"
+            />
+          </div>
+        )}
       </div>
 
-      <div className={`items-center justify-center text-center text-gray-700 md:col-span-2 flex ${left && "md:hidden"}`}>
+      <div
+        className={`flex items-center justify-center text-center text-gray-700 md:col-span-2 ${
+          left && 'md:hidden'
+        }`}
+      >
         <div className="relative z-10 p-12">
           <div className="text-sm uppercase tracking-widest text-gray-700">
             {collectionCards.pretitle}
@@ -74,34 +77,32 @@ const ProductShowcase = ({ collectionCards, lng }: PropTypes) => {
           </Link>
         </div>
       </div>
-      <div className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto">
-        <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
-          <DatoImage
-            data={
-              collectionCards.collection[1].image
-                .responsiveImage as ResponsiveImageType
-            }
-            className="h-full w-full rounded-lg object-contain"
-            layout="fill"
-            objectFit="cover"
-            objectPosition="50% 50%"
-          />
+      {collectionCards.collection[1].details.image.responsiveImage && (
+        <div className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto">
+          <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
+            <DatoImage
+              data={collectionCards.collection[1].details.image.responsiveImage}
+              className="h-full w-full rounded-lg object-contain"
+              layout="fill"
+              objectFit="cover"
+              objectPosition="50% 50%"
+            />
+          </div>
         </div>
-      </div>
-      <div className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto">
-        <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
-          <DatoImage
-            data={
-              collectionCards.collection[2].image
-                .responsiveImage as ResponsiveImageType
-            }
-            className="h-full w-full rounded-lg object-contain"
-            layout="fill"
-            objectFit="cover"
-            objectPosition="50% 50%"
-          />
+      )}
+      {collectionCards.collection[2].details.image.responsiveImage && (
+        <div className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto">
+          <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
+            <DatoImage
+              data={collectionCards.collection[2].details.image.responsiveImage}
+              className="h-full w-full rounded-lg object-contain"
+              layout="fill"
+              objectFit="cover"
+              objectPosition="50% 50%"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

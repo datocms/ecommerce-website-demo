@@ -4,22 +4,22 @@ import { ShowcaseQuery, SiteLocale } from '@/graphql/generated';
 import { notFound } from 'next/navigation';
 
 type PropTypes = {
-  data: ShowcaseQuery
-  lng: SiteLocale
-}
+  data: ShowcaseQuery;
+  lng: SiteLocale;
+};
 
-const ShowcasePage = ({data, lng}: PropTypes) => {
+const ShowcasePage = ({ data, lng }: PropTypes) => {
   if (!data.showcase) notFound();
 
   return (
     <div className="mx-auto max-w-7xl bg-white font-sans antialiased">
       <div className="bg-opacity-50">
-        <div className="md:-mt-8 px-12 py-16 md:py-32">
-          <h1 className="font-display mx-auto max-w-2xl text-center text-4xl md:text-5xl font-semibold leading-tight text-gray-800">
+        <div className="px-12 py-16 md:-mt-8 md:py-32">
+          <h1 className="font-display mx-auto max-w-2xl text-center text-4xl font-semibold leading-tight text-gray-800 md:text-5xl">
             {data.showcase.title}
           </h1>
         </div>
-        <div className="container relative mx-auto grid grid-cols-1 gap-12 md:px-12 md:grid-cols-2">
+        <div className="container relative mx-auto grid grid-cols-1 gap-12 md:grid-cols-2 md:px-12">
           <div className="relative h-screen w-full object-cover">
             <DatoImage
               data={
@@ -31,7 +31,7 @@ const ShowcasePage = ({data, lng}: PropTypes) => {
               objectPosition="50% 50%"
             />
           </div>
-          <div className="relative h-screen w-full object-cover md:mt-32 hidden md:block">
+          <div className="relative hidden h-screen w-full object-cover md:mt-32 md:block">
             <DatoImage
               data={
                 data.showcase.displays[1].responsiveImage as ResponsiveImageType
@@ -44,8 +44,8 @@ const ShowcasePage = ({data, lng}: PropTypes) => {
           </div>
         </div>
         <div className="container mx-auto grid grid-cols-1 gap-12 px-12 md:-mt-32 md:grid-cols-2">
-          <div className="py-6 md:p-16 flex flex-col items-center md:block">
-            <p className="md:mb-12 text-center md:text-left mb-8 leading-relaxed text-gray-700">
+          <div className="flex flex-col items-center py-6 md:block md:p-16">
+            <p className="mb-8 text-center leading-relaxed text-gray-700 md:mb-12 md:text-left">
               {data.showcase.description}
             </p>
             <Link
@@ -56,7 +56,7 @@ const ShowcasePage = ({data, lng}: PropTypes) => {
             </Link>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 px-20 pb-16 md:pb-32 pt-8 md:pt-16">
+        <div className="grid grid-cols-1 gap-12 px-20 pb-16 pt-8 md:grid-cols-3 md:pb-32 md:pt-16">
           {data.showcase.collections.map((collection) => {
             return (
               <Link
@@ -72,23 +72,23 @@ const ShowcasePage = ({data, lng}: PropTypes) => {
                     {data.showcase?.collectionsCta[0].label}
                   </span>
                 </div>
-                <div className="absolute inset-0 h-full w-full rounded-lg object-cover object-right brightness-75">
-                  <DatoImage
-                    data={
-                      collection.image.responsiveImage as ResponsiveImageType
-                    }
-                    className="h-full w-full rounded-lg object-contain"
-                    layout="fill"
-                    objectFit="cover"
-                    objectPosition="70% 30%"
-                  />
-                </div>
+                {collection.details.image.responsiveImage && (
+                  <div className="absolute inset-0 h-full w-full rounded-lg object-cover object-right brightness-75">
+                    <DatoImage
+                      data={collection.details.image.responsiveImage}
+                      className="h-full w-full rounded-lg object-contain"
+                      layout="fill"
+                      objectFit="cover"
+                      objectPosition="70% 30%"
+                    />
+                  </div>
+                )}
               </Link>
             );
           })}
         </div>
         <div className="container mx-auto px-12 pb-16 md:pb-24">
-          <h2 className="font-display px-12 md:text-left text-4xl md:text-5xl font-semibold leading-tight text-gray-800 text-center">
+          <h2 className="font-display px-12 text-center text-4xl font-semibold leading-tight text-gray-800 md:text-left md:text-5xl">
             {data.showcase.newProductsTitle}
           </h2>
         </div>
@@ -97,7 +97,7 @@ const ShowcasePage = ({data, lng}: PropTypes) => {
             href={`/${lng}/product/${data.showcase.newProducts[0].slug}`}
             className="block hover:opacity-75"
           >
-            <div className="relative h-96 md:h-screen w-full object-cover">
+            <div className="relative h-96 w-full object-cover md:h-screen">
               <DatoImage
                 data={
                   data.showcase.newProducts[0].productImages[0]
@@ -129,7 +129,7 @@ const ShowcasePage = ({data, lng}: PropTypes) => {
             href={`/${lng}/product/${data.showcase.newProducts[1].slug}`}
             className="block hover:opacity-75 md:-mt-32"
           >
-            <div className="relative w-full object-cover h-96 md:h-screen">
+            <div className="relative h-96 w-full object-cover md:h-screen">
               <DatoImage
                 data={
                   data.showcase.newProducts[1].productImages[0]
@@ -162,7 +162,7 @@ const ShowcasePage = ({data, lng}: PropTypes) => {
       <div className="bg-white">
         <div className="container mx-auto grid grid-cols-1 gap-32 px-12 md:grid-cols-2">
           <div>
-            <h2 className="font-display px-12 pb-24 md:text-left text-center text-4xl md:text-5xl font-semibold leading-tight text-gray-800">
+            <h2 className="font-display px-12 pb-24 text-center text-4xl font-semibold leading-tight text-gray-800 md:text-left md:text-5xl">
               {data.showcase.materialsTitle}
             </h2>
             <div className="relative h-96 w-full object-cover">
@@ -179,7 +179,7 @@ const ShowcasePage = ({data, lng}: PropTypes) => {
             </div>
           </div>
           <div className="md:pt-32">
-            <div className="relative h-96 w-full object-cover hidden md:block">
+            <div className="relative hidden h-96 w-full object-cover md:block">
               <DatoImage
                 data={
                   data.showcase.materialsDisplay[1]
@@ -191,8 +191,8 @@ const ShowcasePage = ({data, lng}: PropTypes) => {
                 objectPosition="50% 50%"
               />
             </div>
-            <div className="px-12 md:py-24 md:mt-0 -mt-14">
-              <div className="mb-12 leading-relaxed text-gray-700 text-center md:text-left">
+            <div className="-mt-14 px-12 md:mt-0 md:py-24">
+              <div className="mb-12 text-center leading-relaxed text-gray-700 md:text-left">
                 {data.showcase.materialsDescription}
               </div>
             </div>

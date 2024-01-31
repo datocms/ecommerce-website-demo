@@ -68,11 +68,12 @@ query Home($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
         collection {
           name
           slug
-          image {
-            responsiveImage {
-              ...DatoImage_responsiveImage
+          details {
+            image {
+              responsiveImage {
+                ...DatoImage_responsiveImage
+              }
             }
-            id
           }
         }
         description
@@ -87,9 +88,11 @@ query Home($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
           id
           name
           slug
-          image {
-            responsiveImage {
-              ...DatoImage_responsiveImage
+          details {
+            image {
+              responsiveImage {
+                ...DatoImage_responsiveImage
+              }
             }
           }
         }

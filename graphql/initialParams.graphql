@@ -7,28 +7,32 @@ query InitialParams($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
     id
     name
     _modelApiKey
-    image {
-      responsiveImage {
-        ...DatoImage_responsiveImage
+    details {
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
       }
-    }
-    subtitle
-    description {
-      value
+      subtitle
+      description {
+        value
+      }
     }
   }
   allBrands(first: "100", locale: $locale, fallbackLocales: $fallbackLocale) {
     id
     name
     _modelApiKey
-    image {
-      responsiveImage {
-        ...DatoImage_responsiveImage
+    details {
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
       }
-    }
-    subtitle
-    description {
-      value
+      subtitle
+      description {
+        value
+      }
     }
   }
   allMaterials(
@@ -39,14 +43,16 @@ query InitialParams($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
     id
     name
     _modelApiKey
-    image {
-      responsiveImage {
-        ...DatoImage_responsiveImage
+    details {
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
       }
-    }
-    subtitle
-    description {
-      value
+      subtitle
+      description {
+        value
+      }
     }
   }
 }

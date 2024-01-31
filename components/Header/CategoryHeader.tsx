@@ -125,17 +125,21 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                         >
                           <div className="grid grid-cols-2 gap-x-4">
                             <div className="group relative text-sm">
-                              <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                <DatoImage
-                                  data={
-                                    category.newArrival.image.responsiveImage
-                                  }
-                                  className="h-full w-full object-contain"
-                                  layout="fill"
-                                  objectFit="cover"
-                                  objectPosition="50% 50%"
-                                />
-                              </div>
+                              {category.newArrival.details.image
+                                .responsiveImage && (
+                                <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                  <DatoImage
+                                    data={
+                                      category.newArrival.details.image
+                                        .responsiveImage
+                                    }
+                                    className="h-full w-full object-contain"
+                                    layout="fill"
+                                    objectFit="cover"
+                                    objectPosition="50% 50%"
+                                  />
+                                </div>
+                              )}
                               <a
                                 href={`/${lng}/products?${category.newArrival._modelApiKey}s=${category.newArrival.id}`}
                                 className="mt-6 block font-medium text-gray-900"
@@ -152,15 +156,21 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                             </div>
 
                             <div className="group relative text-sm">
-                              <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                <DatoImage
-                                  data={category.trending.image.responsiveImage}
-                                  className="h-full w-full object-contain"
-                                  layout="fill"
-                                  objectFit="cover"
-                                  objectPosition="50% 50%"
-                                />
-                              </div>
+                              {category.trending.details.image
+                                .responsiveImage && (
+                                <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                  <DatoImage
+                                    data={
+                                      category.trending.details.image
+                                        .responsiveImage
+                                    }
+                                    className="h-full w-full object-contain"
+                                    layout="fill"
+                                    objectFit="cover"
+                                    objectPosition="50% 50%"
+                                  />
+                                </div>
+                              )}
                               <a
                                 href={`/${lng}/products?${category.trending._modelApiKey}s=${category.trending.id}`}
                                 className="mt-6 block font-medium text-gray-900"
@@ -300,18 +310,21 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                                           href={`/${lng}/products?${category.newArrival._modelApiKey}s=${category.newArrival.id}`}
                                           className="group relative text-base sm:text-sm"
                                         >
-                                          <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                            <DatoImage
-                                              data={
-                                                category.newArrival.image
-                                                  .responsiveImage as ResponsiveImageType
-                                              }
-                                              className="h-full w-full object-contain"
-                                              layout="fill"
-                                              objectFit="cover"
-                                              objectPosition="50% 50%"
-                                            />
-                                          </div>
+                                          {category.newArrival.details.image
+                                            .responsiveImage && (
+                                            <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                              <DatoImage
+                                                data={
+                                                  category.newArrival.details
+                                                    .image.responsiveImage
+                                                }
+                                                className="h-full w-full object-contain"
+                                                layout="fill"
+                                                objectFit="cover"
+                                                objectPosition="50% 50%"
+                                              />
+                                            </div>
+                                          )}
                                           <p
                                             aria-hidden="true"
                                             className="text-md mt-6 font-bold text-primary/80"
@@ -340,18 +353,21 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                                           href={`/${lng}/products?${category.trending._modelApiKey}s=${category.trending.id}`}
                                           className="group relative text-base sm:text-sm"
                                         >
-                                          <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                            <DatoImage
-                                              data={
-                                                category.trending.image
-                                                  .responsiveImage as ResponsiveImageType
-                                              }
-                                              className="h-full w-full object-contain"
-                                              layout="fill"
-                                              objectFit="cover"
-                                              objectPosition="50% 50%"
-                                            />
-                                          </div>
+                                          {category.trending.details.image
+                                            .responsiveImage && (
+                                            <div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                              <DatoImage
+                                                data={
+                                                  category.trending.details
+                                                    .image.responsiveImage
+                                                }
+                                                className="h-full w-full object-contain"
+                                                layout="fill"
+                                                objectFit="cover"
+                                                objectPosition="50% 50%"
+                                              />
+                                            </div>
+                                          )}
                                           <p
                                             aria-hidden="true"
                                             className="text-md mt-6 font-bold text-primary/80"

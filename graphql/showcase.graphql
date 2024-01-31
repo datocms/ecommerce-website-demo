@@ -1,5 +1,5 @@
 query Showcase($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
-   generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+  generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
     currencySymbol
   }
   showcase(locale: $locale, fallbackLocales: $fallbackLocale) {
@@ -41,9 +41,11 @@ query Showcase($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
       name
       slug
       id
-      image {
-        responsiveImage {
-          ...DatoImage_responsiveImage
+      details {
+        image {
+          responsiveImage {
+            ...DatoImage_responsiveImage
+          }
         }
       }
     }

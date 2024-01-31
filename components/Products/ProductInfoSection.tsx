@@ -29,7 +29,7 @@ const ProductInfoSection = ({
       <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
         <div className="w-full overflow-hidden rounded-lg border bg-gray-50 shadow-sm">
           <div className="mx-auto flex max-w-screen-lg flex-col  items-center gap-8 p-8 lg:flex-row">
-            <div className=" flex flex-col justify-center ml-6 lg:ml-0 md:grid w-2/3 grid-cols-2 gap-8">
+            <div className=" ml-6 flex w-2/3 grid-cols-2 flex-col justify-center gap-8 md:grid lg:ml-0">
               <div className="group flex gap-4">
                 <div className="group-hover:bg- primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/80 text-white shadow-lg transition duration-100 md:h-12 md:w-12">
                   <svg
@@ -156,15 +156,17 @@ const ProductInfoSection = ({
               </div>
             </div>
 
-            <div className="lg:w-1/3 overflow-hidden rounded-lg border md:w-1/2">
-              <div className="relative h-48 bg-gray-100">
-                <DatoImage
-                  data={material.image.responsiveImage}
-                  className="h-full w-full object-cover object-center"
-                  objectFit="cover"
-                  objectPosition="50% 50%"
-                />
-              </div>
+            <div className="overflow-hidden rounded-lg border md:w-1/2 lg:w-1/3">
+              {material.details.image.responsiveImage && (
+                <div className="relative h-48 bg-gray-100">
+                  <DatoImage
+                    data={material.details.image.responsiveImage}
+                    className="h-full w-full object-cover object-center"
+                    objectFit="cover"
+                    objectPosition="50% 50%"
+                  />
+                </div>
+              )}
 
               <div className="flex items-center justify-between gap-2 bg-white p-3">
                 <p className="text-sm text-gray-500">{material.name}</p>

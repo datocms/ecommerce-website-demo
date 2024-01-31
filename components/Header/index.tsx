@@ -29,9 +29,9 @@ const Header = ({ lng, data }: Props) => {
     !isEmptyDocument(data.layout?.notification)
   );
 
-  const [popUp, setPopUp] = useState(!!data.layout?.popup.length);
+  const [popUp, setPopUp] = useState(!!data.layout?.popup);
 
-  const [cookies, setCookies] = useState(!!data.layout?.cookieNotice.length);
+  const [cookies, setCookies] = useState(!!data.layout?.cookieNotice);
 
   return (
     <>
@@ -39,13 +39,13 @@ const Header = ({ lng, data }: Props) => {
         <PopUpBanner
           lng={lng}
           setPopUp={setPopUp}
-          popup={data.layout!.popup[0] as PopupRecord}
+          popup={data.layout!.popup as PopupRecord}
         />
       )}
 
       {cookies && (
         <CookiesNotice
-          cookieNotice={data.layout?.cookieNotice[0] as CookieNoticeRecord}
+          cookieNotice={data.layout?.cookieNotice as CookieNoticeRecord}
           setCookies={setCookies}
         />
       )}

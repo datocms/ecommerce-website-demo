@@ -3,14 +3,12 @@ export const dynamic = 'force-dynamic';
 import '@/styles/global.css';
 import { draftMode } from 'next/headers';
 import {
-  BrandModelDescriptionField,
   BrandRecord,
-  CollectionModelDescriptionField,
   CollectionRecord,
+  FilterDetailModelDescriptionField,
   GeneralInterfaceRecord,
   ImageFileField,
   InitialParamsDocument,
-  MaterialModelDescriptionField,
   MaterialRecord,
   ProductModelOrderBy,
   ProductsDocument,
@@ -23,7 +21,7 @@ import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
 import SideFilter from '@/components/Common/SideFilter';
 import Pagination from '@/components/Products/Pagination';
 import FilterDetail from '@/components/Products/FilterDetail';
-import { Maybe } from 'graphql/jsutils/Maybe';
+
 
 type PropTypes = {
   params: {
@@ -121,15 +119,12 @@ export default async function Products({
         <FilterDetail
           type={(data.generalInterface as any)[singleFilter._modelApiKey]}
           name={singleFilter.name}
-          subtitle={singleFilter.subtitle ?? ''}
+          subtitle={singleFilter.details.subtitle ?? ''}
           description={
-            singleFilter.description as Maybe<
-              | CollectionModelDescriptionField
-              | BrandModelDescriptionField
-              | MaterialModelDescriptionField
-            >
+            singleFilter.details
+              .description as FilterDetailModelDescriptionField
           }
-          image={singleFilter.image as ImageFileField}
+          image={singleFilter.details.image as ImageFileField}
         />
       )}
       <div
@@ -149,7 +144,7 @@ export default async function Products({
             generalInterface={data.generalInterface as GeneralInterfaceRecord}
           />
         </div>
-        <div className="col-span-4 bg-white px-16 md:px-0 ml-4 lg:ml-0">
+        <div className="col-span-4 ml-4 bg-white px-16 md:px-0 lg:ml-0">
           <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {data.allProducts.map((product) => {

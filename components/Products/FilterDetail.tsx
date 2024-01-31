@@ -1,9 +1,7 @@
 import {
-  BrandModelDescriptionField,
-  CollectionModelDescriptionField,
+  FilterDetailModelDescriptionField,
   GeneralInterfaceRecord,
   ImageFileField,
-  MaterialModelDescriptionField,
 } from '@/graphql/generated';
 import {
   CloudArrowUpIcon,
@@ -30,11 +28,7 @@ type PropTypes = {
   subtitle: string;
   type: Maybe<string>;
   image: ImageFileField;
-  description: Maybe<
-    | CollectionModelDescriptionField
-    | BrandModelDescriptionField
-    | MaterialModelDescriptionField
-  >;
+  description: Maybe<FilterDetailModelDescriptionField>;
 };
 
 const FilterDetail = ({
@@ -77,21 +71,21 @@ const FilterDetail = ({
           />
         </svg>
       </div>
-      <div className="-mt-4 lg:mt-0 gap-t-16 lg:gap-t-10 mx-auto grid w-full max-w-2xl gap-x-8 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:items-start">
+      <div className="gap-t-16 lg:gap-t-10 mx-auto -mt-4 grid w-full max-w-2xl gap-x-8 lg:mx-0 lg:mt-0 lg:max-w-none lg:grid-cols-3 lg:items-start">
         <div className="mb-8 w-full lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-16">
           <div className="lg:pr-4">
-            <p className="text-base font-semibold leading-7 text-primary text-center lg:text-left">
+            <p className="text-center text-base font-semibold leading-7 text-primary lg:text-left">
               {type}
             </p>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center lg:text-left">
+            <h1 className="mt-2 text-center text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-left">
               {name}
             </h1>
-            <div className="mt-6 text-xl leading-8 text-gray-700 text-center lg:text-left">
+            <div className="mt-6 text-center text-xl leading-8 text-gray-700 lg:text-left">
               <ReactMarkdown>{subtitle || ''}</ReactMarkdown>
             </div>
           </div>
         </div>
-        <div className="relative mb-8 h-96 p-12 lg:sticky lg:top-32 lg:row-span-5 lg:row-start-1 lg:-ml-12 lg:mb-0 lg:mr-12 lg:h-full lg:overflow-hidden mx-8 lg:mx-0">
+        <div className="relative mx-8 mb-8 h-96 p-12 lg:sticky lg:top-32 lg:row-span-5 lg:row-start-1 lg:mx-0 lg:-ml-12 lg:mb-0 lg:mr-12 lg:h-full lg:overflow-hidden">
           <DatoImage
             data={image.responsiveImage as ResponsiveImageType}
             className="relative h-full w-[48rem] max-w-none rounded-xl bg-gray-900 object-contain shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"

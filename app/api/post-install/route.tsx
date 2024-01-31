@@ -38,19 +38,19 @@ async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
   });
 }
 
-async function installSEOAnalysisPlugin(client: Client, baseUrl: string) {
-  const seoPlugin = await client.plugins.create({
-    package_name: 'datocms-plugin-seo-readability-analysis',
-  });
+// async function installSEOAnalysisPlugin(client: Client, baseUrl: string) {
+//   const seoPlugin = await client.plugins.create({
+//     package_name: 'datocms-plugin-seo-readability-analysis',
+//   });
 
-  await client.plugins.update(seoPlugin.id, {
-    parameters: {
-      htmlGeneratorUrl: `${baseUrl}/api/seoAnalysis?token=${secretToken}`,
-      autoApplyToFieldsWithApiKey: 'seo_analysis',
-      setSeoReadabilityAnalysisFieldExtensionId: true,
-    },
-  });
-}
+//   await client.plugins.update(seoPlugin.id, {
+//     parameters: {
+//       htmlGeneratorUrl: `${baseUrl}/api/seoAnalysis?token=${secretToken}`,
+//       autoApplyToFieldsWithApiKey: 'seo_analysis',
+//       setSeoReadabilityAnalysisFieldExtensionId: true,
+//     },
+//   });
+// }
 
 async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
   await client.webhooks.create({
@@ -97,7 +97,6 @@ export async function POST(request: Request) {
     await Promise.all([
       installWebPreviewsPlugin(client, baseUrl),
       createCacheInvalidationWebhook(client, baseUrl),
-      installSEOAnalysisPlugin(client, baseUrl),
     ]);
 
     return NextResponse.json({ success: true }, cors);

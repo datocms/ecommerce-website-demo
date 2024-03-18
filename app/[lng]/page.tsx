@@ -31,12 +31,7 @@ export default async function Home({ params: { lng, slug } }: Params) {
 
   return (
     <>
-      {!isEnabled && (
-        <Sections
-          locale={lng}
-          sections={data.home.sections as any} 
-        />
-      )}
+      {!isEnabled && <Sections locale={lng} sections={data.home.sections} />}
       {isEnabled && (
         <RealTimeSections
           initialData={data}

@@ -1457,7 +1457,6 @@ export type HomeRecord = RecordInterface & {
   id: Scalars['ItemId']['output'];
   label: Scalars['String']['output'];
   sections: Array<HomeModelSectionsField>;
-  seoAnalysis?: Maybe<Scalars['JsonField']['output']>;
   seoMeta?: Maybe<SeoField>;
   slug: Scalars['String']['output'];
 };
@@ -3648,7 +3647,6 @@ export type ProductModelFilter = {
   reviewAverage?: InputMaybe<FloatFilter>;
   sale?: InputMaybe<StringFilter>;
   salePrice?: InputMaybe<FloatFilter>;
-  seoAnalysis?: InputMaybe<JsonFilter>;
   seoMeta?: InputMaybe<SeoFilter>;
   slug?: InputMaybe<SlugFilter>;
 };
@@ -3777,7 +3775,6 @@ export type ProductRecord = RecordInterface & {
   reviewAverage: Scalars['FloatType']['output'];
   sale: Scalars['String']['output'];
   salePrice?: Maybe<Scalars['FloatType']['output']>;
-  seoAnalysis?: Maybe<Scalars['JsonField']['output']>;
   seoMeta?: Maybe<SeoField>;
   slug: Scalars['String']['output'];
 };
@@ -4313,7 +4310,6 @@ export type ShowcaseRecord = RecordInterface & {
   materialsTitle?: Maybe<Scalars['String']['output']>;
   newProducts: Array<ProductRecord>;
   newProductsTitle?: Maybe<Scalars['String']['output']>;
-  seoAnalysis?: Maybe<Scalars['JsonField']['output']>;
   seoMeta?: Maybe<SeoField>;
   slug?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
@@ -4559,7 +4555,6 @@ export type StoreModelFilter = {
   _updatedAt?: InputMaybe<UpdatedAtFilter>;
   country?: InputMaybe<StringFilter>;
   id?: InputMaybe<ItemIdFilter>;
-  seoAnalysis?: InputMaybe<JsonFilter>;
   seoMeta?: InputMaybe<SeoFilter>;
   slug?: InputMaybe<SlugFilter>;
   storeDescription?: InputMaybe<TextFilter>;
@@ -4615,7 +4610,6 @@ export type StoreRecord = RecordInterface & {
   _updatedAt: Scalars['DateTime']['output'];
   country?: Maybe<Scalars['String']['output']>;
   id: Scalars['ItemId']['output'];
-  seoAnalysis?: Maybe<Scalars['JsonField']['output']>;
   seoMeta?: Maybe<SeoField>;
   slug: Scalars['String']['output'];
   storeDescription?: Maybe<Scalars['String']['output']>;
@@ -5128,13 +5122,34 @@ export type UploadUpdatedAtFilter = {
 
 export type UploadVideoField = {
   __typename?: 'UploadVideoField';
+  alt?: Maybe<Scalars['String']['output']>;
+  blurUpThumb?: Maybe<Scalars['String']['output']>;
+  blurhash?: Maybe<Scalars['String']['output']>;
   duration?: Maybe<Scalars['Int']['output']>;
   framerate?: Maybe<Scalars['Int']['output']>;
+  height: Scalars['IntType']['output'];
   mp4Url?: Maybe<Scalars['String']['output']>;
   muxAssetId: Scalars['String']['output'];
   muxPlaybackId: Scalars['String']['output'];
   streamingUrl: Scalars['String']['output'];
+  thumbhash?: Maybe<Scalars['String']['output']>;
   thumbnailUrl: Scalars['String']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+  width: Scalars['IntType']['output'];
+};
+
+
+export type UploadVideoFieldAltArgs = {
+  fallbackLocales?: InputMaybe<Array<SiteLocale>>;
+  locale?: InputMaybe<SiteLocale>;
+};
+
+
+export type UploadVideoFieldBlurUpThumbArgs = {
+  imgixParams?: InputMaybe<ImgixParams>;
+  punch?: Scalars['Float']['input'];
+  quality?: Scalars['Int']['input'];
+  size?: Scalars['Int']['input'];
 };
 
 
@@ -5146,6 +5161,12 @@ export type UploadVideoFieldMp4UrlArgs = {
 
 export type UploadVideoFieldThumbnailUrlArgs = {
   format?: InputMaybe<MuxThumbnailFormatType>;
+};
+
+
+export type UploadVideoFieldTitleArgs = {
+  fallbackLocales?: InputMaybe<Array<SiteLocale>>;
+  locale?: InputMaybe<SiteLocale>;
 };
 
 /** Specifies how to filter by width */

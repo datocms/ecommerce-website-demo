@@ -10,7 +10,7 @@ import {
   MenuQuery,
   PopupRecord,
   SiteLocale,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import NotificationStrip from './NotificationStrip';
 import { Menu } from './HeaderRenderer';
 import { isEmptyDocument } from 'datocms-structured-text-utils';

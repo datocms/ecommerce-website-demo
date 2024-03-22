@@ -2,7 +2,7 @@ import {
   ProductRecord,
   ResponsiveImage,
   SiteLocale,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import { Image as DatoImage } from 'react-datocms';
 
 type PropTypes = {

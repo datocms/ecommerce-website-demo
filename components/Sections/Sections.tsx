@@ -6,7 +6,7 @@ import {
   MaterialShowcaseSectionRecord,
   SiteLocale,
   TestimonialSectionRecord,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import ProductShowcase from '../Showcases/ProductShowcase';
 import CollectionShowcaseLargeImage from '../Showcases/CollectionShowcaseLargeImage';
 import DividerSection from './DividerSection';

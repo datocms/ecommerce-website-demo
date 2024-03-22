@@ -3,7 +3,7 @@
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SiteLocale } from '@/graphql/generated';
+import { SiteLocale } from '@/graphql/types/graphql';
 
 type PropTypes = {
   lng: SiteLocale;

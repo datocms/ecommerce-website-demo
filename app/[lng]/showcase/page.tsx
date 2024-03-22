@@ -1,7 +1,7 @@
 import { getFallbackLocale } from '@/app/i18n/settings';
 import RealTimeShowcase from '@/components/Showcases/RealTimeShowcase';
 import ShowcasePage from '@/components/Showcases/ShowcasePage';
-import { ShowcaseDocument, SiteLocale } from '@/graphql/generated';
+import { ShowcaseDocument, SiteLocale } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';

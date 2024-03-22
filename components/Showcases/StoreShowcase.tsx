@@ -1,6 +1,6 @@
 'use client';
 
-import { StoreRecord, StoresQuery } from '@/graphql/generated';
+import { StoreRecord, StoresQuery } from '@/graphql/types/graphql';
 import { Maybe } from 'graphql/jsutils/Maybe';
 import { useState } from 'react';
 import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';

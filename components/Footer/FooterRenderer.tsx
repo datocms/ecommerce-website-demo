@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import SvgRenderer from '../Common/SvgRenderer';
-import { FooterQuery, LegalPageRecord, SiteLocale } from '@/graphql/generated';
+import { FooterQuery, LegalPageRecord, SiteLocale } from '@/graphql/types/graphql';
 import { notFound } from 'next/navigation';
 import { primaryColor } from '@/app/i18n/settings';
 import ReactMarkdown from 'react-markdown';

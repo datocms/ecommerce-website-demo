@@ -5,7 +5,7 @@ import {
   SiteLocale,
   StoresQuery,
   StoresQueryVariables,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import StoreShowcase from './StoreShowcase';
 

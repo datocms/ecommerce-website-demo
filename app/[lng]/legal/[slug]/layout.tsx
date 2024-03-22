@@ -2,7 +2,7 @@ import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import '@/styles/global.css';
 import { draftMode } from 'next/headers';
-import { SiteLocale } from '@/graphql/generated';
+import { SiteLocale } from '@/graphql/types/graphql';
 import HeaderRenderer from '@/components/Header/HeaderRenderer';
 import getAvailableLocales from '@/app/i18n/settings';
 

@@ -7,7 +7,7 @@ import {
   HomeQuery,
   HomeQueryVariables,
   SiteLocale,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 
 export default function RealTimeSections({

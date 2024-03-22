@@ -5,7 +5,7 @@ import {
   ShowcaseQuery,
   ShowcaseQueryVariables,
   SiteLocale,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import ShowcasePage from './ShowcasePage';
 

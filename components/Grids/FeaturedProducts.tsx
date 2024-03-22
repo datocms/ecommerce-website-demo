@@ -1,4 +1,4 @@
-import { ProductRecord, SiteLocale } from '@/graphql/generated';
+import { ProductRecord, SiteLocale } from '@/graphql/types/graphql';
 import { Maybe } from 'graphql/jsutils/Maybe';
 import Link from 'next/link';
 import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';

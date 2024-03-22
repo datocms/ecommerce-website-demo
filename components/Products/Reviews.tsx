@@ -1,4 +1,4 @@
-import { FeaturedReviewRecord, SiteLocale } from '@/graphql/generated';
+import { FeaturedReviewRecord, SiteLocale } from '@/graphql/types/graphql';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
 type PropTypes = {

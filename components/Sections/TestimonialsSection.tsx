@@ -1,4 +1,4 @@
-import { TestimonialSectionRecord } from '@/graphql/generated';
+import { TestimonialSectionRecord } from '@/graphql/types/graphql';
 import ReactMarkdown from 'react-markdown';
 
 type PropTypes = {

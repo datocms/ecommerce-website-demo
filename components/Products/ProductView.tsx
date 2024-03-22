@@ -1,6 +1,6 @@
 'use client';
 
-import { ProductQuery, SiteLocale } from '@/graphql/generated';
+import { ProductQuery, SiteLocale } from '@/graphql/types/graphql';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';

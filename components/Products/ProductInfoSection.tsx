@@ -5,7 +5,7 @@ import {
   ProductFeatureSectionRecord,
   ProductQuestionRecord,
   SiteLocale,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { Image as DatoImage } from 'react-datocms';

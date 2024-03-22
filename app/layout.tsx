@@ -1,5 +1,5 @@
 import '@/styles/global.css';
-import { SiteLocale } from '@/graphql/generated';
+import { SiteLocale } from '@/graphql/types/graphql';
 import getAvailableLocales from '@/app/i18n/settings';
 import Head from './[lng]/Head';
 

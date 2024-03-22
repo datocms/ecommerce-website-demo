@@ -2,7 +2,7 @@ import {
   FilterDetailModelDescriptionField,
   GeneralInterfaceRecord,
   ImageFileField,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import {
   CloudArrowUpIcon,
   LockClosedIcon,

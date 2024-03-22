@@ -5,7 +5,7 @@ import {
   CollectionRecord,
   GeneralInterfaceRecord,
   MaterialRecord,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import { Disclosure } from '@headlessui/react';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useRouter, useSearchParams } from 'next/navigation';

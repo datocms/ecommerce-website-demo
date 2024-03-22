@@ -1,7 +1,7 @@
 import ScrollToTop from '@/components/ScrollToTop';
 import '@/styles/global.css';
 import { draftMode } from 'next/headers';
-import { CustomColorDocument, SiteLocale } from '@/graphql/generated';
+import { CustomColorDocument, SiteLocale } from '@/graphql/types/graphql';
 import getAvailableLocales from '@/app/i18n/settings';
 import CustomColor from '@/components/Common/CustomColor';
 import queryDatoCMS from '@/utils/queryDatoCMS';

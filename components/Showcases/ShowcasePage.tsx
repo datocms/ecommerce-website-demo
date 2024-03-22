@@ -1,6 +1,6 @@
 import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
 import Link from 'next/link';
-import { ShowcaseQuery, SiteLocale } from '@/graphql/generated';
+import { ShowcaseQuery, SiteLocale } from '@/graphql/types/graphql';
 import { notFound } from 'next/navigation';
 
 type PropTypes = {

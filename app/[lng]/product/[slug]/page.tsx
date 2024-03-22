@@ -5,7 +5,7 @@ import {
   LegalDocument,
   ProductDocument,
   SiteLocale,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
 

@@ -1,4 +1,4 @@
-import { CookieNoticeRecord } from '@/graphql/generated';
+import { CookieNoticeRecord } from '@/graphql/types/graphql';
 import { Dispatch, SetStateAction } from 'react';
 import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
 

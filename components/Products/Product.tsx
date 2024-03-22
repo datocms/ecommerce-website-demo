@@ -7,7 +7,7 @@ import {
   ProductQuestionRecord,
   ProductRecord,
   SiteLocale,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import { notFound } from 'next/navigation';
 import { StructuredText, renderNodeRule } from 'react-datocms';
 import ProductView from './ProductView';

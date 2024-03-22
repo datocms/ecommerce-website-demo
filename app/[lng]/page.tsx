@@ -2,7 +2,7 @@ import Sections from '@/components/Sections/Sections';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
 import RealTimeSections from '@/components/Sections/RealTimeSections';
-import { HomeDocument, SiteLocale } from '@/graphql/generated';
+import { HomeDocument, SiteLocale } from '@/graphql/types/graphql';
 import { notFound } from 'next/navigation';
 import { getFallbackLocale } from '@/app/i18n/settings';
 

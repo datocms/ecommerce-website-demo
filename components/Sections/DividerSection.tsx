@@ -1,4 +1,4 @@
-import { DividerSectionRecord, SiteLocale } from '@/graphql/generated';
+import { DividerSectionRecord, SiteLocale } from '@/graphql/types/graphql';
 import Link from 'next/link';
 
 type PropTypes = {

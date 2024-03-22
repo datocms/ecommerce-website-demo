@@ -1,7 +1,7 @@
 import {
   FeaturedQuestionsSectionRecord,
   ProductQuestionRecord,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import ReactMarkdown from 'react-markdown';
 
 type PropTypes = {

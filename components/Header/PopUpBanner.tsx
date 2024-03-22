@@ -1,4 +1,4 @@
-import { PopupRecord, SiteLocale } from '@/graphql/generated';
+import { PopupRecord, SiteLocale } from '@/graphql/types/graphql';
 import Link from 'next/link';
 import { Dispatch, SetStateAction } from 'react';
 import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';

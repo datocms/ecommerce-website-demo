@@ -13,7 +13,7 @@ import {
   ProductModelOrderBy,
   ProductsDocument,
   SiteLocale,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import getAvailableLocales, { getFallbackLocale } from '@/app/i18n/settings';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import Link from 'next/link';

@@ -1,6 +1,6 @@
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { getFallbackLocale } from '../i18n/settings';
-import { MetaDocument, SiteLocale } from '@/graphql/generated';
+import { MetaDocument, SiteLocale } from '@/graphql/types/graphql';
 
 export default async function Head() {
   const fallbackLng = await getFallbackLocale();

@@ -14,7 +14,7 @@ import {
   LinkItemRecord,
   MenuQuery,
   SiteLocale,
-} from '@/graphql/generated';
+} from '@/graphql/types/graphql';
 import LanguageSelector from './LanguageSelector';
 import Link from 'next/link';
 import HoveringSearch from './HoveringSearch';

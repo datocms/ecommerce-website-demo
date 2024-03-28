@@ -2,26 +2,28 @@ import {
   FilterDetailModelDescriptionField,
   GeneralInterfaceRecord,
   ImageFileField,
-} from '@/graphql/types/graphql';
+} from "@/graphql/types/graphql";
 import {
   CloudArrowUpIcon,
   LockClosedIcon,
   ServerIcon,
-} from '@heroicons/react/20/solid';
+} from "@heroicons/react/20/solid";
 import {
+  Record,
+  StructuredText,
   isList,
   isListItem,
   isThematicBreak,
-} from 'datocms-structured-text-utils';
-import { Maybe } from 'graphql/jsutils/Maybe';
+} from "datocms-structured-text-utils";
+import { Maybe } from "graphql/jsutils/Maybe";
 import {
   Image as DatoImage,
   ResponsiveImageType,
-  StructuredText,
+  StructuredText as StructuredTextField,
   renderNodeRule,
-} from 'react-datocms';
-import ReactMarkdown from 'react-markdown';
-import Highlighter from '../Common/Highlighter';
+} from "react-datocms";
+import ReactMarkdown from "react-markdown";
+import Highlighter from "../Common/Highlighter";
 
 type PropTypes = {
   name: string;
@@ -81,7 +83,7 @@ const FilterDetail = ({
               {name}
             </h1>
             <div className="mt-6 text-center text-xl leading-8 text-gray-700 lg:text-left">
-              <ReactMarkdown>{subtitle || ''}</ReactMarkdown>
+              <ReactMarkdown>{subtitle || ""}</ReactMarkdown>
             </div>
           </div>
         </div>
@@ -94,42 +96,44 @@ const FilterDetail = ({
             objectPosition="50% 50%"
           />
         </div>
-        <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-8">
-          <div className="px-8 text-base leading-7 text-gray-700">
-            <StructuredText
-              data={description?.value}
-              renderNode={Highlighter}
-              customNodeRules={[
-                renderNodeRule(isListItem, ({ children, key }) => {
-                  return (
-                    <div key={key} className="flex gap-x-3">
-                      <div>{children}</div>
-                    </div>
-                  );
-                }),
-                renderNodeRule(isThematicBreak, ({ children, key }) => {
-                  return (
-                    <hr
-                      key={key}
-                      className="mx-auto my-4 h-[3px] w-1/2 rounded-3xl bg-primary opacity-50"
-                    />
-                  );
-                }),
-                renderNodeRule(isList, ({ children, key }) => {
-                  return (
-                    <ul
-                      key={key}
-                      role="list"
-                      className="my-8 space-y-8 text-gray-600"
-                    >
-                      {children}
-                    </ul>
-                  );
-                }),
-              ]}
-            />
+        {description && (
+          <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-8">
+            <div className="px-8 text-base leading-7 text-gray-700">
+              <StructuredTextField
+                data={description.value as StructuredText<Record, Record>}
+                renderNode={Highlighter}
+                customNodeRules={[
+                  renderNodeRule(isListItem, ({ children, key }) => {
+                    return (
+                      <div key={key} className="flex gap-x-3">
+                        <div>{children}</div>
+                      </div>
+                    );
+                  }),
+                  renderNodeRule(isThematicBreak, ({ children, key }) => {
+                    return (
+                      <hr
+                        key={key}
+                        className="mx-auto my-4 h-[3px] w-1/2 rounded-3xl bg-primary opacity-50"
+                      />
+                    );
+                  }),
+                  renderNodeRule(isList, ({ children, key }) => {
+                    return (
+                      <ul
+                        key={key}
+                        role="list"
+                        className="my-8 space-y-8 text-gray-600"
+                      >
+                        {children}
+                      </ul>
+                    );
+                  }),
+                ]}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

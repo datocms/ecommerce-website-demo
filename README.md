@@ -1,6 +1,6 @@
-# An Ecommerce Website Demo using Next.js 13 and DatoCMS
+# An Ecommerce Website Demo using Next.js 14 and DatoCMS
 
-This example showcases a TypeScript Next.js 13 website with App Router (app) — using [DatoCMS](https://www.datocms.com/) as the data source.
+This example showcases a TypeScript Next.js 14 website with App Router (app) — using [DatoCMS](https://www.datocms.com/) as the data source.
 
 It uses GraphQL CodeGen to type all of the requests comming from Dato automatically: [See how it works here](https://www.datocms.com/blog/how-to-generate-typescript-types-from-graphql)
 

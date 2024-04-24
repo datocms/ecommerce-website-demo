@@ -1,7 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import SvgRenderer from '../Common/SvgRenderer';
-import { FooterQuery, LegalPageRecord, SiteLocale } from '@/graphql/types/graphql';
+import {
+  FooterQuery,
+  LegalPageRecord,
+  SiteLocale,
+} from '@/graphql/types/graphql';
 import { notFound } from 'next/navigation';
 import { primaryColor } from '@/app/i18n/settings';
 import ReactMarkdown from 'react-markdown';
@@ -44,7 +48,7 @@ const Footer = ({ data, lng }: Props) => {
       <div className="pt-12">
         <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
           <div className="mb-16 grid grid-cols-2 gap-y-12 md:grid-cols-4 lg:grid-cols-6 lg:gap-8">
-            <div className="col-span-full lg:col-span-2 flex flex-col items-center justify-center text-center md:block md:my-auto">
+            <div className="col-span-full flex flex-col items-center justify-center text-center md:my-auto md:block lg:col-span-2">
               <div className="mb-4 flex items-center lg:-mt-2">
                 <Link
                   href="/"
@@ -91,11 +95,11 @@ const Footer = ({ data, lng }: Props) => {
             {data.layout?.footerColumns.map((column) => {
               return (
                 <div key={column.id}>
-                  <div className="mb-4 font-bold uppercase tracking-widest text-gray-800 text-center md:text-start -ml-4">
+                  <div className="-ml-4 mb-4 text-center font-bold uppercase tracking-widest text-gray-800 md:text-start">
                     {column.label}
                   </div>
 
-                  <nav className="flex flex-col gap-4 items-center md:items-start -ml-4">
+                  <nav className="-ml-4 flex flex-col items-center gap-4 md:items-start">
                     {column.footerItem.map((item) => {
                       return (
                         <div key={item.id}>

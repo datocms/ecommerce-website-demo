@@ -34,10 +34,11 @@ const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
         </button>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="h-full w-full rounded-xl object-cover relative overflow-hidden">
+          <div className="relative h-full w-full overflow-hidden rounded-xl object-cover">
             <DatoImage
               data={
-                cookieNotice.cookieNoticeImage?.responsiveImage as ResponsiveImageType
+                cookieNotice.cookieNoticeImage
+                  ?.responsiveImage as ResponsiveImageType
               }
               className="h-full w-full object-contain"
               layout="fill"
@@ -63,7 +64,7 @@ const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
                 onClick={() => {
                   setCookies(false);
                 }}
-                className="inline-block rounded-lg px-5 py-3 text-sm font-medium  text-slate-400 cursor-pointer"
+                className="inline-block cursor-pointer rounded-lg px-5 py-3 text-sm  font-medium text-slate-400"
               >
                 {cookieNotice.secondaryButtonLabel}
               </div>
@@ -71,7 +72,7 @@ const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
                 onClick={() => {
                   setCookies(false);
                 }}
-                className="inline-block rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white cursor-pointer"
+                className="inline-block cursor-pointer rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white"
               >
                 {cookieNotice.primaryButtonLabel}
               </div>

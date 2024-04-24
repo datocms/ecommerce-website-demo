@@ -2,28 +2,28 @@ import {
   FilterDetailModelDescriptionField,
   GeneralInterfaceRecord,
   ImageFileField,
-} from "@/graphql/types/graphql";
+} from '@/graphql/types/graphql';
 import {
   CloudArrowUpIcon,
   LockClosedIcon,
   ServerIcon,
-} from "@heroicons/react/20/solid";
+} from '@heroicons/react/20/solid';
 import {
   Record,
   StructuredText,
   isList,
   isListItem,
   isThematicBreak,
-} from "datocms-structured-text-utils";
-import { Maybe } from "graphql/jsutils/Maybe";
+} from 'datocms-structured-text-utils';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import {
   Image as DatoImage,
   ResponsiveImageType,
   StructuredText as StructuredTextField,
   renderNodeRule,
-} from "react-datocms";
-import ReactMarkdown from "react-markdown";
-import Highlighter from "../Common/Highlighter";
+} from 'react-datocms';
+import ReactMarkdown from 'react-markdown';
+import Highlighter from '../Common/Highlighter';
 
 type PropTypes = {
   name: string;
@@ -83,7 +83,7 @@ const FilterDetail = ({
               {name}
             </h1>
             <div className="mt-6 text-center text-xl leading-8 text-gray-700 lg:text-left">
-              <ReactMarkdown>{subtitle || ""}</ReactMarkdown>
+              <ReactMarkdown>{subtitle || ''}</ReactMarkdown>
             </div>
           </div>
         </div>

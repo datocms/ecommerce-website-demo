@@ -1,4 +1,3 @@
-
 import { LocalesDocument } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 

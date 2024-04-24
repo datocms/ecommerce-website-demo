@@ -9,7 +9,7 @@ type PropTypes = {
 export default function DividerSection({ divider, lng }: PropTypes) {
   return (
     <div className="container mx-auto mb-8 flex max-w-7xl flex-wrap items-center px-20 py-16 text-center lg:text-left">
-      <div className="w-full lg:text-right lg:flex-1">
+      <div className="w-full lg:flex-1 lg:text-right">
         <div className="text-sm uppercase tracking-widest text-gray-700">
           {divider.preTitle}
         </div>
@@ -31,7 +31,7 @@ export default function DividerSection({ divider, lng }: PropTypes) {
         <p>{divider.subtitle}</p>
         <Link
           href={`/${lng}/${divider.button[0].slug}`}
-          className="font-heading mt-4 inline-block bg-primary/80 px-8 py-4 text-sm tracking-widest text-white rounded-lg"
+          className="font-heading mt-4 inline-block rounded-lg bg-primary/80 px-8 py-4 text-sm tracking-widest text-white"
         >
           {divider.button[0].label}
         </Link>

@@ -36,13 +36,14 @@ const LanguageSelector = ({ lng, languages, currencySymbol }: Props) => {
         className="ml-4 inline-flex w-full items-center overflow-hidden rounded-md bg-white transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300"
       >
         <button className="inline-flex w-full cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-center text-sm font-medium text-gray-800">
-          {getLangNameFromCode(currentLocale)?.name || currentLocale} ({currencySymbol})
+          {getLangNameFromCode(currentLocale)?.name || currentLocale} (
+          {currencySymbol})
         </button>
       </div>
 
       <div
         className={
-          'absolute left-5 end-0 z-10 mt-1 w-28 rounded-md border border-gray-100 bg-white shadow-lg' +
+          'absolute end-0 left-5 z-10 mt-1 w-28 rounded-md border border-gray-100 bg-white shadow-lg' +
           (isOpen ? '' : ' hidden')
         }
         role="menu"

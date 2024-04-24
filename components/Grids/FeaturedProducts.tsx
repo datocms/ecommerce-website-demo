@@ -18,7 +18,7 @@ const FeaturedProducts = ({
 }: PropTypes) => {
   return (
     <>
-      <div className="bg-white py-6 sm:py-8 lg:mx-56 lg:py-12 px-16 lg:px-8">
+      <div className="bg-white px-16 py-6 sm:py-8 lg:mx-56 lg:px-8 lg:py-12">
         <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
           <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 md:gap-x-6 lg:grid-cols-3 xl:grid-cols-3">
             {products.map((product) => {

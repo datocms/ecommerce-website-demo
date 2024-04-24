@@ -1,7 +1,11 @@
 import { getFallbackLocale } from '@/app/i18n/settings';
 import RealTimeStoreShowcase from '@/components/Showcases/RealTimeStoreShowcase';
 import StoreShowcase from '@/components/Showcases/StoreShowcase';
-import { SiteLocale, StoreRecord, StoresDocument } from '@/graphql/types/graphql';
+import {
+  SiteLocale,
+  StoreRecord,
+  StoresDocument,
+} from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';

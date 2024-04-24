@@ -15,9 +15,9 @@ const StoreShowcase = ({ data }: PropTypes) => {
   const allStores = data.allStores;
 
   return (
-    <div className="mx-auto -mb-8  flex w-full max-w-7xl flex-wrap lg:h-screen lg:pt-24 py-24">
-      <div className="flex lg:block lg:m-0 h-screen -mb-56 -mt-80 w-full lg:items-start lg:justify-start items-center justify-center lg:h-full lg:w-1/2">
-        <div className="max-w-xl flex flex-col justify-center h-full px-12 lg:px-32 text-center lg:text-left">
+    <div className="mx-auto -mb-8  flex w-full max-w-7xl flex-wrap py-24 lg:h-screen lg:pt-24">
+      <div className="-mb-56 -mt-80 flex h-screen w-full items-center justify-center lg:m-0 lg:block lg:h-full lg:w-1/2 lg:items-start lg:justify-start">
+        <div className="flex h-full max-w-xl flex-col justify-center px-12 text-center lg:px-32 lg:text-left">
           <p className="mb-4 font-sans text-xs uppercase tracking-wide text-gray-600">
             {allStores[currentStore].country}
           </p>
@@ -27,7 +27,7 @@ const StoreShowcase = ({ data }: PropTypes) => {
           </h1>
 
           <div className="flex flex-col items-center justify-center">
-            <div className="lg:mb-6 h-48 lg:h-64 pr-6 text-xs leading-normal text-gray-900 md:pr-0 md:leading-loose">
+            <div className="h-48 pr-6 text-xs leading-normal text-gray-900 md:pr-0 md:leading-loose lg:mb-6 lg:h-64">
               {allStores[currentStore].storeDescription}
             </div>
 
@@ -70,14 +70,14 @@ const StoreShowcase = ({ data }: PropTypes) => {
         </div>
       </div>
 
-      <div className="relative h-screen w-full lg:h-full lg:w-1/2 mx-8 lg:mx-0">
+      <div className="relative mx-8 h-screen w-full lg:mx-0 lg:h-full lg:w-1/2">
         <div className="h-full w-full bg-cover bg-center bg-no-repeat">
           <DatoImage
             data={
               allStores[currentStore].storeImage
                 ?.responsiveImage as ResponsiveImageType
             }
-            className="h-full w-full object-contain rounded-lg"
+            className="h-full w-full rounded-lg object-contain"
             layout="fill"
             objectFit="cover"
             objectPosition="70% 30%"

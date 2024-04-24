@@ -113,9 +113,12 @@ const ProductView = ({ data, lng }: Props) => {
               </div>
             </div>
 
-            <div className="w-80 mx-auto md:mx-0 flex flex-col items-center justify-center text-center md:block md:text-left">
+            <div className="mx-auto flex w-80 flex-col items-center justify-center text-center md:mx-0 md:block md:text-left">
               <div className="mb-2 md:mb-3">
-                <Link href={`/${lng}/products?brands=${data.product.brand.id}`} className="mb-0.5 inline-block text-gray-500 cursor-pointer hover:underline">
+                <Link
+                  href={`/${lng}/products?brands=${data.product.brand.id}`}
+                  className="mb-0.5 inline-block cursor-pointer text-gray-500 hover:underline"
+                >
                   {data.product.brand?.name}
                 </Link>
                 <h2 className="text-2xl font-bold text-gray-800 lg:text-3xl">
@@ -271,7 +274,7 @@ const ProductView = ({ data, lng }: Props) => {
                 </span>
               </div>
 
-              <div className="flex flex-col gap-2.5 w-[90%]">
+              <div className="flex w-[90%] flex-col gap-2.5">
                 <a
                   href="#"
                   className="inline-block flex-1 rounded-lg bg-primary/90 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary/40 transition duration-100 hover:bg-primary focus-visible:ring active:bg-primary/50 sm:flex-none md:text-base"

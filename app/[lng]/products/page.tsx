@@ -22,7 +22,6 @@ import SideFilter from '@/components/Common/SideFilter';
 import Pagination from '@/components/Products/Pagination';
 import FilterDetail from '@/components/Products/FilterDetail';
 
-
 type PropTypes = {
   params: {
     lng: SiteLocale;

@@ -45,8 +45,8 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
       : numberOfProducts;
 
   return (
-    <div className="mx-auto flex max-w-7xl items-center justify-center border-gray-200 bg-white px-4 pt-12 sm:px-6 mb-8 sm:mb-0">
-      <div className="gap-8 sm:flex sm:flex-1 justify-center sm:items-center md:justify-end">
+    <div className="mx-auto mb-8 flex max-w-7xl items-center justify-center border-gray-200 bg-white px-4 pt-12 sm:mb-0 sm:px-6">
+      <div className="justify-center gap-8 sm:flex sm:flex-1 sm:items-center md:justify-end">
         <div>
           <p className="text-sm text-gray-700">
             Showing <span className="font-medium">{firstProductIndex}</span> to{' '}

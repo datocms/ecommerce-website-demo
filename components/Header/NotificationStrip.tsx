@@ -1,15 +1,15 @@
 import {
   LayoutModelNotificationField,
   SiteLocale,
-} from "@/graphql/types/graphql";
-import { Record, StructuredText, isLink } from "datocms-structured-text-utils";
-import Link from "next/link";
-import { SetStateAction } from "react";
+} from '@/graphql/types/graphql';
+import { Record, StructuredText, isLink } from 'datocms-structured-text-utils';
+import Link from 'next/link';
+import { SetStateAction } from 'react';
 import {
   StructuredText as StructuredTextField,
   renderNodeRule,
-} from "react-datocms/structured-text";
-import Highlighter from "../Common/Highlighter";
+} from 'react-datocms/structured-text';
+import Highlighter from '../Common/Highlighter';
 
 type Props = {
   notification: LayoutModelNotificationField;
@@ -33,7 +33,7 @@ const NotificationStrip = ({
               renderNodeRule(isLink, ({ node, children, key }) => {
                 return (
                   <Link
-                    href={"/" + lng + node.url || "#"}
+                    href={'/' + lng + node.url || '#'}
                     className="order-last inline-block whitespace-nowrap rounded-lg bg-primary px-2 py-2 text-center text-xs font-semibold text-white outline-none ring-indigo-300 transition duration-100 hover:bg-primary/90 focus-visible:ring active:bg-primary/50 sm:order-none sm:w-auto md:text-sm"
                     key={key}
                   >

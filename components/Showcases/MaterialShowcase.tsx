@@ -1,4 +1,7 @@
-import { MaterialShowcaseSectionRecord, SiteLocale } from '@/graphql/types/graphql';
+import {
+  MaterialShowcaseSectionRecord,
+  SiteLocale,
+} from '@/graphql/types/graphql';
 import Link from 'next/link';
 import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
 

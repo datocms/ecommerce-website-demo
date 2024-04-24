@@ -14,7 +14,7 @@ query Stores($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
       }
     }
   }
-   generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+  generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
     findOnMaps
   }
 }

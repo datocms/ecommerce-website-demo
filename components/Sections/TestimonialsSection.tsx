@@ -7,7 +7,7 @@ type PropTypes = {
 
 const TestimonialsSection = ({ testimonials }: PropTypes) => {
   return (
-    <div className="container mx-auto px-16 py-12 max-w-7xl">
+    <div className="container mx-auto max-w-7xl px-16 py-12">
       <h2 className="font-display text-3xl font-semibold">
         {testimonials.title}
       </h2>
@@ -15,7 +15,7 @@ const TestimonialsSection = ({ testimonials }: PropTypes) => {
         {testimonials.testimonial.map((testimonial) => {
           return (
             <div key={testimonial.id} className="relative">
-              <div className="relative z-10 text-justify h-32">
+              <div className="relative z-10 h-32 text-justify">
                 <ReactMarkdown>{testimonial.testimonial || ''}</ReactMarkdown>
               </div>
               <div className="relative z-10 flex items-center justify-end text-sm">

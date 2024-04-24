@@ -23,6 +23,5 @@ export default async function RootLayout({
   children,
   params: { lng },
 }: Params) {
-
   return <>{children}</>;
 }

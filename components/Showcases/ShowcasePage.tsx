@@ -1,7 +1,7 @@
-import { Image as DatoImage, ResponsiveImageType } from "react-datocms";
-import Link from "next/link";
-import { ShowcaseQuery, SiteLocale } from "@/graphql/types/graphql";
-import { notFound } from "next/navigation";
+import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
+import Link from 'next/link';
+import { ShowcaseQuery, SiteLocale } from '@/graphql/types/graphql';
+import { notFound } from 'next/navigation';
 
 type PropTypes = {
   data: ShowcaseQuery;
@@ -116,10 +116,10 @@ const ShowcasePage = ({ data, lng }: PropTypes) => {
               <h3>{data.showcase.newProducts[0].name}</h3>
               <div className="">
                 {data.generalInterface?.currencySymbol}
-                {data.showcase.newProducts[0].sale !== "not_on_sale"
+                {data.showcase.newProducts[0].sale !== 'not_on_sale'
                   ? data.showcase.newProducts[0].salePrice
                   : data.showcase.newProducts[0].price}
-                {data.showcase.newProducts[0].sale !== "not_on_sale" && (
+                {data.showcase.newProducts[0].sale !== 'not_on_sale' && (
                   <span className="ml-4 text-red-400 line-through">
                     {data.generalInterface?.currencySymbol}
                     {data.showcase.newProducts[0].price}
@@ -148,10 +148,10 @@ const ShowcasePage = ({ data, lng }: PropTypes) => {
               <h3>{data.showcase.newProducts[1].name}</h3>
               <div className="">
                 {data.generalInterface?.currencySymbol}
-                {data.showcase.newProducts[1].sale !== "not_on_sale"
+                {data.showcase.newProducts[1].sale !== 'not_on_sale'
                   ? data.showcase.newProducts[1].salePrice
                   : data.showcase.newProducts[1].price}
-                {data.showcase.newProducts[1].sale !== "not_on_sale" && (
+                {data.showcase.newProducts[1].sale !== 'not_on_sale' && (
                   <span className="ml-4 text-red-400 line-through">
                     {data.generalInterface?.currencySymbol}
                     {data.showcase.newProducts[1].price}

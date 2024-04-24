@@ -1,10 +1,7 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 const NotFound = () => {
-  return (
-    <>
-    </>
-  );
+  return <></>;
 };
 
 export default NotFound;

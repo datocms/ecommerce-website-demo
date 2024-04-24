@@ -73,7 +73,7 @@ const Product = ({ data, lng }: Props) => {
                   return (
                     <div
                       key={key}
-                      className="rounded-full bg-primary/80 px-4 py-2 text-sm font-medium text-white whitespace-nowrap text-center"
+                      className="whitespace-nowrap rounded-full bg-primary/80 px-4 py-2 text-center text-sm font-medium text-white"
                     >
                       <div>{children}</div>
                     </div>
@@ -81,7 +81,10 @@ const Product = ({ data, lng }: Props) => {
                 }),
                 renderNodeRule(isList, ({ children, key }) => {
                   return (
-                    <div key={key} className="justify-center -mb-4 md:mb-0 gap-4 py-8 flex items-center md:flex-row flex-col ">
+                    <div
+                      key={key}
+                      className="-mb-4 flex flex-col items-center justify-center gap-4 py-8 md:mb-0 md:flex-row "
+                    >
                       {children}
                     </div>
                   );

@@ -59,9 +59,9 @@ const Reviews = ({
   reviewButton,
 }: PropTypes) => {
   return (
-    <div className="bg-white py-6 sm:py-8 lg:py-12 text-center md:text-start">
+    <div className="bg-white py-6 text-center sm:py-8 md:text-start lg:py-12">
       <div className="mx-auto max-w-screen-md px-4 md:px-8">
-        <div className="mb-4 flex items-center justify-around md:justify-between border-b border-t py-4">
+        <div className="mb-4 flex items-center justify-around border-b border-t py-4 md:justify-between">
           <div className="flex items-center gap-2">
             <div className="-ml-1 flex gap-0.5 text-primary">
               <div className="flex h-7 items-center gap-1 rounded-full bg-primary/90 px-2 text-white">
@@ -101,7 +101,10 @@ const Reviews = ({
             }).format(date);
 
             return (
-              <div key={review.id} className="flex flex-col gap-3 py-4 md:py-8 items-center justify-center md:justify-start md:items-start">
+              <div
+                key={review.id}
+                className="flex flex-col items-center justify-center gap-3 py-4 md:items-start md:justify-start md:py-8"
+              >
                 <div>
                   <span className="block text-sm font-bold">
                     {review.reviewerName}

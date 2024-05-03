@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import LanguageSelector from './LanguageSelector';
 import {
   CookieNoticeRecord,
@@ -59,8 +59,9 @@ const Header = ({ lng, data }: Props) => {
           setNotificationStrip={setNotificationStrip}
         />
       )}
-
-      <CategoryHeader lng={lng} languages={data._site.locales} data={data} />
+      <Suspense>
+        <CategoryHeader lng={lng} languages={data._site.locales} data={data} />
+      </Suspense>
     </>
   );
 };

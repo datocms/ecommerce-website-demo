@@ -1,7 +1,7 @@
 'use client';
 
 import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, Suspense, useRef, useState } from 'react';
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -445,11 +445,13 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
 
                 <div className="ml-auto flex items-center">
                   <div className="mr-8 flex lg:ml-8 lg:mr-0">
-                    <LanguageSelector
-                      lng={lng}
-                      languages={languages}
-                      currencySymbol={data.generalInterface?.currencySymbol}
-                    />
+                    <Suspense>
+                      <LanguageSelector
+                        lng={lng}
+                        languages={languages}
+                        currencySymbol={data.generalInterface?.currencySymbol}
+                      />
+                    </Suspense>
                   </div>
 
                   {/* Search */}

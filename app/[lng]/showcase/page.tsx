@@ -1,47 +1,31 @@
-import { getFallbackLocale } from '@/app/i18n/settings';
-import RealTimeShowcase from '@/components/Showcases/RealTimeShowcase';
-import ShowcasePage from '@/components/Showcases/ShowcasePage';
-import { ShowcaseDocument, SiteLocale } from '@/graphql/types/graphql';
-import queryDatoCMS from '@/utils/queryDatoCMS';
-import { draftMode } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
+import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
+import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
+import Content from './Content';
+import RealTime from './RealTime';
+import { type PageProps, type Query, type Variables, query } from './meta';
 
-type Params = {
-  params: {
-    lng: SiteLocale;
-    slug: string;
-  };
-};
+const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
+  params,
+  fallbackLocale,
+}) => ({
+  locale: params.lng,
+  fallbackLocale: [fallbackLocale],
+});
 
-const Showcase = async ({ params: { lng, slug } }: Params) => {
-  const fallbackLng = await getFallbackLocale();
-  const { isEnabled } = draftMode();
+export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
+  {
+    query,
+    buildVariables,
+    generate: (data) => data.showcase?.seo,
+  }
+);
 
-  const data = await queryDatoCMS(
-    ShowcaseDocument,
-    {
-      locale: lng,
-      fallbackLocale: [fallbackLng],
-    },
-    isEnabled
-  );
+const Page = generateWrapper<PageProps, Query, Variables>({
+  query,
+  buildVariables,
+  contentComponent: Content,
+  realtimeComponent: RealTime,
+});
 
-  if (!data.showcase) notFound();
-
-  return (
-    <>
-      {!isEnabled && <ShowcasePage lng={lng} data={data} />}
-      {isEnabled && (
-        <RealTimeShowcase
-          initialData={data}
-          locale={lng}
-          token={process.env.DATOCMS_READONLY_API_TOKEN || ''}
-          query={ShowcaseDocument}
-          variables={{ locale: lng, fallbackLocale: [fallbackLng] }}
-        />
-      )}
-    </>
-  );
-};
-
-export default Showcase;
+export default Page;

@@ -1,0 +1,10 @@
+fragment TestimonialSection on TestimonialSectionRecord {
+  id
+  _modelApiKey
+  title
+  testimonial {
+    id
+    testimonial
+    author
+  }
+}

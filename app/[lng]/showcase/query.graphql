@@ -1,0 +1,63 @@
+query Showcase($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+  generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+    currencySymbol
+  }
+  showcase(locale: $locale, fallbackLocales: $fallbackLocale) {
+    seo: _seoMetaTags {
+      attributes
+      content
+      tag
+    }
+    title
+    newProductsTitle
+    newProducts {
+      id
+      slug
+      sale
+      salePrice
+      name
+      productImages {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+        copyright
+      }
+      price
+    }
+    materialsTitle
+    materialsDisplay {
+      responsiveImage {
+        ...DatoImage_responsiveImage
+      }
+    }
+    materialsDescription
+    description
+    displays {
+      responsiveImage {
+        ...DatoImage_responsiveImage
+      }
+    }
+    cta {
+      id
+      label
+      slug
+    }
+    collections {
+      name
+      slug
+      id
+      details {
+        image {
+          responsiveImage {
+            ...DatoImage_responsiveImage
+          }
+        }
+      }
+    }
+    collectionsCta {
+      label
+      slug
+      id
+    }
+  }
+}

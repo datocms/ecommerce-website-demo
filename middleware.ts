@@ -32,18 +32,8 @@ export async function middleware(request: NextRequest) {
   //go to home in browser language if pathname & locale is missing
   if (pathname === '/') {
     const locale = await getLocale(request, locales);
-    return NextResponse.redirect(new URL(`/${locale}/`, request.url));
+    return NextResponse.redirect(new URL(`/${locale}/home`, request.url));
   }
-
-  //go to the specific locale home if there is no pathname but the locale is set
-  // if (
-  //   pathname.split('/').length === 2 &&
-  //   locales.includes(pathname.split('/')[1] as SiteLocale)
-  // ) {
-  //   return NextResponse.redirect(
-  //     new URL(`/${pathname.split('/')[1]}/`, request.url)
-  //   );
-  // }
 
   //go to pathname in browser language if locale is missing but pathname is set
   if (pathnameIsMissingLocale) {

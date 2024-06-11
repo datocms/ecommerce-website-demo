@@ -1,6 +1,5 @@
 'use client';
 
-import { SiteLocale } from '@/graphql/types/graphql';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -8,11 +7,10 @@ import AuthenticationModal from '../Header/AuthenticationModal';
 import SuccessPopUp from '../Header/SuccessPopUp';
 
 type Props = {
-  lng: SiteLocale;
   isDraft: boolean;
 };
 
-export default function ScrollToTop({ lng, isDraft }: Props) {
+export default function ScrollToTop({ isDraft }: Props) {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);

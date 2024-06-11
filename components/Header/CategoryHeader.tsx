@@ -11,8 +11,8 @@ import {
 } from '@heroicons/react/24/outline';
 import {
   DropdownMenuRecord,
+  LayoutQuery,
   LinkItemRecord,
-  MenuQuery,
   SiteLocale,
 } from '@/graphql/types/graphql';
 import LanguageSelector from './LanguageSelector';
@@ -20,18 +20,23 @@ import Link from 'next/link';
 import HoveringSearch from './HoveringSearch';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Cart from './Cart';
+import { GlobalPageProps } from '@/utils/globalPageProps';
 
 type PropTypes = {
-  lng: SiteLocale;
   languages: SiteLocale[];
-  data: MenuQuery;
+  data: LayoutQuery;
+  globalPageProps: GlobalPageProps;
 };
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function CategoryHeader({ lng, languages, data }: PropTypes) {
+export default function CategoryHeader({
+  globalPageProps,
+  languages,
+  data,
+}: PropTypes) {
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
   const [searchIsOpen, setSerachIsOpen] = useState(false);
@@ -141,7 +146,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                                 </div>
                               )}
                               <a
-                                href={`/${lng}/products?${category.newArrival._modelApiKey}s=${category.newArrival.id}`}
+                                href={`/${globalPageProps.params.lng}/products?${category.newArrival._modelApiKey}s=${category.newArrival.id}`}
                                 className="mt-6 block font-medium text-gray-900"
                               >
                                 <span
@@ -172,7 +177,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                                 </div>
                               )}
                               <a
-                                href={`/${lng}/products?${category.trending._modelApiKey}s=${category.trending.id}`}
+                                href={`/${globalPageProps.params.lng}/products?${category.trending._modelApiKey}s=${category.trending.id}`}
                                 className="mt-6 block font-medium text-gray-900"
                               >
                                 <span
@@ -202,7 +207,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                                 {column.item.map((item) => (
                                   <li key={item.name} className="flow-root">
                                     <a
-                                      href={`/${lng}/products?${item._modelApiKey}s=${item.id}`}
+                                      href={`/${globalPageProps.params.lng}/products?${item._modelApiKey}s=${item.id}`}
                                       className="-m-2 block p-2 text-gray-500"
                                     >
                                       {item.name}
@@ -221,7 +226,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                     {links?.map((link) => (
                       <div key={link.id} className="flow-root">
                         <a
-                          href={`/${lng}/${link.slug}`}
+                          href={`/${globalPageProps.params.lng}/${link.slug}`}
                           className="-m-2 block p-2 font-medium text-gray-900"
                         >
                           {link.label}
@@ -254,7 +259,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
 
                 {/* Logo */}
                 <Link
-                  href={`/${lng}/`}
+                  href={`/${globalPageProps.params.lng}/home`}
                   className="relative -m-2 ml-4 flex w-12 lg:ml-0"
                 >
                   <DatoImage
@@ -307,7 +312,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                                       <div className="col-start-2 grid grid-cols-2 gap-x-8">
                                         <Link
                                           onClick={close}
-                                          href={`/${lng}/products?${category.newArrival._modelApiKey}s=${category.newArrival.id}`}
+                                          href={`/${globalPageProps.params.lng}/products?${category.newArrival._modelApiKey}s=${category.newArrival.id}`}
                                           className="group relative text-base sm:text-sm"
                                         >
                                           {category.newArrival.details.image
@@ -350,7 +355,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                                         </Link>
                                         <Link
                                           onClick={close}
-                                          href={`/${lng}/products?${category.trending._modelApiKey}s=${category.trending.id}`}
+                                          href={`/${globalPageProps.params.lng}/products?${category.trending._modelApiKey}s=${category.trending.id}`}
                                           className="group relative text-base sm:text-sm"
                                         >
                                           {category.trending.details.image
@@ -409,7 +414,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                                                   className="flex"
                                                 >
                                                   <Link
-                                                    href={`/${lng}/products?${item._modelApiKey}s=${item.id}`}
+                                                    href={`/${globalPageProps.params.lng}/products?${item._modelApiKey}s=${item.id}`}
                                                     className="hover:text-gray-800"
                                                     onClick={close}
                                                   >
@@ -434,7 +439,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                     {links?.map((link) => (
                       <Link
                         key={link.label}
-                        href={`/${lng}/${link.slug}`}
+                        href={`/${globalPageProps.params.lng}/${link.slug}`}
                         className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-800"
                       >
                         {link.label}
@@ -447,7 +452,6 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                   <div className="mr-8 flex lg:ml-8 lg:mr-0">
                     <Suspense>
                       <LanguageSelector
-                        lng={lng}
                         languages={languages}
                         currencySymbol={data.generalInterface?.currencySymbol}
                       />
@@ -469,7 +473,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                       onKeyDown={(event) => {
                         if (event.key === 'Enter') {
                           router.push(
-                            `/${lng}/products?productName=${searchValue}`
+                            `/${globalPageProps.params.lng}/products?productName=${searchValue}`
                           );
                           setSerachIsOpen(false);
                         }
@@ -492,7 +496,7 @@ export default function CategoryHeader({ lng, languages, data }: PropTypes) {
                             return;
                           }
                           router.push(
-                            `/${lng}/products?productName=${searchValue}`
+                            `/${globalPageProps.params.lng}/products?productName=${searchValue}`
                           );
                           setSerachIsOpen(false);
                         }}

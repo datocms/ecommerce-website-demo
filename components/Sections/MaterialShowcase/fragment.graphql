@@ -1,0 +1,19 @@
+fragment MaterialShowcase on MaterialShowcaseSectionRecord {
+  id
+  _modelApiKey
+  title
+  subDescription
+  description
+  materials {
+    id
+    name
+    slug
+    details {
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+      }
+    }
+  }
+}

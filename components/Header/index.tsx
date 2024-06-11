@@ -7,23 +7,22 @@ import LanguageSelector from './LanguageSelector';
 import {
   CookieNoticeRecord,
   LayoutModelNotificationField,
-  MenuQuery,
+  LayoutQuery,
   PopupRecord,
-  SiteLocale,
 } from '@/graphql/types/graphql';
 import NotificationStrip from './NotificationStrip';
-import { Menu } from './HeaderRenderer';
 import { isEmptyDocument } from 'datocms-structured-text-utils';
 import CategoryHeader from './CategoryHeader';
 import PopUpBanner from './PopUpBanner';
 import CookiesNotice from './CookiesNotice';
+import { GlobalPageProps } from '@/utils/globalPageProps';
 
 type Props = {
-  lng: SiteLocale;
-  data: MenuQuery;
+  data: LayoutQuery;
+  globalPageProps: GlobalPageProps;
 };
 
-const Header = ({ lng, data }: Props) => {
+const Header = ({ data, globalPageProps }: Props) => {
   // Navbar toggle
   const [notificationStrip, setNotificationStrip] = useState(
     !isEmptyDocument(data.layout?.notification)
@@ -37,7 +36,7 @@ const Header = ({ lng, data }: Props) => {
     <>
       {popUp && (
         <PopUpBanner
-          lng={lng}
+          globalPageProps={globalPageProps}
           setPopUp={setPopUp}
           popup={data.layout!.popup as PopupRecord}
         />
@@ -55,12 +54,16 @@ const Header = ({ lng, data }: Props) => {
           notification={
             data.layout?.notification as LayoutModelNotificationField
           }
-          lng={lng}
+          globalPageProps={globalPageProps}
           setNotificationStrip={setNotificationStrip}
         />
       )}
       <Suspense>
-        <CategoryHeader lng={lng} languages={data._site.locales} data={data} />
+        <CategoryHeader
+          globalPageProps={globalPageProps}
+          languages={data._site.locales}
+          data={data}
+        />
       </Suspense>
     </>
   );

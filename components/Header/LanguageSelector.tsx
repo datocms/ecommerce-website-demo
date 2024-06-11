@@ -8,12 +8,11 @@ import { getLangNameFromCode } from 'language-name-map';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
 type Props = {
-  lng: SiteLocale;
   languages: SiteLocale[];
   currencySymbol: Maybe<string>;
 };
 
-const LanguageSelector = ({ lng, languages, currencySymbol }: Props) => {
+const LanguageSelector = ({ languages, currencySymbol }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const pathArray = pathname.split('/');

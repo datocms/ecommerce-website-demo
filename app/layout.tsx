@@ -1,30 +1,23 @@
 import '@/styles/global.css';
 import { SiteLocale } from '@/graphql/types/graphql';
 import getAvailableLocales from '@/app/i18n/settings';
-import Head from './[lng]/Head';
+import { GlobalPageProps } from '@/utils/globalPageProps';
+import ScrollToTop from '@/components/ScrollToTop';
+import { draftMode } from 'next/headers';
 
-type Params = {
+type Params = GlobalPageProps & {
   children: React.ReactNode;
-  params: {
-    lng: SiteLocale;
-  };
 };
-
-export async function generateStaticParams() {
-  const languages = await getAvailableLocales();
-  return languages.map((language) => {
-    language;
-  });
-}
 
 export default async function RootLayout({
   children,
   params: { lng },
 }: Params) {
+  const { isEnabled: isDraft } = draftMode();
   return (
     <html lang={lng}>
-      <Head />
       <body className={`tracking-tight antialiased`}>{children}</body>
+      <ScrollToTop isDraft={isDraft} />
     </html>
   );
 }

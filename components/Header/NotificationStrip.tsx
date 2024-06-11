@@ -10,16 +10,17 @@ import {
   renderNodeRule,
 } from 'react-datocms/structured-text';
 import Highlighter from '../Common/Highlighter';
+import { GlobalPageProps } from '@/utils/globalPageProps';
 
 type Props = {
   notification: LayoutModelNotificationField;
-  lng: SiteLocale;
   setNotificationStrip: React.Dispatch<SetStateAction<boolean>>;
+  globalPageProps: GlobalPageProps;
 };
 
 const NotificationStrip = ({
   notification,
-  lng,
+  globalPageProps,
   setNotificationStrip,
 }: Props) => {
   return (
@@ -33,7 +34,7 @@ const NotificationStrip = ({
               renderNodeRule(isLink, ({ node, children, key }) => {
                 return (
                   <Link
-                    href={'/' + lng + node.url || '#'}
+                    href={'/' + globalPageProps.params.lng + node.url || '#'}
                     className="order-last inline-block whitespace-nowrap rounded-lg bg-primary px-2 py-2 text-center text-xs font-semibold text-white outline-none ring-indigo-300 transition duration-100 hover:bg-primary/90 focus-visible:ring active:bg-primary/50 sm:order-none sm:w-auto md:text-sm"
                     key={key}
                   >

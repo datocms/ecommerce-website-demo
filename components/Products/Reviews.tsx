@@ -1,4 +1,5 @@
 import type { FeaturedReviewRecord, SiteLocale } from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import type { Maybe } from 'graphql/jsutils/Maybe';
 
 type PropTypes = {
@@ -7,7 +8,7 @@ type PropTypes = {
   reviewAverage: number;
   reviewsString: Maybe<string>;
   reviewButton: Maybe<string>;
-  lng: SiteLocale;
+  globalPageProps: GlobalPageProps;
 };
 
 import React, { type FC } from 'react';
@@ -54,7 +55,7 @@ const Reviews = ({
   reviews,
   reviewNumber,
   reviewAverage,
-  lng,
+  globalPageProps,
   reviewsString,
   reviewButton,
 }: PropTypes) => {
@@ -94,11 +95,14 @@ const Reviews = ({
         <div className="divide-y">
           {reviews.map((review) => {
             const date = new Date(review.reviewDate);
-            const formattedDate = new Intl.DateTimeFormat(lng, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            }).format(date);
+            const formattedDate = new Intl.DateTimeFormat(
+              globalPageProps.params.lng,
+              {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              },
+            ).format(date);
 
             return (
               <div

@@ -1,6 +1,7 @@
 'use client';
 
 import type { ProductQuery, SiteLocale } from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -8,12 +9,12 @@ import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 
 type Props = {
   data: ProductQuery;
-  lng: SiteLocale;
+  globalPageProps: GlobalPageProps;
 };
 
 const allSizes = ['xs', 's', 'm', 'l', 'xl'];
 
-const ProductView = ({ data, lng }: Props) => {
+const ProductView = ({ data, globalPageProps }: Props) => {
   if (!data.product) notFound();
 
   const [selectedColor, setSelectedColor] = useState(
@@ -116,7 +117,7 @@ const ProductView = ({ data, lng }: Props) => {
             <div className="mx-auto flex w-80 flex-col items-center justify-center text-center md:mx-0 md:block md:text-left">
               <div className="mb-2 md:mb-3">
                 <Link
-                  href={`/${lng}/products?brands=${data.product.brand.id}`}
+                  href={`/${globalPageProps.params.lng}/products?brands=${data.product.brand.id}`}
                   className="mb-0.5 inline-block cursor-pointer text-gray-500 hover:underline"
                 >
                   {data.product.brand?.name}

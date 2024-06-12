@@ -6,6 +6,7 @@ import {
   ProductQuestionRecord,
   type SiteLocale,
 } from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { Maybe } from 'graphql/jsutils/Maybe';
 import Link from 'next/link';
 import { Image as DatoImage } from 'react-datocms';
@@ -14,14 +15,14 @@ import ReactMarkdown from 'react-markdown';
 type PropTypes = {
   features: ProductFeatureSectionRecord;
   material: MaterialRecord;
-  lng: SiteLocale;
+  globalPageProps: GlobalPageProps;
   interfaceStrings: GeneralInterfaceRecord;
 };
 
 const ProductInfoSection = ({
   features,
   material,
-  lng,
+  globalPageProps,
   interfaceStrings,
 }: PropTypes) => {
   return (
@@ -172,7 +173,7 @@ const ProductInfoSection = ({
                 <p className="text-sm text-gray-500">{material.name}</p>
 
                 <Link
-                  href={`/${lng}/products/?materials=${material.id}`}
+                  href={`/${globalPageProps.params.lng}/products/?materials=${material.id}`}
                   className="inline-block shrink-0 rounded-lg border bg-white px-3 py-1 text-sm font-semibold text-primary outline-none ring-indigo-300 transition duration-100 hover:bg-gray-50 focus-visible:ring active:bg-gray-100"
                 >
                   {interfaceStrings.more}

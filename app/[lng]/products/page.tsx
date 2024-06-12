@@ -4,15 +4,15 @@ import getAvailableLocales, { getFallbackLocale } from '@/app/i18n/settings';
 import SideFilter from '@/components/Common/SideFilter';
 import FilterDetail from '@/components/Products/FilterDetail';
 import Pagination from '@/components/Products/Pagination';
-import {
-  type BrandRecord,
-  type CollectionRecord,
-  type FilterDetailModelDescriptionField,
-  type GeneralInterfaceRecord,
-  type ImageFileField,
-  type MaterialRecord,
-  type ProductModelOrderBy,
-  type SiteLocale,
+import type {
+  BrandRecord,
+  CollectionRecord,
+  FilterDetailModelDescriptionField,
+  GeneralInterfaceRecord,
+  ImageFileField,
+  MaterialRecord,
+  ProductModelOrderBy,
+  SiteLocale,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
 import queryDatoCMS from '@/utils/queryDatoCMS';
@@ -94,7 +94,7 @@ export default async function Products({
     isEnabled,
   );
 
-  let singleFilter;
+  let singleFilter: any;
 
   if (materials.length === 1) {
     singleFilter = initialParams.allMaterials.filter(

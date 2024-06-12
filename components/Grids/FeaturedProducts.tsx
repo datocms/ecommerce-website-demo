@@ -1,18 +1,19 @@
 import type { ProductRecord, SiteLocale } from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import type { Maybe } from 'graphql/jsutils/Maybe';
 import Link from 'next/link';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {
   products: ProductRecord[];
-  lng: SiteLocale;
+  globalPageProps: GlobalPageProps;
   currencySymbol: Maybe<string>;
   sale: Maybe<string>;
 };
 
 const FeaturedProducts = ({
   products,
-  lng,
+  globalPageProps,
   currencySymbol,
   sale,
 }: PropTypes) => {
@@ -26,7 +27,7 @@ const FeaturedProducts = ({
               return (
                 <div key={product.id}>
                   <Link
-                    href={`/${lng}/product/${product.slug}`}
+                    href={`/${globalPageProps.params.lng}/product/${product.slug}`}
                     className="group relative mb-2 block h-96 overflow-hidden rounded-lg bg-gray-100 shadow-lg lg:mb-3"
                   >
                     <div className="h-full w-full object-cover object-center transition duration-200 group-hover:scale-105">

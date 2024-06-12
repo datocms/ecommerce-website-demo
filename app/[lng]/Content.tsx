@@ -1,9 +1,9 @@
+import CustomColor from '@/components/Common/CustomColor';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
+import Meta from '@/components/Meta';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
-import Meta from '@/components/Meta';
-import CustomColor from '@/components/Common/CustomColor';
 
 const Content: ContentPage<PageProps, Query> = ({
   data,

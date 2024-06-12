@@ -1,6 +1,6 @@
 'use client';
 
-import {
+import type {
   BrandRecord,
   CollectionRecord,
   GeneralInterfaceRecord,
@@ -15,9 +15,9 @@ type PropTypes = {
   collections: CollectionRecord[];
   brands: BrandRecord[];
   materials: MaterialRecord[];
-  paramaterCollections: String[];
-  parameterBrands: String[];
-  parameterMaterials: String[];
+  paramaterCollections: string[];
+  parameterBrands: string[];
+  parameterMaterials: string[];
   generalInterface: GeneralInterfaceRecord;
 };
 
@@ -33,13 +33,13 @@ const SideFilter = ({
   const router = useRouter();
   const searchParams = useSearchParams()!;
   const paramaterCollectionsFiltered = paramaterCollections.filter(
-    (parameter) => parameter !== ''
+    (parameter) => parameter !== '',
   );
   const parameterBrandsFiltered = parameterBrands.filter(
-    (parameter) => parameter !== ''
+    (parameter) => parameter !== '',
   );
   const parameterMaterialsFiltered = parameterMaterials.filter(
-    (parameter) => parameter !== ''
+    (parameter) => parameter !== '',
   );
 
   const filters = [
@@ -77,15 +77,12 @@ const SideFilter = ({
   function exportQueryParameters(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
-    router.push('?' + params.toString());
+    router.push(`?${params.toString()}`);
   }
 
   return (
     <form className="mx-4 mb-8 text-center lg:mx-0 lg:mb-0 lg:text-left">
-      <ul
-        role="list"
-        className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900"
-      >
+      <ul className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
         {sortOptions.map((sortOption) => {
           const isSelected =
             searchParams.get('orderBy') === sortOption.value ||
@@ -151,23 +148,24 @@ const SideFilter = ({
                               case 'collections':
                                 if (
                                   paramaterCollectionsFiltered.includes(
-                                    option.id
+                                    option.id,
                                   )
                                 ) {
                                   exportQueryParameters(
                                     'collections',
                                     paramaterCollectionsFiltered
                                       .filter(
-                                        (collection) => collection !== option.id
+                                        (collection) =>
+                                          collection !== option.id,
                                       )
-                                      .join('|')
+                                      .join('|'),
                                   );
                                   return;
                                 }
                                 paramaterCollectionsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'collections',
-                                  paramaterCollectionsFiltered.join('|')
+                                  paramaterCollectionsFiltered.join('|'),
                                 );
                                 return;
                               case 'brands':
@@ -178,16 +176,17 @@ const SideFilter = ({
                                     'brands',
                                     parameterBrandsFiltered
                                       .filter(
-                                        (collection) => collection !== option.id
+                                        (collection) =>
+                                          collection !== option.id,
                                       )
-                                      .join('|')
+                                      .join('|'),
                                   );
                                   return;
                                 }
                                 parameterBrandsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'brands',
-                                  parameterBrandsFiltered.join('|')
+                                  parameterBrandsFiltered.join('|'),
                                 );
                                 return;
                               case 'materials':
@@ -198,16 +197,16 @@ const SideFilter = ({
                                     'materials',
                                     parameterMaterialsFiltered
                                       .filter(
-                                        (material) => material !== option.id
+                                        (material) => material !== option.id,
                                       )
-                                      .join('|')
+                                      .join('|'),
                                   );
                                   return;
                                 }
                                 parameterMaterialsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'materials',
-                                  parameterMaterialsFiltered.join('|')
+                                  parameterMaterialsFiltered.join('|'),
                                 );
                                 return;
                             }

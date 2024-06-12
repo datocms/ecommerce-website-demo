@@ -1,7 +1,7 @@
-import { ProductRecord, SiteLocale } from '@/graphql/types/graphql';
-import { Maybe } from 'graphql/jsutils/Maybe';
+import type { ProductRecord, SiteLocale } from '@/graphql/types/graphql';
+import type { Maybe } from 'graphql/jsutils/Maybe';
 import Link from 'next/link';
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
+import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {
   products: ProductRecord[];

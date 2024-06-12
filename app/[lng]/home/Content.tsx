@@ -1,11 +1,11 @@
 import DividerSection from '@/components/Sections/DividerSection';
-import { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { notFound } from 'next/navigation';
-import { PageProps, Query } from './meta';
 import Hero from '@/components/Sections/Hero';
+import MaterialShowcase from '@/components/Sections/MaterialShowcase';
 import ProductShowcase from '@/components/Sections/ProductShowcase';
 import TestimonialsSection from '@/components/Sections/Testimonials';
-import MaterialShowcase from '@/components/Sections/MaterialShowcase';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
+import { notFound } from 'next/navigation';
+import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({
   data,
@@ -51,7 +51,7 @@ const Content: ContentPage<PageProps, Query> = ({
             );
 
           default:
-            return <></>;
+            return null;
         }
       })}
     </>

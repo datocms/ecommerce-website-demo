@@ -1,6 +1,6 @@
-import { FragmentType, getFragmentData } from '@/graphql/types';
+import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { DividerSectionFragmentDoc } from '@/graphql/types/graphql';
-import { GlobalPageProps } from '@/utils/globalPageProps';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
 export default function DividerSection({ fragment, globalPageProps }: Props) {
   const { preTitle, subtitle, title, button } = getFragmentData(
     DividerSectionFragmentDoc,
-    fragment
+    fragment,
   );
   return (
     <div className="container mx-auto mb-8 flex max-w-7xl flex-wrap items-center px-20 py-16 text-center lg:text-left">

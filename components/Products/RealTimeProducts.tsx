@@ -1,13 +1,13 @@
 'use client';
 
-import { useQuerySubscription } from 'react-datocms/use-query-subscription';
 import {
-  ProductQuery,
-  ProductQueryVariables,
+  type ProductQuery,
+  type ProductQueryVariables,
   ProductsQueryVariables,
-  SiteLocale,
+  type SiteLocale,
 } from '@/graphql/types/graphql';
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { useQuerySubscription } from 'react-datocms/use-query-subscription';
 import Product from './Product';
 
 export default function RealTimeProducts({
@@ -31,7 +31,7 @@ export default function RealTimeProducts({
     preview: true,
   });
 
-  if (!data || !data.product) return <></>;
+  if (!data || !data.product) return null;
 
   return <Product data={data} lng={locale} />;
 }

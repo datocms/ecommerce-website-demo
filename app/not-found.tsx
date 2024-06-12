@@ -30,7 +30,7 @@ const NotFound = () => {
               <img
                 src="https://images.unsplash.com/photo-1590642916589-592bca10dfbf?auto=format&q=75&fit=crop&w=600"
                 loading="lazy"
-                alt="Photo by @heydevn"
+                alt="A person stands behind a red-tinted, foggy surface with hands pressed against it, wearing a cap and jacket."
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
             </div>

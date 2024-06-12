@@ -1,6 +1,6 @@
 import {
   FeaturedQuestionsSectionRecord,
-  ProductQuestionRecord,
+  type ProductQuestionRecord,
 } from '@/graphql/types/graphql';
 import ReactMarkdown from 'react-markdown';
 

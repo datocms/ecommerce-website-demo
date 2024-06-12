@@ -1,8 +1,8 @@
-import { FragmentType, getFragmentData } from '@/graphql/types';
-import { MaterialShowcaseFragmentDoc } from '@/graphql/types/graphql';
-import { GlobalPageProps } from '@/utils/globalPageProps';
-import Link from 'next/link';
 import DatoImage from '@/components/DatoImage';
+import { type FragmentType, getFragmentData } from '@/graphql/types';
+import { MaterialShowcaseFragmentDoc } from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
+import Link from 'next/link';
 
 type Props = {
   fragment: FragmentType<typeof MaterialShowcaseFragmentDoc>;
@@ -12,7 +12,7 @@ type Props = {
 const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
   const { title, description, subDescription, materials } = getFragmentData(
     MaterialShowcaseFragmentDoc,
-    fragment
+    fragment,
   );
   return (
     <div className="mx-auto mb-12 max-w-7xl bg-white px-12 lg:px-24">

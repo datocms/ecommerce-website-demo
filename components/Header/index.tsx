@@ -1,21 +1,21 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { Suspense, useEffect, useState } from 'react';
-import LanguageSelector from './LanguageSelector';
-import {
+import type {
   CookieNoticeRecord,
   LayoutModelNotificationField,
   LayoutQuery,
   PopupRecord,
 } from '@/graphql/types/graphql';
-import NotificationStrip from './NotificationStrip';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { isEmptyDocument } from 'datocms-structured-text-utils';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Suspense, useEffect, useState } from 'react';
 import CategoryHeader from './CategoryHeader';
-import PopUpBanner from './PopUpBanner';
 import CookiesNotice from './CookiesNotice';
-import { GlobalPageProps } from '@/utils/globalPageProps';
+import LanguageSelector from './LanguageSelector';
+import NotificationStrip from './NotificationStrip';
+import PopUpBanner from './PopUpBanner';
 
 type Props = {
   data: LayoutQuery;
@@ -25,7 +25,7 @@ type Props = {
 const Header = ({ data, globalPageProps }: Props) => {
   // Navbar toggle
   const [notificationStrip, setNotificationStrip] = useState(
-    !isEmptyDocument(data.layout?.notification)
+    !isEmptyDocument(data.layout?.notification),
   );
 
   const [popUp, setPopUp] = useState(!!data.layout?.popup);
@@ -38,7 +38,7 @@ const Header = ({ data, globalPageProps }: Props) => {
         <PopUpBanner
           globalPageProps={globalPageProps}
           setPopUp={setPopUp}
-          popup={data.layout!.popup as PopupRecord}
+          popup={data.layout?.popup as PopupRecord}
         />
       )}
 

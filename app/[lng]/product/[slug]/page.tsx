@@ -4,7 +4,7 @@ import RealTimeProducts from '@/components/Products/RealTimeProducts';
 import {
   LegalDocument,
   ProductDocument,
-  SiteLocale,
+  type SiteLocale,
 } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
@@ -27,7 +27,7 @@ const ProductsPage = async ({ params: { slug, lng } }: Params) => {
       locale: lng,
       fallbackLocale: [fallbackLng],
     },
-    isEnabled
+    isEnabled,
   );
 
   return (

@@ -16,7 +16,7 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
   function exportQueryParameters(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
-    router.push('?' + params.toString());
+    router.push(`?${params.toString()}`);
   }
 
   for (let i = 1; i < numberOfProducts; i += 12) {
@@ -24,17 +24,17 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
     const isSelected = pageNumber === currentPage;
     pageItems.push(
       <button
+        type="button"
         aria-current="page"
-        className={
-          'relative inline-flex cursor-pointer items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 focus-visible:outline-primary/80' +
-          (isSelected ? ' bg-primary text-white' : ' text-gray-900')
-        }
+        className={`relative inline-flex cursor-pointer items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 focus-visible:outline-primary/80${
+          isSelected ? ' bg-primary text-white' : ' text-gray-900'
+        }`}
         onClick={() => {
           exportQueryParameters('page', pageNumber.toString());
         }}
       >
         {pageNumber}
-      </button>
+      </button>,
     );
   }
 
@@ -61,6 +61,7 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
           >
             {currentPage !== 1 && (
               <button
+                type="button"
                 onClick={() => {
                   exportQueryParameters('page', (currentPage - 1).toString());
                 }}
@@ -75,6 +76,7 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
             })}
             {!(lastProductIndex === numberOfProducts) && (
               <button
+                type="button"
                 onClick={() => {
                   exportQueryParameters('page', (currentPage + 1).toString());
                 }}

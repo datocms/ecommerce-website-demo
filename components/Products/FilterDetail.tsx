@@ -1,7 +1,7 @@
 import {
-  FilterDetailModelDescriptionField,
+  type FilterDetailModelDescriptionField,
   GeneralInterfaceRecord,
-  ImageFileField,
+  type ImageFileField,
 } from '@/graphql/types/graphql';
 import {
   CloudArrowUpIcon,
@@ -9,16 +9,16 @@ import {
   ServerIcon,
 } from '@heroicons/react/20/solid';
 import {
-  Record,
-  StructuredText,
+  type Record,
+  type StructuredText,
   isList,
   isListItem,
   isThematicBreak,
 } from 'datocms-structured-text-utils';
-import { Maybe } from 'graphql/jsutils/Maybe';
+import type { Maybe } from 'graphql/jsutils/Maybe';
 import {
   Image as DatoImage,
-  ResponsiveImageType,
+  type ResponsiveImageType,
   StructuredText as StructuredTextField,
   renderNodeRule,
 } from 'react-datocms';

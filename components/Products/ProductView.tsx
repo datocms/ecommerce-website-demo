@@ -1,10 +1,10 @@
 'use client';
 
-import { ProductQuery, SiteLocale } from '@/graphql/types/graphql';
+import type { ProductQuery, SiteLocale } from '@/graphql/types/graphql';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
+import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 
 type Props = {
   data: ProductQuery;
@@ -17,15 +17,15 @@ const ProductView = ({ data, lng }: Props) => {
   if (!data.product) notFound();
 
   const [selectedColor, setSelectedColor] = useState(
-    data.product.productVariations[0].color.hex
+    data.product.productVariations[0].color.hex,
   );
 
   const [selectedSize, setSelectedSize] = useState(
-    (data.product.productVariations[0].availableSizes as Array<string>)[0]
+    (data.product.productVariations[0].availableSizes as Array<string>)[0],
   );
 
   const [selectedImage, setSelectedImage] = useState(
-    data.product.productImages[0]
+    data.product.productImages[0],
   );
 
   const isOnSale = data.product?.sale === 'on_sale';
@@ -159,18 +159,20 @@ const ProductView = ({ data, lng }: Props) => {
                           key={variation.id}
                           style={{ backgroundColor: variation.color.hex }}
                           className="h-8 w-8 rounded-full border ring-2 ring-gray-800 ring-offset-1 transition duration-100"
-                        ></span>
+                        />
                       );
                     return (
                       <button
                         key={variation.id}
                         type="button"
                         style={{ backgroundColor: variation.color.hex }}
-                        className={`h-8 w-8 rounded-full border ring-2 ring-transparent ring-offset-1 transition duration-100 hover:ring-gray-200`}
+                        className={
+                          'h-8 w-8 rounded-full border ring-2 ring-transparent ring-offset-1 transition duration-100 hover:ring-gray-200'
+                        }
                         onClick={() => {
                           setSelectedColor(variation.color.hex);
                         }}
-                      ></button>
+                      />
                     );
                   })}
                 </div>
@@ -185,9 +187,9 @@ const ProductView = ({ data, lng }: Props) => {
                   {allSizes.map((size) => {
                     if (
                       (
-                        data.product!.productVariations.find(
-                          (item) => item.color.hex === selectedColor
-                        )!.availableSizes as Array<string>
+                        data.product?.productVariations.find(
+                          (item) => item.color.hex === selectedColor,
+                        )?.availableSizes as Array<string>
                       ).find((item) => item === size)
                     ) {
                       if (selectedSize === size)

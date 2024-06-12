@@ -1,9 +1,9 @@
 'use client';
 
-import { StoreRecord, StoresQuery } from '@/graphql/types/graphql';
+import { StoreRecord, type StoresQuery } from '@/graphql/types/graphql';
 import { Maybe } from 'graphql/jsutils/Maybe';
 import { useState } from 'react';
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
+import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {
   data: StoresQuery;
@@ -37,7 +37,7 @@ const Content = ({ data }: PropTypes) => {
               className="cursor-pointer text-xs uppercase text-black"
             >
               {data.generalInterface?.findOnMaps}{' '}
-              <span className="border-gray-light ml-4 inline-block h-1 w-24 border-t"></span>
+              <span className="border-gray-light ml-4 inline-block h-1 w-24 border-t" />
             </a>
             <div className="pin-l pin-b -ml-6 flex w-32 justify-around bg-white px-4 py-6">
               <div

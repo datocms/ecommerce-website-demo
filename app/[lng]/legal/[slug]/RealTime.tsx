@@ -2,7 +2,7 @@
 
 import { generateRealtimeComponent } from '@/components/WithRealTimeUpdates/generateRealtime';
 import Content from './Content';
-import { PageProps, Query, Variables } from './meta';
+import type { PageProps, Query, Variables } from './meta';
 
 const RealTime = generateRealtimeComponent<PageProps, Query, Variables>({
   contentComponent: Content,

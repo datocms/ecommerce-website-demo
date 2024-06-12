@@ -1,9 +1,9 @@
+import getAvailableLocales from '@/app/i18n/settings';
 import Footer from '@/components/Footer';
+import HeaderRenderer from '@/components/Header/HeaderRenderer';
+import type { SiteLocale } from '@/graphql/types/graphql';
 import '@/styles/global.css';
 import { draftMode } from 'next/headers';
-import { SiteLocale } from '@/graphql/types/graphql';
-import getAvailableLocales from '@/app/i18n/settings';
-import HeaderRenderer from '@/components/Header/HeaderRenderer';
 
 type Params = {
   children: React.ReactNode;

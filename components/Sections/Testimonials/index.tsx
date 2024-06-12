@@ -1,7 +1,5 @@
-import { FragmentType, getFragmentData } from '@/graphql/types';
-import {
-  TestimonialSectionFragmentDoc,
-} from '@/graphql/types/graphql';
+import { type FragmentType, getFragmentData } from '@/graphql/types';
+import { TestimonialSectionFragmentDoc } from '@/graphql/types/graphql';
 import ReactMarkdown from 'react-markdown';
 
 type Props = {
@@ -11,7 +9,7 @@ type Props = {
 const TestimonialsSection = ({ fragment }: Props) => {
   const { title, testimonial } = getFragmentData(
     TestimonialSectionFragmentDoc,
-    fragment
+    fragment,
   );
   return (
     <div className="container mx-auto max-w-7xl px-16 py-12">

@@ -1,9 +1,9 @@
 'use client';
 
+import type { SiteLocale } from '@/graphql/types/graphql';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { Dispatch, SetStateAction, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SiteLocale } from '@/graphql/types/graphql';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 
 type PropTypes = {
   lng: SiteLocale;

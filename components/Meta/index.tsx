@@ -1,11 +1,11 @@
-import { LayoutQuery } from '@/graphql/types/graphql';
+import type { LayoutQuery } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 
 type PropTypes = {
-  data: LayoutQuery
-}
+  data: LayoutQuery;
+};
 
-export default async function Meta({data}: PropTypes) {
+export default async function Meta({ data }: PropTypes) {
   return (
     <>
       <title>{data._site.globalSeo?.fallbackSeo?.title}</title>

@@ -18,7 +18,7 @@ export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
     query,
     buildVariables,
     generate: (data) => data.home?.seo,
-  }
+  },
 );
 
 const Page = generateWrapper<PageProps, Query, Variables>({

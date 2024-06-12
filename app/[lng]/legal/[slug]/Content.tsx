@@ -1,8 +1,8 @@
 import Highlighter from '@/components/Common/Highlighter';
-import { ContentPage } from '@/components/WithRealTimeUpdates/types';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import {
-  Record,
-  StructuredText,
+  type Record,
+  type StructuredText,
   isHeading,
   isParagraph,
 } from 'datocms-structured-text-utils';
@@ -11,11 +11,9 @@ import {
   StructuredText as StructuredTextField,
   renderNodeRule,
 } from 'react-datocms';
-import { PageProps, Query } from './meta';
+import type { PageProps, Query } from './meta';
 
-const Content: ContentPage<PageProps, Query> = ({
-  data,
-}) => {
+const Content: ContentPage<PageProps, Query> = ({ data }) => {
   if (!data.legalPage) {
     notFound();
   }

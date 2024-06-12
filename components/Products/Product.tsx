@@ -1,4 +1,4 @@
-import {
+import type {
   FeaturedReviewRecord,
   GeneralInterfaceRecord,
   MaterialRecord,
@@ -8,14 +8,14 @@ import {
   ProductRecord,
   SiteLocale,
 } from '@/graphql/types/graphql';
+import { isHeading, isList, isListItem } from 'datocms-structured-text-utils';
 import { notFound } from 'next/navigation';
 import { StructuredText, renderNodeRule } from 'react-datocms';
-import ProductView from './ProductView';
-import { isHeading, isList, isListItem } from 'datocms-structured-text-utils';
-import Reviews from './Reviews';
 import FeaturedProducts from '../Grids/FeaturedProducts';
-import QuestionsSection from './QuestionsSection';
 import ProductInfoSection from './ProductInfoSection';
+import ProductView from './ProductView';
+import QuestionsSection from './QuestionsSection';
+import Reviews from './Reviews';
 
 type Props = {
   data: ProductQuery;
@@ -39,7 +39,7 @@ const Product = ({ data, lng }: Props) => {
                     return (
                       <ProductInfoSection
                         features={record as ProductFeatureSectionRecord}
-                        material={data.product!.material as MaterialRecord}
+                        material={data.product?.material as MaterialRecord}
                         interfaceStrings={
                           data.generalInterface as GeneralInterfaceRecord
                         }
@@ -55,7 +55,7 @@ const Product = ({ data, lng }: Props) => {
                       />
                     );
                   default:
-                    return <></>;
+                    return null;
                 }
               }}
               customNodeRules={[

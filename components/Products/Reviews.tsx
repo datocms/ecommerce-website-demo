@@ -1,5 +1,5 @@
-import { FeaturedReviewRecord, SiteLocale } from '@/graphql/types/graphql';
-import { Maybe } from 'graphql/jsutils/Maybe';
+import type { FeaturedReviewRecord, SiteLocale } from '@/graphql/types/graphql';
+import type { Maybe } from 'graphql/jsutils/Maybe';
 
 type PropTypes = {
   reviews: Array<FeaturedReviewRecord>;
@@ -10,7 +10,7 @@ type PropTypes = {
   lng: SiteLocale;
 };
 
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface StarRatingProps {

@@ -1,9 +1,9 @@
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
-import Link from 'next/link';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { ShowcaseQuery, SiteLocale } from '@/graphql/types/graphql';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { PageProps, Query } from './meta';
+import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({
   data,

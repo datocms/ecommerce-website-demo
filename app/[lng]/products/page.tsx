@@ -1,26 +1,24 @@
 export const dynamic = 'force-dynamic';
 
-import '@/styles/global.css';
-import { draftMode } from 'next/headers';
-import {
-  BrandRecord,
-  CollectionRecord,
-  FilterDetailModelDescriptionField,
-  GeneralInterfaceRecord,
-  ImageFileField,
-  InitialParamsDocument,
-  MaterialRecord,
-  ProductModelOrderBy,
-  ProductsDocument,
-  SiteLocale,
-} from '@/graphql/types/graphql';
 import getAvailableLocales, { getFallbackLocale } from '@/app/i18n/settings';
-import queryDatoCMS from '@/utils/queryDatoCMS';
-import Link from 'next/link';
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
 import SideFilter from '@/components/Common/SideFilter';
-import Pagination from '@/components/Products/Pagination';
 import FilterDetail from '@/components/Products/FilterDetail';
+import Pagination from '@/components/Products/Pagination';
+import {
+  type BrandRecord,
+  type CollectionRecord,
+  type FilterDetailModelDescriptionField,
+  type GeneralInterfaceRecord,
+  type ImageFileField,
+  type MaterialRecord,
+  type ProductModelOrderBy,
+  type SiteLocale,
+} from '@/graphql/types/graphql';
+import '@/styles/global.css';
+import queryDatoCMS from '@/utils/queryDatoCMS';
+import { draftMode } from 'next/headers';
+import Link from 'next/link';
+import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {
   params: {
@@ -42,7 +40,7 @@ export default async function Products({
 }: PropTypes) {
   const { isEnabled } = draftMode();
   const fallbackLng = await getFallbackLocale();
-  const pageNumber = parseInt((searchParams?.page as string) ?? '1');
+  const pageNumber = Number.parseInt((searchParams?.page as string) ?? '1');
   const orderBy = (searchParams?.orderBy as string) ?? '_publishedAt_DESC';
   const nameSearch = (searchParams?.productName as string) ?? '';
 
@@ -52,7 +50,7 @@ export default async function Products({
       locale: lng,
       fallbackLocale: [fallbackLng],
     },
-    isEnabled
+    isEnabled,
   );
 
   const collectionParams = (searchParams?.collections as string)
@@ -93,22 +91,22 @@ export default async function Products({
       materials,
       nameSearch,
     },
-    isEnabled
+    isEnabled,
   );
 
   let singleFilter;
 
   if (materials.length === 1) {
     singleFilter = initialParams.allMaterials.filter(
-      (material) => material.id == materials[0]
+      (material) => material.id === materials[0],
     )[0];
   } else if (collections.length === 1) {
     singleFilter = initialParams.allCollections.filter(
-      (collection) => collection.id == collections[0]
+      (collection) => collection.id === collections[0],
     )[0];
   } else if (brands.length === 1) {
     singleFilter = initialParams.allBrands.filter(
-      (brand) => brand.id == brands[0]
+      (brand) => brand.id === brands[0],
     )[0];
   }
 
@@ -127,10 +125,9 @@ export default async function Products({
         />
       )}
       <div
-        className={
-          'mx-auto max-w-7xl grid-cols-5 bg-white pt-8 lg:grid' +
-          (singleFilter ? ' border-t-2' : '')
-        }
+        className={`mx-auto max-w-7xl grid-cols-5 bg-white pt-8 lg:grid${
+          singleFilter ? ' border-t-2' : ''
+        }`}
       >
         <div className="col-span-1 ml-4  p-4">
           <SideFilter

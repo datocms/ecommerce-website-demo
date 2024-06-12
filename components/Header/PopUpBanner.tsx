@@ -1,8 +1,8 @@
-import { PopupRecord, SiteLocale } from '@/graphql/types/graphql';
-import { GlobalPageProps } from '@/utils/globalPageProps';
+import { type PopupRecord, SiteLocale } from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
-import { Dispatch, SetStateAction } from 'react';
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
+import type { Dispatch, SetStateAction } from 'react';
+import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {
   setPopUp: Dispatch<SetStateAction<boolean>>;
@@ -18,7 +18,7 @@ const PopUpBanner = ({ setPopUp, popup, globalPageProps }: PropTypes) => {
           setPopUp(false);
         }}
         className="fixed z-40 h-screen w-screen bg-slate-900 bg-opacity-75 "
-      ></div>
+      />
       <div
         onClick={() => {
           setPopUp(false);

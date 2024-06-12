@@ -1,12 +1,12 @@
+import { primaryColor } from '@/app/i18n/settings';
+import { type LayoutQuery, SiteLocale } from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Image from 'next/image';
 import Link from 'next/link';
-import SvgRenderer from '../Common/SvgRenderer';
-import { LayoutQuery, SiteLocale } from '@/graphql/types/graphql';
 import { notFound } from 'next/navigation';
-import { primaryColor } from '@/app/i18n/settings';
+import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 import ReactMarkdown from 'react-markdown';
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
-import { GlobalPageProps } from '@/utils/globalPageProps';
+import SvgRenderer from '../Common/SvgRenderer';
 
 type Props = {
   data: LayoutQuery;
@@ -34,7 +34,10 @@ const Footer = ({ data, globalPageProps }: Props) => {
                 className="w-full flex-1 rounded border bg-gray-50 px-3 py-2 text-gray-800 placeholder-gray-500 outline-none ring-indigo-300 transition duration-100 focus:ring"
               />
 
-              <button className="inline-block rounded bg-primary px-8 py-2 text-center text-sm font-semibold text-white outline-none ring-indigo-300 transition duration-100 hover:bg-primary/80 focus-visible:ring active:bg-indigo-700 md:text-base">
+              <button
+                type="button"
+                className="inline-block rounded bg-primary px-8 py-2 text-center text-sm font-semibold text-white outline-none ring-indigo-300 transition duration-100 hover:bg-primary/80 focus-visible:ring active:bg-indigo-700 md:text-base"
+              >
                 {data.generalInterface?.newsletterButton}
               </button>
             </form>

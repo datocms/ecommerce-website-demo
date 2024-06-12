@@ -1,9 +1,9 @@
-import { HeroSectionFragmentDoc } from '@/graphql/types/graphql';
-import Link from 'next/link';
 import SvgRenderer from '@/components/Common/SvgRenderer';
-import { GlobalPageProps } from '@/utils/globalPageProps';
-import { FragmentType, getFragmentData } from '@/graphql/types';
 import DatoImage from '@/components/DatoImage';
+import { type FragmentType, getFragmentData } from '@/graphql/types';
+import { HeroSectionFragmentDoc } from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
+import Link from 'next/link';
 
 type Props = {
   fragment: FragmentType<typeof HeroSectionFragmentDoc>;
@@ -37,7 +37,7 @@ const Hero = ({ fragment, globalPageProps }: Props) => {
             <div className="mb-12 flex w-full md:mb-16 lg:w-2/3">
               <div className="relative left-12 top-12 z-10 -ml-12 h-[550px] w-[550px] overflow-hidden rounded-lg bg-gray-100 shadow-lg md:left-16 md:top-16 lg:ml-0">
                 <DatoImage
-                  fragment={heroImage!.responsiveImage}
+                  fragment={heroImage?.responsiveImage}
                   className="h-full w-full object-cover object-center"
                   objectFit="cover"
                   objectPosition="50% 50%"
@@ -46,7 +46,7 @@ const Hero = ({ fragment, globalPageProps }: Props) => {
 
               <div className="h-[550px] w-[550px] overflow-hidden rounded-lg bg-gray-100 shadow-lg">
                 <DatoImage
-                  fragment={additionalImage!.responsiveImage}
+                  fragment={additionalImage?.responsiveImage}
                   className="h-full w-full object-cover object-center"
                   objectFit="cover"
                   objectPosition="50% 50%"
@@ -72,7 +72,7 @@ const Hero = ({ fragment, globalPageProps }: Props) => {
               <span className="text-sm font-semibold uppercase tracking-widest text-gray-400 sm:text-base">
                 {socialLabel ?? 'SOCIALS'}
               </span>
-              <span className="h-px w-12 bg-gray-400"></span>
+              <span className="h-px w-12 bg-gray-400" />
 
               <div className="flex gap-4">
                 {socials.map((social) => (

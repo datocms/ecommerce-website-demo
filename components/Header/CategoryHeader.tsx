@@ -1,7 +1,12 @@
 'use client';
 
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
-import { Fragment, Suspense, useRef, useState } from 'react';
+import type {
+  DropdownMenuRecord,
+  LayoutQuery,
+  LinkItemRecord,
+  SiteLocale,
+} from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -9,18 +14,13 @@ import {
   ShoppingBagIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import {
-  DropdownMenuRecord,
-  LayoutQuery,
-  LinkItemRecord,
-  SiteLocale,
-} from '@/graphql/types/graphql';
-import LanguageSelector from './LanguageSelector';
 import Link from 'next/link';
-import HoveringSearch from './HoveringSearch';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Fragment, Suspense, useRef, useState } from 'react';
+import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 import Cart from './Cart';
-import { GlobalPageProps } from '@/utils/globalPageProps';
+import HoveringSearch from './HoveringSearch';
+import LanguageSelector from './LanguageSelector';
 
 type PropTypes = {
   languages: SiteLocale[];
@@ -41,18 +41,18 @@ export default function CategoryHeader({
   const [open, setOpen] = useState(false);
   const [searchIsOpen, setSerachIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(
-    searchParams.get('productName') ?? ''
+    searchParams.get('productName') ?? '',
   );
   const [cartIsOpen, setCartIsOpen] = useState(false);
   const router = useRouter();
   const searchBar = useRef<HTMLInputElement>(null);
 
   const links = data.layout?.menu.filter(
-    (item) => item._modelApiKey === 'link_item'
+    (item) => item._modelApiKey === 'link_item',
   ) as LinkItemRecord[];
 
   const categories = data.layout?.menu.filter(
-    (item) => item._modelApiKey === 'dropdown_menu'
+    (item) => item._modelApiKey === 'dropdown_menu',
   ) as DropdownMenuRecord[];
 
   return (
@@ -113,7 +113,7 @@ export default function CategoryHeader({
                                 selected
                                   ? 'border-primary text-primary'
                                   : 'border-transparent text-gray-900',
-                                'flex-1 whitespace-nowrap border-b-2 px-1 py-4 text-base font-medium'
+                                'flex-1 whitespace-nowrap border-b-2 px-1 py-4 text-base font-medium',
                               )
                             }
                           >
@@ -283,7 +283,7 @@ export default function CategoryHeader({
                                   open
                                     ? 'border-primary text-primary'
                                     : 'border-transparent text-gray-700 hover:text-gray-800',
-                                  'relative z-10 -mb-px flex cursor-pointer items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out focus:outline-none'
+                                  'relative z-10 -mb-px flex cursor-pointer items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out focus:outline-none',
                                 )}
                               >
                                 {category.label}
@@ -473,7 +473,7 @@ export default function CategoryHeader({
                       onKeyDown={(event) => {
                         if (event.key === 'Enter') {
                           router.push(
-                            `/${globalPageProps.params.lng}/products?productName=${searchValue}`
+                            `/${globalPageProps.params.lng}/products?productName=${searchValue}`,
                           );
                           setSerachIsOpen(false);
                         }
@@ -496,7 +496,7 @@ export default function CategoryHeader({
                             return;
                           }
                           router.push(
-                            `/${globalPageProps.params.lng}/products?productName=${searchValue}`
+                            `/${globalPageProps.params.lng}/products?productName=${searchValue}`,
                           );
                           setSerachIsOpen(false);
                         }}

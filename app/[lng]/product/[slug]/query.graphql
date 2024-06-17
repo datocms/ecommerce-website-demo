@@ -27,37 +27,20 @@ query Product(
       review
     }
     material {
-      id
-      name
-      slug
-      details {
-        image {
-          responsiveImage {
-            ...DatoImage_responsiveImage
-          }
-        }
-      }
+      ...MaterialProductFragment
     }
     description {
       value
       blocks {
-        ... on ProductFeatureSectionRecord {
+        ... on RecordInterface {
           id
-          _modelApiKey
-          material
-          occasions
-          style
-          weather
+          __typename
+        }
+        ... on ProductFeatureSectionRecord {
+          ...ProductInfoSection
         }
         ... on FeaturedQuestionsSectionRecord {
-          id
-          questions {
-            id
-            _modelApiKey
-            question
-            answer
-          }
-          _modelApiKey
+          ...QuestionSection
         }
       }
     }
@@ -98,30 +81,6 @@ query Product(
     }
   }
   generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
-    currencySymbol
-    weather
-    style
-    size
-    shippingText
-    secondaryButton
-    sale
-    reviews
-    reviewButton
-    primaryButton
-    priceUndertext
-    occasions
-    more
-    materials
-    color
+    ...ProductGeneralInterface
   }
-}
-
-fragment DatoImage_responsiveImage on ResponsiveImage {
-  src
-  srcSet
-  base64
-  width
-  height
-  alt
-  title
 }

@@ -1,0 +1,12 @@
+fragment MaterialProductFragment on MaterialRecord {
+  id
+  name
+  slug
+  details {
+    image {
+      responsiveImage {
+        ...DatoImage_responsiveImage
+      }
+    }
+  }
+}

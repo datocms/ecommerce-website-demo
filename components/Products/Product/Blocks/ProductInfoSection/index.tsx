@@ -1,30 +1,48 @@
+import DatoImage from '@/components/DatoImage';
+import { type FragmentType, getFragmentData } from '@/graphql/types';
 import {
-  FeaturedQuestionsSectionRecord,
-  type GeneralInterfaceRecord,
-  type MaterialRecord,
-  type ProductFeatureSectionRecord,
-  ProductQuestionRecord,
-  type SiteLocale,
+  MaterialProductFragmentFragmentDoc,
+  ProductGeneralInterfaceFragmentDoc,
+  ProductInfoSectionFragmentDoc,
 } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import { Maybe } from 'graphql/jsutils/Maybe';
 import Link from 'next/link';
-import { Image as DatoImage } from 'react-datocms';
-import ReactMarkdown from 'react-markdown';
 
-type PropTypes = {
-  features: ProductFeatureSectionRecord;
-  material: MaterialRecord;
+type Props = {
+  ProductInfoFragment: FragmentType<typeof ProductInfoSectionFragmentDoc>;
+  MaterialFragment: FragmentType<typeof MaterialProductFragmentFragmentDoc>;
   globalPageProps: GlobalPageProps;
-  interfaceStrings: GeneralInterfaceRecord;
+  generalInterfaceFragment: FragmentType<
+    typeof ProductGeneralInterfaceFragmentDoc
+  >;
 };
 
 const ProductInfoSection = ({
-  features,
-  material,
+  ProductInfoFragment,
+  MaterialFragment,
   globalPageProps,
-  interfaceStrings,
-}: PropTypes) => {
+  generalInterfaceFragment,
+}: Props) => {
+  const {
+    materials,
+    style: styleString,
+    weather: weatherString,
+    occasions: occasionsString,
+    more,
+  } = getFragmentData(
+    ProductGeneralInterfaceFragmentDoc,
+    generalInterfaceFragment,
+  );
+
+  const { material, style, weather, occasions } = getFragmentData(
+    ProductInfoSectionFragmentDoc,
+    ProductInfoFragment,
+  );
+
+  const { details, name, id } = getFragmentData(
+    MaterialProductFragmentFragmentDoc,
+    MaterialFragment,
+  );
   return (
     <div className="bg-white pt-2">
       <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
@@ -51,10 +69,8 @@ const ProductInfoSection = ({
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">
-                    {interfaceStrings.materials}
-                  </div>
-                  <p className="text-sm text-gray-500">{features.material}</p>
+                  <div className="mb-1 font-semibold">{materials}</div>
+                  <p className="text-sm text-gray-500">{material}</p>
                 </div>
               </div>
 
@@ -101,10 +117,8 @@ const ProductInfoSection = ({
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">
-                    {interfaceStrings.style}
-                  </div>
-                  <p className="text-sm text-gray-500">{features.style}</p>
+                  <div className="mb-1 font-semibold">{styleString}</div>
+                  <p className="text-sm text-gray-500">{style}</p>
                 </div>
               </div>
 
@@ -127,10 +141,8 @@ const ProductInfoSection = ({
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">
-                    {interfaceStrings.weather}
-                  </div>
-                  <p className="text-sm text-gray-500">{features.weather}</p>
+                  <div className="mb-1 font-semibold">{weatherString}</div>
+                  <p className="text-sm text-gray-500">{weather}</p>
                 </div>
               </div>
 
@@ -149,19 +161,17 @@ const ProductInfoSection = ({
                 </div>
 
                 <div>
-                  <div className="mb-1 font-semibold">
-                    {interfaceStrings.occasions}
-                  </div>
-                  <p className="text-sm text-gray-500">{features.occasions}</p>
+                  <div className="mb-1 font-semibold">{occasionsString}</div>
+                  <p className="text-sm text-gray-500">{occasions}</p>
                 </div>
               </div>
             </div>
 
             <div className="overflow-hidden rounded-lg border md:w-1/2 lg:w-1/3">
-              {material.details.image.responsiveImage && (
+              {details.image.responsiveImage && (
                 <div className="relative h-48 bg-gray-100">
                   <DatoImage
-                    data={material.details.image.responsiveImage}
+                    fragment={details.image.responsiveImage}
                     className="h-full w-full object-cover object-center"
                     objectFit="cover"
                     objectPosition="50% 50%"
@@ -170,13 +180,13 @@ const ProductInfoSection = ({
               )}
 
               <div className="flex items-center justify-between gap-2 bg-white p-3">
-                <p className="text-sm text-gray-500">{material.name}</p>
+                <p className="text-sm text-gray-500">{name}</p>
 
                 <Link
-                  href={`/${globalPageProps.params.lng}/products/?materials=${material.id}`}
+                  href={`/${globalPageProps.params.lng}/products/?materials=${id}`}
                   className="inline-block shrink-0 rounded-lg border bg-white px-3 py-1 text-sm font-semibold text-primary outline-none ring-indigo-300 transition duration-100 hover:bg-gray-50 focus-visible:ring active:bg-gray-100"
                 >
-                  {interfaceStrings.more}
+                  {more}
                 </Link>
               </div>
             </div>

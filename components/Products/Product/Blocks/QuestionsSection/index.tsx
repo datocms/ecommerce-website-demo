@@ -1,14 +1,15 @@
-import {
-  FeaturedQuestionsSectionRecord,
-  type ProductQuestionRecord,
-} from '@/graphql/types/graphql';
+import { type FragmentType, getFragmentData } from '@/graphql/types';
+import { QuestionSectionFragmentDoc } from '@/graphql/types/graphql';
+
 import ReactMarkdown from 'react-markdown';
 
-type PropTypes = {
-  questions: Array<ProductQuestionRecord>;
+type Props = {
+  fragment: FragmentType<typeof QuestionSectionFragmentDoc>;
 };
 
-const QuestionsSection = ({ questions }: PropTypes) => {
+const QuestionsSection = ({ fragment }: Props) => {
+  const { questions } = getFragmentData(QuestionSectionFragmentDoc, fragment);
+
   return (
     <div className="bg-white py-6 sm:py-8 lg:py-12">
       <div className="mx-auto max-w-screen-xl px-4 md:px-8">

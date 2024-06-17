@@ -1,9 +1,0 @@
-query CustomColor {
-  layout {
-    mainColor {
-      red
-      blue
-      green
-    }
-  }
-}

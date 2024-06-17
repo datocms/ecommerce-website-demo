@@ -1,17 +1,9 @@
 import FeaturedProducts from '@/components/Grids/FeaturedProducts';
-import ProductInfoSection from '@/components/Products/ProductInfoSection';
+import ProductInfoSection from '@/components/Products/Product/Blocks/ProductInfoSection';
+import QuestionsSection from '@/components/Products/Product/Blocks/QuestionsSection';
 import ProductView from '@/components/Products/ProductView';
-import QuestionsSection from '@/components/Products/QuestionsSection';
 import Reviews from '@/components/Products/Reviews';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import type {
-  FeaturedReviewRecord,
-  GeneralInterfaceRecord,
-  MaterialRecord,
-  ProductFeatureSectionRecord,
-  ProductQuestionRecord,
-  ProductRecord,
-} from '@/graphql/types/graphql';
 import { isHeading, isList, isListItem } from 'datocms-structured-text-utils';
 import { notFound } from 'next/navigation';
 import { StructuredText, renderNodeRule } from 'react-datocms';
@@ -31,28 +23,20 @@ const Content: ContentPage<PageProps, Query> = ({
         <div className="text-gray-500">
           {data.product.description && (
             <StructuredText
-              data={data.product.description as any}
+              data={data.product.description}
               renderBlock={({ record }) => {
-                switch (record._modelApiKey) {
-                  case 'product_feature_section':
+                switch (record.__typename) {
+                  case 'ProductFeatureSectionRecord':
                     return (
                       <ProductInfoSection
-                        features={record as ProductFeatureSectionRecord}
-                        material={data.product?.material as MaterialRecord}
-                        interfaceStrings={
-                          data.generalInterface as GeneralInterfaceRecord
-                        }
+                        ProductInfoFragment={record}
+                        MaterialFragment={data.product?.material}
+                        generalInterfaceFragment={data.generalInterface!}
                         globalPageProps={globalPageProps}
                       />
                     );
-                  case 'featured_questions_section':
-                    return (
-                      <QuestionsSection
-                        questions={
-                          record.questions as Array<ProductQuestionRecord>
-                        }
-                      />
-                    );
+                  case 'FeaturedQuestionsSectionRecord':
+                    return <QuestionsSection fragment={record} />;
                   default:
                     return null;
                 }
@@ -93,20 +77,8 @@ const Content: ContentPage<PageProps, Query> = ({
           )}
         </div>
       </div>
-      <FeaturedProducts
-        products={data.product.relatedProducts as ProductRecord[]}
-        globalPageProps={globalPageProps}
-        sale={data.generalInterface?.sale}
-        currencySymbol={data.generalInterface?.currencySymbol}
-      />
-      <Reviews
-        reviews={data.product.featuredReviews as Array<FeaturedReviewRecord>}
-        reviewNumber={data.product.numberOfReviews}
-        reviewAverage={data.product.reviewAverage}
-        reviewsString={data.generalInterface?.reviews}
-        reviewButton={data.generalInterface?.reviewButton}
-        globalPageProps={globalPageProps}
-      />
+      <FeaturedProducts data={data} globalPageProps={globalPageProps} />
+      <Reviews data={data} globalPageProps={globalPageProps} />
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 const NotFound = () => {
@@ -27,7 +28,7 @@ const NotFound = () => {
             </div>
 
             <div className="relative h-80 overflow-hidden rounded-lg bg-gray-100 shadow-lg md:h-auto">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1590642916589-592bca10dfbf?auto=format&q=75&fit=crop&w=600"
                 loading="lazy"
                 alt="A person stands behind a red-tinted, foggy surface with hands pressed against it, wearing a cap and jacket."

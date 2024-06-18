@@ -16,9 +16,10 @@ import type {
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
 import queryDatoCMS from '@/utils/queryDatoCMS';
+import { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
-import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import { Image as DatoImage, toNextMetadata, type ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {
   params: {
@@ -27,12 +28,24 @@ type PropTypes = {
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-export async function generateStaticParams() {
-  const languages = await getAvailableLocales();
-  return languages.map((language) => {
-    language;
-  });
-}
+export async function generateMetadata(
+  pageProps: PageProps,
+): Promise<Metadata> {
+  const fallbackLocale = await getFallbackLocale();
+  const { isEnabled: isDraft } = draftMode();
+
+  const variables =
+    options.buildVariables?.({
+      ...pageProps,
+      fallbackLocale,
+    }) || ({} as TVariables);
+
+  const data = await queryDatoCMS(options.query, variables, isDraft);
+
+  const tags = options.generate(data);
+
+  return tags ? toNextMetadata(tags) : {};
+};
 
 export default async function Products({
   params: { lng },

@@ -1,7 +1,6 @@
 'use client';
 
-import { StoreRecord, type StoresQuery } from '@/graphql/types/graphql';
-import { Maybe } from 'graphql/jsutils/Maybe';
+import type { StoresQuery } from '@/graphql/types/graphql';
 import { useState } from 'react';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 
@@ -40,7 +39,7 @@ const Content = ({ data }: PropTypes) => {
               <span className="border-gray-light ml-4 inline-block h-1 w-24 border-t" />
             </a>
             <div className="pin-l pin-b -ml-6 flex w-32 justify-around bg-white px-4 py-6">
-              <div
+              <button
                 className="text-gray-600er cursor-pointer text-xs no-underline hover:text-gray-900"
                 onClick={() => {
                   setCurrentStore((currentStore) => {
@@ -48,13 +47,23 @@ const Content = ({ data }: PropTypes) => {
                     return currentStore - 1;
                   });
                 }}
+                onKeyUp={(event) => {
+                  if (event.key === 'Enter') {
+                    setCurrentStore((currentStore) => {
+                      if (currentStore === 0) return allStores.length - 1;
+                      return currentStore - 1;
+                    });
+                  }
+                }}
+                tabIndex={0}
+                type="button"
               >
                 &larr;
-              </div>
+              </button>
               <span className="text-gray-600er text-xs">
                 {currentStore + 1}/{allStores.length}
               </span>
-              <div
+              <button
                 className="text-gray-600er cursor-pointer text-xs no-underline hover:text-gray-900"
                 onClick={() => {
                   setCurrentStore((currentStore) => {
@@ -62,9 +71,19 @@ const Content = ({ data }: PropTypes) => {
                     return currentStore + 1;
                   });
                 }}
+                onKeyUp={(event) => {
+                  if (event.key === 'Enter') {
+                    setCurrentStore((currentStore) => {
+                      if (currentStore === allStores.length - 1) return 0;
+                      return currentStore + 1;
+                    });
+                  }
+                }}
+                tabIndex={0}
+                type="button"
               >
                 &rarr;
-              </div>
+              </button>
             </div>
           </div>
         </div>

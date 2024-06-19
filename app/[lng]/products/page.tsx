@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import getAvailableLocales, { getFallbackLocale } from '@/app/i18n/settings';
+import { getFallbackLocale } from '@/app/i18n/settings';
 import SideFilter from '@/components/Common/SideFilter';
 import FilterDetail from '@/components/Products/FilterDetail';
 import Pagination from '@/components/Products/Pagination';
@@ -16,10 +16,14 @@ import type {
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
 import queryDatoCMS from '@/utils/queryDatoCMS';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
-import { Image as DatoImage, toNextMetadata, type ResponsiveImageType } from 'react-datocms';
+import {
+  Image as DatoImage,
+  toNextMetadata,
+  type ResponsiveImageType,
+} from 'react-datocms';
 
 type PropTypes = {
   params: {
@@ -29,7 +33,7 @@ type PropTypes = {
 };
 
 export async function generateMetadata(
-  pageProps: PageProps,
+  pageProps: PropTypes
 ): Promise<Metadata> {
   const fallbackLocale = await getFallbackLocale();
   const { isEnabled: isDraft } = draftMode();
@@ -45,7 +49,7 @@ export async function generateMetadata(
   const tags = options.generate(data);
 
   return tags ? toNextMetadata(tags) : {};
-};
+}
 
 export default async function Products({
   params: { lng },
@@ -63,7 +67,7 @@ export default async function Products({
       locale: lng,
       fallbackLocale: [fallbackLng],
     },
-    isEnabled,
+    isEnabled
   );
 
   const collectionParams = (searchParams?.collections as string)
@@ -104,22 +108,22 @@ export default async function Products({
       materials,
       nameSearch,
     },
-    isEnabled,
+    isEnabled
   );
 
   let singleFilter: any;
 
   if (materials.length === 1) {
     singleFilter = initialParams.allMaterials.filter(
-      (material) => material.id === materials[0],
+      (material) => material.id === materials[0]
     )[0];
   } else if (collections.length === 1) {
     singleFilter = initialParams.allCollections.filter(
-      (collection) => collection.id === collections[0],
+      (collection) => collection.id === collections[0]
     )[0];
   } else if (brands.length === 1) {
     singleFilter = initialParams.allBrands.filter(
-      (brand) => brand.id === brands[0],
+      (brand) => brand.id === brands[0]
     )[0];
   }
 

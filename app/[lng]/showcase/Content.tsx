@@ -1,5 +1,4 @@
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { ShowcaseQuery, SiteLocale } from '@/graphql/types/graphql';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';

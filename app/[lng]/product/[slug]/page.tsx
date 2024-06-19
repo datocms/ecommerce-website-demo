@@ -13,10 +13,10 @@ export async function generateStaticParams() {
   const { allProducts } = await queryDatoCMS(ProductStaticParamsDocument);
 
   return allProducts.flatMap((product) =>
-    locales.map((locale): PageProps['params'] => ({
+    locales.map((lng): PageProps['params'] => ({
       slug: product.slug,
-      lng: locale,
-    })),
+      lng,
+    }))
   );
 }
 
@@ -34,7 +34,7 @@ export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
     query,
     buildVariables,
     generate: (data) => data.product?.seo,
-  },
+  }
 );
 
 const Page = generateWrapper<PageProps, Query, Variables>({

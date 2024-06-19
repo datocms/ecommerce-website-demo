@@ -31,7 +31,7 @@ const Content: ContentPage<PageProps, Query> = ({
                       <ProductInfoSection
                         ProductInfoFragment={record}
                         MaterialFragment={data.product?.material}
-                        generalInterfaceFragment={data.generalInterface!}
+                        generalInterfaceFragment={data.generalInterface}
                         globalPageProps={globalPageProps}
                       />
                     );

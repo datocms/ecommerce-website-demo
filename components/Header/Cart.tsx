@@ -116,6 +116,8 @@ export default function Cart({ open, setOpen }: PropTypes) {
                                 <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                   <Image
                                     src={product.imageSrc}
+                                    width={100}
+                                    height={100}
                                     alt={product.imageAlt}
                                     className="h-full w-full object-cover object-center"
                                   />

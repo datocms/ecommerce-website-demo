@@ -9,6 +9,7 @@ export type PageProps = GlobalPageProps & {
   params: {
     slug: string;
   };
+  filterParams?: { [key: string]: string | string[] | undefined };
 };
 
 export type Query = ProductQuery;

@@ -4,6 +4,7 @@ import { getFallbackLocale } from '@/app/i18n/settings';
 import SideFilter from '@/components/Common/SideFilter';
 import FilterDetail from '@/components/Products/FilterDetail';
 import Pagination from '@/components/Products/Pagination';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import {
   type BrandRecord,
   type CollectionRecord,
@@ -14,30 +15,23 @@ import {
   type MaterialRecord,
   type ProductModelOrderBy,
   ProductsDocument,
-  type SiteLocale,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import type { PageProps, Query } from './meta';
 
-type PropTypes = {
-  params: {
-    lng: SiteLocale;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
-
-export default async function Content({
+const Content: ContentPage<PageProps, Query> = async ({
   params: { lng },
-  searchParams,
-}: PropTypes) {
+  filterParams,
+}) => {
   const { isEnabled } = draftMode();
   const fallbackLng = await getFallbackLocale();
-  const pageNumber = Number.parseInt((searchParams?.page as string) ?? '1');
-  const orderBy = (searchParams?.orderBy as string) ?? '_publishedAt_DESC';
-  const nameSearch = (searchParams?.productName as string) ?? '';
+  const pageNumber = Number.parseInt((filterParams?.page as string) ?? '1');
+  const orderBy = (filterParams?.orderBy as string) ?? '_publishedAt_DESC';
+  const nameSearch = (filterParams?.productName as string) ?? '';
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -45,10 +39,10 @@ export default async function Content({
       locale: lng,
       fallbackLocale: [fallbackLng],
     },
-    isEnabled,
+    isEnabled
   );
 
-  const collectionParams = (searchParams?.collections as string)
+  const collectionParams = (filterParams?.collections as string)
     ?.split('|')
     .filter((collection) => collection.length);
 
@@ -57,7 +51,7 @@ export default async function Content({
       ? initialParams.allCollections.map((collection) => collection.id)
       : collectionParams;
 
-  const brandParams = (searchParams?.brands as string)
+  const brandParams = (filterParams?.brands as string)
     ?.split('|')
     .filter((brand) => brand.length);
 
@@ -66,7 +60,7 @@ export default async function Content({
       ? initialParams.allBrands.map((brand) => brand.id)
       : brandParams;
 
-  const materialParams = (searchParams?.materials as string)
+  const materialParams = (filterParams?.materials as string)
     ?.split('|')
     .filter((material) => material.length);
   const materials =
@@ -86,22 +80,22 @@ export default async function Content({
       materials,
       nameSearch,
     },
-    isEnabled,
+    isEnabled
   );
 
   let singleFilter: any;
 
   if (materials.length === 1) {
     singleFilter = initialParams.allMaterials.filter(
-      (material) => material.id === materials[0],
+      (material) => material.id === materials[0]
     )[0];
   } else if (collections.length === 1) {
     singleFilter = initialParams.allCollections.filter(
-      (collection) => collection.id === collections[0],
+      (collection) => collection.id === collections[0]
     )[0];
   } else if (brands.length === 1) {
     singleFilter = initialParams.allBrands.filter(
-      (brand) => brand.id === brands[0],
+      (brand) => brand.id === brands[0]
     )[0];
   }
 
@@ -215,4 +209,6 @@ export default async function Content({
       />
     </>
   );
-}
+};
+
+export default Content;

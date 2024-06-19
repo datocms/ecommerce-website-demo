@@ -1,14 +1,11 @@
 'use client';
 
-import type { StoresQuery } from '@/graphql/types/graphql';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { useState } from 'react';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import type { PageProps, Query } from './meta';
 
-type PropTypes = {
-  data: StoresQuery;
-};
-
-const Content = ({ data }: PropTypes) => {
+const Content: ContentPage<PageProps, Query> = ({ data }) => {
   const [currentStore, setCurrentStore] = useState(0);
 
   const allStores = data.allStores;

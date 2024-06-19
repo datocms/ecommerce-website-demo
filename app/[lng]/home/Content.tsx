@@ -21,13 +21,18 @@ const Content: ContentPage<PageProps, Query> = ({
         switch (section.__typename) {
           case 'HeroSectionRecord':
             return (
-              <Hero fragment={section} globalPageProps={globalPageProps} />
+              <Hero
+                fragment={section}
+                globalPageProps={globalPageProps}
+                key={section.id}
+              />
             );
           case 'CollectionCardShowcaseSectionRecord':
             return (
               <ProductShowcase
                 fragment={section}
                 globalPageProps={globalPageProps}
+                key={section.id}
               />
             );
 
@@ -36,17 +41,19 @@ const Content: ContentPage<PageProps, Query> = ({
               <DividerSection
                 globalPageProps={globalPageProps}
                 fragment={section}
+                key={section.id}
               />
             );
 
           case 'TestimonialSectionRecord':
-            return <TestimonialsSection fragment={section} />;
+            return <TestimonialsSection fragment={section} key={section.id} />;
 
           case 'MaterialShowcaseSectionRecord':
             return (
               <MaterialShowcase
                 globalPageProps={globalPageProps}
                 fragment={section}
+                key={section.id}
               />
             );
 

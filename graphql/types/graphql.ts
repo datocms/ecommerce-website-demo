@@ -1411,9 +1411,9 @@ export type HeroSectionRecord = RecordInterface & {
   _status: ItemStatus;
   _unpublishingScheduledAt?: Maybe<Scalars['DateTime']['output']>;
   _updatedAt: Scalars['DateTime']['output'];
-  additionalImage?: Maybe<ImageFileField>;
+  additionalImage: ImageFileField;
   featuredCollections: Array<CollectionRecord>;
-  heroImage?: Maybe<ImageFileField>;
+  heroImage: ImageFileField;
   heroSubtitle?: Maybe<Scalars['String']['output']>;
   heroTitle: Scalars['String']['output'];
   id: Scalars['ItemId']['output'];
@@ -5612,13 +5612,13 @@ export type MaterialProductFragmentFragment = { __typename?: 'MaterialRecord', i
 
 export type DividerSectionFragment = { __typename?: 'DividerSectionRecord', id: string, _modelApiKey: string, title?: string | null, subtitle?: string | null, preTitle?: string | null, button: Array<{ __typename?: 'SimpleButtonRecord', label?: string | null, slug?: string | null }> } & { ' $fragmentName'?: 'DividerSectionFragment' };
 
-export type HeroSectionFragment = { __typename?: 'HeroSectionRecord', _modelApiKey: string, id: string, heroSubtitle?: string | null, heroTitle: string, socialLabel?: string | null, heroImage?: { __typename?: 'ImageFileField', responsiveImage: (
+export type HeroSectionFragment = { __typename?: 'HeroSectionRecord', _modelApiKey: string, id: string, heroSubtitle?: string | null, heroTitle: string, socialLabel?: string | null, heroImage: { __typename?: 'ImageFileField', responsiveImage: (
       { __typename?: 'ResponsiveImage' }
       & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
-    ) } | null, additionalImage?: { __typename?: 'ImageFileField', responsiveImage: (
+    ) }, additionalImage: { __typename?: 'ImageFileField', responsiveImage: (
       { __typename?: 'ResponsiveImage' }
       & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
-    ) } | null, socials: Array<{ __typename?: 'SocialMediaIconRecord', id: string, name?: string | null, url: string, icon: { __typename?: 'FileField', url: string } }>, featuredCollections: Array<{ __typename?: 'CollectionRecord', id: string, name: string }> } & { ' $fragmentName'?: 'HeroSectionFragment' };
+    ) }, socials: Array<{ __typename?: 'SocialMediaIconRecord', id: string, name?: string | null, url: string, icon: { __typename?: 'FileField', url: string } }>, featuredCollections: Array<{ __typename?: 'CollectionRecord', id: string, name: string }> } & { ' $fragmentName'?: 'HeroSectionFragment' };
 
 export type MaterialShowcaseFragment = { __typename?: 'MaterialShowcaseSectionRecord', id: string, _modelApiKey: string, title?: string | null, subDescription?: string | null, description?: string | null, materials: Array<{ __typename?: 'MaterialRecord', id: string, name: string, slug: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', responsiveImage?: (
           { __typename?: 'ResponsiveImage' }

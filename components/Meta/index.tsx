@@ -5,7 +5,7 @@ type PropTypes = {
   data: LayoutQuery;
 };
 
-export default async function Meta({ data }: PropTypes) {
+export default function Meta({ data }: PropTypes) {
   return (
     <>
       <title>{data._site.globalSeo?.fallbackSeo?.title}</title>

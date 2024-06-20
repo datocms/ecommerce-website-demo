@@ -4,6 +4,21 @@ import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import Content from './Content';
 import RealTime from './RealTime';
 import { type PageProps, type Query, type Variables, query } from './meta';
+import getAvailableLocales from '@/app/i18n/settings';
+import queryDatoCMS from '@/utils/queryDatoCMS';
+import { LegalStaticParamsDocument } from '@/graphql/types/graphql';
+
+export async function generateStaticParams() {
+  const locales = await getAvailableLocales();
+  const { allLegalPages } = await queryDatoCMS(LegalStaticParamsDocument);
+
+  return allLegalPages.flatMap((legal) =>
+    locales.map((lng): PageProps['params'] => ({
+      slug: legal.slug,
+      lng,
+    }))
+  );
+}
 
 const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
   params,
@@ -19,7 +34,7 @@ export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
     query,
     buildVariables,
     generate: (data) => data.legalPage?.seo,
-  },
+  }
 );
 
 const Page = generateWrapper<PageProps, Query, Variables>({

@@ -6,22 +6,19 @@ import FilterDetail from '@/components/Products/FilterDetail';
 import Pagination from '@/components/Products/Pagination';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import {
-  type BrandRecord,
-  type CollectionRecord,
-  type FilterDetailModelDescriptionField,
-  type GeneralInterfaceRecord,
-  type ImageFileField,
   InitialParamsDocument,
-  type MaterialRecord,
-  type ProductModelOrderBy,
+  InitialParamsFragmentDoc,
+  ProductModelOrderBy,
   ProductsDocument,
+  ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
-import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 import type { PageProps, Query } from './meta';
+import DatoImage from '@/components/DatoImage';
+import { getFragmentData } from '@/graphql/types';
 
 const Content: ContentPage<PageProps, Query> = async ({
   params: { lng },
@@ -29,9 +26,10 @@ const Content: ContentPage<PageProps, Query> = async ({
 }) => {
   const { isEnabled } = draftMode();
   const fallbackLng = await getFallbackLocale();
-  const pageNumber = Number.parseInt((filterParams?.page as string) ?? '1');
-  const orderBy = (filterParams?.orderBy as string) ?? '_publishedAt_DESC';
-  const nameSearch = (filterParams?.productName as string) ?? '';
+  const pageNumber = Number.parseInt(filterParams?.page ?? '1');
+  const orderBy: ProductModelOrderBy =
+    filterParams?.orderBy ?? ProductModelOrderBy.CreatedAtAsc;
+  const nameSearch = filterParams?.productName ?? '';
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -42,30 +40,37 @@ const Content: ContentPage<PageProps, Query> = async ({
     isEnabled
   );
 
-  const collectionParams = (filterParams?.collections as string)
+  const {
+    allBrands, allCollections, allMaterials
+  } =
+  getFragmentData(InitialParamsFragmentDoc, initialParams) ??
+  {};
+
+
+  const collectionParams = filterParams?.collections
     ?.split('|')
     .filter((collection) => collection.length);
 
   const collections =
     collectionParams === undefined
-      ? initialParams.allCollections.map((collection) => collection.id)
+      ? allCollections.map((collection) => collection.id)
       : collectionParams;
 
-  const brandParams = (filterParams?.brands as string)
+  const brandParams = filterParams?.brands
     ?.split('|')
     .filter((brand) => brand.length);
 
   const brands =
     brandParams === undefined
-      ? initialParams.allBrands.map((brand) => brand.id)
+      ? allBrands.map((brand) => brand.id)
       : brandParams;
 
-  const materialParams = (filterParams?.materials as string)
+  const materialParams = filterParams?.materials
     ?.split('|')
     .filter((material) => material.length);
   const materials =
     materialParams === undefined
-      ? initialParams.allMaterials.map((material) => material.id)
+      ? allMaterials.map((material) => material.id)
       : materialParams;
 
   const data = await queryDatoCMS(
@@ -74,7 +79,7 @@ const Content: ContentPage<PageProps, Query> = async ({
       locale: lng,
       fallbackLocale: [fallbackLng],
       skip: (pageNumber - 1) * 12,
-      orderBy: orderBy as ProductModelOrderBy,
+      orderBy: orderBy,
       collections,
       brands,
       materials,
@@ -82,35 +87,39 @@ const Content: ContentPage<PageProps, Query> = async ({
     },
     isEnabled
   );
-
-  let singleFilter: any;
+  
+  let singleFilter;
 
   if (materials.length === 1) {
-    singleFilter = initialParams.allMaterials.filter(
+    singleFilter = allMaterials.filter(
       (material) => material.id === materials[0]
     )[0];
   } else if (collections.length === 1) {
-    singleFilter = initialParams.allCollections.filter(
+    singleFilter = allCollections.filter(
       (collection) => collection.id === collections[0]
     )[0];
   } else if (brands.length === 1) {
-    singleFilter = initialParams.allBrands.filter(
+    singleFilter = allBrands.filter(
       (brand) => brand.id === brands[0]
     )[0];
   }
+
+  const {
+    sale,
+    currencySymbol,
+  } =
+  getFragmentData(ProductsGeneralInterfaceFragmentDoc, data.generalInterface) ??
+  {};
 
   return (
     <>
       {singleFilter && (
         <FilterDetail
-          type={(data.generalInterface as any)[singleFilter._modelApiKey]}
+          type={data.generalInterface?[singleFilter._modelApiKey]}
           name={singleFilter.name}
           subtitle={singleFilter.details.subtitle ?? ''}
-          description={
-            singleFilter.details
-              .description as FilterDetailModelDescriptionField
-          }
-          image={singleFilter.details.image as ImageFileField}
+          description={singleFilter.details.description}
+          image={singleFilter.details.image}
         />
       )}
       <div
@@ -120,13 +129,11 @@ const Content: ContentPage<PageProps, Query> = async ({
       >
         <div className="col-span-1 ml-4  p-4">
           <SideFilter
-            collections={initialParams.allCollections as CollectionRecord[]}
-            brands={initialParams.allBrands as BrandRecord[]}
-            materials={initialParams.allMaterials as MaterialRecord[]}
+            initialParams={initialParams}
+            generalInterface={data.generalInterface}
             paramaterCollections={collections}
             parameterBrands={brands}
             parameterMaterials={materials}
-            generalInterface={data.generalInterface as GeneralInterfaceRecord}
           />
         </div>
         <div className="col-span-4 ml-4 bg-white px-16 md:px-0 lg:ml-0">
@@ -143,20 +150,19 @@ const Content: ContentPage<PageProps, Query> = async ({
                       href={`/${lng}/product/${product.slug}`}
                       className="relative block h-96 overflow-hidden rounded-t-lg bg-gray-100"
                     >
-                      <DatoImage
-                        data={
-                          product.productImages[0]
-                            .responsiveImage as ResponsiveImageType
+                      {product.productImages[0].responsiveImage && <DatoImage
+                        fragment={
+                          product.productImages[0].responsiveImage
                         }
                         className="h-full w-full object-contain"
                         layout="fill"
                         objectFit="cover"
                         objectPosition="50% 50%"
-                      />
+                      />}
 
                       {isOnSale && (
                         <span className="absolute left-0 top-3 rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
-                          {data.generalInterface?.sale}
+                          {sale}
                         </span>
                       )}
                     </Link>
@@ -177,11 +183,11 @@ const Content: ContentPage<PageProps, Query> = async ({
                       {isOnSale && (
                         <div className="flex flex-col items-end gap-2">
                           <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            {data.generalInterface?.currencySymbol}
+                            {currencySymbol}
                             {product.salePrice}
                           </span>
                           <span className="mb-0.5 text-red-500 line-through">
-                            {data.generalInterface?.currencySymbol}
+                            {currencySymbol}
                             {product.price}
                           </span>
                         </div>
@@ -190,7 +196,7 @@ const Content: ContentPage<PageProps, Query> = async ({
                       {!isOnSale && (
                         <div className="flex items-end gap-2">
                           <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            {data.generalInterface?.currencySymbol}
+                            {currencySymbol}
                             {product.price}
                           </span>
                         </div>

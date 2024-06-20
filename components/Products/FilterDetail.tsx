@@ -1,13 +1,7 @@
 import {
   type FilterDetailModelDescriptionField,
-  GeneralInterfaceRecord,
   type ImageFileField,
 } from '@/graphql/types/graphql';
-import {
-  CloudArrowUpIcon,
-  LockClosedIcon,
-  ServerIcon,
-} from '@heroicons/react/20/solid';
 import {
   type Record,
   type StructuredText,
@@ -100,7 +94,7 @@ const FilterDetail = ({
           <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-8">
             <div className="px-8 text-base leading-7 text-gray-700">
               <StructuredTextField
-                data={description.value as StructuredText<Record, Record>}
+                data={description}
                 renderNode={Highlighter}
                 customNodeRules={[
                   renderNodeRule(isListItem, ({ children, key }) => {

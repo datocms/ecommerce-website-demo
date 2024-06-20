@@ -49,74 +49,10 @@ query Products(
     count
   }
   generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
-    currencySymbol
-    sale
-    newArrivals
-    mostPopular
-    topRated
-    price
-    sales
-    collection
-    material
-    brand
+    ...ProductsGeneralInterface
   }
 }
 
 query InitialParams($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
-  allCollections(
-    first: "100"
-    locale: $locale
-    fallbackLocales: $fallbackLocale
-  ) {
-    id
-    name
-    _modelApiKey
-    details {
-      image {
-        responsiveImage {
-          ...DatoImage_responsiveImage
-        }
-      }
-      subtitle
-      description {
-        value
-      }
-    }
-  }
-  allBrands(first: "100", locale: $locale, fallbackLocales: $fallbackLocale) {
-    id
-    name
-    _modelApiKey
-    details {
-      image {
-        responsiveImage {
-          ...DatoImage_responsiveImage
-        }
-      }
-      subtitle
-      description {
-        value
-      }
-    }
-  }
-  allMaterials(
-    first: "100"
-    locale: $locale
-    fallbackLocales: $fallbackLocale
-  ) {
-    id
-    name
-    _modelApiKey
-    details {
-      image {
-        responsiveImage {
-          ...DatoImage_responsiveImage
-        }
-      }
-      subtitle
-      description {
-        value
-      }
-    }
-  }
+  ...InitialParams
 }

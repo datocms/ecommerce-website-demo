@@ -1,5 +1,6 @@
 import {
   ProductDocument,
+  ProductModelOrderBy,
   type ProductQuery,
   type ProductQueryVariables,
 } from '@/graphql/types/graphql';
@@ -9,7 +10,14 @@ export type PageProps = GlobalPageProps & {
   params: {
     slug: string;
   };
-  filterParams?: { [key: string]: string | string[] | undefined };
+  filterParams?: {
+    page?: string;
+    orderBy?: ProductModelOrderBy;
+    productName?: string;
+    collections?: string;
+    brands?: string;
+    materials?: string;
+  };
 };
 
 export type Query = ProductQuery;

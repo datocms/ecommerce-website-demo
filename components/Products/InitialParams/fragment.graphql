@@ -1,0 +1,58 @@
+fragment InitialParams on Query {
+  allCollections(
+    first: "100"
+    locale: $locale
+    fallbackLocales: $fallbackLocale
+  ) {
+    id
+    name
+    _modelApiKey
+    details {
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+      }
+      subtitle
+      description {
+        value
+      }
+    }
+  }
+  allBrands(first: "100", locale: $locale, fallbackLocales: $fallbackLocale) {
+    id
+    name
+    _modelApiKey
+    details {
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+      }
+      subtitle
+      description {
+        value
+      }
+    }
+  }
+  allMaterials(
+    first: "100"
+    locale: $locale
+    fallbackLocales: $fallbackLocale
+  ) {
+    id
+    name
+    _modelApiKey
+    details {
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+      }
+      subtitle
+      description {
+        value
+      }
+    }
+  }
+}

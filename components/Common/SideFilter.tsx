@@ -1,30 +1,27 @@
 'use client';
 
-import type {
-  BrandRecord,
-  CollectionRecord,
-  GeneralInterfaceRecord,
-  MaterialRecord,
+import { FragmentType, getFragmentData } from '@/graphql/types';
+import {
+  InitialParamsFragmentDoc,
+  ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
 import { Disclosure } from '@headlessui/react';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 type PropTypes = {
-  collections: CollectionRecord[];
-  brands: BrandRecord[];
-  materials: MaterialRecord[];
+  initialParams: Maybe<FragmentType<typeof InitialParamsFragmentDoc>>;
+  generalInterface: Maybe<
+    FragmentType<typeof ProductsGeneralInterfaceFragmentDoc>
+  >;
   paramaterCollections: string[];
   parameterBrands: string[];
   parameterMaterials: string[];
-  generalInterface: GeneralInterfaceRecord;
 };
 
 const SideFilter = ({
-  collections,
-  brands,
-  materials,
+  initialParams,
   paramaterCollections,
   parameterBrands,
   parameterMaterials,
@@ -33,45 +30,61 @@ const SideFilter = ({
   const router = useRouter();
   const searchParams = useSearchParams()!;
   const paramaterCollectionsFiltered = paramaterCollections.filter(
-    (parameter) => parameter !== '',
+    (parameter) => parameter !== ''
   );
   const parameterBrandsFiltered = parameterBrands.filter(
-    (parameter) => parameter !== '',
+    (parameter) => parameter !== ''
   );
   const parameterMaterialsFiltered = parameterMaterials.filter(
-    (parameter) => parameter !== '',
+    (parameter) => parameter !== ''
   );
+
+  const {
+    collection,
+    material,
+    brand,
+    newArrivals,
+    mostPopular,
+    topRated,
+    price,
+    sales,
+  } =
+    getFragmentData(ProductsGeneralInterfaceFragmentDoc, generalInterface) ??
+    {};
+
+  const { allCollections, allBrands, allMaterials } =
+    getFragmentData(InitialParamsFragmentDoc, initialParams) ?? {};
 
   const filters = [
     {
       id: 'collections',
-      name: generalInterface.collection,
-      options: collections.map((collection) => {
+      name: collection,
+      options: allCollections?.map((collection) => {
         return { id: collection.id, name: collection.name, checked: true };
       }),
     },
     {
       id: 'materials',
-      name: generalInterface.material,
-      options: materials.map((material) => {
+      name: material,
+      options: allMaterials?.map((material) => {
         return { id: material.id, name: material.name, checked: true };
       }),
     },
     {
       id: 'brands',
-      name: generalInterface.brand,
-      options: brands.map((brands) => {
+      name: brand,
+      options: allBrands?.map((brands) => {
         return { id: brands.id, name: brands.name, checked: true };
       }),
     },
   ];
 
   const sortOptions = [
-    { label: generalInterface.newArrivals, value: '_publishedAt_DESC' },
-    { label: generalInterface.mostPopular, value: 'numberOfReviews_DESC' },
-    { label: generalInterface.topRated, value: 'reviewAverage_DESC' },
-    { label: generalInterface.price, value: 'price_DESC' },
-    { label: generalInterface.sales, value: 'sale_DESC' },
+    { label: newArrivals, value: '_publishedAt_DESC' },
+    { label: mostPopular, value: 'numberOfReviews_DESC' },
+    { label: topRated, value: 'reviewAverage_DESC' },
+    { label: price, value: 'price_DESC' },
+    { label: sales, value: 'sale_DESC' },
   ];
 
   function exportQueryParameters(key: string, value: string) {
@@ -129,7 +142,7 @@ const SideFilter = ({
                 </h3>
                 <Disclosure.Panel className="pt-6">
                   <div className="grid grid-cols-2 items-center justify-between gap-4 md:grid-cols-3 lg:block lg:space-y-4">
-                    {section.options.map((option, optionIdx) => (
+                    {section.options?.map((option, optionIdx) => (
                       <div
                         key={option.id}
                         className="flex items-center pl-6 md:pl-16 lg:pl-0"
@@ -148,24 +161,23 @@ const SideFilter = ({
                               case 'collections':
                                 if (
                                   paramaterCollectionsFiltered.includes(
-                                    option.id,
+                                    option.id
                                   )
                                 ) {
                                   exportQueryParameters(
                                     'collections',
                                     paramaterCollectionsFiltered
                                       .filter(
-                                        (collection) =>
-                                          collection !== option.id,
+                                        (collection) => collection !== option.id
                                       )
-                                      .join('|'),
+                                      .join('|')
                                   );
                                   return;
                                 }
                                 paramaterCollectionsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'collections',
-                                  paramaterCollectionsFiltered.join('|'),
+                                  paramaterCollectionsFiltered.join('|')
                                 );
                                 return;
                               case 'brands':
@@ -176,17 +188,16 @@ const SideFilter = ({
                                     'brands',
                                     parameterBrandsFiltered
                                       .filter(
-                                        (collection) =>
-                                          collection !== option.id,
+                                        (collection) => collection !== option.id
                                       )
-                                      .join('|'),
+                                      .join('|')
                                   );
                                   return;
                                 }
                                 parameterBrandsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'brands',
-                                  parameterBrandsFiltered.join('|'),
+                                  parameterBrandsFiltered.join('|')
                                 );
                                 return;
                               case 'materials':
@@ -197,16 +208,16 @@ const SideFilter = ({
                                     'materials',
                                     parameterMaterialsFiltered
                                       .filter(
-                                        (material) => material !== option.id,
+                                        (material) => material !== option.id
                                       )
-                                      .join('|'),
+                                      .join('|')
                                   );
                                   return;
                                 }
                                 parameterMaterialsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'materials',
-                                  parameterMaterialsFiltered.join('|'),
+                                  parameterMaterialsFiltered.join('|')
                                 );
                                 return;
                             }

@@ -30,19 +30,19 @@ const SideFilter = ({
   const router = useRouter();
   const searchParams = useSearchParams()!;
   const paramaterCollectionsFiltered = paramaterCollections.filter(
-    (parameter) => parameter !== '',
+    (parameter) => parameter !== ''
   );
   const parameterBrandsFiltered = parameterBrands.filter(
-    (parameter) => parameter !== '',
+    (parameter) => parameter !== ''
   );
   const parameterMaterialsFiltered = parameterMaterials.filter(
-    (parameter) => parameter !== '',
+    (parameter) => parameter !== ''
   );
 
   const {
-    collection,
-    material,
-    brand,
+    BrandRecord,
+    MaterialRecord,
+    CollectionRecord,
     newArrivals,
     mostPopular,
     topRated,
@@ -58,21 +58,21 @@ const SideFilter = ({
   const filters = [
     {
       id: 'collections',
-      name: collection,
+      name: CollectionRecord,
       options: allCollections?.map((collection) => {
         return { id: collection.id, name: collection.name, checked: true };
       }),
     },
     {
       id: 'materials',
-      name: material,
+      name: MaterialRecord,
       options: allMaterials?.map((material) => {
         return { id: material.id, name: material.name, checked: true };
       }),
     },
     {
       id: 'brands',
-      name: brand,
+      name: BrandRecord,
       options: allBrands?.map((brands) => {
         return { id: brands.id, name: brands.name, checked: true };
       }),
@@ -161,24 +161,23 @@ const SideFilter = ({
                               case 'collections':
                                 if (
                                   paramaterCollectionsFiltered.includes(
-                                    option.id,
+                                    option.id
                                   )
                                 ) {
                                   exportQueryParameters(
                                     'collections',
                                     paramaterCollectionsFiltered
                                       .filter(
-                                        (collection) =>
-                                          collection !== option.id,
+                                        (collection) => collection !== option.id
                                       )
-                                      .join('|'),
+                                      .join('|')
                                   );
                                   return;
                                 }
                                 paramaterCollectionsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'collections',
-                                  paramaterCollectionsFiltered.join('|'),
+                                  paramaterCollectionsFiltered.join('|')
                                 );
                                 return;
                               case 'brands':
@@ -189,17 +188,16 @@ const SideFilter = ({
                                     'brands',
                                     parameterBrandsFiltered
                                       .filter(
-                                        (collection) =>
-                                          collection !== option.id,
+                                        (collection) => collection !== option.id
                                       )
-                                      .join('|'),
+                                      .join('|')
                                   );
                                   return;
                                 }
                                 parameterBrandsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'brands',
-                                  parameterBrandsFiltered.join('|'),
+                                  parameterBrandsFiltered.join('|')
                                 );
                                 return;
                               case 'materials':
@@ -210,16 +208,16 @@ const SideFilter = ({
                                     'materials',
                                     parameterMaterialsFiltered
                                       .filter(
-                                        (material) => material !== option.id,
+                                        (material) => material !== option.id
                                       )
-                                      .join('|'),
+                                      .join('|')
                                   );
                                   return;
                                 }
                                 parameterMaterialsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'materials',
-                                  parameterMaterialsFiltered.join('|'),
+                                  parameterMaterialsFiltered.join('|')
                                 );
                                 return;
                             }

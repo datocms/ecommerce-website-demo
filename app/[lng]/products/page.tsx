@@ -111,7 +111,7 @@ const Page: ContentPage<PageProps, Query> = async ({
     isEnabled
   );
 
-  let singleFilter;
+  let singleFilter = null;
 
   if (materials.length === 1) {
     singleFilter = allMaterials.filter(

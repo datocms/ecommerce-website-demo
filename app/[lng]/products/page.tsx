@@ -26,7 +26,7 @@ type PageProps = GlobalPageProps & {
   params: {
     slug: string;
   };
-  filterParams?: {
+  searchParams?: {
     page?: string;
     orderBy?: ProductModelOrderBy;
     productName?: string;
@@ -36,9 +36,6 @@ type PageProps = GlobalPageProps & {
   };
 };
 
-type Query = ProductsQuery;
-type Variables = ProductsQueryVariables;
-
 // export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
 //   {
 //     query,
@@ -47,16 +44,16 @@ type Variables = ProductsQueryVariables;
 //   }
 // );
 
-const Page: ContentPage<PageProps, Query> = async ({
+const Page: ContentPage<PageProps> = async ({
   params: { lng },
-  filterParams,
+  searchParams,
 }) => {
   const { isEnabled } = draftMode();
   const fallbackLng = await getFallbackLocale();
-  const pageNumber = Number.parseInt(filterParams?.page ?? '1');
+  const pageNumber = Number.parseInt(searchParams?.page ?? '1');
   const orderBy: ProductModelOrderBy =
-    filterParams?.orderBy ?? ProductModelOrderBy.CreatedAtAsc;
-  const nameSearch = filterParams?.productName ?? '';
+    searchParams?.orderBy ?? ProductModelOrderBy.CreatedAtAsc;
+  const nameSearch = searchParams?.productName ?? '';
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -70,7 +67,7 @@ const Page: ContentPage<PageProps, Query> = async ({
   const { allBrands, allCollections, allMaterials } =
     getFragmentData(InitialParamsFragmentDoc, initialParams) ?? {};
 
-  const collectionParams = filterParams?.collections
+  const collectionParams = searchParams?.collections
     ?.split('|')
     .filter((collection) => collection.length);
 
@@ -79,7 +76,7 @@ const Page: ContentPage<PageProps, Query> = async ({
       ? allCollections.map((collection) => collection.id)
       : collectionParams;
 
-  const brandParams = filterParams?.brands
+  const brandParams = searchParams?.brands
     ?.split('|')
     .filter((brand) => brand.length);
 
@@ -88,7 +85,7 @@ const Page: ContentPage<PageProps, Query> = async ({
       ? allBrands.map((brand) => brand.id)
       : brandParams;
 
-  const materialParams = filterParams?.materials
+  const materialParams = searchParams?.materials
     ?.split('|')
     .filter((material) => material.length);
   const materials =

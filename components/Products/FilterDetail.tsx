@@ -1,12 +1,17 @@
 import type { FragmentType } from '@/graphql/types';
 import type { DatoImage_ResponsiveImageFragmentDoc } from '@/graphql/types/graphql';
 import {
+  type Record,
+  type StructuredText,
   isList,
   isListItem,
   isThematicBreak,
 } from 'datocms-structured-text-utils';
 import type { Maybe } from 'graphql/jsutils/Maybe';
-import { StructuredText, renderNodeRule } from 'react-datocms/structured-text';
+import {
+  StructuredText as StructuredTextField,
+  renderNodeRule,
+} from 'react-datocms/structured-text';
 import ReactMarkdown from 'react-markdown';
 import Highlighter from '../Common/Highlighter';
 import DatoImage from '../DatoImage';
@@ -16,7 +21,7 @@ type PropTypes = {
   subtitle: string;
   type: Maybe<string>;
   image: Maybe<FragmentType<typeof DatoImage_ResponsiveImageFragmentDoc>>;
-  description: unknown;
+  description: Maybe<StructuredText<Record, Record>>;
 };
 
 const FilterDetail = ({
@@ -86,8 +91,8 @@ const FilterDetail = ({
         </div>
         <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-8">
           <div className="px-8 text-base leading-7 text-gray-700">
-            <StructuredText
-              data={description as any}
+            <StructuredTextField
+              data={description}
               renderNode={Highlighter}
               customNodeRules={[
                 renderNodeRule(isListItem, ({ children, key }) => {

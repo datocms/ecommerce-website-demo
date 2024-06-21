@@ -1,11 +1,15 @@
 'use client';
 
-import type { ProductQuery, SiteLocale } from '@/graphql/types/graphql';
+import { getFragmentData } from '@/graphql/types';
+import {
+  ProductGeneralInterfaceFragmentDoc,
+  type ProductQuery,
+} from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import { useState } from 'react';
+import DatoImage from '../DatoImage';
 
 type Props = {
   data: ProductQuery;
@@ -22,7 +26,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
   );
 
   const [selectedSize, setSelectedSize] = useState(
-    (data.product.productVariations[0].availableSizes as Array<string>)[0],
+    (data.product.productVariations[0].availableSizes as Array<string>)[0], //narrow down of json field with checkbox field editor
   );
 
   const [selectedImage, setSelectedImage] = useState(
@@ -30,6 +34,22 @@ const ProductView = ({ data, globalPageProps }: Props) => {
   );
 
   const isOnSale = data.product?.sale === 'on_sale';
+
+  const {
+    sale,
+    reviews,
+    color,
+    size,
+    currencySymbol,
+    priceUndertext,
+    shippingText,
+    primaryButton,
+    secondaryButton,
+  } =
+    getFragmentData(
+      ProductGeneralInterfaceFragmentDoc,
+      data.generalInterface,
+    ) ?? {};
 
   return (
     <div className="flex w-full items-center justify-center">
@@ -45,13 +65,15 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                         key={image.id}
                         className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100"
                       >
-                        <DatoImage
-                          data={image.responsiveImage as ResponsiveImageType}
-                          className="h-full w-full object-contain"
-                          layout="fill"
-                          objectFit="cover"
-                          objectPosition="50% 50%"
-                        />
+                        {image.responsiveImage && (
+                          <DatoImage
+                            fragment={image.responsiveImage}
+                            className="h-full w-full object-contain"
+                            layout="fill"
+                            objectFit="cover"
+                            objectPosition="50% 50%"
+                          />
+                        )}
                       </div>
                     );
 
@@ -63,13 +85,15 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                         setSelectedImage(image);
                       }}
                     >
-                      <DatoImage
-                        data={image.responsiveImage as ResponsiveImageType}
-                        className="h-full w-full object-contain"
-                        layout="fill"
-                        objectFit="cover"
-                        objectPosition="50% 50%"
-                      />
+                      {image.responsiveImage && (
+                        <DatoImage
+                          fragment={image.responsiveImage}
+                          className="h-full w-full object-contain"
+                          layout="fill"
+                          objectFit="cover"
+                          objectPosition="50% 50%"
+                        />
+                      )}
                     </div>
                   );
                 })}
@@ -77,18 +101,20 @@ const ProductView = ({ data, globalPageProps }: Props) => {
 
               <div className="relative w-full overflow-hidden rounded-lg bg-gray-100 md:h-80 lg:col-span-4 lg:h-full">
                 <div className="h-[500px] sm:h-[650px] md:h-full">
-                  <DatoImage
-                    data={selectedImage?.responsiveImage as ResponsiveImageType}
-                    className="h-full w-full object-contain"
-                    layout="fill"
-                    objectFit="cover"
-                    objectPosition="50% 50%"
-                  />
+                  {selectedImage?.responsiveImage && (
+                    <DatoImage
+                      fragment={selectedImage?.responsiveImage}
+                      className="h-full w-full object-contain"
+                      layout="fill"
+                      objectFit="cover"
+                      objectPosition="50% 50%"
+                    />
+                  )}
                 </div>
 
                 {isOnSale && (
                   <span className="absolute left-0 top-0 rounded-br-lg bg-red-500 px-3 py-1.5 text-sm uppercase tracking-wider text-white">
-                    {data.generalInterface?.sale}
+                    {sale}
                   </span>
                 )}
 
@@ -142,14 +168,13 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                 </div>
 
                 <span className="text-sm text-gray-500 transition duration-100">
-                  {data.product.numberOfReviews}{' '}
-                  {data.generalInterface?.reviews}
+                  {data.product.numberOfReviews} {reviews}
                 </span>
               </div>
 
               <div className="mb-4 md:mb-6">
                 <span className="mb-3 inline-block text-sm font-semibold text-gray-500 md:text-base">
-                  {data.generalInterface?.color}
+                  {color}
                 </span>
 
                 <div className="flex flex-wrap gap-2">
@@ -181,7 +206,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
 
               <div className="mb-8 md:mb-10">
                 <span className="mb-3 inline-block text-sm font-semibold text-gray-500 md:text-base">
-                  {data.generalInterface?.size}
+                  {size}
                 </span>
 
                 <div className="flex flex-wrap gap-3">
@@ -231,12 +256,10 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                 {isOnSale && (
                   <div className="flex items-end gap-2">
                     <span className="text-xl font-bold text-gray-800 md:text-2xl">
-                      {data.generalInterface?.currencySymbol}{' '}
-                      {data.product.salePrice}
+                      {currencySymbol} {data.product.salePrice}
                     </span>
                     <span className="mb-0.5 text-red-500 line-through">
-                      {data.generalInterface?.currencySymbol}{' '}
-                      {data.product.price}
+                      {currencySymbol} {data.product.price}
                     </span>
                   </div>
                 )}
@@ -244,15 +267,12 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                 {!isOnSale && (
                   <div className="">
                     <span className="text-xl font-bold text-gray-800 md:text-2xl">
-                      {data.generalInterface?.currencySymbol}{' '}
-                      {data.product.price}
+                      {currencySymbol} {data.product.price}
                     </span>
                   </div>
                 )}
 
-                <span className="text-sm text-gray-500">
-                  {data.generalInterface?.priceUndertext}
-                </span>
+                <span className="text-sm text-gray-500">{priceUndertext}</span>
               </div>
 
               <div className="mb-6 flex items-center gap-2 text-gray-500">
@@ -272,9 +292,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                   />
                 </svg>
 
-                <span className="text-sm">
-                  {data.generalInterface?.shippingText}
-                </span>
+                <span className="text-sm">{shippingText}</span>
               </div>
 
               <div className="flex w-[90%] flex-col gap-2.5">
@@ -282,14 +300,14 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                   href="#"
                   className="inline-block flex-1 rounded-lg bg-primary/90 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary/40 transition duration-100 hover:bg-primary focus-visible:ring active:bg-primary/50 sm:flex-none md:text-base"
                 >
-                  {data.generalInterface?.primaryButton}
+                  {primaryButton}
                 </a>
 
                 <a
                   href="#"
                   className="inline-block rounded-lg bg-gray-200 px-8 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-300 focus-visible:ring active:text-gray-700 md:text-base"
                 >
-                  {data.generalInterface?.secondaryButton}
+                  {secondaryButton}
                 </a>
               </div>
             </div>

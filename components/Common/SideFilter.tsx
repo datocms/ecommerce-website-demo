@@ -30,13 +30,13 @@ const SideFilter = ({
   const router = useRouter();
   const searchParams = useSearchParams()!;
   const paramaterCollectionsFiltered = paramaterCollections.filter(
-    (parameter) => parameter !== ''
+    (parameter) => parameter !== '',
   );
   const parameterBrandsFiltered = parameterBrands.filter(
-    (parameter) => parameter !== ''
+    (parameter) => parameter !== '',
   );
   const parameterMaterialsFiltered = parameterMaterials.filter(
-    (parameter) => parameter !== ''
+    (parameter) => parameter !== '',
   );
 
   const {
@@ -161,23 +161,24 @@ const SideFilter = ({
                               case 'collections':
                                 if (
                                   paramaterCollectionsFiltered.includes(
-                                    option.id
+                                    option.id,
                                   )
                                 ) {
                                   exportQueryParameters(
                                     'collections',
                                     paramaterCollectionsFiltered
                                       .filter(
-                                        (collection) => collection !== option.id
+                                        (collection) =>
+                                          collection !== option.id,
                                       )
-                                      .join('|')
+                                      .join('|'),
                                   );
                                   return;
                                 }
                                 paramaterCollectionsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'collections',
-                                  paramaterCollectionsFiltered.join('|')
+                                  paramaterCollectionsFiltered.join('|'),
                                 );
                                 return;
                               case 'brands':
@@ -188,16 +189,17 @@ const SideFilter = ({
                                     'brands',
                                     parameterBrandsFiltered
                                       .filter(
-                                        (collection) => collection !== option.id
+                                        (collection) =>
+                                          collection !== option.id,
                                       )
-                                      .join('|')
+                                      .join('|'),
                                   );
                                   return;
                                 }
                                 parameterBrandsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'brands',
-                                  parameterBrandsFiltered.join('|')
+                                  parameterBrandsFiltered.join('|'),
                                 );
                                 return;
                               case 'materials':
@@ -208,16 +210,16 @@ const SideFilter = ({
                                     'materials',
                                     parameterMaterialsFiltered
                                       .filter(
-                                        (material) => material !== option.id
+                                        (material) => material !== option.id,
                                       )
-                                      .join('|')
+                                      .join('|'),
                                   );
                                   return;
                                 }
                                 parameterMaterialsFiltered.push(option.id);
                                 exportQueryParameters(
                                   'materials',
-                                  parameterMaterialsFiltered.join('|')
+                                  parameterMaterialsFiltered.join('|'),
                                 );
                                 return;
                             }

@@ -1,4 +1,4 @@
-import { type PopupRecord, SiteLocale } from '@/graphql/types/graphql';
+import type { PopupRecord } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import type { Dispatch, SetStateAction } from 'react';

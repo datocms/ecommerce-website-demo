@@ -5,7 +5,6 @@ import SideFilter from '@/components/Common/SideFilter';
 import DatoImage from '@/components/DatoImage';
 import FilterDetail from '@/components/Products/FilterDetail';
 import Pagination from '@/components/Products/Pagination';
-import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { getFragmentData } from '@/graphql/types';
 import {
   InitialParamsDocument,
@@ -13,12 +12,11 @@ import {
   ProductModelOrderBy,
   ProductsDocument,
   ProductsGeneralInterfaceFragmentDoc,
-  type ProductsQuery,
-  type ProductsQueryVariables,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
+import type { Record, StructuredText } from 'datocms-structured-text-utils';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
 
@@ -26,7 +24,7 @@ type PageProps = GlobalPageProps & {
   params: {
     slug: string;
   };
-  searchParams?: {
+  searchParams: {
     page?: string;
     orderBy?: ProductModelOrderBy;
     productName?: string;
@@ -36,18 +34,7 @@ type PageProps = GlobalPageProps & {
   };
 };
 
-// export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
-//   {
-//     query,
-//     buildVariables,
-//     generate: (data) => data.product?.seo,
-//   }
-// );
-
-const Page: ContentPage<PageProps> = async ({
-  params: { lng },
-  searchParams,
-}) => {
+const Page = async ({ params: { lng }, searchParams }: PageProps) => {
   const { isEnabled } = draftMode();
   const fallbackLng = await getFallbackLocale();
   const pageNumber = Number.parseInt(searchParams?.page ?? '1');
@@ -61,7 +48,7 @@ const Page: ContentPage<PageProps> = async ({
       locale: lng,
       fallbackLocale: [fallbackLng],
     },
-    isEnabled
+    isEnabled,
   );
 
   const { allBrands, allCollections, allMaterials } =
@@ -105,18 +92,18 @@ const Page: ContentPage<PageProps> = async ({
       materials,
       nameSearch,
     },
-    isEnabled
+    isEnabled,
   );
 
   let singleFilter = null;
 
   if (materials.length === 1) {
     singleFilter = allMaterials.filter(
-      (material) => material.id === materials[0]
+      (material) => material.id === materials[0],
     )[0];
   } else if (collections.length === 1) {
     singleFilter = allCollections.filter(
-      (collection) => collection.id === collections[0]
+      (collection) => collection.id === collections[0],
     )[0];
   } else if (brands.length === 1) {
     singleFilter = allBrands.filter((brand) => brand.id === brands[0])[0];
@@ -131,17 +118,17 @@ const Page: ContentPage<PageProps> = async ({
   } =
     getFragmentData(
       ProductsGeneralInterfaceFragmentDoc,
-      data.generalInterface
+      data.generalInterface,
     ) ?? {};
 
   const type =
     singleFilter?.__typename === 'BrandRecord'
       ? BrandRecord
       : singleFilter?.__typename === 'CollectionRecord'
-      ? CollectionRecord
-      : singleFilter?.__typename === 'MaterialRecord'
-      ? MaterialRecord
-      : null;
+        ? CollectionRecord
+        : singleFilter?.__typename === 'MaterialRecord'
+          ? MaterialRecord
+          : null;
 
   return (
     <>
@@ -150,7 +137,9 @@ const Page: ContentPage<PageProps> = async ({
           type={type}
           name={singleFilter.name}
           subtitle={singleFilter.details.subtitle ?? ''}
-          description={singleFilter.details.description.value}
+          description={
+            singleFilter.details.description as StructuredText<Record, Record>
+          }
           image={singleFilter.details.image.responsiveImage}
         />
       )}

@@ -8,12 +8,9 @@ import type {
 } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { isEmptyDocument } from 'datocms-structured-text-utils';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
 import CategoryHeader from './CategoryHeader';
 import CookiesNotice from './CookiesNotice';
-import LanguageSelector from './LanguageSelector';
 import NotificationStrip from './NotificationStrip';
 import PopUpBanner from './PopUpBanner';
 

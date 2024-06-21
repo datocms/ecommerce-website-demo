@@ -1,11 +1,7 @@
-import { primaryColor } from '@/app/i18n/settings';
-import { type LayoutQuery, SiteLocale } from '@/graphql/types/graphql';
+import type { LayoutQuery } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
-import ReactMarkdown from 'react-markdown';
 import SvgRenderer from '../Common/SvgRenderer';
 
 type Props = {

@@ -1,5 +1,4 @@
 import type { LayoutQuery } from '@/graphql/types/graphql';
-import queryDatoCMS from '@/utils/queryDatoCMS';
 
 type PropTypes = {
   data: LayoutQuery;

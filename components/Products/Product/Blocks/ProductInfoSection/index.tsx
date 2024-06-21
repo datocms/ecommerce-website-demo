@@ -34,12 +34,12 @@ const ProductInfoSection = ({
     more,
   } = getFragmentData(
     ProductGeneralInterfaceFragmentDoc,
-    generalInterfaceFragment
+    generalInterfaceFragment,
   ) ?? {};
 
   const { material, style, weather, occasions } = getFragmentData(
     ProductInfoSectionFragmentDoc,
-    ProductInfoFragment
+    ProductInfoFragment,
   );
 
   const { details, name, id } =

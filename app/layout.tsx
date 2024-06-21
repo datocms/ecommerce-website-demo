@@ -7,10 +7,7 @@ type Params = GlobalPageProps & {
   children: React.ReactNode;
 };
 
-export default function RootLayout({
-  children,
-  params: { lng },
-}: Params) {
+export default function RootLayout({ children, params: { lng } }: Params) {
   const { isEnabled: isDraft } = draftMode();
   return (
     <html lang={lng}>

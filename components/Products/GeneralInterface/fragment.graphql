@@ -6,7 +6,7 @@ fragment ProductsGeneralInterface on GeneralInterfaceRecord {
   topRated
   price
   sales
-  collection
-  material
-  brand
+  CollectionRecord: collection
+  MaterialRecord: material
+  BrandRecord: brand
 }

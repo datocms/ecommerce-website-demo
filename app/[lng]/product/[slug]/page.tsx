@@ -1,12 +1,12 @@
+import getAvailableLocales from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
+import { ProductStaticParamsDocument } from '@/graphql/types/graphql';
+import queryDatoCMS from '@/utils/queryDatoCMS';
 import Content from './Content';
 import RealTime from './RealTime';
 import { type PageProps, type Query, type Variables, query } from './meta';
-import getAvailableLocales from '@/app/i18n/settings';
-import queryDatoCMS from '@/utils/queryDatoCMS';
-import { ProductStaticParamsDocument } from '@/graphql/types/graphql';
 
 export async function generateStaticParams() {
   const locales = await getAvailableLocales();
@@ -16,7 +16,7 @@ export async function generateStaticParams() {
     locales.map((lng): PageProps['params'] => ({
       slug: product.slug,
       lng,
-    }))
+    })),
   );
 }
 
@@ -34,7 +34,7 @@ export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
     query,
     buildVariables,
     generate: (data) => data.product?.seo,
-  }
+  },
 );
 
 const Page = generateWrapper<PageProps, Query, Variables>({

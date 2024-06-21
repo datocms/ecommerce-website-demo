@@ -1,30 +1,22 @@
+import type { FragmentType } from '@/graphql/types';
+import type { DatoImage_ResponsiveImageFragmentDoc } from '@/graphql/types/graphql';
+import type { Maybe } from 'graphql/jsutils/Maybe';
+import ReactMarkdown from 'react-markdown';
+import Highlighter from '../Common/Highlighter';
+import DatoImage from '../DatoImage';
+import { StructuredText, renderNodeRule } from 'react-datocms/structured-text';
 import {
-  type FilterDetailModelDescriptionField,
-  type ImageFileField,
-} from '@/graphql/types/graphql';
-import {
-  type Record,
-  type StructuredText,
   isList,
   isListItem,
   isThematicBreak,
 } from 'datocms-structured-text-utils';
-import type { Maybe } from 'graphql/jsutils/Maybe';
-import {
-  Image as DatoImage,
-  type ResponsiveImageType,
-  StructuredText as StructuredTextField,
-  renderNodeRule,
-} from 'react-datocms';
-import ReactMarkdown from 'react-markdown';
-import Highlighter from '../Common/Highlighter';
 
 type PropTypes = {
   name: string;
   subtitle: string;
   type: Maybe<string>;
-  image: ImageFileField;
-  description: Maybe<FilterDetailModelDescriptionField>;
+  image: Maybe<FragmentType<typeof DatoImage_ResponsiveImageFragmentDoc>>;
+  description: unknown;
 };
 
 const FilterDetail = ({
@@ -82,52 +74,53 @@ const FilterDetail = ({
           </div>
         </div>
         <div className="relative mx-8 mb-8 h-96 p-12 lg:sticky lg:top-32 lg:row-span-5 lg:row-start-1 lg:mx-0 lg:-ml-12 lg:mb-0 lg:mr-12 lg:h-full lg:overflow-hidden">
-          <DatoImage
-            data={image.responsiveImage as ResponsiveImageType}
-            className="relative h-full w-[48rem] max-w-none rounded-xl bg-gray-900 object-contain shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
-            layout="fill"
-            objectFit="cover"
-            objectPosition="50% 50%"
-          />
+          {image && (
+            <DatoImage
+              fragment={image}
+              className="relative h-full w-[48rem] max-w-none rounded-xl bg-gray-900 object-contain shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
+              layout="fill"
+              objectFit="cover"
+              objectPosition="50% 50%"
+            />
+          )}
         </div>
-        {description && (
-          <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-8">
-            <div className="px-8 text-base leading-7 text-gray-700">
-              <StructuredTextField
-                data={description}
-                renderNode={Highlighter}
-                customNodeRules={[
-                  renderNodeRule(isListItem, ({ children, key }) => {
-                    return (
-                      <div key={key} className="flex gap-x-3">
-                        <div>{children}</div>
-                      </div>
-                    );
-                  }),
-                  renderNodeRule(isThematicBreak, ({ children, key }) => {
-                    return (
-                      <hr
-                        key={key}
-                        className="mx-auto my-4 h-[3px] w-1/2 rounded-3xl bg-primary opacity-50"
-                      />
-                    );
-                  }),
-                  renderNodeRule(isList, ({ children, key }) => {
-                    return (
-                      <ul
-                        key={key}
-                        role="list"
-                        className="my-8 space-y-8 text-gray-600"
-                      >
-                        {children}
-                      </ul>
-                    );
-                  }),
-                ]}
-              />
-            </div>
+        <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-8">
+          <div className="px-8 text-base leading-7 text-gray-700">
+            <StructuredText
+              data={description}
+              renderNode={Highlighter}
+              customNodeRules={[
+                renderNodeRule(isListItem, ({ children, key }) => {
+                  return (
+                    <div key={key} className="flex gap-x-3">
+                      <div>{children}</div>
+                    </div>
+                  );
+                }),
+                renderNodeRule(isThematicBreak, ({ children, key }) => {
+                  return (
+                    <hr
+                      key={key}
+                      className="mx-auto my-4 h-[3px] w-1/2 rounded-3xl bg-primary opacity-50"
+                    />
+                  );
+                }),
+                renderNodeRule(isList, ({ children, key }) => {
+                  return (
+                    <ul
+                      key={key}
+                      role="list"
+                      className="my-8 space-y-8 text-gray-600"
+                    >
+                      {children}
+                    </ul>
+                  );
+                }),
+              ]}
+            />
           </div>
-        )}
+        </div>
+        )
       </div>
     </div>
   );

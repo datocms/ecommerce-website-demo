@@ -1,0 +1,20 @@
+query LegalPage(
+  $slug: String
+  $locale: SiteLocale
+  $fallbackLocale: [SiteLocale!]
+) {
+  legalPage(
+    filter: { slug: { eq: $slug } }
+    locale: $locale
+    fallbackLocales: $fallbackLocale
+  ) {
+    seo: _seoMetaTags {
+      attributes
+      content
+      tag
+    }
+    content {
+      value
+    }
+  }
+}

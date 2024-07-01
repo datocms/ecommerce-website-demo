@@ -1,0 +1,33 @@
+query Home($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+  home(locale: $locale, fallbackLocales: $fallbackLocale) {
+    seo: _seoMetaTags {
+      attributes
+      content
+      tag
+    }
+    sections {
+       ... on RecordInterface {
+        id
+        __typename
+      }
+      ... on HeroSectionRecord {
+        ...HeroSection
+      }
+
+      ... on DividerSectionRecord {
+        ...DividerSection
+      }
+
+      ... on TestimonialSectionRecord {
+        ...TestimonialSection
+      }
+
+      ... on CollectionCardShowcaseSectionRecord {
+        ...CollectionCardShowcase
+      }
+      ... on MaterialShowcaseSectionRecord {
+        ...MaterialShowcase
+      }
+    }
+  }
+}

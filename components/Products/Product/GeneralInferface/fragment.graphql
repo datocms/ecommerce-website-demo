@@ -1,0 +1,17 @@
+fragment ProductGeneralInterface on GeneralInterfaceRecord {
+  currencySymbol
+  weather
+  style
+  size
+  shippingText
+  secondaryButton
+  sale
+  reviews
+  reviewButton
+  primaryButton
+  priceUndertext
+  occasions
+  more
+  materials
+  color
+}

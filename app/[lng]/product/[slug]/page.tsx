@@ -1,49 +1,47 @@
-import { getFallbackLocale } from '@/app/i18n/settings';
-import Product from '@/components/Products/Product';
-import RealTimeProducts from '@/components/Products/RealTimeProducts';
-import {
-  LegalDocument,
-  ProductDocument,
-  SiteLocale,
-} from '@/graphql/types/graphql';
+import getAvailableLocales from '@/app/i18n/settings';
+import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
+import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
+import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
+import { ProductStaticParamsDocument } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
-import { draftMode } from 'next/headers';
+import Content from './Content';
+import RealTime from './RealTime';
+import { type PageProps, type Query, type Variables, query } from './meta';
 
-type Params = {
-  params: {
-    slug: string;
-    lng: SiteLocale;
-  };
-};
+export async function generateStaticParams() {
+  const locales = await getAvailableLocales();
+  const { allProducts } = await queryDatoCMS(ProductStaticParamsDocument);
 
-const ProductsPage = async ({ params: { slug, lng } }: Params) => {
-  const fallbackLng = await getFallbackLocale();
-  const { isEnabled } = draftMode();
-
-  const data = await queryDatoCMS(
-    ProductDocument,
-    {
-      slug,
-      locale: lng,
-      fallbackLocale: [fallbackLng],
-    },
-    isEnabled
+  return allProducts.flatMap((product) =>
+    locales.map((lng): PageProps['params'] => ({
+      slug: product.slug,
+      lng,
+    })),
   );
+}
 
-  return (
-    <>
-      {!isEnabled && <Product data={data} lng={lng} />}
-      {isEnabled && (
-        <RealTimeProducts
-          initialData={data}
-          locale={lng}
-          token={process.env.DATOCMS_READONLY_API_TOKEN || ''}
-          query={ProductDocument}
-          variables={{ slug, locale: lng, fallbackLocale: [fallbackLng] }}
-        />
-      )}
-    </>
-  );
-};
+const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
+  params,
+  fallbackLocale,
+}) => ({
+  locale: params.lng,
+  fallbackLocale: [fallbackLocale],
+  slug: params.slug,
+});
 
-export default ProductsPage;
+export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
+  {
+    query,
+    buildVariables,
+    generate: (data) => data.product?.seo,
+  },
+);
+
+const Page = generateWrapper<PageProps, Query, Variables>({
+  query,
+  buildVariables,
+  contentComponent: Content,
+  realtimeComponent: RealTime,
+});
+
+export default Page;

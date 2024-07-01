@@ -1,0 +1,11 @@
+fragment DividerSection on DividerSectionRecord {
+  id
+  _modelApiKey
+  title
+  subtitle
+  preTitle
+  button {
+    label
+    slug
+  }
+}

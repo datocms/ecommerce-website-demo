@@ -1,16 +1,16 @@
-import { FeaturedReviewRecord, SiteLocale } from '@/graphql/types/graphql';
-import { Maybe } from 'graphql/jsutils/Maybe';
+import { getFragmentData } from '@/graphql/types';
+import {
+  ProductGeneralInterfaceFragmentDoc,
+  type ProductQuery,
+} from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 type PropTypes = {
-  reviews: Array<FeaturedReviewRecord>;
-  reviewNumber: number;
-  reviewAverage: number;
-  reviewsString: Maybe<string>;
-  reviewButton: Maybe<string>;
-  lng: SiteLocale;
+  data: ProductQuery;
+  globalPageProps: GlobalPageProps;
 };
 
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface StarRatingProps {
@@ -50,14 +50,12 @@ const StarRating: FC<StarRatingProps> = ({ rating }) => {
   );
 };
 
-const Reviews = ({
-  reviews,
-  reviewNumber,
-  reviewAverage,
-  lng,
-  reviewsString,
-  reviewButton,
-}: PropTypes) => {
+const Reviews = ({ data, globalPageProps }: PropTypes) => {
+  const { reviewButton, reviews } = getFragmentData(
+    ProductGeneralInterfaceFragmentDoc,
+    data.generalInterface!,
+  );
+
   return (
     <div className="bg-white py-6 text-center sm:py-8 md:text-start lg:py-12">
       <div className="mx-auto max-w-screen-md px-4 md:px-8">
@@ -65,7 +63,7 @@ const Reviews = ({
           <div className="flex items-center gap-2">
             <div className="-ml-1 flex gap-0.5 text-primary">
               <div className="flex h-7 items-center gap-1 rounded-full bg-primary/90 px-2 text-white">
-                <span className="text-sm">{reviewAverage}</span>
+                <span className="text-sm">{data.product?.reviewAverage}</span>
 
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -79,7 +77,7 @@ const Reviews = ({
             </div>
 
             <span className="block text-sm text-gray-500">
-              {reviewNumber} {reviewsString}
+              {data.product?.numberOfReviews} {reviews}
             </span>
           </div>
 
@@ -92,13 +90,16 @@ const Reviews = ({
         </div>
 
         <div className="divide-y">
-          {reviews.map((review) => {
+          {data.product?.featuredReviews.map((review) => {
             const date = new Date(review.reviewDate);
-            const formattedDate = new Intl.DateTimeFormat(lng, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            }).format(date);
+            const formattedDate = new Intl.DateTimeFormat(
+              globalPageProps.params.lng,
+              {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              },
+            ).format(date);
 
             return (
               <div

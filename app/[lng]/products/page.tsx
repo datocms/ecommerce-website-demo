@@ -1,50 +1,46 @@
 export const dynamic = 'force-dynamic';
 
-import '@/styles/global.css';
-import { draftMode } from 'next/headers';
+import { getFallbackLocale } from '@/app/i18n/settings';
+import SideFilter from '@/components/Common/SideFilter';
+import DatoImage from '@/components/DatoImage';
+import FilterDetail from '@/components/Products/FilterDetail';
+import Pagination from '@/components/Products/Pagination';
+import { getFragmentData } from '@/graphql/types';
 import {
-  BrandRecord,
-  CollectionRecord,
-  FilterDetailModelDescriptionField,
-  GeneralInterfaceRecord,
-  ImageFileField,
   InitialParamsDocument,
-  MaterialRecord,
+  InitialParamsFragmentDoc,
   ProductModelOrderBy,
   ProductsDocument,
-  SiteLocale,
+  ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
-import getAvailableLocales, { getFallbackLocale } from '@/app/i18n/settings';
+import '@/styles/global.css';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
+import type { Record, StructuredText } from 'datocms-structured-text-utils';
+import { draftMode } from 'next/headers';
 import Link from 'next/link';
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
-import SideFilter from '@/components/Common/SideFilter';
-import Pagination from '@/components/Products/Pagination';
-import FilterDetail from '@/components/Products/FilterDetail';
 
-type PropTypes = {
+type PageProps = GlobalPageProps & {
   params: {
-    lng: SiteLocale;
+    slug: string;
   };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: {
+    page?: string;
+    orderBy?: ProductModelOrderBy;
+    productName?: string;
+    collections?: string;
+    brands?: string;
+    materials?: string;
+  };
 };
 
-export async function generateStaticParams() {
-  const languages = await getAvailableLocales();
-  return languages.map((language) => {
-    language;
-  });
-}
-
-export default async function Products({
-  params: { lng },
-  searchParams,
-}: PropTypes) {
+const Page = async ({ params: { lng }, searchParams }: PageProps) => {
   const { isEnabled } = draftMode();
   const fallbackLng = await getFallbackLocale();
-  const pageNumber = parseInt((searchParams?.page as string) ?? '1');
-  const orderBy = (searchParams?.orderBy as string) ?? '_publishedAt_DESC';
-  const nameSearch = (searchParams?.productName as string) ?? '';
+  const pageNumber = Number.parseInt(searchParams?.page ?? '1');
+  const orderBy: ProductModelOrderBy =
+    searchParams?.orderBy ?? ProductModelOrderBy.CreatedAtAsc;
+  const nameSearch = searchParams?.productName ?? '';
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -52,33 +48,36 @@ export default async function Products({
       locale: lng,
       fallbackLocale: [fallbackLng],
     },
-    isEnabled
+    isEnabled,
   );
 
-  const collectionParams = (searchParams?.collections as string)
+  const { allBrands, allCollections, allMaterials } =
+    getFragmentData(InitialParamsFragmentDoc, initialParams) ?? {};
+
+  const collectionParams = searchParams?.collections
     ?.split('|')
     .filter((collection) => collection.length);
 
   const collections =
     collectionParams === undefined
-      ? initialParams.allCollections.map((collection) => collection.id)
+      ? allCollections.map((collection) => collection.id)
       : collectionParams;
 
-  const brandParams = (searchParams?.brands as string)
+  const brandParams = searchParams?.brands
     ?.split('|')
     .filter((brand) => brand.length);
 
   const brands =
     brandParams === undefined
-      ? initialParams.allBrands.map((brand) => brand.id)
+      ? allBrands.map((brand) => brand.id)
       : brandParams;
 
-  const materialParams = (searchParams?.materials as string)
+  const materialParams = searchParams?.materials
     ?.split('|')
     .filter((material) => material.length);
   const materials =
     materialParams === undefined
-      ? initialParams.allMaterials.map((material) => material.id)
+      ? allMaterials.map((material) => material.id)
       : materialParams;
 
   const data = await queryDatoCMS(
@@ -87,60 +86,75 @@ export default async function Products({
       locale: lng,
       fallbackLocale: [fallbackLng],
       skip: (pageNumber - 1) * 12,
-      orderBy: orderBy as ProductModelOrderBy,
+      orderBy: orderBy,
       collections,
       brands,
       materials,
       nameSearch,
     },
-    isEnabled
+    isEnabled,
   );
 
-  let singleFilter;
+  let singleFilter = null;
 
   if (materials.length === 1) {
-    singleFilter = initialParams.allMaterials.filter(
-      (material) => material.id == materials[0]
+    singleFilter = allMaterials.filter(
+      (material) => material.id === materials[0],
     )[0];
   } else if (collections.length === 1) {
-    singleFilter = initialParams.allCollections.filter(
-      (collection) => collection.id == collections[0]
+    singleFilter = allCollections.filter(
+      (collection) => collection.id === collections[0],
     )[0];
   } else if (brands.length === 1) {
-    singleFilter = initialParams.allBrands.filter(
-      (brand) => brand.id == brands[0]
-    )[0];
+    singleFilter = allBrands.filter((brand) => brand.id === brands[0])[0];
   }
+
+  const {
+    sale,
+    currencySymbol,
+    BrandRecord,
+    CollectionRecord,
+    MaterialRecord,
+  } =
+    getFragmentData(
+      ProductsGeneralInterfaceFragmentDoc,
+      data.generalInterface,
+    ) ?? {};
+
+  const type =
+    singleFilter?.__typename === 'BrandRecord'
+      ? BrandRecord
+      : singleFilter?.__typename === 'CollectionRecord'
+        ? CollectionRecord
+        : singleFilter?.__typename === 'MaterialRecord'
+          ? MaterialRecord
+          : null;
 
   return (
     <>
       {singleFilter && (
         <FilterDetail
-          type={(data.generalInterface as any)[singleFilter._modelApiKey]}
+          type={type}
           name={singleFilter.name}
           subtitle={singleFilter.details.subtitle ?? ''}
           description={
-            singleFilter.details
-              .description as FilterDetailModelDescriptionField
+            singleFilter.details.description as StructuredText<Record, Record>
           }
-          image={singleFilter.details.image as ImageFileField}
+          image={singleFilter.details.image.responsiveImage}
         />
       )}
       <div
-        className={
-          'mx-auto max-w-7xl grid-cols-5 bg-white pt-8 lg:grid' +
-          (singleFilter ? ' border-t-2' : '')
-        }
+        className={`mx-auto max-w-7xl grid-cols-5 bg-white pt-8 lg:grid${
+          singleFilter ? ' border-t-2' : ''
+        }`}
       >
         <div className="col-span-1 ml-4  p-4">
           <SideFilter
-            collections={initialParams.allCollections as CollectionRecord[]}
-            brands={initialParams.allBrands as BrandRecord[]}
-            materials={initialParams.allMaterials as MaterialRecord[]}
+            initialParams={initialParams}
+            generalInterface={data.generalInterface}
             paramaterCollections={collections}
             parameterBrands={brands}
             parameterMaterials={materials}
-            generalInterface={data.generalInterface as GeneralInterfaceRecord}
           />
         </div>
         <div className="col-span-4 ml-4 bg-white px-16 md:px-0 lg:ml-0">
@@ -157,20 +171,19 @@ export default async function Products({
                       href={`/${lng}/product/${product.slug}`}
                       className="relative block h-96 overflow-hidden rounded-t-lg bg-gray-100"
                     >
-                      <DatoImage
-                        data={
-                          product.productImages[0]
-                            .responsiveImage as ResponsiveImageType
-                        }
-                        className="h-full w-full object-contain"
-                        layout="fill"
-                        objectFit="cover"
-                        objectPosition="50% 50%"
-                      />
+                      {product.productImages[0].responsiveImage && (
+                        <DatoImage
+                          fragment={product.productImages[0].responsiveImage}
+                          className="h-full w-full object-contain"
+                          layout="fill"
+                          objectFit="cover"
+                          objectPosition="50% 50%"
+                        />
+                      )}
 
                       {isOnSale && (
                         <span className="absolute left-0 top-3 rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
-                          {data.generalInterface?.sale}
+                          {sale}
                         </span>
                       )}
                     </Link>
@@ -191,11 +204,11 @@ export default async function Products({
                       {isOnSale && (
                         <div className="flex flex-col items-end gap-2">
                           <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            {data.generalInterface?.currencySymbol}
+                            {currencySymbol}
                             {product.salePrice}
                           </span>
                           <span className="mb-0.5 text-red-500 line-through">
-                            {data.generalInterface?.currencySymbol}
+                            {currencySymbol}
                             {product.price}
                           </span>
                         </div>
@@ -204,7 +217,7 @@ export default async function Products({
                       {!isOnSale && (
                         <div className="flex items-end gap-2">
                           <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            {data.generalInterface?.currencySymbol}
+                            {currencySymbol}
                             {product.price}
                           </span>
                         </div>
@@ -223,4 +236,6 @@ export default async function Products({
       />
     </>
   );
-}
+};
+
+export default Page;

@@ -1,0 +1,12 @@
+fragment ProductsGeneralInterface on GeneralInterfaceRecord {
+  currencySymbol
+  sale
+  newArrivals
+  mostPopular
+  topRated
+  price
+  sales
+  CollectionRecord: collection
+  MaterialRecord: material
+  BrandRecord: brand
+}

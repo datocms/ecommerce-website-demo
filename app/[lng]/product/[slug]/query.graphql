@@ -1,0 +1,86 @@
+query Product(
+  $slug: String
+  $locale: SiteLocale
+  $fallbackLocale: [SiteLocale!]
+) {
+  product(
+    filter: { slug: { eq: $slug } }
+    locale: $locale
+    fallbackLocales: $fallbackLocale
+  ) {
+    seo: _seoMetaTags {
+      attributes
+      content
+      tag
+    }
+    name
+    price
+    sale
+    salePrice
+    reviewAverage
+    numberOfReviews
+    featuredReviews {
+      id
+      reviewerName
+      reviewDate
+      reviewScore
+      review
+    }
+    material {
+      ...MaterialProductFragment
+    }
+    description {
+      value
+      blocks {
+        ... on RecordInterface {
+          id
+          __typename
+        }
+        ... on ProductFeatureSectionRecord {
+          ...ProductInfoSection
+        }
+        ... on FeaturedQuestionsSectionRecord {
+          ...QuestionSection
+        }
+      }
+    }
+    id
+    productImages {
+      id
+      responsiveImage {
+        ...DatoImage_responsiveImage
+      }
+    }
+    brand {
+      name
+      id
+    }
+    productVariations {
+      id
+      color {
+        hex
+      }
+      availableSizes
+    }
+    relatedProducts {
+      id
+      name
+      price
+      sale
+      salePrice
+      slug
+      brand {
+        name
+      }
+      productImages {
+        id
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+      }
+    }
+  }
+  generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+    ...ProductGeneralInterface
+  }
+}

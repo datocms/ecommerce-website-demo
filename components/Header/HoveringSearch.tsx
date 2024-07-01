@@ -1,9 +1,8 @@
 'use client';
 
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { Dispatch, SetStateAction, useState } from 'react';
+import type { SiteLocale } from '@/graphql/types/graphql';
 import { useRouter } from 'next/navigation';
-import { SiteLocale } from '@/graphql/types/graphql';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 
 type PropTypes = {
   lng: SiteLocale;
@@ -15,7 +14,6 @@ const HoveringSearch = ({ lng, setSerachIsOpen }: PropTypes) => {
   const router = useRouter();
 
   return (
-    // <div className="absolute z-[99] h-screen w-screen bg-slate-600 bg-opacity-40">
     <input
       type="text"
       value={searchValue}
@@ -30,7 +28,6 @@ const HoveringSearch = ({ lng, setSerachIsOpen }: PropTypes) => {
         }
       }}
     />
-    // </div>
   );
 };
 

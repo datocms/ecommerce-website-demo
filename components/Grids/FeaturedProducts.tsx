@@ -1,40 +1,39 @@
-import { ProductRecord, SiteLocale } from '@/graphql/types/graphql';
-import { Maybe } from 'graphql/jsutils/Maybe';
+import { getFragmentData } from '@/graphql/types';
+import {
+  ProductGeneralInterfaceFragmentDoc,
+  type ProductQuery,
+} from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
-import { Image as DatoImage, ResponsiveImageType } from 'react-datocms';
+import DatoImage from '../DatoImage';
 
 type PropTypes = {
-  products: ProductRecord[];
-  lng: SiteLocale;
-  currencySymbol: Maybe<string>;
-  sale: Maybe<string>;
+  data: ProductQuery;
+  globalPageProps: GlobalPageProps;
 };
 
-const FeaturedProducts = ({
-  products,
-  lng,
-  currencySymbol,
-  sale,
-}: PropTypes) => {
+const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
+  const { sale, currencySymbol } = getFragmentData(
+    ProductGeneralInterfaceFragmentDoc,
+    data.generalInterface!,
+  );
+
   return (
     <>
       <div className="bg-white px-16 py-6 sm:py-8 lg:mx-56 lg:px-8 lg:py-12">
         <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
           <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 md:gap-x-6 lg:grid-cols-3 xl:grid-cols-3">
-            {products.map((product) => {
+            {data.product?.relatedProducts.map((product) => {
               const isOnSale = product?.sale === 'on_sale';
               return (
                 <div key={product.id}>
                   <Link
-                    href={`/${lng}/product/${product.slug}`}
+                    href={`/${globalPageProps.params.lng}/product/${product.slug}`}
                     className="group relative mb-2 block h-96 overflow-hidden rounded-lg bg-gray-100 shadow-lg lg:mb-3"
                   >
                     <div className="h-full w-full object-cover object-center transition duration-200 group-hover:scale-105">
                       <DatoImage
-                        data={
-                          product.productImages[0]
-                            .responsiveImage as ResponsiveImageType
-                        }
+                        fragment={product.productImages[0].responsiveImage!}
                         className="h-full w-full object-contain"
                         layout="fill"
                         objectFit="cover"

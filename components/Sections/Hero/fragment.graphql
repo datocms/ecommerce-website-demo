@@ -1,0 +1,29 @@
+fragment HeroSection on HeroSectionRecord {
+  _modelApiKey
+  id
+  heroSubtitle
+  heroTitle
+  heroImage {
+    responsiveImage {
+      ...DatoImage_responsiveImage
+    }
+  }
+  additionalImage {
+    responsiveImage {
+      ...DatoImage_responsiveImage
+    }
+  }
+  socialLabel
+  socials {
+    id
+    name
+    url
+    icon {
+      url
+    }
+  }
+  featuredCollections {
+    id
+    name
+  }
+}

@@ -1,0 +1,24 @@
+fragment CollectionCardShowcase on CollectionCardShowcaseSectionRecord {
+  id
+  _modelApiKey
+  title
+  pretitle
+  direction
+  button {
+    label
+    slug
+    id
+  }
+  collection {
+    name
+    slug
+    details {
+      image {
+        responsiveImage {
+          ...DatoImage_responsiveImage
+        }
+      }
+    }
+  }
+  description
+}

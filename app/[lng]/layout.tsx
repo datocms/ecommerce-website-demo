@@ -1,45 +1,22 @@
-import ScrollToTop from '@/components/ScrollToTop';
-import '@/styles/global.css';
-import { draftMode } from 'next/headers';
-import { CustomColorDocument, SiteLocale } from '@/graphql/types/graphql';
-import getAvailableLocales from '@/app/i18n/settings';
-import CustomColor from '@/components/Common/CustomColor';
-import queryDatoCMS from '@/utils/queryDatoCMS';
-import Footer from '@/components/Footer';
-import HeaderRenderer from '@/components/Header/HeaderRenderer';
+import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
+import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
+import Content from './Content';
+import RealTime from './RealTime';
+import { type PageProps, type Query, type Variables, query } from './meta';
 
-type Params = {
-  children: React.ReactNode;
-  params: {
-    lng: SiteLocale;
-  };
-};
+const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
+  params,
+  fallbackLocale,
+}) => ({
+  locale: params.lng,
+  fallbackLocale: [fallbackLocale],
+});
 
-export async function generateStaticParams() {
-  const languages = await getAvailableLocales();
-  return languages.map((language) => {
-    language;
-  });
-}
+const layout = generateWrapper<PageProps, Query, Variables>({
+  query,
+  buildVariables,
+  contentComponent: Content,
+  realtimeComponent: RealTime,
+});
 
-export default async function RootLayout({
-  children,
-  params: { lng },
-}: Params) {
-  const { isEnabled } = draftMode();
-  const data = await queryDatoCMS(CustomColorDocument, {}, isEnabled);
-
-  return (
-    <>
-      <HeaderRenderer lng={lng} isDraft={isEnabled} />
-      <CustomColor
-        r={data.layout?.mainColor.red || 135}
-        g={data.layout?.mainColor.green || 235}
-        b={data.layout?.mainColor.blue || 206}
-      />
-      {children}
-      <Footer lng={lng} />
-      <ScrollToTop lng={lng} isDraft={isEnabled} />
-    </>
-  );
-}
+export default layout;

@@ -1,0 +1,5 @@
+query LegalStaticParams {
+  allLegalPages(first: 100) {
+    slug
+  }
+}

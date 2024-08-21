@@ -1,3 +1,13 @@
+<!--datocms-autoinclude-header start-->
+
+<a href="https://www.datocms.com/"><img src="https://www.datocms.com/images/full_logo.svg" height="60"></a>
+
+👉 [Visit the DatoCMS homepage](https://www.datocms.com) or see [What is DatoCMS?](#what-is-datocms)
+
+---
+
+<!--datocms-autoinclude-header end-->
+
 # An Ecommerce Website Demo using Next.js 14 and DatoCMS
 
 This example showcases a TypeScript Next.js 14 website with App Router (app) — using [DatoCMS](https://www.datocms.com/) as the data source.

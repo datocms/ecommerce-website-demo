@@ -2,7 +2,7 @@
   "name": "Ecommerce Website",
   "description": "Offers typed GraphQL queries, Tailwind, multi-language, Web Previews, real-time updates in Preview Mode, SEO/Readability analysis, and much more!",
   "previewImage": "https://www.datocms-assets.com/205/1706099442-ecommerce-demo-preview.png",
-  "livePreviewUrl": "https://ecommerce-website-demo-blond.vercel.app/",
+  "livePreviewUrl": "https://ecommerce-website-demo-livid.vercel.app/",
   "datocmsProjectId": "107337",
   "deploymentType": "static",
   "environmentVariables": {

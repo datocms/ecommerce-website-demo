@@ -15,8 +15,10 @@ async function getLocale(
     headers.set('accept-language', acceptLanguage.replaceAll('_', '-'));
   }
 
+  const reformattedLocales = locales.map((locale) => locale.replaceAll('_', '-'));
   const headersObject = Object.fromEntries(headers.entries());
-  const languages = new Negotiator({ headers: headersObject }).languages();
+  const languages = new Negotiator({ headers: headersObject }).languages(reformattedLocales);
+
   return match(languages, locales, fallbackLng);
 }
 

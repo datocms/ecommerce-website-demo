@@ -66,8 +66,8 @@ export async function POST(request: NextRequest) {
   }
 
   const baseUrl = (
-    process.env.VERCEL_BRANCH_URL
-      ? `https://${process.env.VERCEL_BRANCH_URL}`
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : process.env.URL
   ) as string;
 

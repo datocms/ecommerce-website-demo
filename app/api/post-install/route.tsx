@@ -89,8 +89,8 @@ export async function POST(request: Request) {
   const client = buildClient({ apiToken: body.datocmsApiToken });
 
   const baseUrl = (
-    process.env.VERCEL_BRANCH_URL
-      ? `https://${process.env.VERCEL_BRANCH_URL}`
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : process.env.URL
   ) as string;
 

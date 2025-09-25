@@ -1,5 +1,11 @@
+import 'server-only';
+
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { withContentLinkHeaders } from 'datocms-visual-editing';
+import { draftMode } from 'next/headers';
 import { print } from 'graphql';
+
+const fetchWithContentLink = withContentLinkHeaders(fetch);
 
 export default async function queryDatoCMS<
   TResult = unknown,
@@ -22,9 +28,33 @@ export default async function queryDatoCMS<
     Authorization: `Bearer ${process.env.DATOCMS_READONLY_API_TOKEN}`,
   };
 
-  if (isDraft) headers['X-Include-Drafts'] = 'true';
+  const baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL;
 
-  const response = await fetch('https://graphql.datocms.com/', {
+  let draftEnabled = Boolean(isDraft);
+
+  if (typeof isDraft !== 'boolean') {
+    try {
+      draftEnabled = draftMode().isEnabled;
+    } catch (error) {
+      draftEnabled = false;
+    }
+  }
+
+  if (draftEnabled) {
+    if (!baseEditingUrl) {
+      throw new Error(
+        'Missing NEXT_PUBLIC_DATO_BASE_EDITING_URL environment variable when draft mode is active!',
+      );
+    }
+
+    headers['X-Include-Drafts'] = 'true';
+
+    headers['X-Base-Editing-Url'] = baseEditingUrl;
+  }
+
+  const client = draftEnabled ? fetchWithContentLink : fetch;
+
+  const response = await client('https://graphql.datocms.com/', {
     cache: 'force-cache',
     next: { tags: ['datocms'] },
     method: 'POST',

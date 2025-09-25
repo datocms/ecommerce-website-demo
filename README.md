@@ -68,6 +68,14 @@ npm run dev
 
 Your blog should be up and running on [http://localhost:3000](http://localhost:3000)!
 
+### Preview & Visual Editing
+
+1. Visit `/api/draft?secret=YOUR_DRAFT_SECRET&path=/?edit=1` to enable draft mode locally.
+2. While draft mode is active, GraphQL requests send the Content Link headers:
+   - `X-Visual-Editing: vercel-v1`
+   - `X-Base-Editing-Url: https://<project>.admin.datocms.com`
+3. While in draft, use the floating “Enable Visual Editing” button (just above “Enter Published Mode”) to add or remove the `?edit=1` flag. When enabled, hovering annotated content highlights it and clicking deep-links to the precise record/field in DatoCMS.
+
 ## VS Code
 
 It's strongly suggested to install the [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql) extension, to get autocomplete suggestions, validation against schema, and many more niceties when working with your GraphQL queries.

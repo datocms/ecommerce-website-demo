@@ -15,6 +15,13 @@ export async function GET(request: NextRequest) {
 
   if (!url) return new Response('Draft mode is enabled');
 
+  const siteUrl = process.env.URL || 'http://localhost:3000';
+  const redirectUrl = new URL(url, siteUrl);
+
+  if (!redirectUrl.searchParams.has('edit')) {
+    redirectUrl.searchParams.set('edit', '1');
+  }
+
   //to avoid losing the cookie on redirect in the iFrame
   const cookieStore = cookies();
   const cookie = cookieStore.get('__prerender_bypass')!;
@@ -28,5 +35,5 @@ export async function GET(request: NextRequest) {
     partitioned: true,
   });
 
-  redirect(url);
+  redirect(redirectUrl.toString());
 }

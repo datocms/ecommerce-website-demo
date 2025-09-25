@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import AuthenticationModal from '../Header/AuthenticationModal';
 import SuccessPopUp from '../Header/SuccessPopUp';
@@ -12,15 +12,37 @@ type Props = {
 
 export default function ScrollToTop({ isDraft }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isVisible, setIsVisible] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
+  const isVisualEditingActive = searchParams?.get('edit') === '1';
 
   async function toggleDraft() {
     if (isDraft) {
+      const params = new URLSearchParams(searchParams?.toString());
+      params.delete('edit');
+      const query = params.toString();
+      const nextUrl = query ? `${pathname}?${query}` : pathname;
+
       await fetch('/api/draft/disable');
-      router.refresh();
+      window.location.href = nextUrl;
     } else setModalOpen(true);
+  }
+
+  function toggleVisualEditing() {
+    const params = new URLSearchParams(searchParams?.toString());
+
+    if (isVisualEditingActive) {
+      params.delete('edit');
+    } else {
+      params.set('edit', '1');
+    }
+
+    const query = params.toString();
+    const nextUrl = query ? `${pathname}?${query}` : pathname;
+    window.location.href = nextUrl;
   }
 
   const triggerSuccessToast = () => {
@@ -86,10 +108,24 @@ export default function ScrollToTop({ isDraft }: Props) {
               )}
             </AnimatePresence>
             <div
-              onClick={toggleDraft}
-              className="flex cursor-pointer items-center justify-center rounded-md bg-primary p-4 font-bold text-white shadow-md transition duration-300 ease-in-out hover:bg-opacity-80 hover:shadow-signUp"
+              className="flex flex-col gap-3"
             >
-              {isDraft ? 'Enter Published Mode' : 'Enter Draft Mode'}
+              {isDraft ? (
+                <div
+                  onClick={toggleVisualEditing}
+                  className="flex cursor-pointer items-center justify-center rounded-md border border-primary bg-white p-4 font-bold text-primary shadow-md transition duration-300 ease-in-out hover:bg-primary hover:text-white"
+                >
+                  {isVisualEditingActive
+                    ? 'Disable Visual Editing'
+                    : 'Enable Visual Editing'}
+                </div>
+              ) : null}
+              <div
+                onClick={toggleDraft}
+                className="flex cursor-pointer items-center justify-center rounded-md bg-primary p-4 font-bold text-white shadow-md transition duration-300 ease-in-out hover:bg-opacity-80 hover:shadow-signUp"
+              >
+                {isDraft ? 'Enter Published Mode' : 'Enter Draft Mode'}
+              </div>
             </div>
           </motion.div>
         )}

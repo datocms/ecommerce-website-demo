@@ -27,6 +27,10 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
             {data.product?.relatedProducts.map((product) => {
               const isOnSale = product?.sale === 'on_sale';
               const priceEditAttributes = getProductPriceEditAttributes(product.id);
+              const salePriceEditAttributes = getProductPriceEditAttributes(
+                product.id,
+                { fieldPath: 'salePrice' },
+              );
               return (
                 <div key={product.id}>
                   <Link
@@ -65,17 +69,21 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
                       </span>
                     </div>
 
-                    <div
-                      className="flex flex-col items-end"
-                      {...priceEditAttributes}
-                      data-datocms-edit-target
-                    >
-                      <span className="font-bold text-gray-600 lg:text-lg">
+                    <div className="flex flex-col items-end">
+                      <span
+                        className="font-bold text-gray-600 lg:text-lg"
+                        {...(isOnSale ? salePriceEditAttributes : priceEditAttributes)}
+                        data-datocms-edit-target
+                      >
                         {currencySymbol}
                         {isOnSale ? product.salePrice : product.price}
                       </span>
                       {isOnSale && (
-                        <span className="text-sm text-red-500 line-through">
+                        <span
+                          className="text-sm text-red-500 line-through"
+                          {...priceEditAttributes}
+                          data-datocms-edit-target
+                        >
                           {currencySymbol}
                           {product.price}
                         </span>

@@ -9,8 +9,8 @@ type PropTypes = {
 
 const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 p-4">
-      <div className="pointer-events-auto relative mx-auto max-w-xl rounded-lg bg-gray-100 p-6 shadow-sm">
+    <div className="pointer-events-none fixed bottom-0 left-0 z-20 p-4">
+      <div className="pointer-events-auto relative w-full max-w-xl rounded-lg bg-gray-100 p-6 shadow-sm sm:w-auto">
         <button
           type="button"
           className="absolute -end-1 -top-1 rounded-full border border-gray-200 bg-white p-1 text-gray-400"

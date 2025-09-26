@@ -1,8 +1,13 @@
 import { buildEditTagAttributes } from 'datocms-visual-editing';
 
-export const getProductPriceEditAttributes = (itemId: string) =>
+type ProductPriceFieldPath = 'price' | 'salePrice';
+
+export const getProductPriceEditAttributes = (
+  itemId: string,
+  { fieldPath = 'price' }: { fieldPath?: ProductPriceFieldPath } = {},
+) =>
   buildEditTagAttributes({
     itemId,
     itemTypeId: 'product',
-    fieldPath: 'price',
+    fieldPath,
   });

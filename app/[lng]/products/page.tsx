@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import { getFallbackLocale } from '@/app/i18n/settings';
 import SideFilter from '@/components/Common/SideFilter';
+import StegaText from '@/components/Common/StegaText';
 import DatoImage from '@/components/DatoImage';
 import FilterDetail from '@/components/Products/FilterDetail';
 import Pagination from '@/components/Products/Pagination';
@@ -16,10 +17,11 @@ import {
 import '@/styles/global.css';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
+import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import type { Record, StructuredText } from 'datocms-structured-text-utils';
+import { stripStega } from 'datocms-visual-editing';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
-import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 
 type PageProps = GlobalPageProps & {
   params: {
@@ -162,8 +164,13 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
           <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {data.allProducts.map((product) => {
-                const isOnSale = product.sale === 'on_sale';
+                const saleStatus = stripStega(product.sale ?? '');
+                const isOnSale = saleStatus === 'on_sale';
                 const priceEditAttributes = getProductPriceEditAttributes(product.id);
+                const salePriceEditAttributes = getProductPriceEditAttributes(
+                  product.id,
+                  { fieldPath: 'salePrice' },
+                );
                 return (
                   <div
                     key={product.id}
@@ -184,9 +191,11 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
                       )}
 
                       {isOnSale && (
-                        <span className="absolute left-0 top-3 rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
-                          {sale}
-                        </span>
+                        <StegaText
+                          as="span"
+                          className="absolute left-0 top-3 rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white"
+                          value={sale ?? ''}
+                        />
                       )}
                     </Link>
 
@@ -196,40 +205,45 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
                           href="#"
                           className="lg:text-md overflow-hidden font-bold text-gray-800 transition duration-100 hover:text-gray-500"
                         >
-                          {product.name}
+                          <StegaText value={product.name ?? ''} />
                         </a>
-                        <span className="text-sm text-gray-500">
-                          {product.brand.name}
-                        </span>
+                        <StegaText
+                          as="span"
+                          className="text-sm text-gray-500"
+                          value={product.brand?.name ?? ''}
+                        />
                       </div>
 
                       {isOnSale && (
-                        <div
-                          className="flex flex-col items-end gap-2"
-                          {...priceEditAttributes}
-                          data-datocms-edit-target
-                        >
-                          <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            {currencySymbol}
-                            {product.salePrice}
-                          </span>
-                          <span className="mb-0.5 text-red-500 line-through">
-                            {currencySymbol}
-                            {product.price}
-                          </span>
+                        <div className="flex flex-col items-end gap-2">
+                          <StegaText
+                            as="span"
+                            className="text-xl font-bold text-gray-800 md:text-xl"
+                            value={`${currencySymbol ?? ''}${
+                              product.salePrice ?? ''
+                            }`}
+                            {...salePriceEditAttributes}
+                            data-datocms-edit-target
+                          />
+                          <StegaText
+                            as="span"
+                            className="mb-0.5 text-red-500 line-through"
+                            value={`${currencySymbol ?? ''}${product.price ?? ''}`}
+                            {...priceEditAttributes}
+                            data-datocms-edit-target
+                          />
                         </div>
                       )}
 
                       {!isOnSale && (
-                        <div
-                          className="flex items-end gap-2"
-                          {...priceEditAttributes}
-                          data-datocms-edit-target
-                        >
-                          <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            {currencySymbol}
-                            {product.price}
-                          </span>
+                        <div className="flex items-end gap-2">
+                          <StegaText
+                            as="span"
+                            className="text-xl font-bold text-gray-800 md:text-xl"
+                            value={`${currencySymbol ?? ''}${product.price ?? ''}`}
+                            {...priceEditAttributes}
+                            data-datocms-edit-target
+                          />
                         </div>
                       )}
                     </div>

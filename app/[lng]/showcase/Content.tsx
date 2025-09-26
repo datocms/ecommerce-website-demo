@@ -13,6 +13,27 @@ const Content: ContentPage<PageProps, Query> = ({
     notFound();
   }
 
+  const [firstNewProduct, secondNewProduct] = data.showcase.newProducts;
+  const firstProductIsOnSale = firstNewProduct.sale !== 'not_on_sale';
+  const secondProductIsOnSale = secondNewProduct.sale !== 'not_on_sale';
+  const currencySymbol = data.generalInterface?.currencySymbol ?? '';
+
+  const firstProductPriceAttributes = getProductPriceEditAttributes(
+    firstNewProduct.id,
+  );
+  const firstProductSalePriceAttributes = getProductPriceEditAttributes(
+    firstNewProduct.id,
+    { fieldPath: 'salePrice' },
+  );
+
+  const secondProductPriceAttributes = getProductPriceEditAttributes(
+    secondNewProduct.id,
+  );
+  const secondProductSalePriceAttributes = getProductPriceEditAttributes(
+    secondNewProduct.id,
+    { fieldPath: 'salePrice' },
+  );
+
   return (
     <div className="mx-auto max-w-7xl bg-white font-sans antialiased">
       <div className="bg-opacity-50">
@@ -99,13 +120,13 @@ const Content: ContentPage<PageProps, Query> = ({
         </div>
         <div className="container mx-auto grid grid-cols-1 gap-12 px-12 pb-24 md:grid-cols-2">
           <Link
-            href={`/${globalPageProps.params.lng}/product/${data.showcase.newProducts[0].slug}`}
+            href={`/${globalPageProps.params.lng}/product/${firstNewProduct.slug}`}
             className="block hover:opacity-75"
           >
             <div className="relative h-96 w-full object-cover md:h-screen">
               <DatoImage
                 data={
-                  data.showcase.newProducts[0].productImages[0]
+                  firstNewProduct.productImages[0]
                     .responsiveImage as ResponsiveImageType
                 }
                 className="h-full w-full rounded-lg object-contain"
@@ -115,33 +136,40 @@ const Content: ContentPage<PageProps, Query> = ({
               />
             </div>
             <div className="pt-6">
-              <h3>{data.showcase.newProducts[0].name}</h3>
-              <div
-                className=""
-                {...getProductPriceEditAttributes(data.showcase.newProducts[0].id)}
-                data-datocms-edit-target
-              >
-                {data.generalInterface?.currencySymbol}
-                {data.showcase.newProducts[0].sale !== 'not_on_sale'
-                  ? data.showcase.newProducts[0].salePrice
-                  : data.showcase.newProducts[0].price}
-                {data.showcase.newProducts[0].sale !== 'not_on_sale' && (
-                  <span className="ml-4 text-red-400 line-through">
-                    {data.generalInterface?.currencySymbol}
-                    {data.showcase.newProducts[0].price}
+              <h3>{firstNewProduct.name}</h3>
+              <div className="">
+                <span
+                  {...(firstProductIsOnSale
+                    ? firstProductSalePriceAttributes
+                    : firstProductPriceAttributes)}
+                  data-datocms-edit-target
+                >
+                  {currencySymbol}
+                  {firstProductIsOnSale
+                    ? firstNewProduct.salePrice
+                    : firstNewProduct.price}
+                </span>
+                {firstProductIsOnSale && (
+                  <span
+                    className="ml-4 text-red-400 line-through"
+                    {...firstProductPriceAttributes}
+                    data-datocms-edit-target
+                  >
+                    {currencySymbol}
+                    {firstNewProduct.price}
                   </span>
                 )}
               </div>
             </div>
           </Link>
           <Link
-            href={`/${globalPageProps.params.lng}/product/${data.showcase.newProducts[1].slug}`}
+            href={`/${globalPageProps.params.lng}/product/${secondNewProduct.slug}`}
             className="block hover:opacity-75 md:-mt-32"
           >
             <div className="relative h-96 w-full object-cover md:h-screen">
               <DatoImage
                 data={
-                  data.showcase.newProducts[1].productImages[0]
+                  secondNewProduct.productImages[0]
                     .responsiveImage as ResponsiveImageType
                 }
                 className="h-full w-full rounded-lg object-contain"
@@ -151,20 +179,27 @@ const Content: ContentPage<PageProps, Query> = ({
               />
             </div>
             <div className="pt-6">
-              <h3>{data.showcase.newProducts[1].name}</h3>
-              <div
-                className=""
-                {...getProductPriceEditAttributes(data.showcase.newProducts[1].id)}
-                data-datocms-edit-target
-              >
-                {data.generalInterface?.currencySymbol}
-                {data.showcase.newProducts[1].sale !== 'not_on_sale'
-                  ? data.showcase.newProducts[1].salePrice
-                  : data.showcase.newProducts[1].price}
-                {data.showcase.newProducts[1].sale !== 'not_on_sale' && (
-                  <span className="ml-4 text-red-400 line-through">
-                    {data.generalInterface?.currencySymbol}
-                    {data.showcase.newProducts[1].price}
+              <h3>{secondNewProduct.name}</h3>
+              <div className="">
+                <span
+                  {...(secondProductIsOnSale
+                    ? secondProductSalePriceAttributes
+                    : secondProductPriceAttributes)}
+                  data-datocms-edit-target
+                >
+                  {currencySymbol}
+                  {secondProductIsOnSale
+                    ? secondNewProduct.salePrice
+                    : secondNewProduct.price}
+                </span>
+                {secondProductIsOnSale && (
+                  <span
+                    className="ml-4 text-red-400 line-through"
+                    {...secondProductPriceAttributes}
+                    data-datocms-edit-target
+                  >
+                    {currencySymbol}
+                    {secondNewProduct.price}
                   </span>
                 )}
               </div>

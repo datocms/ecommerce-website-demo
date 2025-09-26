@@ -36,6 +36,9 @@ const ProductView = ({ data, globalPageProps }: Props) => {
 
   const isOnSale = data.product?.sale === 'on_sale';
   const priceEditAttributes = getProductPriceEditAttributes(data.product.id);
+  const salePriceEditAttributes = getProductPriceEditAttributes(data.product.id, {
+    fieldPath: 'salePrice',
+  });
 
   const {
     sale,
@@ -256,27 +259,31 @@ const ProductView = ({ data, globalPageProps }: Props) => {
 
               <div className="mb-4">
                 {isOnSale && (
-                  <div
-                    className="flex items-end gap-2"
-                    {...priceEditAttributes}
-                    data-datocms-edit-target
-                  >
-                    <span className="text-xl font-bold text-gray-800 md:text-2xl">
+                  <div className="flex items-end gap-2">
+                    <span
+                      className="text-xl font-bold text-gray-800 md:text-2xl"
+                      {...salePriceEditAttributes}
+                      data-datocms-edit-target
+                    >
                       {currencySymbol} {data.product.salePrice}
                     </span>
-                    <span className="mb-0.5 text-red-500 line-through">
+                    <span
+                      className="mb-0.5 text-red-500 line-through"
+                      {...priceEditAttributes}
+                      data-datocms-edit-target
+                    >
                       {currencySymbol} {data.product.price}
                     </span>
                   </div>
                 )}
 
                 {!isOnSale && (
-                  <div
-                    className=""
-                    {...priceEditAttributes}
-                    data-datocms-edit-target
-                  >
-                    <span className="text-xl font-bold text-gray-800 md:text-2xl">
+                  <div className="">
+                    <span
+                      className="text-xl font-bold text-gray-800 md:text-2xl"
+                      {...priceEditAttributes}
+                      data-datocms-edit-target
+                    >
                       {currencySymbol} {data.product.price}
                     </span>
                   </div>

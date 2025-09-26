@@ -6,6 +6,7 @@ import {
   type ProductQuery,
 } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useState } from 'react';
@@ -34,6 +35,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
   );
 
   const isOnSale = data.product?.sale === 'on_sale';
+  const priceEditAttributes = getProductPriceEditAttributes(data.product.id);
 
   const {
     sale,
@@ -254,7 +256,11 @@ const ProductView = ({ data, globalPageProps }: Props) => {
 
               <div className="mb-4">
                 {isOnSale && (
-                  <div className="flex items-end gap-2">
+                  <div
+                    className="flex items-end gap-2"
+                    {...priceEditAttributes}
+                    data-datocms-edit-target
+                  >
                     <span className="text-xl font-bold text-gray-800 md:text-2xl">
                       {currencySymbol} {data.product.salePrice}
                     </span>
@@ -265,7 +271,11 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                 )}
 
                 {!isOnSale && (
-                  <div className="">
+                  <div
+                    className=""
+                    {...priceEditAttributes}
+                    data-datocms-edit-target
+                  >
                     <span className="text-xl font-bold text-gray-800 md:text-2xl">
                       {currencySymbol} {data.product.price}
                     </span>

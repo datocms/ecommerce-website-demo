@@ -19,6 +19,7 @@ import queryDatoCMS from '@/utils/queryDatoCMS';
 import type { Record, StructuredText } from 'datocms-structured-text-utils';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
+import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 
 type PageProps = GlobalPageProps & {
   params: {
@@ -162,6 +163,7 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {data.allProducts.map((product) => {
                 const isOnSale = product.sale === 'on_sale';
+                const priceEditAttributes = getProductPriceEditAttributes(product.id);
                 return (
                   <div
                     key={product.id}
@@ -202,7 +204,11 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
                       </div>
 
                       {isOnSale && (
-                        <div className="flex flex-col items-end gap-2">
+                        <div
+                          className="flex flex-col items-end gap-2"
+                          {...priceEditAttributes}
+                          data-datocms-edit-target
+                        >
                           <span className="text-xl font-bold text-gray-800 md:text-xl">
                             {currencySymbol}
                             {product.salePrice}
@@ -215,7 +221,11 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
                       )}
 
                       {!isOnSale && (
-                        <div className="flex items-end gap-2">
+                        <div
+                          className="flex items-end gap-2"
+                          {...priceEditAttributes}
+                          data-datocms-edit-target
+                        >
                           <span className="text-xl font-bold text-gray-800 md:text-xl">
                             {currencySymbol}
                             {product.price}

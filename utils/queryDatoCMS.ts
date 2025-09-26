@@ -5,8 +5,6 @@ import { withContentLinkHeaders } from 'datocms-visual-editing';
 import { draftMode } from 'next/headers';
 import { print } from 'graphql';
 
-const fetchWithContentLink = withContentLinkHeaders(fetch);
-
 export default async function queryDatoCMS<
   TResult = unknown,
   TVariables = Record<string, unknown>,
@@ -38,21 +36,22 @@ export default async function queryDatoCMS<
     }
   }
 
-  const baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL;
-
-  if (!baseEditingUrl) {
-    throw new Error(
-      'Missing NEXT_PUBLIC_DATO_BASE_EDITING_URL environment variable: required for DatoCMS Content Link headers!',
-    );
-  }
-
-  headers['X-Base-Editing-Url'] = baseEditingUrl;
+  let client: typeof fetch = fetch;
 
   if (draftEnabled) {
-    headers['X-Include-Drafts'] = 'true';
-  }
+    const baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL;
 
-  const client = fetchWithContentLink;
+    if (!baseEditingUrl) {
+      throw new Error(
+        'Missing NEXT_PUBLIC_DATO_BASE_EDITING_URL environment variable: required for DatoCMS Content Link headers!',
+      );
+    }
+
+    headers['X-Include-Drafts'] = 'true';
+    headers['X-Base-Editing-Url'] = baseEditingUrl;
+    const fetchWithContentLink = withContentLinkHeaders(fetch);
+    client = fetchWithContentLink;
+  }
 
   const response = await client('https://graphql.datocms.com/', {
     cache: 'force-cache',

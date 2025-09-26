@@ -3,6 +3,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { LayoutQuery } from '@/graphql/types/graphql';
 import Link from 'next/link';
 import { type Dispatch, Fragment, type SetStateAction } from 'react';
+import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import DatoImage from '../DatoImage';
 
 type CartProduct = LayoutQuery['cartProducts'][number];
@@ -159,7 +160,11 @@ export default function Cart({
                                           {product.name}
                                         </Link>
                                       </h3>
-                                      <p className="ml-4">
+                                      <p
+                                        className="ml-4"
+                                        {...getProductPriceEditAttributes(product.id)}
+                                        data-datocms-edit-target
+                                      >
                                         {currencySymbol}
                                         {formatPrice(price)}
                                       </p>

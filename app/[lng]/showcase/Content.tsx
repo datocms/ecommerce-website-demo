@@ -2,6 +2,7 @@ import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({
@@ -115,7 +116,11 @@ const Content: ContentPage<PageProps, Query> = ({
             </div>
             <div className="pt-6">
               <h3>{data.showcase.newProducts[0].name}</h3>
-              <div className="">
+              <div
+                className=""
+                {...getProductPriceEditAttributes(data.showcase.newProducts[0].id)}
+                data-datocms-edit-target
+              >
                 {data.generalInterface?.currencySymbol}
                 {data.showcase.newProducts[0].sale !== 'not_on_sale'
                   ? data.showcase.newProducts[0].salePrice
@@ -147,7 +152,11 @@ const Content: ContentPage<PageProps, Query> = ({
             </div>
             <div className="pt-6">
               <h3>{data.showcase.newProducts[1].name}</h3>
-              <div className="">
+              <div
+                className=""
+                {...getProductPriceEditAttributes(data.showcase.newProducts[1].id)}
+                data-datocms-edit-target
+              >
                 {data.generalInterface?.currencySymbol}
                 {data.showcase.newProducts[1].sale !== 'not_on_sale'
                   ? data.showcase.newProducts[1].salePrice

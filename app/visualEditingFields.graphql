@@ -1,0 +1,3 @@
+fragment VisualEditingFields on RecordInterface {
+  _editingUrl
+}

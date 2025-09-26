@@ -35,10 +35,18 @@ const ProductView = ({ data, globalPageProps }: Props) => {
   );
 
   const isOnSale = data.product?.sale === 'on_sale';
-  const priceEditAttributes = getProductPriceEditAttributes(data.product.id);
-  const salePriceEditAttributes = getProductPriceEditAttributes(data.product.id, {
-    fieldPath: 'salePrice',
-  });
+  const locale = globalPageProps.params.lng;
+  const priceEditAttributes = getProductPriceEditAttributes(
+    data.product._editingUrl,
+    locale,
+  );
+  const salePriceEditAttributes = getProductPriceEditAttributes(
+    data.product._editingUrl,
+    locale,
+    {
+      fieldPath: 'sale_price',
+    },
+  );
 
   const {
     sale,

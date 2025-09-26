@@ -34,7 +34,7 @@ export function generateMetadataFn<
         fallbackLocale,
       }) || ({} as TVariables);
 
-    const data = await queryDatoCMS(options.query, variables, isDraft);
+    const data = await queryDatoCMS(options.query, variables, { isDraft });
 
     const tags = options.generate(data);
 

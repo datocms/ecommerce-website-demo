@@ -162,7 +162,10 @@ export default function Cart({
                                       </h3>
                                       <p
                                         className="ml-4"
-                                        {...getProductPriceEditAttributes(product.id)}
+                                        {...getProductPriceEditAttributes(
+                                          product._editingUrl,
+                                          locale,
+                                        )}
                                         data-datocms-edit-target
                                       >
                                         {currencySymbol}

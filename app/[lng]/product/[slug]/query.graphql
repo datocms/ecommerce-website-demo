@@ -2,6 +2,7 @@ query Product(
   $slug: String
   $locale: SiteLocale
   $fallbackLocale: [SiteLocale!]
+  $visualEditing: Boolean = false
 ) {
   product(
     filter: { slug: { eq: $slug } }
@@ -45,6 +46,7 @@ query Product(
       }
     }
     id
+    ...VisualEditingFields @include(if: $visualEditing)
     productImages {
       id
       responsiveImage {
@@ -64,6 +66,7 @@ query Product(
     }
     relatedProducts {
       id
+      ...VisualEditingFields @include(if: $visualEditing)
       name
       price
       sale

@@ -1,4 +1,8 @@
-query Layout($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+query Layout(
+  $locale: SiteLocale
+  $fallbackLocale: [SiteLocale!]
+  $visualEditing: Boolean = false
+) {
   _site {
     faviconMetaTags {
       attributes
@@ -230,6 +234,7 @@ query Layout($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
     fallbackLocales: $fallbackLocale
   ) {
     id
+    ...VisualEditingFields @include(if: $visualEditing)
     name
     price
     sale

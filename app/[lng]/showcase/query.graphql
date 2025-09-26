@@ -1,4 +1,8 @@
-query Showcase($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+query Showcase(
+  $locale: SiteLocale
+  $fallbackLocale: [SiteLocale!]
+  $visualEditing: Boolean = false
+) {
   generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
     currencySymbol
   }
@@ -12,6 +16,7 @@ query Showcase($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
     newProductsTitle
     newProducts {
       id
+      ...VisualEditingFields @include(if: $visualEditing)
       slug
       sale
       salePrice

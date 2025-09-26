@@ -34,6 +34,7 @@ type PageProps = GlobalPageProps & {
     collections?: string;
     brands?: string;
     materials?: string;
+    edit?: string;
   };
 };
 
@@ -44,6 +45,7 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
   const orderBy: ProductModelOrderBy =
     searchParams?.orderBy ?? ProductModelOrderBy.CreatedAtAsc;
   const nameSearch = searchParams?.productName ?? '';
+  const visualEditingEnabled = searchParams?.edit === '1';
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -51,7 +53,7 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
       locale: lng,
       fallbackLocale: [fallbackLng],
     },
-    isEnabled,
+    { isDraft: isEnabled },
   );
 
   const { allBrands, allCollections, allMaterials } =
@@ -94,8 +96,9 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
       brands,
       materials,
       nameSearch,
+      visualEditing: visualEditingEnabled,
     },
-    isEnabled,
+    { isDraft: isEnabled, visualEditing: visualEditingEnabled },
   );
 
   let singleFilter = null;
@@ -166,10 +169,14 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
               {data.allProducts.map((product) => {
                 const saleStatus = stripStega(product.sale ?? '');
                 const isOnSale = saleStatus === 'on_sale';
-                const priceEditAttributes = getProductPriceEditAttributes(product.id);
+                const priceEditAttributes = getProductPriceEditAttributes(
+                  product._editingUrl,
+                  lng,
+                );
                 const salePriceEditAttributes = getProductPriceEditAttributes(
-                  product.id,
-                  { fieldPath: 'salePrice' },
+                  product._editingUrl,
+                  lng,
+                  { fieldPath: 'sale_price' },
                 );
                 return (
                   <div

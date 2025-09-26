@@ -7,6 +7,7 @@ query Products(
   $brands: [ItemId]
   $materials: [ItemId]
   $nameSearch: String!
+  $visualEditing: Boolean = false
 ) {
   allProducts(
     first: 12
@@ -26,6 +27,7 @@ query Products(
     }
   ) {
     id
+    ...VisualEditingFields @include(if: $visualEditing)
     slug
     sale
     salePrice

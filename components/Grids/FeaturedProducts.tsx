@@ -18,6 +18,7 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
     ProductGeneralInterfaceFragmentDoc,
     data.generalInterface!,
   );
+  const locale = globalPageProps.params.lng;
 
   return (
     <>
@@ -26,10 +27,14 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
           <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 md:gap-x-6 lg:grid-cols-3 xl:grid-cols-3">
             {data.product?.relatedProducts.map((product) => {
               const isOnSale = product?.sale === 'on_sale';
-              const priceEditAttributes = getProductPriceEditAttributes(product.id);
+              const priceEditAttributes = getProductPriceEditAttributes(
+                product._editingUrl,
+                locale,
+              );
               const salePriceEditAttributes = getProductPriceEditAttributes(
-                product.id,
-                { fieldPath: 'salePrice' },
+                product._editingUrl,
+                locale,
+                { fieldPath: 'sale_price' },
               );
               return (
                 <div key={product.id}>

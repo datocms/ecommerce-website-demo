@@ -24,17 +24,55 @@ export function generateWrapper<
     const { isEnabled: isDraft } = draftMode();
 
     const { searchParams, ...pagePropsWithoutSearchParams } =
-      unsanitizedPageProps as PageProps & { searchParams: unknown };
+      unsanitizedPageProps as PageProps & {
+        searchParams?:
+          | URLSearchParams
+          | Record<string, string | string[] | undefined>;
+      };
+
+    const visualEditingEnabled = (() => {
+      if (!searchParams) {
+        return false;
+      }
+
+      if (typeof (searchParams as URLSearchParams).get === 'function') {
+        return (searchParams as URLSearchParams).get('edit') === '1';
+      }
+
+      if (typeof searchParams === 'object') {
+        const rawEdit = (searchParams as Record<string, string | string[] | undefined>).edit;
+
+        if (Array.isArray(rawEdit)) {
+          return rawEdit.includes('1');
+        }
+
+        if (typeof rawEdit === 'string') {
+          return rawEdit === '1';
+        }
+      }
+
+      return false;
+    })();
 
     const pageProps = pagePropsWithoutSearchParams as unknown as PageProps;
 
-    const variables =
+    const baseVariables =
       options.buildVariables?.({
         ...pageProps,
         fallbackLocale,
       }) || ({} as TVariables);
 
-    const data = await queryDatoCMS(options.query, variables, isDraft);
+    const variables = visualEditingEnabled
+      ? ({
+          ...baseVariables,
+          visualEditing: true,
+        } as TVariables)
+      : baseVariables;
+
+    const data = await queryDatoCMS(options.query, variables, {
+      isDraft,
+      visualEditing: visualEditingEnabled,
+    });
 
     const { realtimeComponent: RealTime, contentComponent: Content } = options;
 

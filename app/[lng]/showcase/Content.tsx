@@ -17,21 +17,26 @@ const Content: ContentPage<PageProps, Query> = ({
   const firstProductIsOnSale = firstNewProduct.sale !== 'not_on_sale';
   const secondProductIsOnSale = secondNewProduct.sale !== 'not_on_sale';
   const currencySymbol = data.generalInterface?.currencySymbol ?? '';
+  const locale = globalPageProps.params.lng;
 
   const firstProductPriceAttributes = getProductPriceEditAttributes(
-    firstNewProduct.id,
+    firstNewProduct._editingUrl,
+    locale,
   );
   const firstProductSalePriceAttributes = getProductPriceEditAttributes(
-    firstNewProduct.id,
-    { fieldPath: 'salePrice' },
+    firstNewProduct._editingUrl,
+    locale,
+    { fieldPath: 'sale_price' },
   );
 
   const secondProductPriceAttributes = getProductPriceEditAttributes(
-    secondNewProduct.id,
+    secondNewProduct._editingUrl,
+    locale,
   );
   const secondProductSalePriceAttributes = getProductPriceEditAttributes(
-    secondNewProduct.id,
-    { fieldPath: 'salePrice' },
+    secondNewProduct._editingUrl,
+    locale,
+    { fieldPath: 'sale_price' },
   );
 
   return (

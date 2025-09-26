@@ -2,7 +2,10 @@
 
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { enableDatoVisualEditing } from 'datocms-visual-editing';
+import {
+  autoCleanStegaWithin,
+  enableDatoVisualEditing,
+} from 'datocms-visual-editing';
 
 type Props = {
   baseEditingUrl: string;
@@ -16,6 +19,14 @@ export default function DatoContentLinkClient({ baseEditingUrl, environment }: P
   useEffect(() => {
     if (!baseEditingUrl || !visualEditingEnabled) return;
 
+    const body = document.body;
+    if (!body) return;
+
+    const clean = autoCleanStegaWithin(body, {
+      delayMs: 32,
+      cleanImageAlts: true,
+    });
+
     const dispose = enableDatoVisualEditing({
       baseEditingUrl,
       activate: 'query',
@@ -23,10 +34,14 @@ export default function DatoContentLinkClient({ baseEditingUrl, environment }: P
       showBadge: true,
       targetAttribute: 'data-datocms-edit-target',
       openInNewTab: true,
+      persistAfterClean: true,
       ...(environment ? { environment } : {}),
     });
 
-    return () => dispose?.();
+    return () => {
+      clean();
+      dispose?.();
+    };
   }, [baseEditingUrl, environment, visualEditingEnabled]);
 
   return null;

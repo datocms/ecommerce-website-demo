@@ -1,13 +1,20 @@
 import { buildEditTagAttributes } from 'datocms-visual-editing';
 
-type ProductPriceFieldPath = 'price' | 'salePrice';
+type ProductPriceFieldPath = 'price' | 'sale_price';
+
+type ProductPriceEditOptions = {
+  fieldPath?: ProductPriceFieldPath;
+};
 
 export const getProductPriceEditAttributes = (
-  itemId: string,
-  { fieldPath = 'price' }: { fieldPath?: ProductPriceFieldPath } = {},
+  editingUrl: string | null | undefined,
+  locale: string,
+  { fieldPath = 'price' }: ProductPriceEditOptions = {},
 ) =>
-  buildEditTagAttributes({
-    itemId,
-    itemTypeId: 'product',
-    fieldPath,
-  });
+  editingUrl
+    ? buildEditTagAttributes({
+        _editingUrl: editingUrl,
+        fieldPath,
+        locale,
+      })
+    : {};

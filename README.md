@@ -42,10 +42,10 @@ In your DatoCMS' project, go to the **Settings** menu at the top and click **API
 
 Then click **Read-only API token** and copy the token.
 
-Next, copy the `.env.example` file in this directory to `.env` (which will be ignored by Git):
+Next, copy the `.env.example` file in this directory to `.env.local` (which will be ignored by Git):
 
 ```bash
-cp .env.local.sample .env.local
+cp .env.example .env.local
 ```
 
 and set the `DATOCMS_READONLY_API_TOKEN` variable as the API token you just copied.
@@ -57,7 +57,10 @@ URL=http://localhost:3000
 SEO_SECRET_TOKEN=superSecretToken
 DRAFT_SECRET_TOKEN=superSecretToken
 CACHE_INVALIDATION_SECRET_TOKEN=superSecretToken
+NEXT_PUBLIC_DATO_BASE_EDITING_URL=https://<project>.admin.datocms.com
 ```
+
+`NEXT_PUBLIC_DATO_BASE_EDITING_URL` needs to point to your project's DatoCMS dashboard so the Visual Editing overlay can deep link you to the exact record while you're reviewing drafts.
 
 #### Run your project locally
 
@@ -70,11 +73,12 @@ Your blog should be up and running on [http://localhost:3000](http://localhost:3
 
 ### Preview & Visual Editing
 
-1. Visit `/api/draft?secret=YOUR_DRAFT_SECRET&path=/?edit=1` to enable draft mode locally.
-2. While draft mode is active, GraphQL requests send the Content Link headers:
+1. Confirm `.env.local` contains `NEXT_PUBLIC_DATO_BASE_EDITING_URL` matching your project's admin URL (for example `https://my-project.admin.datocms.com`).
+2. Visit `/api/draft?secret=YOUR_DRAFT_SECRET&path=/?edit=1` to enable draft mode locally.
+3. While draft mode is active, GraphQL requests send the Content Link headers:
    - `X-Visual-Editing: vercel-v1`
    - `X-Base-Editing-Url: https://<project>.admin.datocms.com`
-3. While in draft, use the floating “Enable Visual Editing” button (just above “Enter Published Mode”) to add or remove the `?edit=1` flag. When enabled, hovering annotated content highlights it and clicking deep-links to the precise record/field in DatoCMS.
+4. While in draft, use the floating “Enable Visual Editing” button (just above “Enter Published Mode”) to add or remove the `?edit=1` flag. When enabled, hovering annotated content highlights it and clicking deep-links to the precise record/field in DatoCMS. The overlay is powered by the [`datocms-visual-editing`](https://github.com/datocms/datocms-visual-editing/tree/main/packages/datocms-visual-editing) package included in this starter.
 
 ## VS Code
 

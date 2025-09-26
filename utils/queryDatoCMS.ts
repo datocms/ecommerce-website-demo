@@ -28,8 +28,6 @@ export default async function queryDatoCMS<
     Authorization: `Bearer ${process.env.DATOCMS_READONLY_API_TOKEN}`,
   };
 
-  const baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL;
-
   let draftEnabled = Boolean(isDraft);
 
   if (typeof isDraft !== 'boolean') {
@@ -40,19 +38,21 @@ export default async function queryDatoCMS<
     }
   }
 
-  if (draftEnabled) {
-    if (!baseEditingUrl) {
-      throw new Error(
-        'Missing NEXT_PUBLIC_DATO_BASE_EDITING_URL environment variable when draft mode is active!',
-      );
-    }
+  const baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL;
 
-    headers['X-Include-Drafts'] = 'true';
-
-    headers['X-Base-Editing-Url'] = baseEditingUrl;
+  if (!baseEditingUrl) {
+    throw new Error(
+      'Missing NEXT_PUBLIC_DATO_BASE_EDITING_URL environment variable: required for DatoCMS Content Link headers!',
+    );
   }
 
-  const client = draftEnabled ? fetchWithContentLink : fetch;
+  headers['X-Base-Editing-Url'] = baseEditingUrl;
+
+  if (draftEnabled) {
+    headers['X-Include-Drafts'] = 'true';
+  }
+
+  const client = fetchWithContentLink;
 
   const response = await client('https://graphql.datocms.com/', {
     cache: 'force-cache',

@@ -57,7 +57,13 @@ export default function CategoryHeader({
 
   return (
     <>
-      <Cart setOpen={setCartIsOpen} open={cartIsOpen} />
+      <Cart
+        setOpen={setCartIsOpen}
+        open={cartIsOpen}
+        products={data.cartProducts ?? []}
+        currencySymbol={data.generalInterface?.currencySymbol ?? ''}
+        locale={globalPageProps.params.lng}
+      />
       <div className={'bg-white'}>
         {/* Mobile menu */}
         <Transition.Root show={open} as={Fragment}>

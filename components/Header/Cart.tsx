@@ -1,42 +1,65 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
+import type { LayoutQuery } from '@/graphql/types/graphql';
+import Link from 'next/link';
 import { type Dispatch, Fragment, type SetStateAction } from 'react';
+import DatoImage from '../DatoImage';
 
-const products = [
-  {
-    id: 1,
-    name: 'Throwback Hip Bag',
-    href: '#',
-    color: 'Salmon',
-    price: '$90.00',
-    quantity: 1,
-    imageSrc:
-      'https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-01.jpg',
-    imageAlt:
-      'Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt.',
-  },
-  {
-    id: 2,
-    name: 'Medium Stuff Satchel',
-    href: '#',
-    color: 'Blue',
-    price: '$32.00',
-    quantity: 1,
-    imageSrc:
-      'https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg',
-    imageAlt:
-      'Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch.',
-  },
-  // More products...
-];
+type CartProduct = LayoutQuery['cartProducts'][number];
 
 type PropTypes = {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  products: CartProduct[];
+  currencySymbol: string;
+  locale: string;
 };
 
-export default function Cart({ open, setOpen }: PropTypes) {
+const DEFAULT_QUANTITY = 1;
+
+const formatPrice = (value: number) => value.toFixed(2);
+
+export default function Cart({
+  open,
+  setOpen,
+  products,
+  currencySymbol,
+  locale,
+}: PropTypes) {
+  const cartItems = products.reduce<
+    Array<{
+      product: CartProduct;
+      price: number;
+      responsiveImage: NonNullable<CartProduct['productImages'][number]['responsiveImage']>;
+    }>
+  >((accumulator, product) => {
+    if (!product?.productImages?.length) {
+      return accumulator;
+    }
+
+    const responsiveImage = product.productImages[0]?.responsiveImage;
+
+    if (!responsiveImage) {
+      return accumulator;
+    }
+
+    const isOnSale = product.sale === 'on_sale' && product.salePrice != null;
+    const price = isOnSale && product.salePrice != null ? product.salePrice : product.price;
+
+    accumulator.push({
+      product,
+      price,
+      responsiveImage,
+    });
+
+    return accumulator;
+  }, []);
+
+  const subtotal = cartItems.reduce(
+    (total, item) => total + item.price * DEFAULT_QUANTITY,
+    0,
+  );
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={setOpen}>
@@ -111,15 +134,20 @@ export default function Cart({ open, setOpen }: PropTypes) {
                       <div className="mt-8">
                         <div className="flow-root">
                           <ul className="-my-6 divide-y divide-gray-200">
-                            {products.map((product) => (
+                            {cartItems.length === 0 && (
+                              <li className="py-6 text-sm text-gray-500">
+                                No products in the cart yet.
+                              </li>
+                            )}
+                            {cartItems.map(({ product, price, responsiveImage }) => (
                               <li key={product.id} className="flex py-6">
-                                <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                  <Image
-                                    src={product.imageSrc}
-                                    width={100}
-                                    height={100}
-                                    alt={product.imageAlt}
+                                <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                  <DatoImage
+                                    fragment={responsiveImage}
                                     className="h-full w-full object-cover object-center"
+                                    layout="fill"
+                                    objectFit="cover"
+                                    objectPosition="50% 50%"
                                   />
                                 </div>
 
@@ -127,25 +155,31 @@ export default function Cart({ open, setOpen }: PropTypes) {
                                   <div>
                                     <div className="flex justify-between text-base font-medium text-gray-900">
                                       <h3>
-                                        <a href={product.href}>
+                                        <Link href={`/${locale}/product/${product.slug}`}>
                                           {product.name}
-                                        </a>
+                                        </Link>
                                       </h3>
-                                      <p className="ml-4">{product.price}</p>
+                                      <p className="ml-4">
+                                        {currencySymbol}
+                                        {formatPrice(price)}
+                                      </p>
                                     </div>
-                                    <p className="mt-1 text-sm text-gray-500">
-                                      {product.color}
-                                    </p>
+                                    {product.brand?.name && (
+                                      <p className="mt-1 text-sm text-gray-500">
+                                        {product.brand.name}
+                                      </p>
+                                    )}
                                   </div>
                                   <div className="flex flex-1 items-end justify-between text-sm">
                                     <p className="text-gray-500">
-                                      Qty {product.quantity}
+                                      Qty {DEFAULT_QUANTITY}
                                     </p>
 
                                     <div className="flex">
                                       <button
                                         type="button"
                                         className="font-medium text-primary hover:text-primary/80"
+                                        aria-label={`Remove ${product.name} from cart`}
                                       >
                                         Remove
                                       </button>
@@ -162,18 +196,21 @@ export default function Cart({ open, setOpen }: PropTypes) {
                     <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
                       <div className="flex justify-between text-base font-medium text-gray-900">
                         <p>Subtotal</p>
-                        <p>$262.00</p>
+                        <p>
+                          {currencySymbol}
+                          {formatPrice(subtotal)}
+                        </p>
                       </div>
                       <p className="mt-0.5 text-sm text-gray-500">
                         Shipping and taxes calculated at checkout.
                       </p>
                       <div className="mt-6">
-                        <a
-                          href="#"
+                        <Link
+                          href={`/${locale}/products`}
                           className="flex items-center justify-center rounded-md border border-transparent bg-primary px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-primary/80"
                         >
                           Checkout
-                        </a>
+                        </Link>
                       </div>
                       <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                         <p>

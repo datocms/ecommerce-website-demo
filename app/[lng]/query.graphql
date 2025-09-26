@@ -29,7 +29,7 @@ query Layout($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
     footerTitle
     footerLogo {
       responsiveImage {
-        src
+        ...DatoImage_responsiveImage
       }
     }
     footerColumns {
@@ -223,5 +223,26 @@ query Layout($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
     newsletterButton
     emailPlaceholder
     displayNewsletterFooter
+  }
+  cartProducts: allProducts(
+    first: 3
+    locale: $locale
+    fallbackLocales: $fallbackLocale
+  ) {
+    id
+    name
+    price
+    sale
+    salePrice
+    slug
+    brand {
+      name
+    }
+    productImages {
+      id
+      responsiveImage {
+        ...DatoImage_responsiveImage
+      }
+    }
   }
 }

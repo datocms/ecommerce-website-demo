@@ -15,7 +15,7 @@ query Stores($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
     }
     storeImage {
       responsiveImage {
-        src
+        ...DatoImage_responsiveImage
       }
     }
   }

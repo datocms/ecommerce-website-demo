@@ -27,12 +27,14 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
           <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 md:gap-x-6 lg:grid-cols-3 xl:grid-cols-3">
             {data.product?.relatedProducts.map((product) => {
               const isOnSale = product?.sale === 'on_sale';
+              const editingUrl = (product as { _editingUrl?: string | null })
+                ._editingUrl;
               const priceEditAttributes = getProductPriceEditAttributes(
-                product._editingUrl,
+                editingUrl,
                 locale,
               );
               const salePriceEditAttributes = getProductPriceEditAttributes(
-                product._editingUrl,
+                editingUrl,
                 locale,
                 { fieldPath: 'sale_price' },
               );

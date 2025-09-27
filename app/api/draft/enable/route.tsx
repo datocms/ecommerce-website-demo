@@ -11,7 +11,8 @@ export async function GET(request: NextRequest) {
   if (token !== process.env.DRAFT_SECRET_TOKEN)
     return new Response('Invalid token', { status: 401 });
 
-  draftMode().enable();
+  const draft = await draftMode();
+  draft.enable();
 
   if (!url) return new Response('Draft mode is enabled');
 
@@ -23,9 +24,9 @@ export async function GET(request: NextRequest) {
   }
 
   //to avoid losing the cookie on redirect in the iFrame
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const cookie = cookieStore.get('__prerender_bypass')!;
-  cookies().set({
+  cookieStore.set({
     name: '__prerender_bypass',
     value: cookie?.value,
     httpOnly: true,

@@ -11,7 +11,8 @@ type PropTypes = {
 const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
   const router = useRouter();
   const searchParams = useSearchParams()!;
-  const pageItems = [];
+  const pageSize = 12;
+  const totalPages = Math.max(1, Math.ceil(numberOfProducts / pageSize));
 
   function exportQueryParameters(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -19,30 +20,11 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
     router.push(`?${params.toString()}`);
   }
 
-  for (let i = 1; i < numberOfProducts; i += 12) {
-    const pageNumber = (i - 1) / 12 + 1;
-    const isSelected = pageNumber === currentPage;
-    pageItems.push(
-      <button
-        type="button"
-        aria-current="page"
-        className={`relative inline-flex cursor-pointer items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 focus-visible:outline-primary/80${
-          isSelected ? ' bg-primary text-white' : ' text-gray-900'
-        }`}
-        onClick={() => {
-          exportQueryParameters('page', pageNumber.toString());
-        }}
-      >
-        {pageNumber}
-      </button>,
-    );
-  }
+  const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
 
-  const firstProductIndex = 1 + (currentPage - 1) * 12;
+  const firstProductIndex = 1 + (currentPage - 1) * pageSize;
   const lastProductIndex =
-    1 + currentPage * 12 < numberOfProducts
-      ? 1 + currentPage * 12
-      : numberOfProducts;
+    Math.min(numberOfProducts, currentPage * pageSize);
 
   return (
     <div className="mx-auto mb-8 flex max-w-7xl items-center justify-center border-gray-200 bg-white px-4 pt-12 sm:mb-0 sm:px-6">
@@ -71,10 +53,26 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
                 <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
               </button>
             )}
-            {pageItems.map((item) => {
-              return item;
+            {pageNumbers.map((pageNumber) => {
+              const isSelected = pageNumber === currentPage;
+
+              return (
+                <button
+                  key={pageNumber}
+                  type="button"
+                  aria-current={isSelected ? 'page' : undefined}
+                  className={`relative inline-flex cursor-pointer items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 focus-visible:outline-primary/80${
+                    isSelected ? ' bg-primary text-white' : ' text-gray-900'
+                  }`}
+                  onClick={() => {
+                    exportQueryParameters('page', pageNumber.toString());
+                  }}
+                >
+                  {pageNumber}
+                </button>
+              );
             })}
-            {!(lastProductIndex === numberOfProducts) && (
+            {currentPage < totalPages && (
               <button
                 type="button"
                 onClick={() => {

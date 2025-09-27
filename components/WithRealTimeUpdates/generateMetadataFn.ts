@@ -1,5 +1,8 @@
 import { getFallbackLocale } from '@/app/i18n/settings';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type {
+  AsyncGlobalPageProps,
+  GlobalPageProps,
+} from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import type { Metadata } from 'next';
@@ -23,14 +26,28 @@ export function generateMetadataFn<
   ) => TitleMetaLinkTag[] | SeoOrFaviconTag[] | undefined;
 }) {
   return async function generateMetadata(
-    pageProps: PageProps,
+    pageProps: AsyncGlobalPageProps<PageProps>,
   ): Promise<Metadata> {
     const fallbackLocale = await getFallbackLocale();
-    const { isEnabled: isDraft } = draftMode();
+    const { isEnabled: isDraft } = await draftMode();
+
+    const { searchParams: _unusedSearchParams, ...pagePropsWithoutSearchParams } =
+      pageProps;
+
+    const rawParams = await pageProps.params;
+
+    if (!rawParams) {
+      throw new Error('Missing route params while generating metadata.');
+    }
+
+    const resolvedPageProps = {
+      ...pagePropsWithoutSearchParams,
+      params: rawParams as PageProps['params'],
+    } as unknown as PageProps;
 
     const variables =
       options.buildVariables?.({
-        ...pageProps,
+        ...resolvedPageProps,
         fallbackLocale,
       }) || ({} as TVariables);
 

@@ -1,5 +1,8 @@
 import { getFallbackLocale } from '@/app/i18n/settings';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type {
+  AsyncGlobalPageProps,
+  GlobalPageProps,
+} from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { draftMode, headers } from 'next/headers';
@@ -8,6 +11,12 @@ import type {
   ContentPage,
   RealtimeUpdatesPage,
 } from './types';
+
+type AsyncPageProps<PageProps extends GlobalPageProps> = AsyncGlobalPageProps<
+  PageProps,
+  URLSearchParams | Record<string, string | string[] | undefined>,
+  Record<string, string>
+>;
 
 export function generateWrapper<
   PageProps extends GlobalPageProps,
@@ -19,36 +28,43 @@ export function generateWrapper<
   contentComponent: ContentPage<PageProps, TResult>;
   realtimeComponent: RealtimeUpdatesPage<PageProps, TResult, TVariables>;
 }) {
-  return async function Page(unsanitizedPageProps: PageProps) {
+  return async function Page(
+    unsanitizedPageProps: AsyncPageProps<PageProps>,
+  ) {
     const fallbackLocale = await getFallbackLocale();
-    const { isEnabled: isDraft } = draftMode();
+    const { isEnabled: isDraft } = await draftMode();
 
-    const { searchParams, ...pagePropsWithoutSearchParams } =
-      unsanitizedPageProps as PageProps & {
-        searchParams?:
-          | URLSearchParams
-          | Record<string, string | string[] | undefined>;
-      };
+    const { searchParams: unresolvedSearchParams, ...pagePropsWithoutSearchParams } =
+      unsanitizedPageProps;
 
-    const requestHeaders = headers();
+    const rawParams = await unsanitizedPageProps.params;
+
+    if (!rawParams) {
+      throw new Error('Missing route params in page wrapper.');
+    }
+
+    const params = rawParams as PageProps['params'];
+    const resolvedSearchParams = await unresolvedSearchParams;
+
+    const requestHeaders = await headers();
     const headerValue = requestHeaders.get('x-datocms-visual-editing');
     const headerEditToggle = headerValue == null ? null : headerValue === '1';
 
     const visualEditingEnabled = (() => {
-      if (!searchParams) {
+      if (!resolvedSearchParams) {
         return headerEditToggle ?? false;
       }
 
-      if (typeof (searchParams as URLSearchParams).get === 'function') {
-        const raw = (searchParams as URLSearchParams).get('edit');
+      if (typeof (resolvedSearchParams as URLSearchParams).get === 'function') {
+        const raw = (resolvedSearchParams as URLSearchParams).get('edit');
         if (raw) {
           return ['1', 'true', 'on'].includes(raw);
         }
         return headerEditToggle ?? false;
       }
 
-      if (typeof searchParams === 'object') {
-        const rawEdit = (searchParams as Record<string, string | string[] | undefined>).edit;
+      if (typeof resolvedSearchParams === 'object') {
+        const rawEdit = (resolvedSearchParams as Record<string, string | string[] | undefined>).edit;
 
         if (Array.isArray(rawEdit)) {
           if (rawEdit.some((value) => ['1', 'true', 'on'].includes(value))) {
@@ -74,7 +90,10 @@ export function generateWrapper<
       return headerEditToggle ?? false;
     })();
 
-    const pageProps = pagePropsWithoutSearchParams as unknown as PageProps;
+    const pageProps = {
+      ...pagePropsWithoutSearchParams,
+      params,
+    } as unknown as PageProps;
 
     const baseVariables =
       options.buildVariables?.({

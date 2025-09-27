@@ -80,7 +80,7 @@ const ProductInfoSection = ({
                 <div className="group-hover:bg- primary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/80 text-white shadow-lg transition duration-100   md:h-12 md:w-12">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    enable-background="new 0 0 32 32"
+                    enableBackground="new 0 0 32 32"
                     viewBox="0 0 32 32"
                     id="cloth"
                     className="h-6 w-6"
@@ -91,8 +91,8 @@ const ProductInfoSection = ({
                       stroke="currentColor"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      stroke-miterlimit="10"
-                      stroke-width="2"
+                      strokeMiterlimit="10"
+                      strokeWidth="2"
                       d="M15,3H6v26h20V14C19.925,14,15,9.075,15,3z"
                     />
                     <line
@@ -104,16 +104,16 @@ const ProductInfoSection = ({
                       stroke="currentColor"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      stroke-miterlimit="10"
-                      stroke-width="2"
+                      strokeMiterlimit="10"
+                      strokeWidth="2"
                     />
                     <path
                       fill="none"
                       stroke="currentColor"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      stroke-miterlimit="10"
-                      stroke-width="2"
+                      strokeMiterlimit="10"
+                      strokeWidth="2"
                       d="M19.922 16.713c.668.297 1.362.547 2.078.745V19M14.342 12.429c.506.624 1.06 1.206 1.658 1.742M11.541 7c.193.695.434 1.37.72 2.021"
                     />
                   </svg>
@@ -138,7 +138,7 @@ const ProductInfoSection = ({
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      stroke-width="2"
+                      strokeWidth="2"
                       d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"
                     />
                   </svg>

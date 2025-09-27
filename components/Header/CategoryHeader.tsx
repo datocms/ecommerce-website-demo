@@ -342,16 +342,13 @@ export default function CategoryHeader({
                                           >
                                             {data.generalInterface?.trending}
                                           </p>
-                                          <a
-                                            href={'item.href'} //change
-                                            className="6 mt-1 block font-medium text-gray-900"
-                                          >
+                                          <span className="mt-1 block font-medium text-gray-900">
                                             <span
                                               className="absolute inset-0 z-10"
                                               aria-hidden="true"
                                             />
                                             {category.newArrival?.name}
-                                          </a>
+                                          </span>
                                           <p
                                             aria-hidden="true"
                                             className="mt-1"

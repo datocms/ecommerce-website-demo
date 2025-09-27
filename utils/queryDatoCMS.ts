@@ -54,7 +54,8 @@ export default async function queryDatoCMS<
 
   if (typeof isDraft !== 'boolean') {
     try {
-      draftEnabled = draftMode().isEnabled;
+      const draft = await draftMode();
+      draftEnabled = draft.isEnabled;
     } catch (error) {
       draftEnabled = false;
     }

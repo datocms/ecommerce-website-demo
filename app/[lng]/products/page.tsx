@@ -15,18 +15,18 @@ import {
   ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { AsyncGlobalPageProps, GlobalPageProps } from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
-import type { Record, StructuredText } from 'datocms-structured-text-utils';
+import type {
+  Record as StructuredTextRecord,
+  StructuredText,
+} from 'datocms-structured-text-utils';
 import { stripStega } from 'datocms-visual-editing';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
 
 type PageProps = GlobalPageProps & {
-  params: {
-    slug: string;
-  };
   searchParams: {
     page?: string;
     orderBy?: ProductModelOrderBy;
@@ -38,14 +38,52 @@ type PageProps = GlobalPageProps & {
   };
 };
 
-const Page = async ({ params: { lng }, searchParams }: PageProps) => {
-  const { isEnabled } = draftMode();
+type ProductsSearchParams =
+  | URLSearchParams
+  | {
+      page?: string;
+      orderBy?: ProductModelOrderBy;
+      productName?: string;
+      collections?: string;
+      brands?: string;
+      materials?: string;
+      edit?: string;
+    };
+
+const Page = async ({
+  params,
+  searchParams,
+}: AsyncGlobalPageProps<PageProps, ProductsSearchParams>) => {
+  const resolvedParams = await params;
+
+  if (!resolvedParams?.lng) {
+    throw new Error('Missing locale parameter in products page.');
+  }
+
+  const lng = resolvedParams.lng as PageProps['params']['lng'];
+  const resolvedSearchParams = await searchParams;
+  const searchParamsRecord =
+    resolvedSearchParams instanceof URLSearchParams
+      ? (Object.fromEntries(resolvedSearchParams.entries()) as Record<
+          string,
+          string
+        >)
+      : ((resolvedSearchParams ?? {}) as Record<
+          string,
+          string | string[] | undefined
+        >);
+
+  const firstValue = (value: string | string[] | undefined) =>
+    Array.isArray(value) ? value[0] : value;
+
+  const { isEnabled } = await draftMode();
   const fallbackLng = await getFallbackLocale();
-  const pageNumber = Number.parseInt(searchParams?.page ?? '1');
+  const pageNumber = Number.parseInt(firstValue(searchParamsRecord?.page) ?? '1');
   const orderBy: ProductModelOrderBy =
-    searchParams?.orderBy ?? ProductModelOrderBy.CreatedAtAsc;
-  const nameSearch = searchParams?.productName ?? '';
-  const visualEditingEnabled = searchParams?.edit === '1';
+    (firstValue(searchParamsRecord?.orderBy) as ProductModelOrderBy | undefined) ??
+    ProductModelOrderBy.CreatedAtAsc;
+  const nameSearch = firstValue(searchParamsRecord?.productName) ?? '';
+  const visualEditingEnabled = firstValue(searchParamsRecord?.edit) === '1';
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -59,27 +97,35 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
   const { allBrands, allCollections, allMaterials } =
     getFragmentData(InitialParamsFragmentDoc, initialParams) ?? {};
 
-  const collectionParams = searchParams?.collections
-    ?.split('|')
-    .filter((collection) => collection.length);
+  const rawCollections = searchParamsRecord?.collections;
+  const collectionParams =
+    typeof rawCollections === 'string'
+      ? rawCollections
+          .split('|')
+          .filter((collection) => collection.length)
+      : rawCollections;
 
   const collections =
     collectionParams === undefined
       ? allCollections.map((collection) => collection.id)
       : collectionParams;
 
-  const brandParams = searchParams?.brands
-    ?.split('|')
-    .filter((brand) => brand.length);
+  const rawBrands = searchParamsRecord?.brands;
+  const brandParams =
+    typeof rawBrands === 'string'
+      ? rawBrands.split('|').filter((brand) => brand.length)
+      : rawBrands;
 
   const brands =
     brandParams === undefined
       ? allBrands.map((brand) => brand.id)
       : brandParams;
 
-  const materialParams = searchParams?.materials
-    ?.split('|')
-    .filter((material) => material.length);
+  const rawMaterials = searchParamsRecord?.materials;
+  const materialParams =
+    typeof rawMaterials === 'string'
+      ? rawMaterials.split('|').filter((material) => material.length)
+      : rawMaterials;
   const materials =
     materialParams === undefined
       ? allMaterials.map((material) => material.id)
@@ -144,7 +190,8 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
           name={singleFilter.name}
           subtitle={singleFilter.details.subtitle ?? ''}
           description={
-            singleFilter.details.description as StructuredText<Record, Record>
+            singleFilter.details
+              .description as StructuredText<StructuredTextRecord, StructuredTextRecord>
           }
           image={singleFilter.details.image.responsiveImage}
         />
@@ -169,12 +216,14 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
               {data.allProducts.map((product) => {
                 const saleStatus = stripStega(product.sale ?? '');
                 const isOnSale = saleStatus === 'on_sale';
+                const editingUrl = (product as { _editingUrl?: string | null })
+                  ._editingUrl;
                 const priceEditAttributes = getProductPriceEditAttributes(
-                  product._editingUrl,
+                  editingUrl,
                   lng,
                 );
                 const salePriceEditAttributes = getProductPriceEditAttributes(
-                  product._editingUrl,
+                  editingUrl,
                   lng,
                   { fieldPath: 'sale_price' },
                 );

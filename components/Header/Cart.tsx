@@ -163,7 +163,8 @@ export default function Cart({
                                       <p
                                         className="ml-4"
                                         {...getProductPriceEditAttributes(
-                                          product._editingUrl,
+                                          (product as { _editingUrl?: string | null })
+                                            ._editingUrl,
                                           locale,
                                         )}
                                         data-datocms-edit-target

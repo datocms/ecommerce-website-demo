@@ -19,22 +19,28 @@ const Content: ContentPage<PageProps, Query> = ({
   const currencySymbol = data.generalInterface?.currencySymbol ?? '';
   const locale = globalPageProps.params.lng;
 
+  const firstProductEditingUrl = (firstNewProduct as {
+    _editingUrl?: string | null;
+  })._editingUrl;
   const firstProductPriceAttributes = getProductPriceEditAttributes(
-    firstNewProduct._editingUrl,
+    firstProductEditingUrl,
     locale,
   );
   const firstProductSalePriceAttributes = getProductPriceEditAttributes(
-    firstNewProduct._editingUrl,
+    firstProductEditingUrl,
     locale,
     { fieldPath: 'sale_price' },
   );
 
+  const secondProductEditingUrl = (secondNewProduct as {
+    _editingUrl?: string | null;
+  })._editingUrl;
   const secondProductPriceAttributes = getProductPriceEditAttributes(
-    secondNewProduct._editingUrl,
+    secondProductEditingUrl,
     locale,
   );
   const secondProductSalePriceAttributes = getProductPriceEditAttributes(
-    secondNewProduct._editingUrl,
+    secondProductEditingUrl,
     locale,
     { fieldPath: 'sale_price' },
   );

@@ -10,7 +10,8 @@ export async function GET(req: Request) {
     return new NextResponse('Invalid secret', { status: 401 });
   }
 
-  draftMode().enable();
+  const draft = await draftMode();
+  draft.enable();
 
   const baseUrl = process.env.URL || 'http://localhost:3000';
   const url = new URL(path, baseUrl);

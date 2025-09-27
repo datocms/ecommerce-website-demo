@@ -94,7 +94,7 @@ export default function ScrollToTop({ isDraft }: Props) {
           {isDraft ? (
             <div
               onClick={toggleVisualEditing}
-              className="flex cursor-pointer items-center justify-center rounded-md border border-primary bg-white p-4 font-bold text-primary shadow-md transition duration-300 ease-in-out hover:bg-primary hover:text-white"
+              className="flex cursor-pointer items-center justify-center rounded-md bg-[#FF7751] p-4 font-bold text-white shadow-md transition duration-300 ease-in-out hover:bg-[#ff8f6f] hover:shadow-signUp"
             >
               {isVisualEditingActive
                 ? 'Disable Visual Editing'

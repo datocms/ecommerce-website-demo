@@ -4,6 +4,24 @@ import { type NextRequest, NextResponse } from 'next/server';
 import getAvailableLocales, { getFallbackLocale } from './app/i18n/settings';
 import type { SiteLocale } from './graphql/types/graphql';
 
+const VISUAL_EDITING_HEADER = 'x-datocms-visual-editing';
+
+function normalizeVisualEditingToggle(raw: string | null): string | null {
+  if (!raw) return null;
+
+  const normalized = raw.toLowerCase();
+
+  if (['1', 'true', 'on'].includes(normalized)) {
+    return '1';
+  }
+
+  if (['0', 'false', 'off'].includes(normalized)) {
+    return '0';
+  }
+
+  return null;
+}
+
 async function getLocale(
   request: Request,
   locales: SiteLocale[],
@@ -51,6 +69,23 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.redirect(redirectUrl);
   }
+
+  const editToggle = normalizeVisualEditingToggle(
+    request.nextUrl.searchParams.get('edit'),
+  );
+
+  if (editToggle) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set(VISUAL_EDITING_HEADER, editToggle);
+
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {

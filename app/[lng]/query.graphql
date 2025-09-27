@@ -46,6 +46,7 @@ query Layout(
       }
     }
     cookieNotice {
+      ...VisualEditingFields @include(if: $visualEditing)
       primaryButtonLabel
       secondaryButtonLabel
       subheader
@@ -62,12 +63,14 @@ query Layout(
       green
     }
     popup {
+      ...VisualEditingFields @include(if: $visualEditing)
       title
       underText
       subtitle
       preTitle
       dismissButtonLabel
       button {
+        ...VisualEditingFields @include(if: $visualEditing)
         label
         slug
       }

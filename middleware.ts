@@ -5,6 +5,7 @@ import getAvailableLocales, { getFallbackLocale } from './app/i18n/settings';
 import type { SiteLocale } from './graphql/types/graphql';
 
 const VISUAL_EDITING_HEADER = 'x-datocms-visual-editing';
+const VISUAL_EDITING_COOKIE = 'datocms-visual-editing';
 
 function normalizeVisualEditingToggle(raw: string | null): string | null {
   if (!raw) return null;
@@ -70,19 +71,93 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  const nextUrl = request.nextUrl.clone();
+  const isDraftMode =
+    request.cookies.has('__prerender_bypass') ||
+    request.cookies.has('__next_preview_data');
   const editToggle = normalizeVisualEditingToggle(
-    request.nextUrl.searchParams.get('edit'),
+    nextUrl.searchParams.get('edit'),
   );
 
   if (editToggle) {
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set(VISUAL_EDITING_HEADER, editToggle);
+    if (editToggle === '1' && !isDraftMode) {
+      nextUrl.searchParams.delete('edit');
+      const response = NextResponse.redirect(nextUrl);
+      response.cookies.delete(VISUAL_EDITING_COOKIE);
+      return response;
+    }
 
-    return NextResponse.next({
+    const response =
+      editToggle === '0'
+        ? (() => {
+            nextUrl.searchParams.delete('edit');
+            return NextResponse.redirect(nextUrl);
+          })()
+        : (() => {
+            const requestHeaders = new Headers(request.headers);
+            requestHeaders.set(VISUAL_EDITING_HEADER, editToggle);
+            return NextResponse.next({
+              request: {
+                headers: requestHeaders,
+              },
+            });
+          })();
+
+    response.cookies.set(VISUAL_EDITING_COOKIE, editToggle, {
+      path: '/',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30,
+    });
+
+    response.headers.set(VISUAL_EDITING_HEADER, editToggle);
+
+    return response;
+  }
+
+  const cookieToggle = normalizeVisualEditingToggle(
+    request.cookies.get(VISUAL_EDITING_COOKIE)?.value ?? null,
+  );
+
+  if (cookieToggle) {
+    if (cookieToggle === '1' && !isDraftMode) {
+      if (nextUrl.searchParams.has('edit')) {
+        nextUrl.searchParams.delete('edit');
+        const response = NextResponse.redirect(nextUrl);
+        response.cookies.delete(VISUAL_EDITING_COOKIE);
+        return response;
+      }
+
+      const response = NextResponse.next();
+      response.cookies.delete(VISUAL_EDITING_COOKIE);
+      return response;
+    }
+
+    if (
+      cookieToggle === '1' &&
+      isDraftMode &&
+      !nextUrl.searchParams.has('edit')
+    ) {
+      nextUrl.searchParams.set('edit', '1');
+      return NextResponse.redirect(nextUrl);
+    }
+
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set(VISUAL_EDITING_HEADER, cookieToggle);
+
+    const response = NextResponse.next({
       request: {
         headers: requestHeaders,
       },
     });
+
+    response.headers.set(VISUAL_EDITING_HEADER, cookieToggle);
+    response.cookies.set(VISUAL_EDITING_COOKIE, cookieToggle, {
+      path: '/',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30,
+    });
+
+    return response;
   }
 
   return NextResponse.next();

@@ -34,7 +34,7 @@ export default function ScrollToTop({ isDraft }: Props) {
     const params = new URLSearchParams(searchParams?.toString());
 
     if (isVisualEditingActive) {
-      params.delete('edit');
+      params.set('edit', '0');
     } else {
       params.set('edit', '1');
     }

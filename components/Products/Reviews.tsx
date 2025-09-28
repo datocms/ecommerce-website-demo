@@ -4,6 +4,7 @@ import {
   type ProductQuery,
 } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
 
 type PropTypes = {
   data: ProductQuery;
@@ -15,14 +16,18 @@ import ReactMarkdown from 'react-markdown';
 
 interface StarRatingProps {
   rating: number;
+  editAttributes?: Record<string, string>;
 }
 
-const StarRating: FC<StarRatingProps> = ({ rating }) => {
+const StarRating: FC<StarRatingProps> = ({ rating, editAttributes }) => {
   const filledStars = Array.from({ length: Math.round(rating) });
   const emptyStars = Array.from({ length: 5 - Math.round(rating) });
+  const editTagProps = editAttributes
+    ? { ...editAttributes, 'data-datocms-edit-target': '' }
+    : {};
 
   return (
-    <div className="flex">
+    <div className="flex" {...editTagProps}>
       {filledStars.map((_, index) => (
         <svg
           key={`filled-star-${index}`}
@@ -55,6 +60,20 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
     ProductGeneralInterfaceFragmentDoc,
     data.generalInterface!,
   );
+  const locale = globalPageProps.params.lng;
+  const productEditingUrl = (
+    data.product as { _editingUrl?: string | null }
+  )?._editingUrl;
+  const reviewAverageEditAttributes = getProductFieldEditAttributes(
+    productEditingUrl,
+    locale,
+    'review_average',
+  );
+  const numberOfReviewsEditAttributes = getProductFieldEditAttributes(
+    productEditingUrl,
+    locale,
+    'number_of_reviews',
+  );
 
   return (
     <div className="bg-white py-6 text-center sm:py-8 md:text-start lg:py-12">
@@ -63,7 +82,13 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
           <div className="flex items-center gap-2">
             <div className="-ml-1 flex gap-0.5 text-primary">
               <div className="flex h-7 items-center gap-1 rounded-full bg-primary/90 px-2 text-white">
-                <span className="text-sm">{data.product?.reviewAverage}</span>
+                <span
+                  className="text-sm"
+                  {...reviewAverageEditAttributes}
+                  data-datocms-edit-target
+                >
+                  {data.product?.reviewAverage}
+                </span>
 
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +102,13 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
             </div>
 
             <span className="block text-sm text-gray-500">
-              {data.product?.numberOfReviews} {reviews}
+              <span
+                {...numberOfReviewsEditAttributes}
+                data-datocms-edit-target
+              >
+                {data.product?.numberOfReviews}
+              </span>{' '}
+              {reviews}
             </span>
           </div>
 
@@ -90,7 +121,7 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
         </div>
 
         <div className="divide-y">
-          {data.product?.featuredReviews.map((review) => {
+          {data.product?.featuredReviews.map((review, index) => {
             const date = new Date(review.reviewDate);
             const formattedDate = new Intl.DateTimeFormat(
               globalPageProps.params.lng,
@@ -100,6 +131,16 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
                 day: 'numeric',
               },
             ).format(date);
+            const reviewScoreEditAttributes = getProductFieldEditAttributes(
+              productEditingUrl,
+              locale,
+              ['featured_reviews', index.toString(), 'review_score'],
+            );
+            const reviewDateEditAttributes = getProductFieldEditAttributes(
+              productEditingUrl,
+              locale,
+              ['featured_reviews', index.toString(), 'review_date'],
+            );
 
             return (
               <div
@@ -110,13 +151,20 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
                   <span className="block text-sm font-bold">
                     {review.reviewerName}
                   </span>
-                  <span className="block text-sm text-gray-500">
+                  <span
+                    className="block text-sm text-gray-500"
+                    {...reviewDateEditAttributes}
+                    data-datocms-edit-target
+                  >
                     {formattedDate}
                   </span>
                 </div>
 
                 <div className="-ml-1 flex gap-0.5 text-primary">
-                  <StarRating rating={review.reviewScore} />
+                  <StarRating
+                    rating={review.reviewScore}
+                    editAttributes={reviewScoreEditAttributes}
+                  />
                 </div>
 
                 <div className="text-gray-600">

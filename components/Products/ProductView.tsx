@@ -6,7 +6,10 @@ import {
   type ProductQuery,
 } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
+import {
+  getProductFieldEditAttributes,
+  getProductPriceEditAttributes,
+} from '@/utils/datocmsVisualEditing';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useState } from 'react';
@@ -49,6 +52,25 @@ const ProductView = ({ data, globalPageProps }: Props) => {
       fieldPath: 'sale_price',
     },
   );
+  const reviewAverageEditAttributes = getProductFieldEditAttributes(
+    productEditingUrl,
+    locale,
+    'review_average',
+  );
+  const numberOfReviewsEditAttributes = getProductFieldEditAttributes(
+    productEditingUrl,
+    locale,
+    'number_of_reviews',
+  );
+  const selectedVariationIndex = data.product.productVariations.findIndex(
+    (item) => item.color.hex === selectedColor,
+  );
+  const selectedVariation =
+    selectedVariationIndex > -1
+      ? data.product.productVariations[selectedVariationIndex]
+      : null;
+  const selectedVariationSizes =
+    (selectedVariation?.availableSizes as Array<string>) ?? [];
 
   const {
     sale,
@@ -170,7 +192,13 @@ const ProductView = ({ data, globalPageProps }: Props) => {
 
               <div className="mb-6 flex items-center gap-3 md:mb-10">
                 <div className="flex h-7 items-center gap-1 rounded-full bg-primary/90 px-2 text-white">
-                  <span className="text-sm">{data.product.reviewAverage}</span>
+                  <span
+                    className="text-sm"
+                    {...reviewAverageEditAttributes}
+                    data-datocms-edit-target
+                  >
+                    {data.product.reviewAverage}
+                  </span>
 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -183,7 +211,13 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                 </div>
 
                 <span className="text-sm text-gray-500 transition duration-100">
-                  {data.product.numberOfReviews} {reviews}
+                  <span
+                    {...numberOfReviewsEditAttributes}
+                    data-datocms-edit-target
+                  >
+                    {data.product.numberOfReviews}
+                  </span>{' '}
+                  {reviews}
                 </span>
               </div>
 
@@ -193,29 +227,41 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                 </span>
 
                 <div className="flex flex-wrap gap-2">
-                  {data.product.productVariations.map((variation) => {
-                    if (variation.color.hex === selectedColor)
+                  {data.product.productVariations.map(
+                    (variation, variationIndex) => {
+                      const colorEditAttributes = getProductFieldEditAttributes(
+                        productEditingUrl,
+                        locale,
+                        ['product_variations', variationIndex.toString(), 'color'],
+                      );
+
+                      if (variation.color.hex === selectedColor)
+                        return (
+                          <span
+                            key={variation.id}
+                            style={{ backgroundColor: variation.color.hex }}
+                            className="h-8 w-8 rounded-full border ring-2 ring-gray-800 ring-offset-1 transition duration-100"
+                            {...colorEditAttributes}
+                            data-datocms-edit-target
+                          />
+                        );
                       return (
-                        <span
+                        <button
                           key={variation.id}
+                          type="button"
                           style={{ backgroundColor: variation.color.hex }}
-                          className="h-8 w-8 rounded-full border ring-2 ring-gray-800 ring-offset-1 transition duration-100"
+                          className={
+                            'h-8 w-8 rounded-full border ring-2 ring-transparent ring-offset-1 transition duration-100 hover:ring-gray-200'
+                          }
+                          {...colorEditAttributes}
+                          data-datocms-edit-target
+                          onClick={() => {
+                            setSelectedColor(variation.color.hex);
+                          }}
                         />
                       );
-                    return (
-                      <button
-                        key={variation.id}
-                        type="button"
-                        style={{ backgroundColor: variation.color.hex }}
-                        className={
-                          'h-8 w-8 rounded-full border ring-2 ring-transparent ring-offset-1 transition duration-100 hover:ring-gray-200'
-                        }
-                        onClick={() => {
-                          setSelectedColor(variation.color.hex);
-                        }}
-                      />
-                    );
-                  })}
+                    },
+                  )}
                 </div>
               </div>
 
@@ -225,42 +271,61 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                 </span>
 
                 <div className="flex flex-wrap gap-3">
-                  {allSizes.map((size) => {
-                    if (
-                      (
-                        data.product?.productVariations.find(
-                          (item) => item.color.hex === selectedColor,
-                        )?.availableSizes as Array<string>
-                      ).find((item) => item === size)
-                    ) {
-                      if (selectedSize === size)
+                  {allSizes.map((sizeOption) => {
+                    const availableIndex = selectedVariationSizes.findIndex(
+                      (item) => item === sizeOption,
+                    );
+                    const sizeEditAttributes =
+                      availableIndex > -1 && selectedVariationIndex > -1
+                        ? getProductFieldEditAttributes(
+                            productEditingUrl,
+                            locale,
+                            [
+                              'product_variations',
+                              selectedVariationIndex.toString(),
+                              'available_sizes',
+                              availableIndex.toString(),
+                            ],
+                          )
+                        : null;
+
+                    if (availableIndex > -1) {
+                      if (selectedSize === sizeOption)
                         return (
                           <span
-                            key={size}
+                            key={sizeOption}
                             className="border-primary/90-500 flex h-8 w-12 cursor-default items-center justify-center rounded-md border bg-primary/90 text-center text-sm font-semibold text-white"
+                            {...(sizeEditAttributes ?? {})}
+                            data-datocms-edit-target={
+                              sizeEditAttributes ? true : undefined
+                            }
                           >
-                            {size.toUpperCase()}
+                            {sizeOption.toUpperCase()}
                           </span>
                         );
                       return (
                         <button
-                          key={size}
+                          key={sizeOption}
                           type="button"
                           className="flex h-8 w-12 items-center justify-center rounded-md border bg-white text-center text-sm font-semibold text-gray-800 transition duration-100 hover:bg-gray-100 active:bg-gray-200"
+                          {...(sizeEditAttributes ?? {})}
+                          data-datocms-edit-target={
+                            sizeEditAttributes ? true : undefined
+                          }
                           onClick={() => {
-                            setSelectedSize(size);
+                            setSelectedSize(sizeOption);
                           }}
                         >
-                          {size.toUpperCase()}
+                          {sizeOption.toUpperCase()}
                         </button>
                       );
                     }
                     return (
                       <span
-                        key={size}
+                        key={sizeOption}
                         className="flex h-8 w-12 cursor-not-allowed items-center justify-center rounded-md border bg-white text-center text-sm font-semibold text-gray-400"
                       >
-                        {size.toUpperCase()}
+                        {sizeOption.toUpperCase()}
                       </span>
                     );
                   })}

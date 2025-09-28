@@ -18,3 +18,16 @@ export const getProductPriceEditAttributes = (
         locale,
       })
     : {};
+
+export const getProductFieldEditAttributes = (
+  editingUrl: string | null | undefined,
+  locale: string,
+  fieldPath: string | string[],
+) =>
+  editingUrl
+    ? buildEditTagAttributes({
+        _editingUrl: editingUrl,
+        fieldPath,
+        locale,
+      })
+    : {};

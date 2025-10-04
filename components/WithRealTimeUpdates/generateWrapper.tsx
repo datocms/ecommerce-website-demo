@@ -95,22 +95,28 @@ export function generateWrapper<
       params,
     } as unknown as PageProps;
 
+    const includeVisualEditingMetadata = isDraft || visualEditingEnabled;
+
     const baseVariables =
       options.buildVariables?.({
         ...pageProps,
         fallbackLocale,
       }) || ({} as TVariables);
 
-    const variables = visualEditingEnabled
+    const variables = includeVisualEditingMetadata
       ? ({
           ...baseVariables,
-          visualEditing: true,
+          ...(baseVariables &&
+          typeof baseVariables === 'object' &&
+          'visualEditing' in (baseVariables as Record<string, unknown>)
+            ? {}
+            : { visualEditing: true }),
         } as TVariables)
       : baseVariables;
 
     const data = await queryDatoCMS(options.query, variables, {
       isDraft,
-      visualEditing: visualEditingEnabled,
+      visualEditing: includeVisualEditingMetadata,
     });
 
     const { realtimeComponent: RealTime, contentComponent: Content } = options;

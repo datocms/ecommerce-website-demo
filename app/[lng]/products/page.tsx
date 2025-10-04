@@ -23,7 +23,7 @@ import type {
   StructuredText,
 } from 'datocms-structured-text-utils';
 import { stripStega } from 'datocms-visual-editing';
-import { draftMode } from 'next/headers';
+import { draftMode, headers } from 'next/headers';
 import Link from 'next/link';
 
 type PageProps = GlobalPageProps & {
@@ -83,7 +83,23 @@ const Page = async ({
     (firstValue(searchParamsRecord?.orderBy) as ProductModelOrderBy | undefined) ??
     ProductModelOrderBy.CreatedAtAsc;
   const nameSearch = firstValue(searchParamsRecord?.productName) ?? '';
-  const visualEditingEnabled = firstValue(searchParamsRecord?.edit) === '1';
+
+  const parseVisualEditingToggle = (value: string | undefined | null) => {
+    if (!value) return undefined;
+    const normalized = value.toLowerCase();
+    if (['1', 'true', 'on'].includes(normalized)) return true;
+    if (['0', 'false', 'off'].includes(normalized)) return false;
+    return undefined;
+  };
+
+  const rawEditParam = firstValue(searchParamsRecord?.edit);
+  const paramToggle = parseVisualEditingToggle(rawEditParam ?? undefined);
+  const requestHeaders = headers();
+  const headerToggle = parseVisualEditingToggle(
+    requestHeaders.get('x-datocms-visual-editing'),
+  );
+  const visualEditingEnabled = paramToggle ?? headerToggle ?? false;
+  const includeVisualEditingMetadata = isEnabled || visualEditingEnabled;
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -142,9 +158,9 @@ const Page = async ({
       brands,
       materials,
       nameSearch,
-      visualEditing: visualEditingEnabled,
+      ...(includeVisualEditingMetadata ? { visualEditing: true } : {}),
     },
-    { isDraft: isEnabled, visualEditing: visualEditingEnabled },
+    { isDraft: isEnabled, visualEditing: includeVisualEditingMetadata },
   );
 
   let singleFilter = null;

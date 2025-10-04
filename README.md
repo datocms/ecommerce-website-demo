@@ -80,6 +80,17 @@ Your blog should be up and running on [http://localhost:3000](http://localhost:3
    - `X-Base-Editing-Url: https://<project>.admin.datocms.com`
 4. While in draft, use the floating “Enable Visual Editing” button (just above “Enter Published Mode”) to add or remove the `?edit=1` flag. When enabled, hovering annotated content highlights it and clicking deep-links to the precise record/field in DatoCMS. The overlay is powered by the [`datocms-visual-editing`](https://github.com/datocms/datocms-visual-editing/tree/main/packages/datocms-visual-editing) package included in this starter.
 
+#### Seamless toggle flow (no page refresh)
+
+This project ships a no-reload experience for turning Visual Editing on/off. Adapt the same pattern by following the checklist below:
+
+- **Always fetch editing metadata in draft/preview.** Page wrappers call `queryDatoCMS` with `visualEditing: true` whenever draft mode or the `datocms-visual-editing=1` cookie/header is present (`components/WithRealTimeUpdates/generateWrapper.tsx`, `app/[lng]/products/page.tsx`, etc.). That guarantees `_editingUrl` and stega markers are already in the payload when the user toggles overlays on.
+- **Keep the DOM stega markers while Visual Editing is active.** Presentation helpers such as `components/Common/StegaText.tsx` render the encoded value whenever `?edit=1` is set and only strip stega when the overlay is disabled, so re-enabling works without a reload.
+- **Let the client toggle flip the query param and cookie without `window.location`.** The floating control uses `router.replace(nextUrl, { scroll: false })` plus `router.refresh()` to trigger a soft navigation, and it mirrors the middleware cookie write. See `components/ScrollToTop/index.tsx` for the full interaction.
+- **Avoid auto-cleaning on mount.** `components/preview/DatoContentLinkClient.tsx` mounts `enableDatoVisualEditing` directly (with `persistAfterClean: true`) so the observer retains the metadata needed for subsequent toggles.
+
+With those pieces in place the Visual Editing overlay appears instantly, and disabling/re-enabling the toggle still works because the underlying `_editingUrl` data and stega payload never go stale.
+
 ## VS Code
 
 It's strongly suggested to install the [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql) extension, to get autocomplete suggestions, validation against schema, and many more niceties when working with your GraphQL queries.

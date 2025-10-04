@@ -1,6 +1,7 @@
 'use client';
 
 import { stripStega } from 'datocms-visual-editing';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { ComponentPropsWithoutRef, ElementType } from 'react';
 
@@ -15,12 +16,16 @@ export default function StegaText<E extends ElementType = 'span'>({
   ...rest
 }: StegaTextProps<E>) {
   const Component = (as ?? 'span') as ElementType;
-  const [displayValue, setDisplayValue] = useState(value);
+  const searchParams = useSearchParams();
+  const editToggle = searchParams?.get('edit') ?? null;
+  const visualEditingActive = editToggle === '1';
+  const [displayValue, setDisplayValue] = useState(() =>
+    visualEditingActive ? value : stripStega(value),
+  );
 
   useEffect(() => {
-    setDisplayValue(stripStega(value));
-  }, [value]);
+    setDisplayValue(visualEditingActive ? value : stripStega(value));
+  }, [value, visualEditingActive]);
 
   return <Component {...rest}>{displayValue}</Component>;
 }
-

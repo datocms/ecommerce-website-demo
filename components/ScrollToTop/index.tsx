@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { startTransition, useState } from 'react';
 import AuthenticationModal from '../Header/AuthenticationModal';
 import SuccessPopUp from '../Header/SuccessPopUp';
 
@@ -17,6 +17,8 @@ export default function ScrollToTop({ isDraft }: Props) {
   const [modalOpen, setModalOpen] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
   const isVisualEditingActive = searchParams?.get('edit') === '1';
+  const visualEditingCookieName = 'datocms-visual-editing';
+  const thirtyDaysInSeconds = 60 * 60 * 24 * 30;
 
   async function toggleDraft() {
     if (isDraft) {
@@ -34,14 +36,20 @@ export default function ScrollToTop({ isDraft }: Props) {
     const params = new URLSearchParams(searchParams?.toString());
 
     if (isVisualEditingActive) {
-      params.set('edit', '0');
+      params.delete('edit');
+      document.cookie = `${visualEditingCookieName}=0; Path=/; Max-Age=0; SameSite=Lax`;
     } else {
       params.set('edit', '1');
+      document.cookie = `${visualEditingCookieName}=1; Path=/; Max-Age=${thirtyDaysInSeconds}; SameSite=Lax`;
     }
 
     const query = params.toString();
     const nextUrl = query ? `${pathname}?${query}` : pathname;
-    window.location.href = nextUrl;
+
+    startTransition(() => {
+      router.replace(nextUrl, { scroll: false });
+      router.refresh();
+    });
   }
 
   const triggerSuccessToast = () => {

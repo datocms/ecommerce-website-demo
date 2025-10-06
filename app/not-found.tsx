@@ -5,12 +5,19 @@ import queryDatoCMS from '@/utils/queryDatoCMS';
 import Link from 'next/link';
 
 const resolveNotFoundImage = (layout?: LayoutQuery['layout']) => {
-  return (
-    layout?.popup?.popupImage?.responsiveImage ??
-    layout?.logo?.responsiveImage ??
-    layout?.footerLogo?.responsiveImage ??
-    null
-  );
+  const candidates = [
+    layout?.popup?.popupImage,
+    layout?.logo,
+    layout?.footerLogo,
+  ].filter(Boolean) as NonNullable<LayoutQuery['layout']>['logo'][];
+
+  for (const candidate of candidates) {
+    if (candidate?.responsiveImage) {
+      return candidate;
+    }
+  }
+
+  return null;
 };
 
 const NotFound = async () => {
@@ -47,9 +54,10 @@ const NotFound = async () => {
           </div>
 
           <div className="relative h-80 overflow-hidden rounded-lg bg-gray-100 shadow-lg md:h-auto">
-            {notFoundImage && (
+            {notFoundImage?.responsiveImage && (
               <DatoImage
-                fragment={notFoundImage}
+                fragment={notFoundImage.responsiveImage}
+                assetAlt={notFoundImage.alt}
                 className="absolute inset-0 h-full w-full object-cover object-center"
                 objectFit="cover"
                 objectPosition="50% 50%"

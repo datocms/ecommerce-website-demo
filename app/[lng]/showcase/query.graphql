@@ -22,6 +22,7 @@ query Showcase(
       salePrice
       name
       productImages {
+        alt
         responsiveImage {
           ...DatoImage_responsiveImage
         }
@@ -31,6 +32,7 @@ query Showcase(
     }
     materialsTitle
     materialsDisplay {
+      alt
       responsiveImage {
         ...DatoImage_responsiveImage
       }
@@ -38,6 +40,7 @@ query Showcase(
     materialsDescription
     description
     displays {
+      alt
       responsiveImage {
         ...DatoImage_responsiveImage
       }
@@ -53,6 +56,7 @@ query Showcase(
       id
       details {
         image {
+          alt
           responsiveImage {
             ...DatoImage_responsiveImage
           }

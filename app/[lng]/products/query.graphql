@@ -32,6 +32,7 @@ query Products(
     sale
     salePrice
     productImages {
+      alt
       responsiveImage {
         ...DatoImage_responsiveImage
       }

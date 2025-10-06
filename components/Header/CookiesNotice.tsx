@@ -1,6 +1,7 @@
 import type { CookieNoticeRecord } from '@/graphql/types/graphql';
 import type { Dispatch, SetStateAction } from 'react';
-import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import DatoImage from '@/components/DatoImage';
+import type { ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {
   setCookies: Dispatch<SetStateAction<boolean>>;
@@ -40,6 +41,7 @@ const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
                 cookieNotice.cookieNoticeImage
                   ?.responsiveImage as ResponsiveImageType
               }
+              assetAlt={cookieNotice.cookieNoticeImage?.alt ?? null}
               className="h-full w-full object-contain"
               layout="fill"
               objectFit="cover"

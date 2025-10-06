@@ -14,6 +14,7 @@ query Stores($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
       longitude
     }
     storeImage {
+      alt
       responsiveImage {
         ...DatoImage_responsiveImage
       }

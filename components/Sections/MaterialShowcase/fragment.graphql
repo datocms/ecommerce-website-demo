@@ -10,6 +10,7 @@ fragment MaterialShowcase on MaterialShowcaseSectionRecord {
     slug
     details {
       image {
+        alt
         responsiveImage {
           ...DatoImage_responsiveImage
         }

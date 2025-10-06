@@ -1,14 +1,20 @@
-query Home($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+query Home(
+  $locale: SiteLocale
+  $fallbackLocale: [SiteLocale!]
+  $visualEditing: Boolean = false
+) {
   home(locale: $locale, fallbackLocales: $fallbackLocale) {
+    ...VisualEditingFields @include(if: $visualEditing)
     seo: _seoMetaTags {
       attributes
       content
       tag
     }
     sections {
-       ... on RecordInterface {
+      ... on RecordInterface {
         id
         __typename
+        ...VisualEditingFields @include(if: $visualEditing)
       }
       ... on HeroSectionRecord {
         ...HeroSection

@@ -21,6 +21,7 @@ type PropTypes = {
   subtitle: string;
   type: Maybe<string>;
   image: Maybe<FragmentType<typeof DatoImage_ResponsiveImageFragmentDoc>>;
+  imageAlt?: string | null;
   description: Maybe<StructuredText<Record, Record>>;
 };
 
@@ -28,6 +29,7 @@ const FilterDetail = ({
   name,
   type,
   image,
+  imageAlt,
   description,
   subtitle,
 }: PropTypes) => {
@@ -82,6 +84,7 @@ const FilterDetail = ({
           {image && (
             <DatoImage
               fragment={image}
+              assetAlt={imageAlt}
               className="relative h-full w-[48rem] max-w-none rounded-xl bg-gray-900 object-contain shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
               layout="fill"
               objectFit="cover"

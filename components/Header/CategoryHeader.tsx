@@ -17,7 +17,8 @@ import {
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Fragment, Suspense, useRef, useState } from 'react';
-import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import DatoImage from '@/components/DatoImage';
+import type { ResponsiveImageType } from 'react-datocms';
 import Cart from './Cart';
 import HoveringSearch from './HoveringSearch';
 import LanguageSelector from './LanguageSelector';
@@ -144,6 +145,7 @@ export default function CategoryHeader({
                                       category.newArrival.details.image
                                         .responsiveImage
                                     }
+                                    assetAlt={category.newArrival.details.image.alt}
                                     className="h-full w-full object-contain"
                                     layout="fill"
                                     objectFit="cover"
@@ -175,6 +177,7 @@ export default function CategoryHeader({
                                       category.trending.details.image
                                         .responsiveImage
                                     }
+                                    assetAlt={category.trending.details.image.alt}
                                     className="h-full w-full object-contain"
                                     layout="fill"
                                     objectFit="cover"
@@ -272,6 +275,7 @@ export default function CategoryHeader({
                     data={
                       data.layout?.logo.responsiveImage as ResponsiveImageType
                     }
+                    assetAlt={data.layout?.logo.alt ?? null}
                     className="object-contain"
                   />
                 </Link>
@@ -329,6 +333,9 @@ export default function CategoryHeader({
                                                   category.newArrival.details
                                                     .image.responsiveImage
                                                 }
+                                                assetAlt={
+                                                  category.newArrival.details.image.alt
+                                                }
                                                 className="h-full w-full object-contain"
                                                 layout="fill"
                                                 objectFit="cover"
@@ -368,6 +375,9 @@ export default function CategoryHeader({
                                                 data={
                                                   category.trending.details
                                                     .image.responsiveImage
+                                                }
+                                                assetAlt={
+                                                  category.trending.details.image.alt
                                                 }
                                                 className="h-full w-full object-contain"
                                                 layout="fill"

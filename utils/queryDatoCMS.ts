@@ -67,9 +67,11 @@ export default async function queryDatoCMS<
 
   const fetchClient = visualEditing ? fetchWithContentLinkHeaders : fetch;
 
+  const shouldBypassCache = Boolean(visualEditing) || draftEnabled;
+
   const response = await fetchClient('https://graphql.datocms.com/', {
-    cache: 'force-cache',
-    next: { tags: ['datocms'] },
+    cache: shouldBypassCache ? 'no-store' : 'force-cache',
+    ...(shouldBypassCache ? {} : { next: { tags: ['datocms'] } }),
     method: 'POST',
     headers,
     body: JSON.stringify({ query: print(document), variables }),

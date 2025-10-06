@@ -4,11 +4,13 @@ fragment HeroSection on HeroSectionRecord {
   heroSubtitle
   heroTitle
   heroImage {
+    alt
     responsiveImage {
       ...DatoImage_responsiveImage
     }
   }
   additionalImage {
+    alt
     responsiveImage {
       ...DatoImage_responsiveImage
     }

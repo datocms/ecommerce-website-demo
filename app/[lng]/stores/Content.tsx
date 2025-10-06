@@ -2,7 +2,8 @@
 
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { useState } from 'react';
-import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import DatoImage from '@/components/DatoImage';
+import type { ResponsiveImageType } from 'react-datocms';
 import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({ data }) => {
@@ -93,6 +94,7 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
               allStores[currentStore].storeImage
                 ?.responsiveImage as ResponsiveImageType
             }
+            assetAlt={allStores[currentStore].storeImage?.alt ?? null}
             className="h-full w-full rounded-lg object-contain"
             layout="fill"
             objectFit="cover"

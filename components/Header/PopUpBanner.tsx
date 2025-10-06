@@ -2,7 +2,8 @@ import type { PopupRecord } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import type { Dispatch, SetStateAction } from 'react';
-import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import DatoImage from '@/components/DatoImage';
+import type { ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {
   setPopUp: Dispatch<SetStateAction<boolean>>;
@@ -32,6 +33,7 @@ const PopUpBanner = ({ setPopUp, popup, globalPageProps }: PropTypes) => {
           <div className="relative h-32 w-full object-cover md:h-full">
             <DatoImage
               data={popup.popupImage?.responsiveImage as ResponsiveImageType}
+              assetAlt={popup.popupImage?.alt ?? null}
               className="h-full w-full object-contain"
               layout="fill"
               objectFit="cover"

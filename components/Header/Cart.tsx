@@ -51,6 +51,7 @@ export default function Cart({
       product,
       price,
       responsiveImage,
+      assetAlt: product.productImages[0]?.alt ?? null,
     });
 
     return accumulator;
@@ -140,11 +141,12 @@ export default function Cart({
                                 No products in the cart yet.
                               </li>
                             )}
-                            {cartItems.map(({ product, price, responsiveImage }) => (
+                            {cartItems.map(({ product, price, responsiveImage, assetAlt }) => (
                               <li key={product.id} className="flex py-6">
                                 <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                   <DatoImage
                                     fragment={responsiveImage}
+                                    assetAlt={assetAlt}
                                     className="h-full w-full object-cover object-center"
                                     layout="fill"
                                     objectFit="cover"

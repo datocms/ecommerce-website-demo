@@ -73,23 +73,37 @@ Your blog should be up and running on [http://localhost:3000](http://localhost:3
 
 ### Preview & Visual Editing
 
-1. Confirm `.env.local` contains `NEXT_PUBLIC_DATO_BASE_EDITING_URL` matching your project's admin URL (for example `https://my-project.admin.datocms.com`).
-2. Visit `/api/draft?secret=YOUR_DRAFT_SECRET&path=/?edit=1` to enable draft mode locally.
-3. While draft mode is active, GraphQL requests send the Content Link headers:
+Follow this exact checklist whenever you wire up or test Visual Editing locally. Skipping a step is the fastest way to hit the “works once, then breaks after disabling” trap.
+
+1. **Set the required environment variables.** In `.env.local` you need *both* `DATOCMS_READONLY_API_TOKEN=<token>` and `NEXT_PUBLIC_DATO_BASE_EDITING_URL=https://<project>.admin.datocms.com`. The second one is mandatory whenever a GraphQL query requests `_editingUrl`; without it DatoCMS rejects the request once the overlay is re-enabled.
+2. **Enter draft mode with the edit flag.** Visit `/api/draft?secret=YOUR_DRAFT_SECRET&path=/?edit=1`. This sets the preview cookies, adds `?edit=1`, and ensures our middleware writes the `datocms-visual-editing=1` cookie.
+3. **Verify the special headers are present.** While draft mode is active the app automatically includes:
    - `X-Visual-Editing: vercel-v1`
    - `X-Base-Editing-Url: https://<project>.admin.datocms.com`
-4. While in draft, use the floating “Enable Visual Editing” button (just above “Enter Published Mode”) to add or remove the `?edit=1` flag. When enabled, hovering annotated content highlights it and clicking deep-links to the precise record/field in DatoCMS. The overlay is powered by the [`datocms-visual-editing`](https://github.com/datocms/datocms-visual-editing/tree/main/packages/datocms-visual-editing) package included in this starter.
+   You can confirm this in your browser’s network tab on any DatoCMS GraphQL request.
+4. **Toggle visual editing from the in-app control.** Use the floating “Enable Visual Editing” button (above “Enter Published Mode”) to turn overlays off and on. This control only does a soft navigation, so metadata stays warm and overlays light up immediately when you re-enable them.
+5. **After toggling off, toggle back on without a full reload.** If the overlay still highlights elements, your environment is configured correctly. If it doesn’t, re-check steps 1–3—most failures are missing headers or stripped stega markup.
 
-#### Seamless toggle flow (no page refresh)
+#### Preventing stale overlays after toggling off/on
 
-This project ships a no-reload experience for turning Visual Editing on/off. Adapt the same pattern by following the checklist below:
+This project ships with the safeguards already in place. If you customize the code, keep these rules intact so Visual Editing keeps working after you disable and re-enable it:
 
-- **Always fetch editing metadata in draft/preview.** Page wrappers call `queryDatoCMS` with `visualEditing: true` whenever draft mode or the `datocms-visual-editing=1` cookie/header is present (`components/WithRealTimeUpdates/generateWrapper.tsx`, `app/[lng]/products/page.tsx`, etc.). That guarantees `_editingUrl` and stega markers are already in the payload when the user toggles overlays on.
-- **Keep the DOM stega markers while Visual Editing is active.** Presentation helpers such as `components/Common/StegaText.tsx` render the encoded value whenever `?edit=1` is set and only strip stega when the overlay is disabled, so re-enabling works without a reload.
-- **Let the client toggle flip the query param and cookie without `window.location`.** The floating control uses `router.replace(nextUrl, { scroll: false })` plus `router.refresh()` to trigger a soft navigation, and it mirrors the middleware cookie write. See `components/ScrollToTop/index.tsx` for the full interaction.
-- **Avoid auto-cleaning on mount.** `components/preview/DatoContentLinkClient.tsx` mounts `enableDatoVisualEditing` directly (with `persistAfterClean: true`) so the observer retains the metadata needed for subsequent toggles.
+- **Never request `_editingUrl` unless `visualEditing: true`.** All queries use the `...VisualEditingFields @include(if: $visualEditing)` fragment and the page wrappers only set that flag when draft mode or the `datocms-visual-editing=1` cookie is active. Removing that guard will trigger the GraphQL error mentioned above.
+- **Do not strip stega data while overlays are enabled.** Components such as `components/Common/StegaText.tsx` only call `stripStega` when visual editing is off. Keep that behaviour so the hidden markers survive a toggle.
+- **Leave the client toggle logic intact.** `components/ScrollToTop/index.tsx` updates the query param and cookie with `router.replace` + `router.refresh()` instead of forcing a full reload. Reuse that pattern for any custom toggles so the existing metadata stays cached.
+- **Mount the overlay once per page.** `components/preview/DatoContentLinkClient.tsx` calls `enableDatoVisualEditing` with `persistAfterClean: true`, which stops the observer from auto-cleaning metadata on mount. Make sure your layout continues to mount this component whenever draft mode is enabled.
 
-With those pieces in place the Visual Editing overlay appears instantly, and disabling/re-enabling the toggle still works because the underlying `_editingUrl` data and stega payload never go stale.
+Keep those pieces in place and the overlay survives infinite on/off cycles without requiring a hard refresh.
+
+### Visual Editing on responsive images
+
+DatoCMS only embeds the stega payload in the original upload fields (for example `Upload.alt`), not in the Imgix-derived `responsiveImage.alt`. To make the hover overlays appear on `<img>` tags you need to preserve that upload alt end-to-end:
+
+1. **Request upload-level alt values wherever you query images.** Every GraphQL selection that pulls a `responsiveImage` should also ask for the parent `alt`. See `app/[lng]/query.graphql`, `app/[lng]/product/[slug]/query.graphql`, and the fragments under `components/Sections/**/fragment.graphql` for reference.
+2. **Thread the raw alt through your components.** The shared image wrapper (`components/DatoImage/index.tsx`) exposes an `assetAlt` prop that overrides the `responsiveImage.alt` with the upload alt before rendering. All call sites pass the value through, so the Visual Editing overlay decodes the hidden metadata when `?edit=1` is active.
+3. **Populate alt text inside DatoCMS.** Even with the overrides in place the overlay can only decode non-empty strings. Make sure editors add localized alt text to every asset that should support visual editing.
+
+Once these three pieces are wired up, hovering any visual-edit-enabled image in draft or preview mode highlights the element and deep-links you to the exact upload record in DatoCMS when you click it.
 
 ## VS Code
 

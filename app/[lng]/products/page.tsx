@@ -210,6 +210,7 @@ const Page = async ({
               .description as StructuredText<StructuredTextRecord, StructuredTextRecord>
           }
           image={singleFilter.details.image.responsiveImage}
+          imageAlt={singleFilter.details.image.alt}
         />
       )}
       <div
@@ -230,6 +231,7 @@ const Page = async ({
           <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {data.allProducts.map((product) => {
+                const firstProductImage = product.productImages[0];
                 const saleStatus = stripStega(product.sale ?? '');
                 const isOnSale = saleStatus === 'on_sale';
                 const editingUrl = (product as { _editingUrl?: string | null })
@@ -252,9 +254,10 @@ const Page = async ({
                       href={`/${lng}/product/${product.slug}`}
                       className="relative block h-96 overflow-hidden rounded-t-lg bg-gray-100"
                     >
-                      {product.productImages[0].responsiveImage && (
+                      {firstProductImage?.responsiveImage && (
                         <DatoImage
-                          fragment={product.productImages[0].responsiveImage}
+                          fragment={firstProductImage.responsiveImage}
+                          assetAlt={firstProductImage.alt}
                           className="h-full w-full object-contain"
                           layout="fill"
                           objectFit="cover"

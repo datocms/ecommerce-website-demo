@@ -38,6 +38,11 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
                 locale,
                 { fieldPath: 'sale_price' },
               );
+              const firstProductImage = product.productImages[0];
+
+              if (!firstProductImage?.responsiveImage) {
+                return null;
+              }
               return (
                 <div key={product.id}>
                   <Link
@@ -46,7 +51,8 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
                   >
                     <div className="h-full w-full object-cover object-center transition duration-200 group-hover:scale-105">
                       <DatoImage
-                        fragment={product.productImages[0].responsiveImage!}
+                        fragment={firstProductImage.responsiveImage}
+                        assetAlt={firstProductImage.alt}
                         className="h-full w-full object-contain"
                         layout="fill"
                         objectFit="cover"

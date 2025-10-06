@@ -1,7 +1,8 @@
 import type { LayoutQuery } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
-import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import DatoImage from '@/components/DatoImage';
+import type { ResponsiveImageType } from 'react-datocms';
 import SvgRenderer from '../Common/SvgRenderer';
 
 type Props = {
@@ -56,6 +57,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
                       data.layout?.footerLogo
                         ?.responsiveImage as ResponsiveImageType
                     }
+                    assetAlt={data.layout?.footerLogo?.alt ?? null}
                     className="h-full w-full object-contain"
                     layout="fill"
                     objectFit="cover"

@@ -49,6 +49,7 @@ query Product(
     ...VisualEditingFields @include(if: $visualEditing)
     productImages {
       id
+      alt
       responsiveImage {
         ...DatoImage_responsiveImage
       }
@@ -77,6 +78,7 @@ query Product(
       }
       productImages {
         id
+        alt
         responsiveImage {
           ...DatoImage_responsiveImage
         }

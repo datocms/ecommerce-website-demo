@@ -42,6 +42,7 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
                 <div className="opacity-85 relative mb-8 block h-[300px] rounded-lg bg-black hover:bg-gray-700 md:h-[500px]">
                   <DatoImage
                     fragment={material.details.image.responsiveImage}
+                    assetAlt={material.details.image.alt}
                     className="h-full w-full rounded-lg object-contain"
                     layout="fill"
                     objectFit="cover"

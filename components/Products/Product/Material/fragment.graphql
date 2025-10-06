@@ -4,6 +4,7 @@ fragment MaterialProductFragment on MaterialRecord {
   slug
   details {
     image {
+      alt
       responsiveImage {
         ...DatoImage_responsiveImage
       }

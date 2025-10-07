@@ -177,7 +177,7 @@ const ProductInfoSection = ({
                 <div className="relative h-48 bg-gray-100">
                   <DatoImage
                     fragment={details.image.responsiveImage}
-                    assetAlt={details.image.alt}
+
                     className="h-full w-full object-cover object-center"
                     objectFit="cover"
                     objectPosition="50% 50%"

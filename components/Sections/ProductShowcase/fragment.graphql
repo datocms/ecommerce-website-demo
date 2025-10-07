@@ -15,7 +15,6 @@ fragment CollectionCardShowcase on CollectionCardShowcaseSectionRecord {
     slug
     details {
       image {
-        _editingUrl @include(if: $visualEditing)
         alt
         responsiveImage {
           ...DatoImage_responsiveImage

@@ -10,7 +10,6 @@ fragment MaterialShowcase on MaterialShowcaseSectionRecord {
     slug
     details {
       image {
-        _editingUrl @include(if: $visualEditing)
         alt
         responsiveImage {
           ...DatoImage_responsiveImage

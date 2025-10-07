@@ -60,7 +60,7 @@ const Content: ContentPage<PageProps, Query> = ({
               data={
                 data.showcase.displays[0].responsiveImage as ResponsiveImageType
               }
-              assetAlt={data.showcase.displays[0].alt ?? null}
+
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -72,7 +72,7 @@ const Content: ContentPage<PageProps, Query> = ({
               data={
                 data.showcase.displays[1].responsiveImage as ResponsiveImageType
               }
-              assetAlt={data.showcase.displays[1].alt ?? null}
+
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -116,7 +116,7 @@ const Content: ContentPage<PageProps, Query> = ({
                         collection.details.image
                           .responsiveImage as ResponsiveImageType
                       }
-                      assetAlt={collection.details.image.alt}
+
                       className="h-full w-full rounded-lg object-contain"
                       layout="fill"
                       objectFit="cover"
@@ -144,7 +144,7 @@ const Content: ContentPage<PageProps, Query> = ({
                   firstNewProduct.productImages[0]
                     .responsiveImage as ResponsiveImageType
                 }
-                assetAlt={firstNewProduct.productImages[0].alt}
+
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -188,7 +188,7 @@ const Content: ContentPage<PageProps, Query> = ({
                   secondNewProduct.productImages[0]
                     .responsiveImage as ResponsiveImageType
                 }
-                assetAlt={secondNewProduct.productImages[0].alt}
+
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -236,7 +236,7 @@ const Content: ContentPage<PageProps, Query> = ({
                   data.showcase.materialsDisplay[0]
                     .responsiveImage as ResponsiveImageType
                 }
-                assetAlt={data.showcase.materialsDisplay[0].alt ?? null}
+
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -251,7 +251,7 @@ const Content: ContentPage<PageProps, Query> = ({
                   data.showcase.materialsDisplay[1]
                     .responsiveImage as ResponsiveImageType
                 }
-                assetAlt={data.showcase.materialsDisplay[1].alt ?? null}
+
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"

@@ -17,7 +17,7 @@ const SvgRenderer = ({ url }: Props) => {
         const svgText = await response.text();
         setSvgContent(svgText);
       } catch (error) {
-        console.error('Error fetching SVG:', error);
+        setSvgContent('');
       }
     };
 

@@ -94,7 +94,7 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
               allStores[currentStore].storeImage
                 ?.responsiveImage as ResponsiveImageType
             }
-            assetAlt={allStores[currentStore].storeImage?.alt ?? null}
+
             className="h-full w-full rounded-lg object-contain"
             layout="fill"
             objectFit="cover"

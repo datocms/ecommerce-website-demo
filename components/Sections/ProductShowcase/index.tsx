@@ -2,8 +2,6 @@ import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { CollectionCardShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import { extractDatoFieldPath } from '@/utils/datocmsVisualEditing';
-import { decodeStega, stripStega } from 'datocms-visual-editing';
 import Link from 'next/link';
 
 type Props = {
@@ -16,40 +14,6 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
     getFragmentData(CollectionCardShowcaseFragmentDoc, fragment);
 
   const left = direction === 'left';
-
-  if (process.env.NODE_ENV !== 'production') {
-    const entries = collection
-      .map((item, index) => {
-        const image = item.details.image;
-        if (!image || !image.alt) return null;
-
-        const rawAlt = image.alt;
-        const metadata = decodeStega(rawAlt);
-        const translatedAlt = stripStega(rawAlt);
-        const datoUrl = image._editingUrl ?? metadata?.editUrl ?? null;
-
-        return {
-          index,
-          collectionId: item.id,
-          datoUrl,
-          fieldPath:
-            metadata?.fieldPath ??
-            extractDatoFieldPath(datoUrl) ??
-            `collection.${index}.details.image`,
-          locale: metadata?.locale ?? null,
-          environment: metadata?.environment ?? null,
-          itemId: metadata?.itemId ?? null,
-          itemTypeId: metadata?.itemTypeId ?? null,
-          stega: rawAlt,
-          translatedAlt,
-        };
-      })
-      .filter(Boolean);
-
-    if (entries.length > 0) {
-      console.debug('[visual-editing][ProductShowcase]', entries);
-    }
-  }
 
   return (
     <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-4 md:h-screen md:grid-cols-4 md:grid-rows-2">
@@ -75,13 +39,10 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
 
       <div className="relative h-[700px] md:col-span-2 md:row-span-2 md:h-auto">
         {collection[0].details.image.responsiveImage && (
-          <div
-            data-datocms-field-path="collection.0.details.image"
-            className="absolute inset-0 h-full w-full rounded-lg object-cover"
-          >
+          <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
             <DatoImage
               fragment={collection[0].details.image.responsiveImage}
-              assetAlt={collection[0].details.image.alt}
+
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -111,14 +72,11 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
         </div>
       </div>
       {collection[1].details.image.responsiveImage && (
-        <div
-          data-datocms-field-path="collection.1.details.image"
-          className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto"
-        >
+        <div className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto">
           <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
             <DatoImage
               fragment={collection[1].details.image.responsiveImage}
-              assetAlt={collection[1].details.image.alt}
+
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -128,14 +86,11 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
         </div>
       )}
       {collection[2].details.image.responsiveImage && (
-        <div
-          data-datocms-field-path="collection.2.details.image"
-          className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto"
-        >
+        <div className="relative col-span-1 row-span-1 hidden h-64 md:block md:h-auto">
           <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
             <DatoImage
               fragment={collection[2].details.image.responsiveImage}
-              assetAlt={collection[2].details.image.alt}
+
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"

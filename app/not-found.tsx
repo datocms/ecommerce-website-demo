@@ -57,7 +57,7 @@ const NotFound = async () => {
             {notFoundImage?.responsiveImage && (
               <DatoImage
                 fragment={notFoundImage.responsiveImage}
-                assetAlt={notFoundImage.alt}
+
                 className="absolute inset-0 h-full w-full object-cover object-center"
                 objectFit="cover"
                 objectPosition="50% 50%"

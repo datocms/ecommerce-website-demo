@@ -105,7 +105,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                         {image.responsiveImage && (
                           <DatoImage
                             fragment={image.responsiveImage}
-                            assetAlt={image.alt}
+
                             className="h-full w-full object-contain"
                             layout="fill"
                             objectFit="cover"
@@ -126,7 +126,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                       {image.responsiveImage && (
                         <DatoImage
                           fragment={image.responsiveImage}
-                          assetAlt={image.alt}
+
                           className="h-full w-full object-contain"
                           layout="fill"
                           objectFit="cover"
@@ -143,7 +143,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                   {selectedImage?.responsiveImage && (
                     <DatoImage
                       fragment={selectedImage?.responsiveImage}
-                      assetAlt={selectedImage?.alt}
+
                       className="h-full w-full object-contain"
                       layout="fill"
                       objectFit="cover"

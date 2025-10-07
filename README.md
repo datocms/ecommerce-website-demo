@@ -100,8 +100,7 @@ Keep those pieces in place and the overlay survives infinite on/off cycles witho
 DatoCMS only embeds the stega payload in the original upload fields (for example `Upload.alt`), not in the Imgix-derived `responsiveImage.alt`. To make the hover overlays appear on `<img>` tags you need to preserve that upload alt end-to-end:
 
 1. **Request upload-level alt values wherever you query images.** Every GraphQL selection that pulls a `responsiveImage` should also ask for the parent `alt`. See `app/[lng]/query.graphql`, `app/[lng]/product/[slug]/query.graphql`, and the fragments under `components/Sections/**/fragment.graphql` for reference.
-2. **Thread the raw alt through your components.** The shared image wrapper (`components/DatoImage/index.tsx`) exposes an `assetAlt` prop that overrides the `responsiveImage.alt` with the upload alt before rendering. All call sites pass the value through, so the Visual Editing overlay decodes the hidden metadata when `?edit=1` is active.
-3. **Populate alt text inside DatoCMS.** Even with the overrides in place the overlay can only decode non-empty strings. Make sure editors add localized alt text to every asset that should support visual editing.
+2. **Populate alt text inside DatoCMS.** Even with the overrides in place the overlay can only decode non-empty strings. Make sure editors add localized alt text to every asset that should support visual editing.
 
 Once these three pieces are wired up, hovering any visual-edit-enabled image in draft or preview mode highlights the element and deep-links you to the exact upload record in DatoCMS when you click it.
 

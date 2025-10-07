@@ -33,7 +33,7 @@ const PopUpBanner = ({ setPopUp, popup, globalPageProps }: PropTypes) => {
           <div className="relative h-32 w-full object-cover md:h-full">
             <DatoImage
               data={popup.popupImage?.responsiveImage as ResponsiveImageType}
-              assetAlt={popup.popupImage?.alt ?? null}
+
               className="h-full w-full object-contain"
               layout="fill"
               objectFit="cover"

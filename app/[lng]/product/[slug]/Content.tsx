@@ -4,6 +4,7 @@ import QuestionsSection from '@/components/Products/Product/Blocks/QuestionsSect
 import ProductView from '@/components/Products/ProductView';
 import Reviews from '@/components/Products/Reviews';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
+import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
 import { isHeading, isList, isListItem } from 'datocms-structured-text-utils';
 import { notFound } from 'next/navigation';
 import { StructuredText, renderNodeRule } from 'react-datocms';
@@ -16,64 +17,77 @@ const Content: ContentPage<PageProps, Query> = ({
   if (!data.product) {
     notFound();
   }
+  const locale = globalPageProps.params.lng;
+  const productEditingUrl =
+    (data.product as { _editingUrl?: string | null })?._editingUrl ?? null;
+  const descriptionEditAttributes = productEditingUrl
+    ? getProductFieldEditAttributes(productEditingUrl, locale, 'description')
+    : {};
+  const descriptionWrapperProps =
+    productEditingUrl && Object.keys(descriptionEditAttributes).length > 0
+      ? { ...descriptionEditAttributes, 'data-datocms-edit-target': '' }
+      : undefined;
+
   return (
     <div className="mx-auto max-w-[1480px]">
       <ProductView data={data} globalPageProps={globalPageProps} />
       <div className="mx-12 mt-8 sm:mx-24 lg:mx-64">
         <div className="text-gray-500">
           {data.product.description && (
-            <StructuredText
-              data={data.product.description}
-              renderBlock={({ record }) => {
-                switch (record.__typename) {
-                  case 'ProductFeatureSectionRecord':
+            <div {...(descriptionWrapperProps ?? {})}>
+              <StructuredText
+                data={data.product.description}
+                renderBlock={({ record }) => {
+                  switch (record.__typename) {
+                    case 'ProductFeatureSectionRecord':
+                      return (
+                        <ProductInfoSection
+                          ProductInfoFragment={record}
+                          MaterialFragment={data.product?.material}
+                          generalInterfaceFragment={data.generalInterface}
+                          globalPageProps={globalPageProps}
+                        />
+                      );
+                    case 'FeaturedQuestionsSectionRecord':
+                      return <QuestionsSection fragment={record} />;
+                    default:
+                      return null;
+                  }
+                }}
+                customNodeRules={[
+                  renderNodeRule(isHeading, ({ children, key }) => {
                     return (
-                      <ProductInfoSection
-                        ProductInfoFragment={record}
-                        MaterialFragment={data.product?.material}
-                        generalInterfaceFragment={data.generalInterface}
-                        globalPageProps={globalPageProps}
-                      />
+                      <h3
+                        className="mb-4 mt-9 text-xl font-bold text-black dark:text-white sm:text-2xl lg:text-xl xl:text-2xl"
+                        key={key}
+                      >
+                        {children}
+                      </h3>
                     );
-                  case 'FeaturedQuestionsSectionRecord':
-                    return <QuestionsSection fragment={record} />;
-                  default:
-                    return null;
-                }
-              }}
-              customNodeRules={[
-                renderNodeRule(isHeading, ({ children, key }) => {
-                  return (
-                    <h3
-                      className="mb-4 mt-9 text-xl font-bold text-black dark:text-white sm:text-2xl lg:text-xl xl:text-2xl"
-                      key={key}
-                    >
-                      {children}
-                    </h3>
-                  );
-                }),
-                renderNodeRule(isListItem, ({ children, key }) => {
-                  return (
-                    <div
-                      key={key}
-                      className="whitespace-nowrap rounded-full bg-primary/80 px-4 py-2 text-center text-sm font-medium text-white"
-                    >
-                      <div>{children}</div>
-                    </div>
-                  );
-                }),
-                renderNodeRule(isList, ({ children, key }) => {
-                  return (
-                    <div
-                      key={key}
-                      className="-mb-4 flex flex-col items-center justify-center gap-4 py-8 md:mb-0 md:flex-row "
-                    >
-                      {children}
-                    </div>
-                  );
-                }),
-              ]}
-            />
+                  }),
+                  renderNodeRule(isListItem, ({ children, key }) => {
+                    return (
+                      <div
+                        key={key}
+                        className="whitespace-nowrap rounded-full bg-primary/80 px-4 py-2 text-center text-sm font-medium text-white"
+                      >
+                        <div>{children}</div>
+                      </div>
+                    );
+                  }),
+                  renderNodeRule(isList, ({ children, key }) => {
+                    return (
+                      <div
+                        key={key}
+                        className="-mb-4 flex flex-col items-center justify-center gap-4 py-8 md:mb-0 md:flex-row "
+                      >
+                        {children}
+                      </div>
+                    );
+                  }),
+                ]}
+              />
+            </div>
           )}
         </div>
       </div>

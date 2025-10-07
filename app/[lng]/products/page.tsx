@@ -211,6 +211,11 @@ const Page = async ({
           }
           image={singleFilter.details.image.responsiveImage}
           imageAlt={singleFilter.details.image.alt}
+          descriptionEditingUrl={
+            (singleFilter.details as { _editingUrl?: string | null })?._editingUrl ??
+            null
+          }
+          locale={lng}
         />
       )}
       <div

@@ -51,6 +51,7 @@ const Header = ({ data, globalPageProps }: Props) => {
           notification={
             data.layout?.notification as LayoutModelNotificationField
           }
+          layoutEditingUrl={data.layout?._editingUrl ?? null}
           globalPageProps={globalPageProps}
           setNotificationStrip={setNotificationStrip}
         />

@@ -20,6 +20,7 @@ query Layout(
     }
   }
   layout(locale: $locale, fallbackLocales: $fallbackLocale) {
+    ...VisualEditingFields @include(if: $visualEditing)
     copyrightText
     socialMediaLinks {
       id

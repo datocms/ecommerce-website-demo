@@ -1,5 +1,9 @@
 import type { FragmentType } from '@/graphql/types';
-import type { DatoImage_ResponsiveImageFragmentDoc } from '@/graphql/types/graphql';
+import type {
+  DatoImage_ResponsiveImageFragmentDoc,
+  SiteLocale,
+} from '@/graphql/types/graphql';
+import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
 import {
   type Record,
   type StructuredText,
@@ -23,6 +27,8 @@ type PropTypes = {
   image: Maybe<FragmentType<typeof DatoImage_ResponsiveImageFragmentDoc>>;
   imageAlt?: string | null;
   description: Maybe<StructuredText<Record, Record>>;
+  descriptionEditingUrl: string | null;
+  locale: SiteLocale;
 };
 
 const FilterDetail = ({
@@ -32,7 +38,21 @@ const FilterDetail = ({
   imageAlt,
   description,
   subtitle,
+  descriptionEditingUrl,
+  locale,
 }: PropTypes) => {
+  const descriptionEditAttributes = descriptionEditingUrl
+    ? getProductFieldEditAttributes(
+        descriptionEditingUrl,
+        locale,
+        'description',
+      )
+    : {};
+  const descriptionWrapperProps =
+    descriptionEditingUrl && Object.keys(descriptionEditAttributes).length > 0
+      ? { ...descriptionEditAttributes, 'data-datocms-edit-target': '' }
+      : undefined;
+
   return (
     <div className="relative isolate mx-auto max-w-7xl overflow-hidden bg-white px-6 py-12 lg:overflow-visible lg:px-0">
       <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -94,41 +114,44 @@ const FilterDetail = ({
         </div>
         <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-8">
           <div className="px-8 text-base leading-7 text-gray-700">
-            <StructuredTextField
-              data={description}
-              renderNode={Highlighter}
-              customNodeRules={[
-                renderNodeRule(isListItem, ({ children, key }) => {
-                  return (
-                    <div key={key} className="flex gap-x-3">
-                      <div>{children}</div>
-                    </div>
-                  );
-                }),
-                renderNodeRule(isThematicBreak, ({ children, key }) => {
-                  return (
-                    <hr
-                      key={key}
-                      className="mx-auto my-4 h-[3px] w-1/2 rounded-3xl bg-primary opacity-50"
-                    />
-                  );
-                }),
-                renderNodeRule(isList, ({ children, key }) => {
-                  return (
-                    <ul
-                      key={key}
-                      role="list"
-                      className="my-8 space-y-8 text-gray-600"
-                    >
-                      {children}
-                    </ul>
-                  );
-                }),
-              ]}
-            />
+            {description && (
+              <div {...(descriptionWrapperProps ?? {})}>
+                <StructuredTextField
+                  data={description}
+                  renderNode={Highlighter}
+                  customNodeRules={[
+                    renderNodeRule(isListItem, ({ children, key }) => {
+                      return (
+                        <div key={key} className="flex gap-x-3">
+                          <div>{children}</div>
+                        </div>
+                      );
+                    }),
+                    renderNodeRule(isThematicBreak, ({ children, key }) => {
+                      return (
+                        <hr
+                          key={key}
+                          className="mx-auto my-4 h-[3px] w-1/2 rounded-3xl bg-primary opacity-50"
+                        />
+                      );
+                    }),
+                    renderNodeRule(isList, ({ children, key }) => {
+                      return (
+                        <ul
+                          key={key}
+                          role="list"
+                          className="my-8 space-y-8 text-gray-600"
+                        >
+                          {children}
+                        </ul>
+                      );
+                    }),
+                  ]}
+                />
+              </div>
+            )}
           </div>
         </div>
-        )
       </div>
     </div>
   );

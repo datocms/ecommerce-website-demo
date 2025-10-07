@@ -56,6 +56,10 @@ query Products(
   }
 }
 
-query InitialParams($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+query InitialParams(
+  $locale: SiteLocale
+  $fallbackLocale: [SiteLocale!]
+  $visualEditing: Boolean = false
+) {
   ...InitialParams
 }

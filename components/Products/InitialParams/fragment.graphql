@@ -8,6 +8,7 @@ fragment InitialParams on Query {
     name
     _modelApiKey
     details {
+      ...VisualEditingFields @include(if: $visualEditing)
       image {
         alt
         responsiveImage {
@@ -25,6 +26,7 @@ fragment InitialParams on Query {
     name
     _modelApiKey
     details {
+      ...VisualEditingFields @include(if: $visualEditing)
       image {
         alt
         responsiveImage {
@@ -46,6 +48,7 @@ fragment InitialParams on Query {
     name
     _modelApiKey
     details {
+      ...VisualEditingFields @include(if: $visualEditing)
       image {
         alt
         responsiveImage {

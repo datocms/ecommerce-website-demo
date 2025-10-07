@@ -2,6 +2,8 @@ import SvgRenderer from '@/components/Common/SvgRenderer';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { HeroSectionFragmentDoc } from '@/graphql/types/graphql';
+import { extractDatoFieldPath } from '@/utils/datocmsVisualEditing';
+import { decodeStega, stripStega } from 'datocms-visual-editing';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 
@@ -20,6 +22,62 @@ const Hero = ({ fragment, globalPageProps }: Props) => {
     featuredCollections,
     socials,
   } = getFragmentData(HeroSectionFragmentDoc, fragment);
+
+  if (process.env.NODE_ENV !== 'production') {
+    const entries = [
+      (() => {
+        const rawAlt = heroImage.alt ?? null;
+        if (!rawAlt) return null;
+
+        const metadata = decodeStega(rawAlt);
+        const translatedAlt = stripStega(rawAlt);
+        const datoUrl = heroImage._editingUrl ?? metadata?.editUrl ?? null;
+
+        return {
+          label: 'heroImage',
+          datoUrl,
+          fieldPath:
+            metadata?.fieldPath ??
+            extractDatoFieldPath(datoUrl) ??
+            'heroImage',
+          itemId: metadata?.itemId ?? null,
+          itemTypeId: metadata?.itemTypeId ?? null,
+          locale: metadata?.locale ?? null,
+          environment: metadata?.environment ?? null,
+          stega: rawAlt,
+          translatedAlt,
+        };
+      })(),
+      (() => {
+        const rawAlt = additionalImage.alt ?? null;
+        if (!rawAlt) return null;
+
+        const metadata = decodeStega(rawAlt);
+        const translatedAlt = stripStega(rawAlt);
+        const datoUrl =
+          additionalImage._editingUrl ?? metadata?.editUrl ?? null;
+
+        return {
+          label: 'additionalImage',
+          datoUrl,
+          fieldPath:
+            metadata?.fieldPath ??
+            extractDatoFieldPath(datoUrl) ??
+            'additionalImage',
+          itemId: metadata?.itemId ?? null,
+          itemTypeId: metadata?.itemTypeId ?? null,
+          locale: metadata?.locale ?? null,
+          environment: metadata?.environment ?? null,
+          stega: rawAlt,
+          translatedAlt,
+        };
+      })(),
+    ].filter(Boolean);
+
+    if (entries.length > 0) {
+      console.debug('[visual-editing][Hero]', entries);
+    }
+  }
   return (
     <>
       <div className="mx-auto max-w-7xl bg-white pb-6 pt-14 sm:pb-8 lg:pb-12">
@@ -35,7 +93,10 @@ const Hero = ({ fragment, globalPageProps }: Props) => {
               </p>
             </div>
             <div className="mb-12 flex w-full md:mb-16 lg:w-2/3">
-              <div className="relative left-12 top-12 z-10 -ml-12 h-[550px] w-[550px] overflow-hidden rounded-lg bg-gray-100 shadow-lg md:left-16 md:top-16 lg:ml-0">
+              <div
+                data-datocms-field-path="heroImage"
+                className="relative left-12 top-12 z-10 -ml-12 h-[550px] w-[550px] overflow-hidden rounded-lg bg-gray-100 shadow-lg md:left-16 md:top-16 lg:ml-0"
+              >
                 <DatoImage
                   fragment={heroImage.responsiveImage}
                   assetAlt={heroImage.alt}
@@ -45,7 +106,10 @@ const Hero = ({ fragment, globalPageProps }: Props) => {
                 />
               </div>
 
-              <div className="h-[550px] w-[550px] overflow-hidden rounded-lg bg-gray-100 shadow-lg">
+              <div
+                data-datocms-field-path="additionalImage"
+                className="h-[550px] w-[550px] overflow-hidden rounded-lg bg-gray-100 shadow-lg"
+              >
                 <DatoImage
                   fragment={additionalImage.responsiveImage}
                   assetAlt={additionalImage.alt}

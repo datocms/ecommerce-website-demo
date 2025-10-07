@@ -2,6 +2,8 @@ import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { MaterialShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { extractDatoFieldPath } from '@/utils/datocmsVisualEditing';
+import { decodeStega, stripStega } from 'datocms-visual-editing';
 import Link from 'next/link';
 
 type Props = {
@@ -14,6 +16,40 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
     MaterialShowcaseFragmentDoc,
     fragment,
   );
+
+  if (process.env.NODE_ENV !== 'production') {
+    const entries = materials
+      .map((material, index) => {
+        const image = material.details.image;
+        if (!image || !image.alt) return null;
+
+        const rawAlt = image.alt;
+        const metadata = decodeStega(rawAlt);
+        const translatedAlt = stripStega(rawAlt);
+        const datoUrl = image._editingUrl ?? metadata?.editUrl ?? null;
+
+        return {
+          index,
+          materialId: material.id,
+          datoUrl,
+          fieldPath:
+            metadata?.fieldPath ??
+            extractDatoFieldPath(datoUrl) ??
+            `materials.${index}.details.image`,
+          locale: metadata?.locale ?? null,
+          environment: metadata?.environment ?? null,
+          itemId: metadata?.itemId ?? null,
+          itemTypeId: metadata?.itemTypeId ?? null,
+          stega: rawAlt,
+          translatedAlt,
+        };
+      })
+      .filter(Boolean);
+
+    if (entries.length > 0) {
+      console.debug('[visual-editing][MaterialShowcase]', entries);
+    }
+  }
   return (
     <div className="mx-auto mb-12 max-w-7xl bg-white px-12 lg:px-24">
       <div className="mb-12">
@@ -31,7 +67,7 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
       </div>
 
       <div className="-mx-2 flex flex-col flex-wrap lg:flex-row">
-        {materials.map((material) => {
+        {materials.map((material, index) => {
           return (
             <Link
               href={`/${globalPageProps.params.lng}/products?materials=${material.id}`}
@@ -39,7 +75,10 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
               key={material.id}
             >
               {material.details.image.responsiveImage && (
-                <div className="opacity-85 relative mb-8 block h-[300px] rounded-lg bg-black hover:bg-gray-700 md:h-[500px]">
+                <div
+                  data-datocms-field-path={`materials.${index}.details.image`}
+                  className="opacity-85 relative mb-8 block h-[300px] rounded-lg bg-black hover:bg-gray-700 md:h-[500px]"
+                >
                   <DatoImage
                     fragment={material.details.image.responsiveImage}
                     assetAlt={material.details.image.alt}

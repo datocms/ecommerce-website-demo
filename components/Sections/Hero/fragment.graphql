@@ -4,12 +4,14 @@ fragment HeroSection on HeroSectionRecord {
   heroSubtitle
   heroTitle
   heroImage {
+    _editingUrl @include(if: $visualEditing)
     alt
     responsiveImage {
       ...DatoImage_responsiveImage
     }
   }
   additionalImage {
+    _editingUrl @include(if: $visualEditing)
     alt
     responsiveImage {
       ...DatoImage_responsiveImage

@@ -10,7 +10,19 @@ type QueryDatoCMSOptions = {
   visualEditing?: boolean;
 };
 
-const fetchWithContentLinkHeaders = withContentLinkHeaders(fetch);
+const getFetchWithContentLinkHeaders = (() => {
+  let cachedClient: typeof fetch | null = null;
+  let cachedBaseEditingUrl: string | null = null;
+
+  return (baseEditingUrl: string) => {
+    if (!cachedClient || cachedBaseEditingUrl !== baseEditingUrl) {
+      cachedClient = withContentLinkHeaders(fetch, baseEditingUrl);
+      cachedBaseEditingUrl = baseEditingUrl;
+    }
+
+    return cachedClient;
+  };
+})();
 
 export default async function queryDatoCMS<
   TResult = unknown,
@@ -38,18 +50,6 @@ export default async function queryDatoCMS<
     Authorization: `Bearer ${process.env.DATOCMS_READONLY_API_TOKEN}`,
   };
 
-  if (visualEditing) {
-    const baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL;
-
-    if (!baseEditingUrl) {
-      throw new Error(
-        'Missing NEXT_PUBLIC_DATO_BASE_EDITING_URL environment variable: required when requesting `_editingUrl` fields from DatoCMS.',
-      );
-    }
-
-    headers['X-Base-Editing-Url'] = baseEditingUrl;
-  }
-
   let draftEnabled = Boolean(isDraft);
 
   if (typeof isDraft !== 'boolean') {
@@ -61,13 +61,29 @@ export default async function queryDatoCMS<
     }
   }
 
+  const includeVisualEditingMetadata = visualEditing ?? draftEnabled;
+
   if (draftEnabled) {
     headers['X-Include-Drafts'] = 'true';
   }
 
-  const fetchClient = visualEditing ? fetchWithContentLinkHeaders : fetch;
+  let baseEditingUrl: string | null = null;
 
-  const shouldBypassCache = Boolean(visualEditing) || draftEnabled;
+  if (includeVisualEditingMetadata) {
+    baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL ?? null;
+
+    if (!baseEditingUrl) {
+      throw new Error(
+        'Missing NEXT_PUBLIC_DATO_BASE_EDITING_URL environment variable: required when requesting `_editingUrl` fields from DatoCMS.',
+      );
+    }
+  }
+
+  const fetchClient = includeVisualEditingMetadata
+    ? getFetchWithContentLinkHeaders(baseEditingUrl!)
+    : fetch;
+
+  const shouldBypassCache = includeVisualEditingMetadata || draftEnabled;
 
   const response = await fetchClient('https://graphql.datocms.com/', {
     cache: shouldBypassCache ? 'no-store' : 'force-cache',

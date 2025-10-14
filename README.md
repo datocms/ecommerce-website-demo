@@ -8,105 +8,111 @@
 
 <!--datocms-autoinclude-header end-->
 
-# An Ecommerce Website Demo using Next.js 14 and DatoCMS
+# Ecommerce Visual Editing Demo (Next.js 15 + DatoCMS)
 
-This example showcases a TypeScript Next.js 14 website with App Router (app) — using [DatoCMS](https://www.datocms.com/) as the data source.
+This repository is a reference storefront that demonstrates how to deliver DatoCMS visual editing with the Next.js App Router (Next.js 15.5.x at the time of writing). The focus of this README is the visual editing experience: how it is wired, how the toggle behaves, and what you need to keep overlays working after local changes.
 
-It uses GraphQL CodeGen to type all of the requests comming from Dato automatically: [See how it works here](https://www.datocms.com/blog/how-to-generate-typescript-types-from-graphql)
+The data model, real-time subscription layer, and UI come from the standard ecommerce starter. All visual-editing-specific logic lives in the `app`, `components/preview`, `components/WithRealTimeUpdates`, and `middleware.ts` folders referenced below.
 
 ## Demo
 
-Have a look at the end result live:
+Live deployment: [https://ecommerce-website-demo-livid.vercel.app/](https://ecommerce-website-demo-livid.vercel.app/)
 
-### [https://ecommerce-website-demo-livid.vercel.app/](https://ecommerce-website-demo-livid.vercel.app/)
+## Getting Started
 
-## How to use
+1. **Clone the project** (or deploy it via the “Deploy with DatoCMS” button on the starter page).
+2. **Install dependencies** using the same package manager declared in `package.json`:
 
-### Quick start
+   ```bash
+   pnpm install
+   ```
 
-1. [Create an account on DatoCMS](https://datocms.com).
+3. **Copy environment variables**:
 
-2. Make sure that you have set up the [Github integration on Vercel](https://vercel.com/docs/git/vercel-for-github).
+   ```bash
+   cp .env.example .env.local
+   ```
 
-3. Let DatoCMS set everything up for you clicking this button below:
+   Required values:
 
-[![Deploy with DatoCMS](https://dashboard.datocms.com/deploy/button.svg)](https://dashboard.datocms.com/deploy?repo=marcelofinamorvieira%2Fecommerce-website-demo%3Amain)
+   - `DATOCMS_READONLY_API_TOKEN` – read-only Content Delivery token.
+   - `NEXT_PUBLIC_DATO_BASE_EDITING_URL` – your project dashboard URL (`https://<project>.admin.datocms.com`). Mandatory whenever a query requests `_editingUrl`.
+   - `NEXT_PUBLIC_DATO_ENVIRONMENT` – optional, only if you preview a non-default environment.
+   - Preview secrets (`DRAFT_SECRET_TOKEN`, `SEO_SECRET_TOKEN`, `CACHE_INVALIDATION_SECRET_TOKEN`) can be any random string in local development.
+   - `URL` defaults to `http://localhost:3000`; adjust if you run the dev server on another port.
 
-### Local setup
+4. **Run the development server**:
 
-Once the setup of the project and repo is done, clone the repo locally.
+   ```bash
+   pnpm dev
+   ```
 
-#### Set up environment variables
+   The site listens on [http://localhost:3000](http://localhost:3000) by default.
 
-In your DatoCMS' project, go to the **Settings** menu at the top and click **API tokens**.
+## Visual Editing Workflow
 
-Then click **Read-only API token** and copy the token.
+Visual editing only activates when three conditions are true:
 
-Next, copy the `.env.example` file in this directory to `.env.local` (which will be ignored by Git):
+1. **Draft mode** (preview cookies `__prerender_bypass` and `__next_preview_data`) is set. Visit `/api/draft?secret=<DRAFT_SECRET_TOKEN>&path=/<locale>/home` to enable it.
+2. A **base editing URL** is configured – `NEXT_PUBLIC_DATO_BASE_EDITING_URL` must point to your project dashboard so overlays can deep-link back to DatoCMS.
+3. GraphQL requests are issued with visual-editing headers. In draft mode we always request stega payloads, and the client-side controller decides whether overlays render.
 
-```bash
-cp .env.example .env.local
-```
+The toggle state is stored in `localStorage` (`datocms.visual-editing.enabled`). It defaults to “enabled” the first time you enter draft mode in a browser session and persists across navigations until you turn it off.
 
-and set the `DATOCMS_READONLY_API_TOKEN` variable as the API token you just copied.
+### Enabling overlays locally
 
-Also then set a secret token that is being used for WebPreviews, SEO Previews and Cache invalidation:
+1. Start the dev server and open `/en/home` (or another locale).
+2. Hit `/api/draft?secret=<your-secret>&path=/en/home` in the same browser session.
+3. You’ll land back on the storefront with the floating control exposed (bottom-right). Visual editing starts enabled by default; click **Disable Visual Editing** if you want to hide overlays temporarily.
 
-```
-URL=http://localhost:3000
-SEO_SECRET_TOKEN=superSecretToken
-DRAFT_SECRET_TOKEN=superSecretToken
-CACHE_INVALIDATION_SECRET_TOKEN=superSecretToken
-NEXT_PUBLIC_DATO_BASE_EDITING_URL=https://<project>.admin.datocms.com
-```
+Disabling the overlay keeps draft mode active and cleans the DOM through the controller’s built-in `disable()` + `autoCleanStegaWithin` collaboration. Re-enabling restores overlays instantly without a full remount.
 
-`NEXT_PUBLIC_DATO_BASE_EDITING_URL` needs to point to your project's DatoCMS dashboard so the Visual Editing overlay can deep link you to the exact record while you're reviewing drafts.
+### How the toggle works (and why the UI “blinks”)
 
-#### Run your project locally
+- The toggle lives in `components/ScrollToTop/index.tsx`. It calls the shared visual-editing controller directly—no URL parameters or cookies—so state persists via `localStorage` and survives client-side navigations.
+- On the server, `components/WithRealTimeUpdates/generateWrapper.tsx` always requests `_editingUrl` metadata while draft mode is on. There is no keyed remount; the controller enables/disables overlays without forcing a re-render.
+- The client bridge (`components/preview/DatoVisualEditingBridge.tsx`) instantiates `enableDatoVisualEditing({ autoEnable: false })`, delays activation with a double `requestAnimationFrame` + short timeout to avoid hydration issues, and exposes `enable/disable/toggle` helpers to the rest of the app.
+- When you disable overlays, the bridge parks the controller, starts `autoCleanStegaWithin(document, { observe: true })` to keep stega markers scrubbed, and updates the `<html>` dataset for DevTools inspection. Re-enabling cancels the cleaner and reuses the same controller instance, so overlays resume instantly.
 
-```bash
-npm install
-npm run dev
-```
+### Middleware responsibilities
 
-Your blog should be up and running on [http://localhost:3000](http://localhost:3000)!
+`middleware.ts` now focuses solely on locale routing:
 
-### Preview & Visual Editing
+- Normalises locales and redirects bare paths to the correct locale.
+- Leaves visual editing to the client controller—no query parameters, cookies, or custom headers required.
 
-Follow this exact checklist whenever you wire up or test Visual Editing locally. Skipping a step is the fastest way to hit the “works once, then breaks after disabling” trap.
+### Key files to inspect
 
-1. **Set the required environment variables.** In `.env.local` you need *both* `DATOCMS_READONLY_API_TOKEN=<token>` and `NEXT_PUBLIC_DATO_BASE_EDITING_URL=https://<project>.admin.datocms.com`. The second one is mandatory whenever a GraphQL query requests `_editingUrl`; without it DatoCMS rejects the request once the overlay is re-enabled.
-2. **Enter draft mode with the edit flag.** Visit `/api/draft?secret=YOUR_DRAFT_SECRET&path=/?edit=1`. This sets the preview cookies, adds `?edit=1`, and ensures our middleware writes the `datocms-visual-editing=1` cookie.
-3. **Verify the special headers are present.** While draft mode is active the app automatically includes:
-   - `X-Visual-Editing: vercel-v1`
-   - `X-Base-Editing-Url: https://<project>.admin.datocms.com`
-   You can confirm this in your browser’s network tab on any DatoCMS GraphQL request.
-4. **Toggle visual editing from the in-app control.** Use the floating “Enable Visual Editing” button (above “Enter Published Mode”) to turn overlays off and on. This control only does a soft navigation, so metadata stays warm and overlays light up immediately when you re-enable them.
-5. **After toggling off, toggle back on without a full reload.** If the overlay still highlights elements, your environment is configured correctly. If it doesn’t, re-check steps 1–3—most failures are missing headers or stripped stega markup.
+- `components/ScrollToTop/index.tsx` – floating controls for draft mode and the new controller-driven visual-editing toggle.
+- `components/preview/DatoVisualEditingBridge.tsx` – client-side glue that powers the controller, persists state, and coordinates DOM cleanup.
+- `components/WithRealTimeUpdates/generateWrapper.tsx` – central wrapper that always requests `_editingUrl` metadata in draft mode.
+- `utils/queryDatoCMS.ts` – attaches `withContentLinkHeaders` automatically when metadata is requested.
+- `middleware.ts` – locale routing only.
 
-#### Preventing stale overlays after toggling off/on
+### Responsive images & stega data
 
-This project ships with the safeguards already in place. If you customize the code, keep these rules intact so Visual Editing keeps working after you disable and re-enable it:
+DatoCMS stores stega payloads on the original upload fields (`Upload.alt`, structured text, etc.). To keep overlays working on responsive images:
 
-- **Never request `_editingUrl` unless `visualEditing: true`.** All queries use the `...VisualEditingFields @include(if: $visualEditing)` fragment and the page wrappers only set that flag when draft mode or the `datocms-visual-editing=1` cookie is active. Removing that guard will trigger the GraphQL error mentioned above.
-- **Do not strip stega data while overlays are enabled.** Components such as `components/Common/StegaText.tsx` only call `stripStega` when visual editing is off. Keep that behaviour so the hidden markers survive a toggle.
-- **Leave the client toggle logic intact.** `components/ScrollToTop/index.tsx` updates the query param and cookie with `router.replace` + `router.refresh()` instead of forcing a full reload. Reuse that pattern for any custom toggles so the existing metadata stays cached.
-- **Mount the overlay once per page.** `components/preview/DatoContentLinkClient.tsx` calls `enableDatoVisualEditing` with `persistAfterClean: true`, which stops the observer from auto-cleaning metadata on mount. Make sure your layout continues to mount this component whenever draft mode is enabled.
+- Request both the upload `alt` and the `responsiveImage` fragment.
+- Render the decoded string directly (do not call `stripStega`).
+- Ensure editors populate alt text for every asset that should be editable.
 
-Keep those pieces in place and the overlay survives infinite on/off cycles without requiring a hard refresh.
+## Troubleshooting
 
-### Visual Editing on responsive images
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| Overlay never enables | Missing `NEXT_PUBLIC_DATO_BASE_EDITING_URL` or draft mode cookies | Verify `.env.local`, restart dev server, re-run `/api/draft?...` |
+| Overlay enables once, then fails after toggling | `_editingUrl` requested when `visualEditing` is false, or bridge not mounted | Check GraphQL fragments for `@include(if: $visualEditing)` and confirm the bridge is rendered in `app/layout.tsx` |
+| Hydration failed / flashing debug markup | Overlay booted before hydration finished | Ensure you are on the current bridge implementation; it already delays activation. If you changed it, restore the double `requestAnimationFrame` + timeout combination |
+| Overlays disabled themselves after leaving draft mode | Previous session stored “disabled” in localStorage | Clear the `datocms.visual-editing.enabled` key or re-enable the toggle once you re-enter draft mode |
 
-DatoCMS only embeds the stega payload in the original upload fields (for example `Upload.alt`), not in the Imgix-derived `responsiveImage.alt`. To make the hover overlays appear on `<img>` tags you need to preserve that upload alt end-to-end:
+## Contributing
 
-1. **Request upload-level alt values wherever you query images.** Every GraphQL selection that pulls a `responsiveImage` should also ask for the parent `alt`. See `app/[lng]/query.graphql`, `app/[lng]/product/[slug]/query.graphql`, and the fragments under `components/Sections/**/fragment.graphql` for reference.
-2. **Populate alt text inside DatoCMS.** Even with the overrides in place the overlay can only decode non-empty strings. Make sure editors add localized alt text to every asset that should support visual editing.
+Pull requests that improve the visual editing UX are welcome. Please run `pnpm lint` before committing and include reproduction steps for any visual editing changes so we can verify overlay behaviour across locales and devices.
 
-Once these three pieces are wired up, hovering any visual-edit-enabled image in draft or preview mode highlights the element and deep-links you to the exact upload record in DatoCMS when you click it.
+## Editor Tooling
 
-## VS Code
-
-It's strongly suggested to install the [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql) extension, to get autocomplete suggestions, validation against schema, and many more niceties when working with your GraphQL queries.
+For a better authoring experience install the [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql) extension. It provides schema-aware completions for the generated `.graphql` documents used throughout this repo.
 
 <!--datocms-autoinclude-footer start-->
 

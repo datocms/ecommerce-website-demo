@@ -56,7 +56,7 @@
 
 ### 5. Validation
 - [ ] `pnpm dev`: smoke-test core flows (home, product detail, legal pages) in local draft/preview mode.
-- [ ] Validate draft enable/disable routes and visual editing toggles; ensure cookies still set correctly in iframe use.
+- [ ] Validate draft enable/disable routes and the controller-based visual editing toggle; confirm localStorage persistence works in iframe/use-embed scenarios.
 - [ ] `pnpm build && pnpm start`: verify production build success.
 - [ ] Run existing automated tests (if added) or add targeted tests for critical paths.
 - [ ] Confirm Netlify (or other CI) build succeeds with upgraded dependencies.

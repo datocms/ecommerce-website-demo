@@ -1,6 +1,6 @@
 import ScrollToTop from '@/components/ScrollToTop';
 import '@/styles/global.css';
-import DatoContentLinkClient from '@/components/preview/DatoContentLinkClient';
+import DatoVisualEditingBridge from '@/components/preview/DatoVisualEditingBridge';
 import type {
   AsyncGlobalPageProps,
   GlobalPageProps,
@@ -18,6 +18,7 @@ export default async function RootLayout({ children, params }: Params) {
   const lng = resolvedParams?.lng ?? 'en';
   const { isEnabled: isDraft } = await draftMode();
   const baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL;
+  const datoEnvironment = process.env.NEXT_PUBLIC_DATO_ENVIRONMENT;
 
   return (
     <html lang={lng}>
@@ -25,8 +26,12 @@ export default async function RootLayout({ children, params }: Params) {
         {children}
         <Suspense fallback={null}>
           <ScrollToTop isDraft={isDraft} />
-          {isDraft && baseEditingUrl ? (
-            <DatoContentLinkClient baseEditingUrl={baseEditingUrl} />
+          {baseEditingUrl ? (
+            <DatoVisualEditingBridge
+              baseEditingUrl={baseEditingUrl}
+              environment={datoEnvironment}
+              isDraft={isDraft}
+            />
           ) : null}
         </Suspense>
       </body>

@@ -2,9 +2,10 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { startTransition, useState } from 'react';
+import { useState } from 'react';
 import AuthenticationModal from '../Header/AuthenticationModal';
 import SuccessPopUp from '../Header/SuccessPopUp';
+import { useDatoVisualEditing } from '../preview/DatoVisualEditingBridge';
 
 type Props = {
   isDraft: boolean;
@@ -16,40 +17,20 @@ export default function ScrollToTop({ isDraft }: Props) {
   const searchParams = useSearchParams();
   const [modalOpen, setModalOpen] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
-  const isVisualEditingActive = searchParams?.get('edit') === '1';
-  const visualEditingCookieName = 'datocms-visual-editing';
-  const thirtyDaysInSeconds = 60 * 60 * 24 * 30;
+  const visualEditing = useDatoVisualEditing();
 
   async function toggleDraft() {
-    if (isDraft) {
-      const params = new URLSearchParams(searchParams?.toString());
-      params.delete('edit');
-      const query = params.toString();
-      const nextUrl = query ? `${pathname}?${query}` : pathname;
-
-      await fetch('/api/draft/disable');
-      window.location.href = nextUrl;
-    } else setModalOpen(true);
-  }
-
-  function toggleVisualEditing() {
     const params = new URLSearchParams(searchParams?.toString());
-
-    if (isVisualEditingActive) {
-      params.delete('edit');
-      document.cookie = `${visualEditingCookieName}=0; Path=/; Max-Age=0; SameSite=Lax`;
-    } else {
-      params.set('edit', '1');
-      document.cookie = `${visualEditingCookieName}=1; Path=/; Max-Age=${thirtyDaysInSeconds}; SameSite=Lax`;
-    }
-
+    params.delete('edit');
     const query = params.toString();
     const nextUrl = query ? `${pathname}?${query}` : pathname;
 
-    startTransition(() => {
-      router.replace(nextUrl, { scroll: false });
-      router.refresh();
-    });
+    if (isDraft) {
+      await fetch('/api/draft/disable');
+      window.location.href = nextUrl;
+    } else {
+      setModalOpen(true);
+    }
   }
 
   const triggerSuccessToast = () => {
@@ -100,21 +81,28 @@ export default function ScrollToTop({ isDraft }: Props) {
           className="flex flex-col gap-3"
         >
           {isDraft ? (
-            <div
-              onClick={toggleVisualEditing}
-              className="flex cursor-pointer items-center justify-center rounded-md bg-[#FF7751] p-4 font-bold text-white shadow-md transition duration-300 ease-in-out hover:bg-[#ff8f6f] hover:shadow-signUp"
+            <button
+              type="button"
+              onClick={visualEditing.toggle}
+              disabled={!visualEditing.ready}
+              className={`flex items-center justify-center rounded-md p-4 font-bold text-white shadow-md transition duration-300 ease-in-out ${
+                visualEditing.ready
+                  ? 'cursor-pointer bg-[#FF7751] hover:bg-[#ff8f6f] hover:shadow-signUp'
+                  : 'cursor-not-allowed bg-[#FF7751]/60'
+              }`}
             >
-              {isVisualEditingActive
+              {visualEditing.enabled
                 ? 'Disable Visual Editing'
                 : 'Enable Visual Editing'}
-            </div>
+            </button>
           ) : null}
-          <div
+          <button
+            type="button"
             onClick={toggleDraft}
             className="flex cursor-pointer items-center justify-center rounded-md bg-primary p-4 font-bold text-white shadow-md transition duration-300 ease-in-out hover:bg-opacity-80 hover:shadow-signUp"
           >
             {isDraft ? 'Enter Published Mode' : 'Enter Draft Mode'}
-          </div>
+          </button>
         </div>
       </motion.div>
     </>

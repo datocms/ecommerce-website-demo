@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic';
 
 import { getFallbackLocale } from '@/app/i18n/settings';
 import SideFilter from '@/components/Common/SideFilter';
-import StegaText from '@/components/Common/StegaText';
 import DatoImage from '@/components/DatoImage';
 import FilterDetail from '@/components/Products/FilterDetail';
 import Pagination from '@/components/Products/Pagination';
@@ -23,7 +22,7 @@ import type {
   StructuredText,
 } from 'datocms-structured-text-utils';
 import { stripStega } from 'datocms-visual-editing';
-import { draftMode, headers } from 'next/headers';
+import { draftMode } from 'next/headers';
 import Link from 'next/link';
 
 type PageProps = GlobalPageProps & {
@@ -34,7 +33,6 @@ type PageProps = GlobalPageProps & {
     collections?: string;
     brands?: string;
     materials?: string;
-    edit?: string;
   };
 };
 
@@ -47,7 +45,6 @@ type ProductsSearchParams =
       collections?: string;
       brands?: string;
       materials?: string;
-      edit?: string;
     };
 
 const Page = async ({
@@ -84,22 +81,7 @@ const Page = async ({
     ProductModelOrderBy.CreatedAtAsc;
   const nameSearch = firstValue(searchParamsRecord?.productName) ?? '';
 
-  const parseVisualEditingToggle = (value: string | undefined | null) => {
-    if (!value) return undefined;
-    const normalized = value.toLowerCase();
-    if (['1', 'true', 'on'].includes(normalized)) return true;
-    if (['0', 'false', 'off'].includes(normalized)) return false;
-    return undefined;
-  };
-
-  const rawEditParam = firstValue(searchParamsRecord?.edit);
-  const paramToggle = parseVisualEditingToggle(rawEditParam ?? undefined);
-  const requestHeaders = headers();
-  const headerToggle = parseVisualEditingToggle(
-    requestHeaders.get('x-datocms-visual-editing'),
-  );
-  const visualEditingEnabled = paramToggle ?? headerToggle ?? false;
-  const includeVisualEditingMetadata = isEnabled || visualEditingEnabled;
+  const includeVisualEditingMetadata = isEnabled;
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
@@ -271,11 +253,9 @@ const Page = async ({
                       )}
 
                       {isOnSale && (
-                        <StegaText
-                          as="span"
-                          className="absolute left-0 top-3 rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white"
-                          value={sale ?? ''}
-                        />
+                        <span className="absolute left-0 top-3 rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
+                          {sale ?? ''}
+                        </span>
                       )}
                     </Link>
 
@@ -285,45 +265,41 @@ const Page = async ({
                           href="#"
                           className="lg:text-md overflow-hidden font-bold text-gray-800 transition duration-100 hover:text-gray-500"
                         >
-                          <StegaText value={product.name ?? ''} />
+                          {product.name ?? ''}
                         </a>
-                        <StegaText
-                          as="span"
-                          className="text-sm text-gray-500"
-                          value={product.brand?.name ?? ''}
-                        />
+                        <span className="text-sm text-gray-500">
+                          {product.brand?.name ?? ''}
+                        </span>
                       </div>
 
                       {isOnSale && (
                         <div className="flex flex-col items-end gap-2">
-                          <StegaText
-                            as="span"
+                          <span
                             className="text-xl font-bold text-gray-800 md:text-xl"
-                            value={`${currencySymbol ?? ''}${
-                              product.salePrice ?? ''
-                            }`}
                             {...salePriceEditAttributes}
                             data-datocms-edit-target
-                          />
-                          <StegaText
-                            as="span"
+                          >
+                            {`${currencySymbol ?? ''}${product.salePrice ?? ''}`}
+                          </span>
+                          <span
                             className="mb-0.5 text-red-500 line-through"
-                            value={`${currencySymbol ?? ''}${product.price ?? ''}`}
                             {...priceEditAttributes}
                             data-datocms-edit-target
-                          />
+                          >
+                            {`${currencySymbol ?? ''}${product.price ?? ''}`}
+                          </span>
                         </div>
                       )}
 
                       {!isOnSale && (
                         <div className="flex items-end gap-2">
-                          <StegaText
-                            as="span"
+                          <span
                             className="text-xl font-bold text-gray-800 md:text-xl"
-                            value={`${currencySymbol ?? ''}${product.price ?? ''}`}
                             {...priceEditAttributes}
                             data-datocms-edit-target
-                          />
+                          >
+                            {`${currencySymbol ?? ''}${product.price ?? ''}`}
+                          </span>
                         </div>
                       )}
                     </div>

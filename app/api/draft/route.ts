@@ -16,9 +16,5 @@ export async function GET(req: Request) {
   const baseUrl = process.env.URL || 'http://localhost:3000';
   const url = new URL(path, baseUrl);
 
-  if (!url.searchParams.has('edit')) {
-    url.searchParams.set('edit', '1');
-  }
-
   return NextResponse.redirect(url);
 }

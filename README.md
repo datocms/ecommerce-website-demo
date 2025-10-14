@@ -57,22 +57,22 @@ Visual editing only activates when three conditions are true:
 2. A **base editing URL** is configured – `NEXT_PUBLIC_DATO_BASE_EDITING_URL` must point to your project dashboard so overlays can deep-link back to DatoCMS.
 3. GraphQL requests are issued with visual-editing headers. In draft mode we always request stega payloads, and the client-side controller decides whether overlays render.
 
-The toggle state is stored in `localStorage` (`datocms.visual-editing.enabled`). It defaults to “enabled” the first time you enter draft mode in a browser session and persists across navigations until you turn it off.
+The toggle state is stored in `localStorage` (`datocms.visual-editing.enabled`). It defaults to “disabled” the first time you enter draft mode in a browser session and persists across navigations until you turn it on.
 
 ### Enabling overlays locally
 
 1. Start the dev server and open `/en/home` (or another locale).
 2. Hit `/api/draft?secret=<your-secret>&path=/en/home` in the same browser session.
-3. You’ll land back on the storefront with the floating control exposed (bottom-right). Visual editing starts enabled by default; click **Disable Visual Editing** if you want to hide overlays temporarily.
+3. You’ll land back on the storefront with the floating control exposed (bottom-right). Visual editing stays off until you enable it manually; click **Enable Visual Editing** when you’re ready to see overlays.
 
-Disabling the overlay keeps draft mode active and cleans the DOM through the controller’s built-in `disable()` + `autoCleanStegaWithin` collaboration. Re-enabling restores overlays instantly without a full remount.
+Disabling the overlay keeps draft mode active while hiding the overlays. Re-enabling restores them instantly without a full remount.
 
 ### How the toggle works (and why the UI “blinks”)
 
 - The toggle lives in `components/ScrollToTop/index.tsx`. It calls the shared visual-editing controller directly—no URL parameters or cookies—so state persists via `localStorage` and survives client-side navigations.
 - On the server, `components/WithRealTimeUpdates/generateWrapper.tsx` always requests `_editingUrl` metadata while draft mode is on. There is no keyed remount; the controller enables/disables overlays without forcing a re-render.
 - The client bridge (`components/preview/DatoVisualEditingBridge.tsx`) instantiates `enableDatoVisualEditing({ autoEnable: false })`, delays activation with a double `requestAnimationFrame` + short timeout to avoid hydration issues, and exposes `enable/disable/toggle` helpers to the rest of the app.
-- When you disable overlays, the bridge parks the controller, starts `autoCleanStegaWithin(document, { observe: true })` to keep stega markers scrubbed, and updates the `<html>` dataset for DevTools inspection. Re-enabling cancels the cleaner and reuses the same controller instance, so overlays resume instantly.
+- When you disable overlays, the bridge simply parks the controller and updates the `<html>` dataset for DevTools inspection; all stega metadata remains available so re-enabling overlays is instantaneous.
 
 ### Middleware responsibilities
 

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import {
-  autoCleanStegaWithin,
   decodeStega,
   enableDatoVisualEditing,
   type VisualEditingController,
@@ -37,7 +36,6 @@ let snapshot: VisualEditingSnapshot = {
 };
 
 let controller: VisualEditingController | null = null;
-let disposeAutoClean: (() => void) | null = null;
 let firstFrame: number | null = null;
 let secondFrame: number | null = null;
 let enableTimeout: number | null = null;
@@ -105,20 +103,6 @@ const setDocumentState = (state: 'enabled' | 'disabled') => {
   documentElement.dataset.datocmsVisualEditingDebug = DEBUG ? 'on' : 'off';
 };
 
-const cancelAutoClean = () => {
-  if (disposeAutoClean) {
-    disposeAutoClean();
-    disposeAutoClean = null;
-  }
-};
-
-const ensureAutoClean = () => {
-  if (typeof document === 'undefined') return;
-  if (disposeAutoClean) return;
-
-  disposeAutoClean = autoCleanStegaWithin(document, { observe: true });
-};
-
 const clearPendingEnable = () => {
   if (typeof window === 'undefined') return;
 
@@ -138,8 +122,10 @@ const clearPendingEnable = () => {
   }
 };
 
-const updateEnabledFromController = () => {
-  updateSnapshot({ enabled: controller?.isEnabled() ?? false });
+const syncEnabledState = () => {
+  const enabled = controller?.isEnabled() ?? false;
+  setDocumentState(enabled ? 'enabled' : 'disabled');
+  updateSnapshot({ enabled });
 };
 
 const readPreference = () => {
@@ -169,10 +155,8 @@ const persistPreference = (enabled: boolean) => {
 const runEnable = () => {
   if (!controller) return;
 
-  cancelAutoClean();
   controller.enable();
-  setDocumentState('enabled');
-  updateEnabledFromController();
+  syncEnabledState();
   persistPreference(true);
 };
 
@@ -181,8 +165,7 @@ const scheduleEnable = () => {
   if (!controller) return;
 
   if (controller.isEnabled()) {
-    setDocumentState('enabled');
-    updateEnabledFromController();
+    syncEnabledState();
     persistPreference(true);
     return;
   }
@@ -204,7 +187,7 @@ const scheduleEnable = () => {
   });
 };
 
-// Disable overlays and keep stega markers scrubbed via AutoClean.
+// Disable overlays without touching the underlying stega metadata.
 const runDisable = () => {
   if (!controller) return;
 
@@ -212,9 +195,7 @@ const runDisable = () => {
   if (controller.isEnabled()) {
     controller.disable();
   }
-  setDocumentState('disabled');
-  ensureAutoClean();
-  updateEnabledFromController();
+  syncEnabledState();
   persistPreference(false);
 };
 
@@ -267,7 +248,6 @@ export default function DatoVisualEditingBridge({
 
     if (!baseEditingUrl || !isDraft) {
       clearPendingEnable();
-      cancelAutoClean();
       clearDocumentState();
       clearDecode();
       disposeCurrentController();
@@ -287,10 +267,12 @@ export default function DatoVisualEditingBridge({
     setDocumentState('disabled');
 
     const preference = readPreference();
+    const shouldEnable = preference === true;
+    const shouldDisable = preference === false;
 
-    if (preference ?? true) {
+    if (shouldEnable) {
       scheduleEnable();
-    } else {
+    } else if (shouldDisable) {
       runDisable();
     }
 
@@ -298,7 +280,6 @@ export default function DatoVisualEditingBridge({
       clearPendingEnable();
       visualEditing.dispose();
       registerController(null);
-      cancelAutoClean();
       clearDocumentState();
       clearDecode();
     };

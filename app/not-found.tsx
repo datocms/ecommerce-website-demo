@@ -33,6 +33,8 @@ const NotFound = () => {
                 loading="lazy"
                 alt="A person stands behind a red-tinted, foggy surface with hands pressed against it, wearing a cap and jacket."
                 className="absolute inset-0 h-full w-full object-cover object-center"
+                width={600}
+                height={752}
               />
             </div>
           </div>

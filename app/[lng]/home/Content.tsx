@@ -1,3 +1,5 @@
+'use client';
+
 import DividerSection from '@/components/Sections/DividerSection';
 import Hero from '@/components/Sections/Hero';
 import MaterialShowcase from '@/components/Sections/MaterialShowcase';
@@ -7,12 +9,18 @@ import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { notFound } from 'next/navigation';
 import type { PageProps, Query } from './meta';
 
-const Content: ContentPage<PageProps, Query> = ({
+type ContentViewProps = PageProps & {
+  data: Query;
+};
+
+// Pure view that assumes data has already been validated. We reuse this from the
+// client realtime wrapper so overlays stay consistent across renders.
+export function HomeContentView({
   data,
   ...globalPageProps
-}) => {
+}: ContentViewProps) {
   if (!data.home) {
-    notFound();
+    return null;
   }
 
   return (
@@ -63,6 +71,15 @@ const Content: ContentPage<PageProps, Query> = ({
       })}
     </>
   );
+}
+
+// Server component: guard against missing data and render the shared view.
+const Content: ContentPage<PageProps, Query> = (props) => {
+  if (!props.data.home) {
+    notFound();
+  }
+
+  return <HomeContentView {...props} />;
 };
 
 export default Content;

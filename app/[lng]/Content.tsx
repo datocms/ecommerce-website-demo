@@ -5,11 +5,14 @@ import Meta from '@/components/Meta';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
 
-const Content: ContentPage<PageProps, Query> = ({
+// Shared layout view: reused by both server and client renderers.
+export function LayoutContentView({
   data,
   children,
   ...globalPageProps
-}) => {
+}: PageProps & {
+  data: Query;
+}) {
   return (
     <>
       <Meta data={data} />
@@ -23,6 +26,11 @@ const Content: ContentPage<PageProps, Query> = ({
       <Footer globalPageProps={globalPageProps} data={data} />
     </>
   );
+}
+
+// Server component entry point.
+const Content: ContentPage<PageProps, Query> = (props) => {
+  return <LayoutContentView {...props} />;
 };
 
 export default Content;

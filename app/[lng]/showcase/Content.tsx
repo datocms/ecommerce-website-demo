@@ -1,17 +1,22 @@
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageType } from 'react-datocms';
 import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
+import { notFound } from 'next/navigation';
 import type { PageProps, Query } from './meta';
 
-const Content: ContentPage<PageProps, Query> = ({
+type ShowcaseContentViewProps = PageProps & {
+  data: Query;
+};
+
+// Shared view between server render and client realtime layer.
+export function ShowcaseContentView({
   data,
   ...globalPageProps
-}) => {
+}: ShowcaseContentViewProps) {
   if (!data.showcase) {
-    notFound();
+    return null;
   }
 
   const [firstNewProduct, secondNewProduct] = data.showcase.newProducts;
@@ -60,7 +65,6 @@ const Content: ContentPage<PageProps, Query> = ({
               data={
                 data.showcase.displays[0].responsiveImage as ResponsiveImageType
               }
-
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -72,7 +76,6 @@ const Content: ContentPage<PageProps, Query> = ({
               data={
                 data.showcase.displays[1].responsiveImage as ResponsiveImageType
               }
-
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -116,7 +119,6 @@ const Content: ContentPage<PageProps, Query> = ({
                         collection.details.image
                           .responsiveImage as ResponsiveImageType
                       }
-
                       className="h-full w-full rounded-lg object-contain"
                       layout="fill"
                       objectFit="cover"
@@ -144,7 +146,6 @@ const Content: ContentPage<PageProps, Query> = ({
                   firstNewProduct.productImages[0]
                     .responsiveImage as ResponsiveImageType
                 }
-
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -153,7 +154,7 @@ const Content: ContentPage<PageProps, Query> = ({
             </div>
             <div className="pt-6">
               <h3>{firstNewProduct.name}</h3>
-              <div className="">
+              <div>
                 <span
                   {...(firstProductIsOnSale
                     ? firstProductSalePriceAttributes
@@ -188,7 +189,6 @@ const Content: ContentPage<PageProps, Query> = ({
                   secondNewProduct.productImages[0]
                     .responsiveImage as ResponsiveImageType
                 }
-
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -197,7 +197,7 @@ const Content: ContentPage<PageProps, Query> = ({
             </div>
             <div className="pt-6">
               <h3>{secondNewProduct.name}</h3>
-              <div className="">
+              <div>
                 <span
                   {...(secondProductIsOnSale
                     ? secondProductSalePriceAttributes
@@ -236,7 +236,6 @@ const Content: ContentPage<PageProps, Query> = ({
                   data.showcase.materialsDisplay[0]
                     .responsiveImage as ResponsiveImageType
                 }
-
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -251,7 +250,6 @@ const Content: ContentPage<PageProps, Query> = ({
                   data.showcase.materialsDisplay[1]
                     .responsiveImage as ResponsiveImageType
                 }
-
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -268,6 +266,15 @@ const Content: ContentPage<PageProps, Query> = ({
       </div>
     </div>
   );
+}
+
+// Server guard to keep control-flow helpers (`notFound`) on the server.
+const Content: ContentPage<PageProps, Query> = (props) => {
+  if (!props.data.showcase) {
+    notFound();
+  }
+
+  return <ShowcaseContentView {...props} />;
 };
 
 export default Content;

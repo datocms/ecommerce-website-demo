@@ -28,6 +28,7 @@ export function generateWrapper<
   buildVariables?: BuildVariablesFn<PageProps, TVariables>;
   contentComponent: ContentPage<PageProps, TResult>;
   realtimeComponent: RealtimeUpdatesPage<PageProps, TResult, TVariables>;
+  onData?: (data: TResult, context: { pageProps: PageProps }) => void;
 }) {
   return async function Page(
     unsanitizedPageProps: AsyncPageProps<PageProps>,
@@ -75,19 +76,40 @@ export function generateWrapper<
       visualEditing: includeVisualEditingMetadata,
     });
 
-    const { realtimeComponent: RealTime, contentComponent: Content } = options;
+    options.onData?.(data, { pageProps });
 
-    return isDraft ? (
-      <Fragment>
+    const Content = options.contentComponent;
+    const RealTime = options.realtimeComponent;
+    const previewToken = process.env.DATOCMS_READONLY_API_TOKEN;
+    const environment = process.env.NEXT_PUBLIC_DATO_ENVIRONMENT;
+    const baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL;
+
+    if (isDraft) {
+      if (!previewToken) {
+        throw new Error(
+          'Draft mode requires DATOCMS_READONLY_API_TOKEN to be set.',
+        );
+      }
+      if (!baseEditingUrl) {
+        throw new Error(
+          'Draft mode requires NEXT_PUBLIC_DATO_BASE_EDITING_URL to be set when requesting `_editingUrl`.',
+        );
+      }
+
+      return (
         <RealTime
-          token={process.env.DATOCMS_READONLY_API_TOKEN || ''}
+          token={previewToken}
           query={options.query}
           variables={variables}
           initialData={data}
           pageProps={pageProps}
+          environment={environment}
+          baseEditingUrl={baseEditingUrl}
         />
-      </Fragment>
-    ) : (
+      );
+    }
+
+    return (
       <Fragment>
         <Content {...pageProps} data={data} />
       </Fragment>

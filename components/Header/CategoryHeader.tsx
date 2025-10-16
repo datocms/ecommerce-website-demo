@@ -42,7 +42,7 @@ export default function CategoryHeader({
   const [open, setOpen] = useState(false);
   const [searchIsOpen, setSerachIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(
-    searchParams.get('productName') ?? '',
+    searchParams?.get('productName') ?? '',
   );
   const [cartIsOpen, setCartIsOpen] = useState(false);
   const router = useRouter();

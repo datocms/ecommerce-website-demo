@@ -97,6 +97,58 @@ DatoCMS stores stega payloads on the original upload fields (`Upload.alt`, struc
 - Render the decoded string directly (do not call `stripStega`).
 - Ensure editors populate alt text for every asset that should be editable.
 
+## Realtime Updates + Visual Editing (App Router)
+
+DatoCMS’ realtime Listen API can run alongside Visual Editing overlays as long as the initial markup still comes from the server. The pattern used in this demo keeps the server in charge of fetching stega-rich data, and adds a thin client “island” that streams updates without triggering page refreshes.
+
+### Why a server-first render?
+
+- `queryDatoCMS` (and `withContentLinkHeaders`) already attach the `X-Base-Editing-Url` header and return `_editingUrl` metadata; Visual Editing breaks if those headers are missing even once.
+- Server components stay free to call `draftMode()`, `notFound()`, and locale helpers.
+- The Visual Editing bridge expects the DOM it hydrates to contain stega attributes. Replaying the same React view on the client ensures overlays stay aligned as data changes.
+
+### Implementation checklist
+
+1. **Keep the page layout as a Server Component**  
+   - Example: `app/[lng]/home/Content.tsx` calls `notFound()` and renders `HomeContentView`.  
+   - This component receives GraphQL data from `generateWrapper` and runs exactly once per request.
+
+2. **Extract a pure “view” function**  
+   - Share the JSX that renders the page (`HomeContentView`, `ProductContentView`, etc.) so the server and client paths use identical markup and keep stega attributes intact.
+
+3. **Create a lightweight client wrapper**  
+   - Example: `app/[lng]/home/LiveContent.tsx` simply re-exports the shared view with `'use client'`.  
+   - These files never fetch data; they just render the payload received from the realtime stream.
+
+4. **Wrap the route with `generateWrapper` and `generateRealtimeComponent`**  
+   - `generateWrapper` (server) fetches preview data, ensures `_editingUrl` is requested, and passes it to the realtime component whenever draft mode is enabled.  
+   - `generateRealtimeComponent` returns a small client component that renders once with the server payload and then calls `useDatoVisualEditingListen` to keep the DOM in sync with Dato’s SSE stream.  
+   - Because the same DOM node is reused, the visual-editing controller can simply refresh the tree—no duplicate “fallback” markup is needed.
+
+5. **Provide draft-only realtime bridges**  
+   - Each route exports a `RealTime.tsx` client component (e.g. `app/[lng]/home/RealTime.tsx`) that passes the client view to `generateRealtimeComponent`.
+
+6. **Ensure the Listen subscription sends `X-Base-Editing-Url`**
+   - `components/WithRealTimeUpdates/index.tsx` wraps the Listen fetcher so the preview stream includes `_editingUrl` on every payload.
+   - The component merges new data into React state and re-renders children without calling `router.refresh()`.
+   - The fallback server markup stays visible until visual editing overlays are enabled, guaranteeing the bridge always finds stega-rich DOM before the client hand-off.
+
+7. **Expose the preview token only in draft mode**  
+   - `generateWrapper` guards the client listener with `isDraft && DATOCMS_READONLY_API_TOKEN` so production bundles never ship secrets.
+
+### Files to study
+
+- `components/WithRealTimeUpdates/index.tsx` — client listener that keeps the Listen stream in sync with overlays.
+- `components/WithRealTimeUpdates/generateWrapper.tsx` — server wrapper that builds GraphQL variables, fetches draft data, and mounts the listener only when needed.
+- `app/[lng]/**/LiveContent.tsx` — minimal client renderers that reuse their server counterparts’ JSX.
+- `app/[lng]/**/RealTime.tsx` — per-route client bridges wired up by `generateRealtimeComponent`.
+
+### Common pitfalls
+
+- Forgetting to request `_editingUrl` or to pass the same fragments to the Listen query causes overlays to disappear after the first live update.
+- Replacing DOM elements wholesale in the client wrapper (instead of updating props) can detach overlays. Stick to the shared view pattern so React only patches content.
+- Running the listener without `NEXT_PUBLIC_DATO_BASE_EDITING_URL` or a preview-capable token will surface errors in the console and stop updates.
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |

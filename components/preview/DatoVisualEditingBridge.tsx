@@ -7,6 +7,13 @@ import {
   type VisualEditingController,
 } from 'datocms-visual-editing';
 
+/**
+ * Bridge the imperative Visual Editing controller into React state so UI
+ * elements (toggles, indicators) can react to changes. The controller itself
+ * is shared across the app; this component only mounts it when draft mode is
+ * active and the project has a base editing URL configured.
+ */
+
 declare global {
   interface Window {
     __DATOCMS_DECODE_STEGA__?: typeof decodeStega;
@@ -41,7 +48,7 @@ let secondFrame: number | null = null;
 let enableTimeout: number | null = null;
 
 const STORAGE_KEY = 'datocms.visual-editing.enabled';
-const DEBUG = true;
+const DEBUG_ATTRIBUTES = process.env.NODE_ENV !== 'production';
 
 const getSnapshot = () => ({ ...snapshot });
 
@@ -89,7 +96,6 @@ const clearDecode = () => {
 
 const clearDocumentState = () => {
   if (typeof document === 'undefined') return;
-
   const { documentElement } = document;
   delete documentElement.dataset.datocmsVisualEditing;
   delete documentElement.dataset.datocmsVisualEditingDebug;
@@ -97,25 +103,23 @@ const clearDocumentState = () => {
 
 const setDocumentState = (state: 'enabled' | 'disabled') => {
   if (typeof document === 'undefined') return;
-
   const { documentElement } = document;
   documentElement.dataset.datocmsVisualEditing = state;
-  documentElement.dataset.datocmsVisualEditingDebug = DEBUG ? 'on' : 'off';
+  documentElement.dataset.datocmsVisualEditingDebug = DEBUG_ATTRIBUTES
+    ? 'on'
+    : 'off';
 };
 
 const clearPendingEnable = () => {
   if (typeof window === 'undefined') return;
-
   if (firstFrame !== null) {
     window.cancelAnimationFrame(firstFrame);
     firstFrame = null;
   }
-
   if (secondFrame !== null) {
     window.cancelAnimationFrame(secondFrame);
     secondFrame = null;
   }
-
   if (enableTimeout !== null) {
     window.clearTimeout(enableTimeout);
     enableTimeout = null;
@@ -130,40 +134,37 @@ const syncEnabledState = () => {
 
 const readPreference = () => {
   if (typeof window === 'undefined') return null;
-
   try {
     const value = window.localStorage.getItem(STORAGE_KEY);
     if (value === 'enabled') return true;
     if (value === 'disabled') return false;
   } catch {
-    // ignore – localStorage might be unavailable (Safari private mode, etc.)
+    // Ignore storage errors (e.g. Safari private mode).
   }
-
   return null;
 };
 
 const persistPreference = (enabled: boolean) => {
   if (typeof window === 'undefined') return;
-
   try {
     window.localStorage.setItem(STORAGE_KEY, enabled ? 'enabled' : 'disabled');
   } catch {
-    // ignore – storage errors are non-fatal
+    // Ignore storage errors – lack of persistence is non-fatal.
   }
 };
 
+// Enable overlays and persist the preference in localStorage. The controller
+// might already be enabled if a previous draft session set it so.
 const runEnable = () => {
   if (!controller) return;
-
   controller.enable();
   syncEnabledState();
   persistPreference(true);
 };
 
-// Wait two animation frames + a short timeout before enabling overlays so hydration can settle.
+// Defer enabling by two rAF ticks + a short timeout so hydration settles.
 const scheduleEnable = () => {
   if (!controller) return;
-
   if (controller.isEnabled()) {
     syncEnabledState();
     persistPreference(true);
@@ -187,10 +188,10 @@ const scheduleEnable = () => {
   });
 };
 
-// Disable overlays without touching the underlying stega metadata.
+// Disable overlays while leaving the stega metadata in place so re-enabling is
+// instant.
 const runDisable = () => {
   if (!controller) return;
-
   clearPendingEnable();
   if (controller.isEnabled()) {
     controller.disable();
@@ -200,9 +201,7 @@ const runDisable = () => {
 };
 
 const disposeCurrentController = () => {
-  if (controller) {
-    controller.dispose();
-  }
+  controller?.dispose();
   registerController(null);
 };
 
@@ -216,6 +215,17 @@ export function disableVisualEditing() {
   runDisable();
 }
 
+export function refreshVisualEditing(scope?: ParentNode | undefined) {
+  if (!controller) return;
+  if ('isDisposed' in controller && controller.isDisposed()) return;
+  if (!('refresh' in controller)) return;
+  controller.refresh(scope);
+}
+
+export function getVisualEditingController() {
+  return controller;
+}
+
 export function toggleVisualEditing() {
   if (!controller || !snapshot.isDraft) return;
   if (controller.isEnabled()) {
@@ -227,9 +237,7 @@ export function toggleVisualEditing() {
 
 export function useDatoVisualEditing() {
   const [state, setState] = useState<VisualEditingSnapshot>(() => getSnapshot());
-
   useEffect(() => subscribe(setState), []);
-
   return {
     ...state,
     enable: enableVisualEditing,
@@ -254,25 +262,26 @@ export default function DatoVisualEditingBridge({
       return;
     }
 
+    // Mount a fresh controller for the current preview session.
     registerDecode();
 
     const visualEditing = enableDatoVisualEditing({
       baseEditingUrl,
       ...(environment ? { environment } : {}),
-      debug: DEBUG,
       autoEnable: false,
+      debug: DEBUG_ATTRIBUTES,
     });
 
     registerController(visualEditing);
     setDocumentState('disabled');
 
+    // Restore the last-known overlay preference (enabled/disabled) so the UI
+    // feels consistent across refreshes.
     const preference = readPreference();
-    const shouldEnable = preference === true;
-    const shouldDisable = preference === false;
-
-    if (shouldEnable) {
+    if (preference === true) {
       scheduleEnable();
-    } else if (shouldDisable) {
+    }
+    if (preference === false) {
       runDisable();
     }
 

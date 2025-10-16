@@ -11,19 +11,6 @@ export type BuildVariablesFn<
   },
 ) => TVariables;
 
-export type RealtimeUpdatesPage<
-  PageProps extends GlobalPageProps,
-  TResult = unknown,
-  TVariables = Record<string, unknown>,
-> = (props: {
-  initialData: TResult;
-  pageProps: PageProps;
-  variables: TVariables;
-  query: TypedDocumentNode<TResult, TVariables>;
-  token: string;
-  children?: React.ReactNode;
-}) => React.ReactNode;
-
 export type ContentPage<
   PageProps extends GlobalPageProps,
   TResult = unknown,
@@ -32,3 +19,27 @@ export type ContentPage<
     data: TResult;
   },
 ) => React.ReactNode;
+
+export type ClientContentPage<
+  PageProps extends GlobalPageProps,
+  TResult = unknown,
+> = React.ComponentType<
+  PageProps & {
+    data: TResult;
+  }
+>;
+
+export type RealtimeUpdatesPage<
+  PageProps extends GlobalPageProps,
+  TResult = unknown,
+  TVariables = Record<string, unknown>,
+> = (props: {
+  initialData: TResult;
+  pageProps: PageProps;
+  variables: TVariables;
+  query: TypedDocumentNode<TResult, TVariables> | string;
+  token: string;
+  environment?: string;
+  baseEditingUrl: string;
+  children?: React.ReactNode;
+}) => React.ReactNode;

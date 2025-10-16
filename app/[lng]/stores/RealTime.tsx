@@ -1,11 +1,12 @@
 'use client';
 
 import { generateRealtimeComponent } from '@/components/WithRealTimeUpdates/generateRealtime';
-import Content from './Content';
+import LiveContent from './LiveContent';
 import type { PageProps, Query, Variables } from './meta';
 
+// Client-only realtime layer for the Stores route.
 const RealTime = generateRealtimeComponent<PageProps, Query, Variables>({
-  contentComponent: Content,
+  clientContentComponent: LiveContent,
 });
 
 export default RealTime;

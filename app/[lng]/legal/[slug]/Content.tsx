@@ -14,10 +14,15 @@ import {
 } from 'react-datocms';
 import type { PageProps, Query } from './meta';
 
-const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
+type LegalContentViewProps = PageProps & {
+  data: Query;
+};
+
+export function LegalContentView({ data, params }: LegalContentViewProps) {
   if (!data.legalPage) {
-    notFound();
+    return null;
   }
+
   const locale = params.lng;
   const editingUrl =
     (data.legalPage as { _editingUrl?: string | null })?._editingUrl ?? null;
@@ -28,6 +33,7 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
     editingUrl && Object.keys(contentEditAttributes).length > 0
       ? { ...contentEditAttributes, 'data-datocms-edit-target': '' }
       : undefined;
+
   return (
     <section className="mt-24 pb-[120px]">
       <div className="container">
@@ -75,6 +81,15 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
       </div>
     </section>
   );
+}
+
+// Server component retains control over routing helpers.
+const Content: ContentPage<PageProps, Query> = (props) => {
+  if (!props.data.legalPage) {
+    notFound();
+  }
+
+  return <LegalContentView {...props} />;
 };
 
 export default Content;

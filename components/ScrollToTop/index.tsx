@@ -11,6 +11,11 @@ type Props = {
   isDraft: boolean;
 };
 
+/**
+ * Floating toolbox used in the demo. It exposes a button to enter/leave draft
+ * mode and, when draft mode is active, a button to toggle visual editing
+ * overlays.
+ */
 export default function ScrollToTop({ isDraft }: Props) {
   const router = useRouter();
   const pathname = usePathname();

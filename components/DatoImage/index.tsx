@@ -20,4 +20,3 @@ export default function DatoImage(props: Props) {
 
   return <ReactDatocmsImage {...props} />;
 }
-

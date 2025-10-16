@@ -6,6 +6,7 @@ import { ProductStaticParamsDocument } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import Content from './Content';
 import RealTime from './RealTime';
+import { notFound } from 'next/navigation';
 import { type PageProps, type Query, type Variables, query } from './meta';
 
 export async function generateStaticParams() {
@@ -42,6 +43,11 @@ const Page = generateWrapper<PageProps, Query, Variables>({
   buildVariables,
   contentComponent: Content,
   realtimeComponent: RealTime,
+  onData: (data) => {
+    if (!data.product) {
+      notFound();
+    }
+  },
 });
 
 export default Page;

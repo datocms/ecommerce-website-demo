@@ -10,13 +10,19 @@ import { notFound } from 'next/navigation';
 import { StructuredText, renderNodeRule } from 'react-datocms';
 import type { PageProps, Query } from './meta';
 
-const Content: ContentPage<PageProps, Query> = ({
+type ProductContentViewProps = PageProps & {
+  data: Query;
+};
+
+// Shared product view rendered by both server and client modules.
+export function ProductContentView({
   data,
   ...globalPageProps
-}) => {
+}: ProductContentViewProps) {
   if (!data.product) {
-    notFound();
+    return null;
   }
+
   const locale = globalPageProps.params.lng;
   const productEditingUrl =
     (data.product as { _editingUrl?: string | null })?._editingUrl ?? null;
@@ -95,6 +101,15 @@ const Content: ContentPage<PageProps, Query> = ({
       <Reviews data={data} globalPageProps={globalPageProps} />
     </div>
   );
+}
+
+// Server component to keep draft helpers (eg. `notFound`) on the server.
+const Content: ContentPage<PageProps, Query> = (props) => {
+  if (!props.data.product) {
+    notFound();
+  }
+
+  return <ProductContentView {...props} />;
 };
 
 export default Content;

@@ -15,7 +15,7 @@ const generatePreviewUrl = ({
 }: generatePreviewUrlParams) => {
   switch (itemType.attributes.api_key) {
     case 'home':
-      return `/${locale}/`;
+      return `/${locale}/home`;
     case 'showcase':
       return `/${locale}/showcase`;
     case 'store':

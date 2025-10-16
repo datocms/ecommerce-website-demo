@@ -20,7 +20,23 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**'
+      }
     ],
+  },
+  async redirects() {
+    return [
+      // Redirect bare locale to /home to prevent accidental 404s
+      {
+        source: '/:lng',
+        destination: '/:lng/home',
+        permanent: true,
+      },
+    ]
   },
 };
 

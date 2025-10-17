@@ -12,7 +12,7 @@
  */
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, memo } from 'react';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { subscribeToQuery } from 'datocms-listen';
@@ -132,14 +132,31 @@ export default function WithRealTimeUpdates<
   const ve = useDatoVisualEditing();
   const externalController = getVisualEditingController() ?? undefined;
 
-  // Always reuse the app-wide controller from the preview bridge to avoid
-  // double-controllers and races.
-  useDatoVisualEditingListen(subscribe, {
-    scopeRef,
-    controller: externalController,
-  });
+  // Defer wiring the listen-hook until a controller exists to avoid the
+  // development warning about missing controllerOptions (and to prevent the
+  // hook from creating a second controller). Hooks cannot be conditional, so
+  // we render a tiny child component that calls the hook unconditionally when
+  // mounted.
+  const VisualEditingSync = useMemo(
+    () =>
+      memo(function VisualEditingSyncInner() {
+        useDatoVisualEditingListen(subscribe, {
+          scopeRef,
+          controller: externalController!,
+          // initialRefresh: true by default; the hook will request a mark.
+        });
+        return null;
+      }),
+    // Recreate if the subscribe function identity or ref changes.
+    [externalController, scopeRef, subscribe],
+  );
 
   // Render the server view into the exact node React hydrated. This preserves
   // all stega markers across updates and keeps overlays stable.
-  return <div ref={scopeRef}>{children({ ...pageProps, data })}</div>;
+  return (
+    <div ref={scopeRef}>
+      {children({ ...pageProps, data })}
+      {externalController ? <VisualEditingSync /> : null}
+    </div>
+  );
 }

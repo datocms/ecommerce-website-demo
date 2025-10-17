@@ -9,7 +9,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AuthenticationModal from '../Header/AuthenticationModal';
 import SuccessPopUp from '../Header/SuccessPopUp';
 import { useDatoVisualEditing } from '../preview/DatoVisualEditingBridge';
@@ -29,6 +29,11 @@ export default function ScrollToTop({ isDraft }: Props) {
   const searchParams = useSearchParams();
   const [modalOpen, setModalOpen] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
+  // Avoid hydration mismatches by rendering this toolbox only on the client.
+  // Server-rendered markup can’t know the visual-editing controller readiness
+  // yet, which would flip `disabled`/label immediately on hydration.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const visualEditing = useDatoVisualEditing();
 
   // Toggle draft cookies through server routes. We avoid coupling overlays to
@@ -53,6 +58,8 @@ export default function ScrollToTop({ isDraft }: Props) {
       setSuccessToast(false);
     }, 5000);
   };
+  if (!mounted) return null;
+
   return (
     <>
       <motion.div

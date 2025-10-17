@@ -1,3 +1,10 @@
+/**
+ * Draft enable endpoint for embedded flows
+ * - Accepts `?token=<secret>&url=/en/home`.
+ * - Enables Next.js preview cookies and redirects back to `url`.
+ * - Re-sets `__prerender_bypass` as a partitioned cookie to avoid losing it
+ *   when this endpoint is called inside an iframe (DatoCMS editor preview).
+ */
 import { cookies, draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { NextRequest } from 'next/server';
@@ -19,11 +26,13 @@ export async function GET(request: NextRequest) {
   const siteUrl = process.env.URL || 'http://localhost:3000';
   const redirectUrl = new URL(url, siteUrl);
 
+  // Mark the URL so the editor knows it is in editable mode (optional).
   if (!redirectUrl.searchParams.has('edit')) {
     redirectUrl.searchParams.set('edit', '1');
   }
 
-  //to avoid losing the cookie on redirect in the iFrame
+  // Avoid losing the cookie on redirect inside an iframe by re-setting it with
+  // `partitioned: true` (Chrome) and SameSite=None.
   const cookieStore = await cookies();
   const cookie = cookieStore.get('__prerender_bypass')!;
   cookieStore.set({

@@ -1,5 +1,9 @@
 'use client';
 
+// NOTE: Keep the shared view markup identical across server and client renders
+// to preserve stega/_editingUrl markers. The LiveContent wrappers reuse this
+// view without replacing DOM nodes.
+
 import DividerSection from '@/components/Sections/DividerSection';
 import Hero from '@/components/Sections/Hero';
 import MaterialShowcase from '@/components/Sections/MaterialShowcase';

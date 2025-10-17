@@ -1,3 +1,14 @@
+/**
+ * Server Wrapper for Pages
+ *
+ * Responsibilities
+ * - Resolves locale params and `draftMode()` on the server.
+ * - Ensures `_editingUrl` metadata is requested while in draft mode by
+ *   injecting `visualEditing: true` (and `X-Base-Editing-Url` via
+ *   utils/queryDatoCMS.ts).
+ * - Returns the realtime client wrapper when in draft mode; otherwise renders
+ *   the server view directly.
+ */
 import { getFallbackLocale } from '@/app/i18n/settings';
 import type {
   AsyncGlobalPageProps,
@@ -52,6 +63,8 @@ export function generateWrapper<
       params,
     } as unknown as PageProps;
 
+    // While draft mode is enabled, always include visual-editing metadata in
+    // queries so the client controller can render overlays on demand.
     const includeVisualEditingMetadata = isDraft;
 
     const baseVariables =
@@ -96,6 +109,8 @@ export function generateWrapper<
         );
       }
 
+      // In draft mode we return the realtime client wrapper that will stream
+      // changes via Listen and keep overlays in sync.
       return (
         <RealTime
           token={previewToken}

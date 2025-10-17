@@ -1,3 +1,8 @@
+/**
+ * Product page
+ * - Generates static params for SSG, uses the same server/client wrapper
+ *   pattern for preview.
+ */
 import getAvailableLocales from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';

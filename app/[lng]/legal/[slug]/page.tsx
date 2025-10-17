@@ -1,3 +1,4 @@
+/** Legal page — SSG params + realtime preview when in draft mode. */
 import getAvailableLocales from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';

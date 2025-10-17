@@ -41,7 +41,7 @@ const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
                 cookieNotice.cookieNoticeImage
                   ?.responsiveImage as ResponsiveImageType
               }
-
+              altOverride={cookieNotice.cookieNoticeImage?.alt ?? null}
               className="h-full w-full object-contain"
               layout="fill"
               objectFit="cover"

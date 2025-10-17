@@ -145,7 +145,7 @@ export default function CategoryHeader({
                                       category.newArrival.details.image
                                         .responsiveImage
                                     }
-
+                                    altOverride={category.newArrival.details.image.alt ?? null}
                                     className="h-full w-full object-contain"
                                     layout="fill"
                                     objectFit="cover"
@@ -177,7 +177,7 @@ export default function CategoryHeader({
                                       category.trending.details.image
                                         .responsiveImage
                                     }
-
+                                    altOverride={category.trending.details.image.alt ?? null}
                                     className="h-full w-full object-contain"
                                     layout="fill"
                                     objectFit="cover"
@@ -275,7 +275,7 @@ export default function CategoryHeader({
                     data={
                       data.layout?.logo.responsiveImage as ResponsiveImageType
                     }
-
+                    altOverride={data.layout?.logo.alt ?? null}
                     className="object-contain"
                   />
                 </Link>
@@ -333,6 +333,7 @@ export default function CategoryHeader({
                                                   category.newArrival.details
                                                     .image.responsiveImage
                                                 }
+                                                altOverride={category.newArrival.details.image.alt ?? null}
                                                 className="h-full w-full object-contain"
                                                 layout="fill"
                                                 objectFit="cover"
@@ -373,6 +374,7 @@ export default function CategoryHeader({
                                                   category.trending.details
                                                     .image.responsiveImage
                                                 }
+                                                altOverride={category.trending.details.image.alt ?? null}
                                                 className="h-full w-full object-contain"
                                                 layout="fill"
                                                 objectFit="cover"

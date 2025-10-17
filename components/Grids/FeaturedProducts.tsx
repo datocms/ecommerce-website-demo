@@ -52,7 +52,7 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
                     <div className="h-full w-full object-cover object-center transition duration-200 group-hover:scale-105">
                       <DatoImage
                         fragment={firstProductImage.responsiveImage}
-
+                        altOverride={firstProductImage.alt ?? null}
                         className="h-full w-full object-contain"
                         layout="fill"
                         objectFit="cover"

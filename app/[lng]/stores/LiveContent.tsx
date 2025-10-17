@@ -1,3 +1,6 @@
+/**
+ * Client renderer for the stores page used by realtime updates.
+ */
 'use client';
 
 import StoresContentClient from './StoresContentClient';

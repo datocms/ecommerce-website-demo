@@ -1,3 +1,8 @@
+/**
+ * Per-locale realtime client shell
+ * - Creates a route-scoped client component that renders the shared view and
+ *   subscribes to Listen updates via the generic realtime wrapper.
+ */
 'use client';
 
 import { generateRealtimeComponent } from '@/components/WithRealTimeUpdates/generateRealtime';

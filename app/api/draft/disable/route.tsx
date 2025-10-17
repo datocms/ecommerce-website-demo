@@ -1,3 +1,8 @@
+/**
+ * Draft disable endpoint
+ * - Accepts `?url=/en/home` and clears preview cookies.
+ * - Mirrors /api/draft/enable’s cookie handling for iframe safety.
+ */
 import { cookies, draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -11,7 +16,7 @@ export async function GET(request: Request) {
 
   if (!url) return new Response('Draft mode is disabled');
 
-  //to avoid losing the cookie on redirect in the iFrame
+  // Avoid losing the cookie on redirect in an iframe; see enable route.
   const cookieStore = await cookies();
   const cookie = cookieStore.get('__prerender_bypass')!;
   cookieStore.set({

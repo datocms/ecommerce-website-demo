@@ -1,3 +1,7 @@
+/**
+ * Client renderer for product pages used by realtime updates.
+ * - Reuses the server view to avoid DOM replacement.
+ */
 'use client';
 
 import type { ClientContentPage } from '@/components/WithRealTimeUpdates/types';

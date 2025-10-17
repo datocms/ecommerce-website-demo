@@ -105,7 +105,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                         {image.responsiveImage && (
                           <DatoImage
                             fragment={image.responsiveImage}
-
+                            altOverride={image.alt ?? null}
                             className="h-full w-full object-contain"
                             layout="fill"
                             objectFit="cover"
@@ -126,7 +126,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                       {image.responsiveImage && (
                         <DatoImage
                           fragment={image.responsiveImage}
-
+                          altOverride={image.alt ?? null}
                           className="h-full w-full object-contain"
                           layout="fill"
                           objectFit="cover"
@@ -143,7 +143,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                   {selectedImage?.responsiveImage && (
                     <DatoImage
                       fragment={selectedImage?.responsiveImage}
-
+                      altOverride={selectedImage?.alt ?? null}
                       className="h-full w-full object-contain"
                       layout="fill"
                       objectFit="cover"

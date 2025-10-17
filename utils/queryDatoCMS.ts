@@ -1,3 +1,15 @@
+/**
+ * queryDatoCMS
+ *
+ * Server-side helper to call the DatoCMS GraphQL API with sensible defaults:
+ * - Attaches `X-Include-Drafts: true` when draft mode is active.
+ * - When visual-editing metadata is requested, wraps `fetch` with
+ *   `withContentLinkHeaders`, which sets `X-Visual-Editing` and
+ *   `X-Base-Editing-Url` (required for `_editingUrl`). The wrapper is cached
+ *   per base URL to avoid re-creating clients.
+ * - Disables caching for preview/draft requests and enables Next.js tag-based
+ *   caching otherwise.
+ */
 import 'server-only';
 
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
@@ -10,6 +22,7 @@ type QueryDatoCMSOptions = {
   visualEditing?: boolean;
 };
 
+// Cache the wrapped fetch so repeated calls don’t allocate extra wrappers.
 const getFetchWithContentLinkHeaders = (() => {
   let cachedClient: typeof fetch | null = null;
   let cachedBaseEditingUrl: string | null = null;
@@ -61,6 +74,8 @@ export default async function queryDatoCMS<
     }
   }
 
+  // Visual-editing metadata is enabled in draft mode unless explicitly
+  // overridden via the `visualEditing` option.
   const includeVisualEditingMetadata = visualEditing ?? draftEnabled;
 
   if (draftEnabled) {
@@ -83,6 +98,8 @@ export default async function queryDatoCMS<
     ? getFetchWithContentLinkHeaders(baseEditingUrl!)
     : fetch;
 
+  // Preview/draft traffic should bypass cache; published traffic can be cached
+  // and tagged for on-demand revalidation.
   const shouldBypassCache = includeVisualEditingMetadata || draftEnabled;
 
   const response = await fetchClient('https://graphql.datocms.com/', {

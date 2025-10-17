@@ -51,7 +51,19 @@ Live deployment: [https://ecommerce-website-demo-livid.vercel.app/](https://ecom
 
 ## Visual Editing Workflow
 
-Visual editing only activates when three conditions are true:
+Architecture at a glance:
+
+- Server (data + headers)
+  - `components/WithRealTimeUpdates/generateWrapper.tsx` detects `draftMode()` and always requests visual‑editing metadata while preview is on.
+  - `utils/queryDatoCMS.ts` attaches `X-Visual-Editing` and `X-Base-Editing-Url` (via `withContentLinkHeaders`) whenever visual editing metadata is requested so `_editingUrl` is present in responses.
+- Client (single global controller)
+  - `components/preview/DatoVisualEditingBridge.tsx` creates one controller for the whole app. It mounts in `app/layout.tsx` before `{children}` so realtime listeners find it on first render. Activation is deferred by two `requestAnimationFrame`s + a short timeout to avoid hydration races.
+- Client (realtime streaming)
+  - `components/WithRealTimeUpdates/index.tsx` subscribes to DatoCMS Listen. On each update it reuses the server DOM (same view component) and calls `controller.refresh(scope)` to rescan stega markers. It reuses the global controller — it never creates its own.
+- UI (toggle)
+  - `components/ScrollToTop/index.tsx` exposes an “Enable/Disable Visual Editing” button that talks to the global controller only. No cookies/URL params are changed; overlay state persists in `localStorage` (`datocms.visual-editing.enabled`).
+
+Visual editing activates when:
 
 1. **Draft mode** (preview cookies `__prerender_bypass` and `__next_preview_data`) is set. Visit `/api/draft?secret=<DRAFT_SECRET_TOKEN>&path=/<locale>/home` to enable it.
 2. A **base editing URL** is configured – `NEXT_PUBLIC_DATO_BASE_EDITING_URL` must point to your project dashboard so overlays can deep-link back to DatoCMS.
@@ -67,27 +79,35 @@ The toggle state is stored in `localStorage` (`datocms.visual-editing.enabled`).
 
 Disabling the overlay keeps draft mode active while hiding the overlays. Re-enabling restores them instantly without a full remount.
 
-### How the toggle works (and why the UI “blinks”)
+### How the toggle works (single‑controller pattern)
 
-- The toggle lives in `components/ScrollToTop/index.tsx`. It calls the shared visual-editing controller directly—no URL parameters or cookies—so state persists via `localStorage` and survives client-side navigations.
-- On the server, `components/WithRealTimeUpdates/generateWrapper.tsx` always requests `_editingUrl` metadata while draft mode is on. There is no keyed remount; the controller enables/disables overlays without forcing a re-render.
-- The client bridge (`components/preview/DatoVisualEditingBridge.tsx`) instantiates `enableDatoVisualEditing({ autoEnable: false })`, delays activation with a double `requestAnimationFrame` + short timeout to avoid hydration issues, and exposes `enable/disable/toggle` helpers to the rest of the app.
-- When you disable overlays, the bridge simply parks the controller and updates the `<html>` dataset for DevTools inspection; all stega metadata remains available so re-enabling overlays is instantaneous.
+- The toggle is a thin UI that talks to the global controller (`components/preview/DatoVisualEditingBridge.tsx`). No URL params or cookies are used; state is kept in `localStorage` so it persists across navigations.
+- The server always fetches `_editingUrl` when in draft; enabling/disabling the overlay never remounts the page — it only turns the controller on/off.
+- The bridge defers `enable()` until hydration settles. Enabling too early can produce the dev warning “no editable elements were detected after enable()”. The defer avoids this.
+- When disabled, the controller stays mounted and the `<html>` element reflects state via `data-datocms-visual-editing`. Re‑enabling is instant.
+
+### Realtime + overlays: keeping both working
+
+- Realtime updates render the exact same view the server used (see `app/[lng]/**/LiveContent.tsx`). React patches content in place; it does not replace the DOM nodes that carry stega markers.
+- After each Listen update, the realtime wrapper calls `controller.refresh(scope)` so overlays re‑mark the updated subtree.
+- There is only one controller in the app. The realtime wrapper imports it with `getVisualEditingController()` and never passes `controllerOptions` (so it cannot create a second controller by mistake).
 
 ### Middleware responsibilities
 
-`middleware.ts` now focuses solely on locale routing:
+`middleware.ts` only handles locale routing.
 
 - Normalises locales and redirects bare paths to the correct locale.
-- Leaves visual editing to the client controller—no query parameters, cookies, or custom headers required.
+- Leaves visual editing to server routes/query helpers and the client bridge — no custom headers or query params are added by middleware.
 
 ### Key files to inspect
 
-- `components/ScrollToTop/index.tsx` – floating controls for draft mode and the new controller-driven visual-editing toggle.
-- `components/preview/DatoVisualEditingBridge.tsx` – client-side glue that powers the controller, persists state, and coordinates DOM cleanup.
-- `components/WithRealTimeUpdates/generateWrapper.tsx` – central wrapper that always requests `_editingUrl` metadata in draft mode.
-- `utils/queryDatoCMS.ts` – attaches `withContentLinkHeaders` automatically when metadata is requested.
-- `middleware.ts` – locale routing only.
+- `components/preview/DatoVisualEditingBridge.tsx` — single global controller; enable/disable/toggle/refresh and hydration delay.
+- `app/layout.tsx` — mounts the bridge before `{children}` so listeners find the controller on first render.
+- `components/WithRealTimeUpdates/index.tsx` — Listen subscription; reuses the global controller and calls `refresh(scope)` after each update.
+- `components/WithRealTimeUpdates/generateWrapper.tsx` — server wrapper that injects `visualEditing: true` during draft and chooses realtime vs server render.
+- `utils/queryDatoCMS.ts` — attaches `withContentLinkHeaders` when visual editing is on; disables caching for preview traffic.
+- `components/ScrollToTop/index.tsx` — floating toggle that controls the controller only (persisted in `localStorage`).
+- `app/[lng]/**/LiveContent.tsx` — client renderers that reuse their server views; crucial for DOM reuse.
 
 ### Responsive images & stega data
 
@@ -128,35 +148,38 @@ DatoCMS’ realtime Listen API can run alongside Visual Editing overlays as long
 5. **Provide draft-only realtime bridges**  
    - Each route exports a `RealTime.tsx` client component (e.g. `app/[lng]/home/RealTime.tsx`) that passes the client view to `generateRealtimeComponent`.
 
-6. **Ensure the Listen subscription sends `X-Base-Editing-Url`**
+6. **Ensure the Listen subscription sends `X-Base-Editing-Url` and reuse the global controller**
    - `components/WithRealTimeUpdates/index.tsx` wraps the Listen fetcher so the preview stream includes `_editingUrl` on every payload.
-   - The component merges new data into React state and re-renders children without calling `router.refresh()`.
-   - The fallback server markup stays visible until visual editing overlays are enabled, guaranteeing the bridge always finds stega-rich DOM before the client hand-off.
+   - It imports the shared controller via `getVisualEditingController()` and passes it to `useDatoVisualEditingListen` (no `controllerOptions`).
+   - On each update, it merges new data into React state, re-renders the same view, and calls `refresh(scope)` so overlays re‑mark the subtree.
 
 7. **Expose the preview token only in draft mode**  
    - `generateWrapper` guards the client listener with `isDraft && DATOCMS_READONLY_API_TOKEN` so production bundles never ship secrets.
 
 ### Files to study
 
-- `components/WithRealTimeUpdates/index.tsx` — client listener that keeps the Listen stream in sync with overlays.
-- `components/WithRealTimeUpdates/generateWrapper.tsx` — server wrapper that builds GraphQL variables, fetches draft data, and mounts the listener only when needed.
-- `app/[lng]/**/LiveContent.tsx` — minimal client renderers that reuse their server counterparts’ JSX.
-- `app/[lng]/**/RealTime.tsx` — per-route client bridges wired up by `generateRealtimeComponent`.
+- `components/preview/DatoVisualEditingBridge.tsx` — controller lifecycle and hydration delay.
+- `components/WithRealTimeUpdates/index.tsx` — Listen + overlay refresh using the shared controller.
+- `components/WithRealTimeUpdates/generateWrapper.tsx` — server wrapper for draft/deterministic variables.
+- `app/[lng]/**/LiveContent.tsx` — client renderers that reuse the server view.
+- `app/[lng]/**/RealTime.tsx` — route-scoped client shell created by `generateRealtimeComponent`.
 
 ### Common pitfalls
 
-- Forgetting to request `_editingUrl` or to pass the same fragments to the Listen query causes overlays to disappear after the first live update.
-- Replacing DOM elements wholesale in the client wrapper (instead of updating props) can detach overlays. Stick to the shared view pattern so React only patches content.
-- Running the listener without `NEXT_PUBLIC_DATO_BASE_EDITING_URL` or a preview-capable token will surface errors in the console and stop updates.
+- Two controllers racing (bridge + realtime) → overlays “disappear” after ~1s. Fix: do not pass `controllerOptions` in the realtime hook; reuse the global controller.
+- DOM replacement after hydration (e.g. keyed remounts, `dynamic(..., { ssr: false })`) → “no editables” warning. Fix: reuse the exact server view in the client and avoid keyed wrapper swaps.
+- Missing `X-Base-Editing-Url` on any request while in draft → `_editingUrl` absent and overlays won’t mark. Fix: keep `withContentLinkHeaders` on both server and client fetchers.
+- Stripping stega strings before rendering — overlays can’t find targets. Fix: don’t call `stripStega` on fields you want to edit visually.
 
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
-| Overlay never enables | Missing `NEXT_PUBLIC_DATO_BASE_EDITING_URL` or draft mode cookies | Verify `.env.local`, restart dev server, re-run `/api/draft?...` |
-| Overlay enables once, then fails after toggling | `_editingUrl` requested when `visualEditing` is false, or bridge not mounted | Check GraphQL fragments for `@include(if: $visualEditing)` and confirm the bridge is rendered in `app/layout.tsx` |
-| Hydration failed / flashing debug markup | Overlay booted before hydration finished | Ensure you are on the current bridge implementation; it already delays activation. If you changed it, restore the double `requestAnimationFrame` + timeout combination |
-| Overlays disabled themselves after leaving draft mode | Previous session stored “disabled” in localStorage | Clear the `datocms.visual-editing.enabled` key or re-enable the toggle once you re-enter draft mode |
+| Overlay never enables | Missing `NEXT_PUBLIC_DATO_BASE_EDITING_URL` or draft cookies | Verify `.env.local`, restart dev server, re-run `/api/draft?...` |
+| Overlays vanish ~1s after enabling | Two controllers racing or DOM got replaced | Reuse the global controller only; ensure client renders the same view the server used |
+| “no editable elements were detected after enable()” | Enabled too early, before hydration/stream settled | Keep the bridge delay; avoid keyed remounts or `ssr: false` wrappers; mount the bridge before `{children}` |
+| Live updates apply but overlays don’t move | Not calling `refresh(scope)` after SSE update | Realtime wrapper already does this; ensure it receives the global controller |
+| Overlays flip off when re-entering draft | `localStorage` persisted disabled state | Re-enable once or clear `datocms.visual-editing.enabled` |
 
 ## Contributing
 

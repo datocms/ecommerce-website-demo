@@ -42,7 +42,7 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
           <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
             <DatoImage
               fragment={collection[0].details.image.responsiveImage}
-
+              altOverride={collection[0].details.image.alt}
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -76,7 +76,7 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
           <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
             <DatoImage
               fragment={collection[1].details.image.responsiveImage}
-
+              altOverride={collection[1].details.image.alt}
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -90,7 +90,7 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
           <div className="absolute inset-0 h-full w-full rounded-lg object-cover">
             <DatoImage
               fragment={collection[2].details.image.responsiveImage}
-
+              altOverride={collection[2].details.image.alt}
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"

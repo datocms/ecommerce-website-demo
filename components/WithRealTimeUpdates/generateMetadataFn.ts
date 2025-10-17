@@ -1,3 +1,8 @@
+/**
+ * Metadata factory per route
+ * - Runs on the server; pulls SEO fragments from GraphQL with the same
+ *   variables as the page and converts them to Next.js Metadata.
+ */
 import { getFallbackLocale } from '@/app/i18n/settings';
 import type {
   AsyncGlobalPageProps,

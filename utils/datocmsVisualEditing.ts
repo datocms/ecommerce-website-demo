@@ -1,3 +1,9 @@
+/**
+ * Small helpers to build edit attributes for inline targets.
+ * - `buildEditTagAttributes` computes data-* attributes consumed by the
+ *   visual-editing controller. Spread them onto the element you want to make
+ *   editable and add `data-datocms-edit-target` to explicitly mark it.
+ */
 import { buildEditTagAttributes } from 'datocms-visual-editing';
 
 type ProductPriceFieldPath = 'price' | 'sale_price';

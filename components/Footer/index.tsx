@@ -57,7 +57,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
                       data.layout?.footerLogo
                         ?.responsiveImage as ResponsiveImageType
                     }
-
+                    altOverride={data.layout?.footerLogo?.alt ?? null}
                     className="h-full w-full object-contain"
                     layout="fill"
                     objectFit="cover"

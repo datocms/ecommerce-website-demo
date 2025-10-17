@@ -1,3 +1,15 @@
+/**
+ * Realtime Preview Wrapper
+ *
+ * Subscribes to DatoCMS Listen and re-renders page content whenever draft
+ * content changes. After each update, it asks the shared Visual Editing
+ * controller to rescan the updated DOM so overlays remain accurate.
+ *
+ * Important:
+ * - Reuse the exact DOM nodes React hydrated; render the same view the server
+ *   used so `_editingUrl`/stega markers stay attached.
+ * - Always reuse the global controller created by the preview bridge.
+ */
 'use client';
 
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -10,6 +22,7 @@ import {
   getVisualEditingController,
   refreshVisualEditing,
 } from '@/components/preview/DatoVisualEditingBridge';
+import { useDatoVisualEditing } from '@/components/preview/DatoVisualEditingBridge';
 
 /**
  * Client component that keeps the server-rendered preview tree in sync with the
@@ -56,8 +69,8 @@ export default function WithRealTimeUpdates<
 
   const queryDocument = useMemo(() => query, [query]);
 
-  // Wrap `fetch` so every GraphQL call includes the base editing URL headers
-  // required for `_editingUrl` to appear in the response.
+  // Wrap `fetch` so every Listen request includes `X-Base-Editing-Url`, which
+  // is required for `_editingUrl` to appear in responses.
   const fetcher = useMemo(() => {
     const client = withContentLinkHeaders(fetch);
     return async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -67,9 +80,8 @@ export default function WithRealTimeUpdates<
     };
   }, [baseEditingUrl]);
 
-  // Subscribe to the DatoCMS Listen API. The hook expects a synchronous
-  // unsubscribe function, so we normalise the promise returned by
-  // `subscribeToQuery` into a plain cleanup function.
+  // Subscribe to the DatoCMS Listen API. `subscribeToQuery` returns a Promise
+  // of an unsubscribe; normalise into a sync cleanup for React effects.
   const subscribe = useCallback(
     ({
       onUpdate,
@@ -90,6 +102,7 @@ export default function WithRealTimeUpdates<
         onUpdate: (payload) => {
           setData(payload.response.data);
           onUpdate?.();
+          // Ask the global controller to rescan just our subtree.
           refreshVisualEditing(scopeRef.current ?? undefined);
         },
         onChannelError: (error) => {
@@ -114,26 +127,19 @@ export default function WithRealTimeUpdates<
     [environment, fetcher, queryDocument, token, variables],
   );
 
+  // Track controller readiness so this component re-renders once the global
+  // controller is mounted by the preview bridge.
+  const ve = useDatoVisualEditing();
   const externalController = getVisualEditingController() ?? undefined;
 
-  // Keep overlays in sync with the Listen stream. If a controller already
-  // exists (mounted by the preview bridge) we reuse it; otherwise the hook
-  // creates one using the supplied options.
+  // Always reuse the app-wide controller from the preview bridge to avoid
+  // double-controllers and races.
   useDatoVisualEditingListen(subscribe, {
     scopeRef,
     controller: externalController,
-    controllerOptions: externalController
-      ? undefined
-      : {
-          baseEditingUrl,
-          ...(environment ? { environment } : {}),
-          autoEnable: false,
-          debug: process.env.NODE_ENV !== 'production',
-        },
   });
 
-  // The child component renders the preview markup. Because this component is
-  // client-side, it hydrates the same DOM node the server produced, ensuring
-  // visual-editing attributes remain intact.
+  // Render the server view into the exact node React hydrated. This preserves
+  // all stega markers across updates and keeps overlays stable.
   return <div ref={scopeRef}>{children({ ...pageProps, data })}</div>;
 }

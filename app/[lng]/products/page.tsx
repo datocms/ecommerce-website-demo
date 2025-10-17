@@ -244,7 +244,7 @@ const Page = async ({
                       {firstProductImage?.responsiveImage && (
                         <DatoImage
                           fragment={firstProductImage.responsiveImage}
-
+                          altOverride={firstProductImage.alt ?? null}
                           className="h-full w-full object-contain"
                           layout="fill"
                           objectFit="cover"

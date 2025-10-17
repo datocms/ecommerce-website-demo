@@ -14,7 +14,9 @@ type ProductContentViewProps = PageProps & {
   data: Query;
 };
 
-// Shared product view rendered by both server and client modules.
+// Shared product view rendered by both server and client modules. The client
+// renderer reuses this view during realtime updates so React patches content in
+// place and preserves stega markers.
 export function ProductContentView({
   data,
   ...globalPageProps
@@ -26,6 +28,9 @@ export function ProductContentView({
   const locale = globalPageProps.params.lng;
   const productEditingUrl =
     (data.product as { _editingUrl?: string | null })?._editingUrl ?? null;
+  // Build edit attributes for nested Structured Text: we spread them on a
+  // wrapper with `data-datocms-edit-target` so the overlay highlights the
+  // entire block when focused.
   const descriptionEditAttributes = productEditingUrl
     ? getProductFieldEditAttributes(productEditingUrl, locale, 'description')
     : {};

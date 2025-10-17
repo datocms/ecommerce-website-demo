@@ -1,3 +1,9 @@
+/**
+ * Client-only view (carousel interactions)
+ * - This page has client-only interactivity. We still render into the same
+ *   DOM structure across server/client so stega markers on ancestor nodes
+ *   remain intact.
+ */
 'use client';
 
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
@@ -96,7 +102,7 @@ const StoresContentClient: ContentPage<PageProps, Query> = ({ data }) => {
               allStores[currentStore].storeImage
                 ?.responsiveImage as ResponsiveImageType
             }
-
+            altOverride={allStores[currentStore].storeImage?.alt ?? null}
             className="h-full w-full rounded-lg object-contain"
             layout="fill"
             objectFit="cover"

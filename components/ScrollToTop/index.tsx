@@ -1,3 +1,10 @@
+/**
+ * Floating Preview Controls
+ * - Exposes a button to enter/leave draft mode (via server routes).
+ * - When draft mode is active, exposes a toggle that calls the shared visual
+ *   editing controller directly. State is persisted in localStorage so it
+ *   survives navigations.
+ */
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -24,6 +31,8 @@ export default function ScrollToTop({ isDraft }: Props) {
   const [successToast, setSuccessToast] = useState(false);
   const visualEditing = useDatoVisualEditing();
 
+  // Toggle draft cookies through server routes. We avoid coupling overlays to
+  // draft by keeping the visual-editing toggle entirely client-side.
   async function toggleDraft() {
     const params = new URLSearchParams(searchParams?.toString());
     params.delete('edit');

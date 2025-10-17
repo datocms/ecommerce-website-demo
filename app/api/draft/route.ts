@@ -1,3 +1,10 @@
+/**
+ * Legacy draft enable endpoint
+ * - Accepts `?secret=<token>&path=/en/home` and redirects to the path with
+ *   preview cookies set. Intended for local testing from a simple link.
+ * - For embedded editors/iframe flows prefer /api/draft/enable which handles
+ *   cookie partitioning.
+ */
 import { NextResponse } from 'next/server';
 import { draftMode } from 'next/headers';
 

@@ -1,3 +1,8 @@
+/**
+ * Realtime Component Factory
+ * - Produces a client component (per route) that renders a given view and
+ *   wires it to the shared realtime wrapper.
+ */
 'use client';
 
 import type { GlobalPageProps } from '@/utils/globalPageProps';

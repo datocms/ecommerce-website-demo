@@ -3,20 +3,27 @@ import { DatoImage_ResponsiveImageFragmentDoc } from '@/graphql/types/graphql';
 import { type ImagePropTypes, Image as ReactDatocmsImage } from 'react-datocms';
 
 type Props =
-  | ImagePropTypes
+  | (ImagePropTypes & { altOverride?: string | null })
   | (Omit<ImagePropTypes, 'data'> & {
       fragment: FragmentType<typeof DatoImage_ResponsiveImageFragmentDoc>;
+      altOverride?: string | null;
     });
 
 export default function DatoImage(props: Props) {
   if ('fragment' in props) {
-    const { fragment, ...rest } = props;
+    const { fragment, altOverride, ...rest } = props;
     const data = getFragmentData(
       DatoImage_ResponsiveImageFragmentDoc,
       fragment,
     );
-    return <ReactDatocmsImage {...rest} data={data} />;
+    const finalData =
+      altOverride != null ? { ...data, alt: altOverride } : data;
+    return <ReactDatocmsImage {...rest} data={finalData} />;
   }
 
-  return <ReactDatocmsImage {...props} />;
+  const { altOverride, data, ...rest } = props as ImagePropTypes & {
+    altOverride?: string | null;
+  };
+  const finalData = altOverride != null ? { ...data, alt: altOverride } : data;
+  return <ReactDatocmsImage {...rest} data={finalData} />;
 }

@@ -144,7 +144,7 @@ export default function Cart({
                                 <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                   <DatoImage
                                     fragment={responsiveImage}
-
+                                    altOverride={product.productImages[0]?.alt ?? null}
                                     className="h-full w-full object-cover object-center"
                                     layout="fill"
                                     objectFit="cover"

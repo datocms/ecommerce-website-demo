@@ -1,3 +1,9 @@
+/**
+ * Shared typing for the server/client preview choreography.
+ * - `ContentPage` is the pure view that both server and client render.
+ * - `RealtimeUpdatesPage` is the client shell that streams updates.
+ * - `BuildVariablesFn` lets pages derive query variables from params + locale.
+ */
 import type { SiteLocale } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';

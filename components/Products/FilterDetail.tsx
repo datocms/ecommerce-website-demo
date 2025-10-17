@@ -104,7 +104,7 @@ const FilterDetail = ({
           {image && (
             <DatoImage
               fragment={image}
-
+              altOverride={imageAlt ?? null}
               className="relative h-full w-[48rem] max-w-none rounded-xl bg-gray-900 object-contain shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
               layout="fill"
               objectFit="cover"

@@ -10,7 +10,8 @@ type ShowcaseContentViewProps = PageProps & {
   data: Query;
 };
 
-// Shared view between server render and client realtime layer.
+// Shared view between server render and client realtime layer. The client
+// renderer draws the same JSX so the DOM node identities remain stable.
 export function ShowcaseContentView({
   data,
   ...globalPageProps
@@ -28,6 +29,8 @@ export function ShowcaseContentView({
   const firstProductEditingUrl = (firstNewProduct as {
     _editingUrl?: string | null;
   })._editingUrl;
+  // Inline price edit targets; spreading attributes on the exact element that
+  // displays the price keeps overlay alignment crisp.
   const firstProductPriceAttributes = getProductPriceEditAttributes(
     firstProductEditingUrl,
     locale,
@@ -65,6 +68,7 @@ export function ShowcaseContentView({
               data={
                 data.showcase.displays[0].responsiveImage as ResponsiveImageType
               }
+              altOverride={data.showcase.displays[0].alt ?? null}
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -76,6 +80,7 @@ export function ShowcaseContentView({
               data={
                 data.showcase.displays[1].responsiveImage as ResponsiveImageType
               }
+              altOverride={data.showcase.displays[1].alt ?? null}
               className="h-full w-full rounded-lg object-contain"
               layout="fill"
               objectFit="cover"
@@ -146,6 +151,7 @@ export function ShowcaseContentView({
                   firstNewProduct.productImages[0]
                     .responsiveImage as ResponsiveImageType
                 }
+                altOverride={firstNewProduct.productImages[0].alt ?? null}
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -189,6 +195,7 @@ export function ShowcaseContentView({
                   secondNewProduct.productImages[0]
                     .responsiveImage as ResponsiveImageType
                 }
+                altOverride={secondNewProduct.productImages[0].alt ?? null}
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -236,6 +243,7 @@ export function ShowcaseContentView({
                   data.showcase.materialsDisplay[0]
                     .responsiveImage as ResponsiveImageType
                 }
+                altOverride={data.showcase.materialsDisplay[0].alt ?? null}
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"
@@ -250,6 +258,7 @@ export function ShowcaseContentView({
                   data.showcase.materialsDisplay[1]
                     .responsiveImage as ResponsiveImageType
                 }
+                altOverride={data.showcase.materialsDisplay[1].alt ?? null}
                 className="h-full w-full rounded-lg object-contain"
                 layout="fill"
                 objectFit="cover"

@@ -1,3 +1,6 @@
+/**
+ * Client renderer for the showcase page used by realtime updates.
+ */
 'use client';
 
 import type { ClientContentPage } from '@/components/WithRealTimeUpdates/types';

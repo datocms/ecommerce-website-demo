@@ -1,3 +1,24 @@
+/**
+ * Visual Editing Bridge
+ *
+ * Purpose
+ * - Creates and owns a single global Visual Editing controller for the whole
+ *   app while draft mode is active. Other components (realtime listeners,
+ *   floating toggle UI) subscribe to its state rather than creating their own
+ *   controllers.
+ *
+ * Why a single controller?
+ * - Multiple controllers can race during hydration/streaming, causing overlays
+ *   to detach right after enabling. Centralising ownership guarantees a stable
+ *   lifecycle and avoids "no editable elements were detected" warnings.
+ *
+ * Key behaviours
+ * - Defers `enable()` by two rAF ticks + a short timeout so hydration settles.
+ * - Persists the last user choice (enabled/disabled) in localStorage.
+ * - Exposes a small API (enable/disable/toggle/refresh) and a React hook to
+ *   read state. Also mirrors state on <html data-datocms-visual-editing> for
+ *   quick debugging.
+ */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -47,6 +68,7 @@ let firstFrame: number | null = null;
 let secondFrame: number | null = null;
 let enableTimeout: number | null = null;
 
+// Toggle persistence key; safe to clear in your browser to reset state.
 const STORAGE_KEY = 'datocms.visual-editing.enabled';
 const DEBUG_ATTRIBUTES = process.env.NODE_ENV !== 'production';
 
@@ -82,6 +104,8 @@ const subscribe = (listener: Listener) => {
   };
 };
 
+// Expose decodeStega globally so third-party components (eg. images) can
+// display human-readable content during preview without stripping markers.
 const registerDecode = () => {
   if (typeof window !== 'undefined') {
     window.__DATOCMS_DECODE_STEGA__ = decodeStega;
@@ -94,6 +118,8 @@ const clearDecode = () => {
   }
 };
 
+// Keep a simple debug signal on <html> so developers can verify controller
+// state from DevTools: [data-datocms-visual-editing="enabled"|"disabled"].
 const clearDocumentState = () => {
   if (typeof document === 'undefined') return;
   const { documentElement } = document;
@@ -163,6 +189,8 @@ const runEnable = () => {
 };
 
 // Defer enabling by two rAF ticks + a short timeout so hydration settles.
+// Request enabling after hydration settles to avoid DOM replacement races.
+// In dev, enabling too early often produces the "no editables" warning.
 const scheduleEnable = () => {
   if (!controller) return;
   if (controller.isEnabled()) {
@@ -215,6 +243,10 @@ export function disableVisualEditing() {
   runDisable();
 }
 
+/**
+ * Ask the controller to rescan the page (or a subtree) for stega markers.
+ * Call after streaming/SSE updates. A no-op if the controller is not ready.
+ */
 export function refreshVisualEditing(scope?: ParentNode | undefined) {
   if (!controller) return;
   if ('isDisposed' in controller && controller.isDisposed()) return;
@@ -226,6 +258,7 @@ export function getVisualEditingController() {
   return controller;
 }
 
+/** Toggle overlays while staying in draft mode. */
 export function toggleVisualEditing() {
   if (!controller || !snapshot.isDraft) return;
   if (controller.isEnabled()) {
@@ -235,6 +268,7 @@ export function toggleVisualEditing() {
   }
 }
 
+/** Hook used by UI/clients to observe controller state and actions. */
 export function useDatoVisualEditing() {
   const [state, setState] = useState<VisualEditingSnapshot>(() => getSnapshot());
   useEffect(() => subscribe(setState), []);
@@ -246,6 +280,11 @@ export function useDatoVisualEditing() {
   };
 }
 
+/**
+ * Mounts the global controller when draft mode is active.
+ * - The bridge must be mounted at layout level, before children, so that
+ *   realtime listeners can find the controller on first render.
+ */
 export default function DatoVisualEditingBridge({
   baseEditingUrl,
   environment,

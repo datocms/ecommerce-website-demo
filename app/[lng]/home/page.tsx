@@ -1,3 +1,8 @@
+/**
+ * Home page
+ * - Server fetch wrapped by `generateWrapper`; in draft mode, the client
+ *   realtime shell takes over and streams updates.
+ */
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';

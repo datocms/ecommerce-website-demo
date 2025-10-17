@@ -1,3 +1,9 @@
+/**
+ * Middleware: locale routing only
+ * - Normalises locale prefixes and redirects to the correct language.
+ * - Intentionally does NOT manage visual-editing headers, cookies, or state —
+ *   those live in server routes and the client bridge.
+ */
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 import { type NextRequest, NextResponse } from 'next/server';

@@ -14,6 +14,7 @@ import {
   ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
+import { getInitialParamsPublishedCached } from '@/utils/cachedQueries';
 import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import type {
   AsyncGlobalPageProps,
@@ -89,14 +90,16 @@ const Page = async ({
 
   const includeVisualEditingMetadata = isEnabled;
 
-  const initialParams = await queryDatoCMS(
-    InitialParamsDocument,
-    {
-      locale: lng,
-      fallbackLocale: [fallbackLng],
-    },
-    { isDraft: isEnabled },
-  );
+  const initialParams = isEnabled
+    ? await queryDatoCMS(
+        InitialParamsDocument,
+        {
+          locale: lng,
+          fallbackLocale: [fallbackLng],
+        },
+        { isDraft: isEnabled },
+      )
+    : await getInitialParamsPublishedCached(lng, fallbackLng);
 
   const { allBrands, allCollections, allMaterials } =
     getFragmentData(InitialParamsFragmentDoc, initialParams) ?? {};

@@ -10,7 +10,9 @@ export type GlobalPageProps = {
 
 export type AsyncGlobalPageProps<
   T extends GlobalPageProps = GlobalPageProps,
-  TSearchParams = URLSearchParams | Record<string, string | string[] | undefined>,
+  TSearchParams =
+    | URLSearchParams
+    | Record<string, string | string[] | undefined>,
   TAsyncParams extends Record<string, any> = Record<string, string>,
 > = Omit<T, 'params'> & {
   params?: Promise<TAsyncParams>;

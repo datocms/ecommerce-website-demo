@@ -14,12 +14,15 @@ import {
   ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
-import type { AsyncGlobalPageProps, GlobalPageProps } from '@/utils/globalPageProps';
-import queryDatoCMS from '@/utils/queryDatoCMS';
 import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import type {
-  Record as StructuredTextRecord,
+  AsyncGlobalPageProps,
+  GlobalPageProps,
+} from '@/utils/globalPageProps';
+import queryDatoCMS from '@/utils/queryDatoCMS';
+import type {
   StructuredText,
+  Record as StructuredTextRecord,
 } from 'datocms-structured-text-utils';
 import { stripStega } from 'datocms-visual-editing';
 import { draftMode } from 'next/headers';
@@ -75,10 +78,13 @@ const Page = async ({
 
   const { isEnabled } = await draftMode();
   const fallbackLng = await getFallbackLocale();
-  const pageNumber = Number.parseInt(firstValue(searchParamsRecord?.page) ?? '1');
+  const pageNumber = Number.parseInt(
+    firstValue(searchParamsRecord?.page) ?? '1',
+  );
   const orderBy: ProductModelOrderBy =
-    (firstValue(searchParamsRecord?.orderBy) as ProductModelOrderBy | undefined) ??
-    ProductModelOrderBy.CreatedAtAsc;
+    (firstValue(searchParamsRecord?.orderBy) as
+      | ProductModelOrderBy
+      | undefined) ?? ProductModelOrderBy.CreatedAtAsc;
   const nameSearch = firstValue(searchParamsRecord?.productName) ?? '';
 
   const includeVisualEditingMetadata = isEnabled;
@@ -98,9 +104,7 @@ const Page = async ({
   const rawCollections = searchParamsRecord?.collections;
   const collectionParams =
     typeof rawCollections === 'string'
-      ? rawCollections
-          .split('|')
-          .filter((collection) => collection.length)
+      ? rawCollections.split('|').filter((collection) => collection.length)
       : rawCollections;
 
   const collections =
@@ -188,14 +192,16 @@ const Page = async ({
           name={singleFilter.name}
           subtitle={singleFilter.details.subtitle ?? ''}
           description={
-            singleFilter.details
-              .description as StructuredText<StructuredTextRecord, StructuredTextRecord>
+            singleFilter.details.description as StructuredText<
+              StructuredTextRecord,
+              StructuredTextRecord
+            >
           }
           image={singleFilter.details.image.responsiveImage}
           imageAlt={singleFilter.details.image.alt}
           descriptionEditingUrl={
-            (singleFilter.details as { _editingUrl?: string | null })?._editingUrl ??
-            null
+            (singleFilter.details as { _editingUrl?: string | null })
+              ?._editingUrl ?? null
           }
           locale={lng}
         />
@@ -279,7 +285,9 @@ const Page = async ({
                             {...salePriceEditAttributes}
                             data-datocms-edit-target
                           >
-                            {`${currencySymbol ?? ''}${product.salePrice ?? ''}`}
+                            {`${currencySymbol ?? ''}${
+                              product.salePrice ?? ''
+                            }`}
                           </span>
                           <span
                             className="mb-0.5 text-red-500 line-through"

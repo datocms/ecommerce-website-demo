@@ -98,9 +98,7 @@ export default function ScrollToTop({ isDraft }: Props) {
             </motion.div>
           )}
         </AnimatePresence>
-        <div
-          className="flex flex-col gap-3"
-        >
+        <div className="flex flex-col gap-3">
           {isDraft ? (
             <button
               type="button"

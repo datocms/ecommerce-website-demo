@@ -2,9 +2,9 @@
 // Backfill empty Upload.alt values so DatoCMS can append stega payloads.
 // Requires a Management API token: DATOCMS_MANAGEMENT_TOKEN (Full-access).
 
-import { buildClient } from '@datocms/cma-client-node';
 import fs from 'node:fs';
 import path from 'node:path';
+import { buildClient } from '@datocms/cma-client-node';
 
 function loadDotEnv(filename) {
   try {
@@ -32,17 +32,20 @@ loadDotEnv('.env.local');
 loadDotEnv('.env');
 
 const token =
-  process.env.DATOCMS_MANAGEMENT_TOKEN || process.env.DATOCMS_FULLACCESS_API_TOKEN;
+  process.env.DATOCMS_MANAGEMENT_TOKEN ||
+  process.env.DATOCMS_FULLACCESS_API_TOKEN;
 
 if (!token) {
   console.error(
-    'Missing DATOCMS_MANAGEMENT_TOKEN (or DATOCMS_FULLACCESS_API_TOKEN). Set it in your env and retry.'
+    'Missing DATOCMS_MANAGEMENT_TOKEN (or DATOCMS_FULLACCESS_API_TOKEN). Set it in your env and retry.',
   );
   process.exit(1);
 }
 
 const DRY_RUN = /^1|true$/i.test(process.env.DRY_RUN || '');
-const LIMIT = process.env.LIMIT ? parseInt(process.env.LIMIT, 10) : undefined;
+const LIMIT = process.env.LIMIT
+  ? Number.parseInt(process.env.LIMIT, 10)
+  : undefined;
 
 function filenameWithoutExt(urlOrFilename) {
   try {
@@ -78,12 +81,23 @@ async function main() {
       processed += 1;
 
       const meta = up.default_field_metadata || {};
-      const enMeta = meta.en || { alt: null, title: null, custom_data: {}, focal_point: null };
+      const enMeta = meta.en || {
+        alt: null,
+        title: null,
+        custom_data: {},
+        focal_point: null,
+      };
       const rawAlt = (enMeta.alt || '').trim();
       if (rawAlt.length > 0) continue; // already filled for en
 
-      const proposed = filenameWithoutExt(up.filename || up.url || up.basename || 'image');
-      console.log(`• ${up.id} ${up.filename} -> alt: "${proposed}"${DRY_RUN ? ' (dry-run)' : ''}`);
+      const proposed = filenameWithoutExt(
+        up.filename || up.url || up.basename || 'image',
+      );
+      console.log(
+        `• ${up.id} ${up.filename} -> alt: "${proposed}"${
+          DRY_RUN ? ' (dry-run)' : ''
+        }`,
+      );
 
       if (!DRY_RUN) {
         const next = {

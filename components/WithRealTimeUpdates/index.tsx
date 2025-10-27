@@ -12,17 +12,17 @@
  */
 'use client';
 
-import { useCallback, useMemo, useRef, useState, memo } from 'react';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { subscribeToQuery } from 'datocms-listen';
-import { withContentLinkHeaders } from 'datocms-visual-editing';
-import { useDatoVisualEditingListen } from 'datocms-visual-editing/react';
 import {
   getVisualEditingController,
   refreshVisualEditing,
 } from '@/components/preview/DatoVisualEditingBridge';
 import { useDatoVisualEditing } from '@/components/preview/DatoVisualEditingBridge';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { subscribeToQuery } from 'datocms-listen';
+import { withContentLinkHeaders } from 'datocms-visual-editing';
+import { useDatoVisualEditingListen } from 'datocms-visual-editing/react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 
 /**
  * Client component that keeps the server-rendered preview tree in sync with the
@@ -31,11 +31,7 @@ import { useDatoVisualEditing } from '@/components/preview/DatoVisualEditingBrid
  * editing controller to rescan the page.
  */
 
-type Props<
-  PageProps extends GlobalPageProps,
-  TResult,
-  TVariables,
-> = {
+type Props<PageProps extends GlobalPageProps, TResult, TVariables> = {
   initialData: TResult;
   query: TypedDocumentNode<TResult, TVariables> | string;
   variables: TVariables;

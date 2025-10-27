@@ -14,8 +14,8 @@ import 'server-only';
 
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { withContentLinkHeaders } from 'datocms-visual-editing';
-import { draftMode } from 'next/headers';
 import { print } from 'graphql';
+import { draftMode } from 'next/headers';
 
 type QueryDatoCMSOptions = {
   isDraft?: boolean;

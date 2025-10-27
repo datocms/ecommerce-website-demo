@@ -60,13 +60,10 @@ export default async function queryDatoCMSCore<
   async function makeQueryId(input: string): Promise<string> {
     try {
       // Use Web Crypto API (Edge/Node >=18)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       if (typeof crypto !== 'undefined' && crypto?.subtle?.digest) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const enc = new TextEncoder();
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const buf = await crypto.subtle.digest('SHA-1', enc.encode(input));
         const bytes = Array.from(new Uint8Array(buf));
@@ -79,7 +76,8 @@ export default async function queryDatoCMSCore<
     } catch {}
     // Fallback: deterministic non-crypto hash
     let h = 0;
-    for (let i = 0; i < input.length; i++) h = (h * 31 + input.charCodeAt(i)) | 0;
+    for (let i = 0; i < input.length; i++)
+      h = (h * 31 + input.charCodeAt(i)) | 0;
     return `q:${String(h >>> 0)}`;
   }
   const queryId = await makeQueryId(qInput);
@@ -98,7 +96,8 @@ export default async function queryDatoCMSCore<
   }
 
   const cacheTagsHeader =
-    response.headers.get('x-cache-tags') || response.headers.get('X-Cache-Tags');
+    response.headers.get('x-cache-tags') ||
+    response.headers.get('X-Cache-Tags');
 
   const body = (await response.json()) as
     | { data: TResult }
@@ -110,4 +109,3 @@ export default async function queryDatoCMSCore<
 
   return { data: body.data, queryId, cacheTagsHeader };
 }
-

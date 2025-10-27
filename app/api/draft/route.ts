@@ -1,3 +1,4 @@
+import { draftMode } from 'next/headers';
 /**
  * Legacy draft enable endpoint
  * - Accepts `?secret=<token>&path=/en/home` and redirects to the path with
@@ -6,7 +7,6 @@
  *   cookie partitioning.
  */
 import { NextResponse } from 'next/server';
-import { draftMode } from 'next/headers';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);

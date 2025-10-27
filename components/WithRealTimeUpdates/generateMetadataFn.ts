@@ -36,8 +36,10 @@ export function generateMetadataFn<
     const fallbackLocale = await getFallbackLocale();
     const { isEnabled: isDraft } = await draftMode();
 
-    const { searchParams: _unusedSearchParams, ...pagePropsWithoutSearchParams } =
-      pageProps;
+    const {
+      searchParams: _unusedSearchParams,
+      ...pagePropsWithoutSearchParams
+    } = pageProps;
 
     const rawParams = await pageProps.params;
 

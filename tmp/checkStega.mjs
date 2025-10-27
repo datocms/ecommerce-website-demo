@@ -1,4 +1,4 @@
-import { withContentLinkHeaders, decodeStega } from 'datocms-visual-editing';
+import { decodeStega, withContentLinkHeaders } from 'datocms-visual-editing';
 
 // Load .env/.env.local (best-effort) when running directly via Node
 import fs from 'node:fs';
@@ -33,7 +33,9 @@ const TOKEN = process.env.DATOCMS_READONLY_API_TOKEN;
 const BASE = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL;
 
 if (!TOKEN || !BASE) {
-  console.error('Missing DATOCMS_READONLY_API_TOKEN or NEXT_PUBLIC_DATO_BASE_EDITING_URL');
+  console.error(
+    'Missing DATOCMS_READONLY_API_TOKEN or NEXT_PUBLIC_DATO_BASE_EDITING_URL',
+  );
   process.exit(1);
 }
 
@@ -108,8 +110,14 @@ const locale = 'en';
     console.log('\nUpload id:', img.id);
     console.log('  productImages.alt length:', rawAltField.length);
     console.log('  responsiveImage.alt length:', rawAltResponsive.length);
-    console.log('  productImages.alt decoded:', decodedField ? JSON.stringify(decodedField) : null);
-    console.log('  responsiveImage.alt decoded:', decodedResponsive ? JSON.stringify(decodedResponsive) : null);
+    console.log(
+      '  productImages.alt decoded:',
+      decodedField ? JSON.stringify(decodedField) : null,
+    );
+    console.log(
+      '  responsiveImage.alt decoded:',
+      decodedResponsive ? JSON.stringify(decodedResponsive) : null,
+    );
   }
 
   const l = data.layout;
@@ -128,8 +136,14 @@ const locale = 'en';
       console.log(`\nLayout ${label}:`);
       console.log('  field alt length:', rawAltField.length);
       console.log('  responsive alt length:', rawAltResponsive.length);
-      console.log('  field alt decoded:', decodedField ? JSON.stringify(decodedField) : null);
-      console.log('  responsive alt decoded:', decodedResponsive ? JSON.stringify(decodedResponsive) : null);
+      console.log(
+        '  field alt decoded:',
+        decodedField ? JSON.stringify(decodedField) : null,
+      );
+      console.log(
+        '  responsive alt decoded:',
+        decodedResponsive ? JSON.stringify(decodedResponsive) : null,
+      );
     }
   }
 })().catch((err) => {

@@ -33,3 +33,6 @@ tsconfig.tsbuildinfo
 .vercel
 
 .env
+ 
+# local QA helper
+scripts/quick-qa.mjs

@@ -3,8 +3,8 @@ import {
   ProductGeneralInterfaceFragmentDoc,
   type ProductQuery,
 } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import DatoImage from '../DatoImage';
 
@@ -85,7 +85,9 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
                     <div className="flex flex-col items-end">
                       <span
                         className="font-bold text-gray-600 lg:text-lg"
-                        {...(isOnSale ? salePriceEditAttributes : priceEditAttributes)}
+                        {...(isOnSale
+                          ? salePriceEditAttributes
+                          : priceEditAttributes)}
                         data-datocms-edit-target
                       >
                         {currencySymbol}

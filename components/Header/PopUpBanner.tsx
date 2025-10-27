@@ -1,8 +1,8 @@
+import DatoImage from '@/components/DatoImage';
 import type { PopupRecord } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import type { Dispatch, SetStateAction } from 'react';
-import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageType } from 'react-datocms';
 
 type PropTypes = {

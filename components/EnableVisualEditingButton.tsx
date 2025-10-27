@@ -29,7 +29,6 @@ export default function EnableVisualEditingButton({ className }: Props) {
         router.refresh();
       }
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error('Enable Visual Editing failed:', err);
       alert('Could not enable Visual Editing. See console for details.');
       onceRef.current = false;

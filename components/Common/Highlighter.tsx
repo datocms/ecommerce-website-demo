@@ -1,10 +1,6 @@
 import React, { type ReactNode } from 'react';
 
-const Highlighter = (
-  rawTagName: any,
-  props: any,
-  ...children: ReactNode[]
-) => {
+const Highlighter = (rawTagName: any, props: any, ...children: ReactNode[]) => {
   const normalizedChildren = React.Children.toArray(children);
 
   if (rawTagName === 'mark') {

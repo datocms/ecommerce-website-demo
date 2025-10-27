@@ -9,7 +9,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    revalidateTag('datocms');
+    // Next 16 requires a second "profile" argument for revalidateTag.
+    // Use 'max' to ensure immediate revalidation of all associated entries.
+    revalidateTag('datocms', 'max');
   } catch (error) {
     return NextResponse.json({
       status: 500,

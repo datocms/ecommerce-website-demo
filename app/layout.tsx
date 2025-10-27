@@ -6,8 +6,8 @@
  *   here via `draftMode()`.
  */
 import ScrollToTop from '@/components/ScrollToTop';
-import '@/styles/global.css';
 import DatoVisualEditingBridge from '@/components/preview/DatoVisualEditingBridge';
+import '@/styles/global.css';
 import type {
   AsyncGlobalPageProps,
   GlobalPageProps,
@@ -20,7 +20,9 @@ type Params = AsyncGlobalPageProps<GlobalPageProps> & {
 };
 
 export default async function RootLayout({ children, params }: Params) {
-  const resolvedParams = (await params) as GlobalPageProps['params'] | undefined;
+  const resolvedParams = (await params) as
+    | GlobalPageProps['params']
+    | undefined;
 
   const lng = resolvedParams?.lng ?? 'en';
   const { isEnabled: isDraft } = await draftMode();

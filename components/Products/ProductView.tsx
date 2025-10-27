@@ -5,11 +5,11 @@ import {
   ProductGeneralInterfaceFragmentDoc,
   type ProductQuery,
 } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
 import {
   getProductFieldEditAttributes,
   getProductPriceEditAttributes,
 } from '@/utils/datocmsVisualEditing';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useState } from 'react';
@@ -235,7 +235,11 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                       const colorEditAttributes = getProductFieldEditAttributes(
                         productEditingUrl,
                         locale,
-                        ['product_variations', variationIndex.toString(), 'color'],
+                        [
+                          'product_variations',
+                          variationIndex.toString(),
+                          'color',
+                        ],
                       );
 
                       if (variation.color.hex === selectedColor)

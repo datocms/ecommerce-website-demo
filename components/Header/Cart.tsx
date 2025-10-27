@@ -1,9 +1,9 @@
+import type { LayoutQuery } from '@/graphql/types/graphql';
+import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import type { LayoutQuery } from '@/graphql/types/graphql';
 import Link from 'next/link';
 import { type Dispatch, Fragment, type SetStateAction } from 'react';
-import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import DatoImage from '../DatoImage';
 
 type CartProduct = LayoutQuery['cartProducts'][number];
@@ -31,7 +31,9 @@ export default function Cart({
     Array<{
       product: CartProduct;
       price: number;
-      responsiveImage: NonNullable<CartProduct['productImages'][number]['responsiveImage']>;
+      responsiveImage: NonNullable<
+        CartProduct['productImages'][number]['responsiveImage']
+      >;
     }>
   >((accumulator, product) => {
     if (!product?.productImages?.length) {
@@ -45,12 +47,14 @@ export default function Cart({
     }
 
     const isOnSale = product.sale === 'on_sale' && product.salePrice != null;
-    const price = isOnSale && product.salePrice != null ? product.salePrice : product.price;
+    const price =
+      isOnSale && product.salePrice != null ? product.salePrice : product.price;
 
     accumulator.push({
       product,
       price,
-      responsiveImage,    });
+      responsiveImage,
+    });
 
     return accumulator;
   }, []);
@@ -139,64 +143,73 @@ export default function Cart({
                                 No products in the cart yet.
                               </li>
                             )}
-                            {cartItems.map(({ product, price, responsiveImage }) => (
-                              <li key={product.id} className="flex py-6">
-                                <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                  <DatoImage
-                                    fragment={responsiveImage}
-                                    altOverride={product.productImages[0]?.alt ?? null}
-                                    className="h-full w-full object-cover object-center"
-                                    layout="fill"
-                                    objectFit="cover"
-                                    objectPosition="50% 50%"
-                                  />
-                                </div>
-
-                                <div className="ml-4 flex flex-1 flex-col">
-                                  <div>
-                                    <div className="flex justify-between text-base font-medium text-gray-900">
-                                      <h3>
-                                        <Link href={`/${locale}/product/${product.slug}`}>
-                                          {product.name}
-                                        </Link>
-                                      </h3>
-                                      <p
-                                        className="ml-4"
-                                        {...getProductPriceEditAttributes(
-                                          (product as { _editingUrl?: string | null })
-                                            ._editingUrl,
-                                          locale,
-                                        )}
-                                        data-datocms-edit-target
-                                      >
-                                        {currencySymbol}
-                                        {formatPrice(price)}
-                                      </p>
-                                    </div>
-                                    {product.brand?.name && (
-                                      <p className="mt-1 text-sm text-gray-500">
-                                        {product.brand.name}
-                                      </p>
-                                    )}
+                            {cartItems.map(
+                              ({ product, price, responsiveImage }) => (
+                                <li key={product.id} className="flex py-6">
+                                  <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                    <DatoImage
+                                      fragment={responsiveImage}
+                                      altOverride={
+                                        product.productImages[0]?.alt ?? null
+                                      }
+                                      className="h-full w-full object-cover object-center"
+                                      layout="fill"
+                                      objectFit="cover"
+                                      objectPosition="50% 50%"
+                                    />
                                   </div>
-                                  <div className="flex flex-1 items-end justify-between text-sm">
-                                    <p className="text-gray-500">
-                                      Qty {DEFAULT_QUANTITY}
-                                    </p>
 
-                                    <div className="flex">
-                                      <button
-                                        type="button"
-                                        className="font-medium text-primary hover:text-primary/80"
-                                        aria-label={`Remove ${product.name} from cart`}
-                                      >
-                                        Remove
-                                      </button>
+                                  <div className="ml-4 flex flex-1 flex-col">
+                                    <div>
+                                      <div className="flex justify-between text-base font-medium text-gray-900">
+                                        <h3>
+                                          <Link
+                                            href={`/${locale}/product/${product.slug}`}
+                                          >
+                                            {product.name}
+                                          </Link>
+                                        </h3>
+                                        <p
+                                          className="ml-4"
+                                          {...getProductPriceEditAttributes(
+                                            (
+                                              product as {
+                                                _editingUrl?: string | null;
+                                              }
+                                            )._editingUrl,
+                                            locale,
+                                          )}
+                                          data-datocms-edit-target
+                                        >
+                                          {currencySymbol}
+                                          {formatPrice(price)}
+                                        </p>
+                                      </div>
+                                      {product.brand?.name && (
+                                        <p className="mt-1 text-sm text-gray-500">
+                                          {product.brand.name}
+                                        </p>
+                                      )}
+                                    </div>
+                                    <div className="flex flex-1 items-end justify-between text-sm">
+                                      <p className="text-gray-500">
+                                        Qty {DEFAULT_QUANTITY}
+                                      </p>
+
+                                      <div className="flex">
+                                        <button
+                                          type="button"
+                                          className="font-medium text-primary hover:text-primary/80"
+                                          aria-label={`Remove ${product.name} from cart`}
+                                        >
+                                          Remove
+                                        </button>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              </li>
-                            ))}
+                                </li>
+                              ),
+                            )}
                           </ul>
                         </div>
                       </div>

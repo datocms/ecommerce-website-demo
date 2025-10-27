@@ -20,11 +20,13 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
     router.push(`?${params.toString()}`);
   }
 
-  const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
+  const pageNumbers = Array.from(
+    { length: totalPages },
+    (_, index) => index + 1,
+  );
 
   const firstProductIndex = 1 + (currentPage - 1) * pageSize;
-  const lastProductIndex =
-    Math.min(numberOfProducts, currentPage * pageSize);
+  const lastProductIndex = Math.min(numberOfProducts, currentPage * pageSize);
 
   return (
     <div className="mx-auto mb-8 flex max-w-7xl items-center justify-center border-gray-200 bg-white px-4 pt-12 sm:mb-0 sm:px-6">

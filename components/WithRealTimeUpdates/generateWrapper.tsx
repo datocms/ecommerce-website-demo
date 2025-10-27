@@ -41,14 +41,14 @@ export function generateWrapper<
   realtimeComponent: RealtimeUpdatesPage<PageProps, TResult, TVariables>;
   onData?: (data: TResult, context: { pageProps: PageProps }) => void;
 }) {
-  return async function Page(
-    unsanitizedPageProps: AsyncPageProps<PageProps>,
-  ) {
+  return async function Page(unsanitizedPageProps: AsyncPageProps<PageProps>) {
     const fallbackLocale = await getFallbackLocale();
     const { isEnabled: isDraft } = await draftMode();
 
-    const { searchParams: _unusedSearchParams, ...pagePropsWithoutSearchParams } =
-      unsanitizedPageProps;
+    const {
+      searchParams: _unusedSearchParams,
+      ...pagePropsWithoutSearchParams
+    } = unsanitizedPageProps;
 
     const rawParams = await unsanitizedPageProps.params;
 

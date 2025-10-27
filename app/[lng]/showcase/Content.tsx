@@ -1,9 +1,9 @@
-import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import Link from 'next/link';
 import DatoImage from '@/components/DatoImage';
-import type { ResponsiveImageType } from 'react-datocms';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { ResponsiveImageType } from 'react-datocms';
 import type { PageProps, Query } from './meta';
 
 type ShowcaseContentViewProps = PageProps & {
@@ -26,9 +26,11 @@ export function ShowcaseContentView({
   const currencySymbol = data.generalInterface?.currencySymbol ?? '';
   const locale = globalPageProps.params.lng;
 
-  const firstProductEditingUrl = (firstNewProduct as {
-    _editingUrl?: string | null;
-  })._editingUrl;
+  const firstProductEditingUrl = (
+    firstNewProduct as {
+      _editingUrl?: string | null;
+    }
+  )._editingUrl;
   // Inline price edit targets; spreading attributes on the exact element that
   // displays the price keeps overlay alignment crisp.
   const firstProductPriceAttributes = getProductPriceEditAttributes(
@@ -41,9 +43,11 @@ export function ShowcaseContentView({
     { fieldPath: 'sale_price' },
   );
 
-  const secondProductEditingUrl = (secondNewProduct as {
-    _editingUrl?: string | null;
-  })._editingUrl;
+  const secondProductEditingUrl = (
+    secondNewProduct as {
+      _editingUrl?: string | null;
+    }
+  )._editingUrl;
   const secondProductPriceAttributes = getProductPriceEditAttributes(
     secondProductEditingUrl,
     locale,

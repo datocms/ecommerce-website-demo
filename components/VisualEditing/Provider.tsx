@@ -25,7 +25,6 @@ export default function VisualEditingProvider({ isDraft, children }: Props) {
       // Clean stega characters after hydration, while keeping overlays clickable.
       enableDatoAutoClean();
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.warn('Visual Editing bootstrap failed:', e);
     }
   }, [isDraft]);

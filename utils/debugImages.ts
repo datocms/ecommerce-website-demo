@@ -56,7 +56,6 @@ export function logClientResponsiveImage(
     extra: extra ?? null,
     ts: Date.now(),
   };
-  // eslint-disable-next-line no-console
   console.log(JSON.stringify(payload));
 }
 
@@ -147,7 +146,6 @@ export function logServerResponsiveImages(
     entries,
     ts: Date.now(),
   };
-  // eslint-disable-next-line no-console
   console.log(JSON.stringify(out));
 }
 
@@ -180,6 +178,5 @@ export function logDocumentImagesSample(opts?: {
     entries,
     ts: Date.now(),
   };
-  // eslint-disable-next-line no-console
   console.log(JSON.stringify(out));
 }

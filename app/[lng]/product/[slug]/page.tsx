@@ -9,9 +9,9 @@ import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrappe
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import { ProductStaticParamsDocument } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
+import { notFound } from 'next/navigation';
 import Content from './Content';
 import RealTime from './RealTime';
-import { notFound } from 'next/navigation';
 import { type PageProps, type Query, type Variables, query } from './meta';
 
 export async function generateStaticParams() {
@@ -28,7 +28,6 @@ export async function generateStaticParams() {
     })),
   );
 }
-
 
 const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
   params,

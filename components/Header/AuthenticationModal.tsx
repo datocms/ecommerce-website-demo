@@ -1,4 +1,9 @@
-import { type Dispatch, type SetStateAction, type FormEvent, useState } from 'react';
+import {
+  type Dispatch,
+  type FormEvent,
+  type SetStateAction,
+  useState,
+} from 'react';
 
 type Props = {
   setModalOpen: Dispatch<SetStateAction<boolean>>;

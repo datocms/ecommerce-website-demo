@@ -3,8 +3,8 @@ import {
   ProductGeneralInterfaceFragmentDoc,
   type ProductQuery,
 } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 type PropTypes = {
   data: ProductQuery;
@@ -61,9 +61,8 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
     data.generalInterface!,
   );
   const locale = globalPageProps.params.lng;
-  const productEditingUrl = (
-    data.product as { _editingUrl?: string | null }
-  )?._editingUrl;
+  const productEditingUrl = (data.product as { _editingUrl?: string | null })
+    ?._editingUrl;
   const reviewAverageEditAttributes = getProductFieldEditAttributes(
     productEditingUrl,
     locale,
@@ -102,10 +101,7 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
             </div>
 
             <span className="block text-sm text-gray-500">
-              <span
-                {...numberOfReviewsEditAttributes}
-                data-datocms-edit-target
-              >
+              <span {...numberOfReviewsEditAttributes} data-datocms-edit-target>
                 {data.product?.numberOfReviews}
               </span>{' '}
               {reviews}

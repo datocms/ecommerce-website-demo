@@ -7,10 +7,7 @@
 
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import WithRealTimeUpdates from '.';
-import type {
-  ClientContentPage,
-  RealtimeUpdatesPage,
-} from './types';
+import type { ClientContentPage, RealtimeUpdatesPage } from './types';
 
 export function generateRealtimeComponent<
   PageProps extends GlobalPageProps,

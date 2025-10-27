@@ -1,5 +1,5 @@
-import DatoImage from '@/components/DatoImage';
 import { getFallbackLocale } from '@/app/i18n/settings';
+import DatoImage from '@/components/DatoImage';
 import { LayoutDocument, type LayoutQuery } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import Link from 'next/link';

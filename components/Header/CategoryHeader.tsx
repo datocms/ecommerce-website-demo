@@ -1,5 +1,6 @@
 'use client';
 
+import DatoImage from '@/components/DatoImage';
 import type {
   DropdownMenuRecord,
   LayoutQuery,
@@ -17,7 +18,6 @@ import {
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Fragment, Suspense, useRef, useState } from 'react';
-import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageType } from 'react-datocms';
 import Cart from './Cart';
 import HoveringSearch from './HoveringSearch';
@@ -145,7 +145,10 @@ export default function CategoryHeader({
                                       category.newArrival.details.image
                                         .responsiveImage
                                     }
-                                    altOverride={category.newArrival.details.image.alt ?? null}
+                                    altOverride={
+                                      category.newArrival.details.image.alt ??
+                                      null
+                                    }
                                     className="h-full w-full object-contain"
                                     layout="fill"
                                     objectFit="cover"
@@ -177,7 +180,10 @@ export default function CategoryHeader({
                                       category.trending.details.image
                                         .responsiveImage
                                     }
-                                    altOverride={category.trending.details.image.alt ?? null}
+                                    altOverride={
+                                      category.trending.details.image.alt ??
+                                      null
+                                    }
                                     className="h-full w-full object-contain"
                                     layout="fill"
                                     objectFit="cover"
@@ -333,7 +339,10 @@ export default function CategoryHeader({
                                                   category.newArrival.details
                                                     .image.responsiveImage
                                                 }
-                                                altOverride={category.newArrival.details.image.alt ?? null}
+                                                altOverride={
+                                                  category.newArrival.details
+                                                    .image.alt ?? null
+                                                }
                                                 className="h-full w-full object-contain"
                                                 layout="fill"
                                                 objectFit="cover"
@@ -374,7 +383,10 @@ export default function CategoryHeader({
                                                   category.trending.details
                                                     .image.responsiveImage
                                                 }
-                                                altOverride={category.trending.details.image.alt ?? null}
+                                                altOverride={
+                                                  category.trending.details
+                                                    .image.alt ?? null
+                                                }
                                                 className="h-full w-full object-contain"
                                                 layout="fill"
                                                 objectFit="cover"

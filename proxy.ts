@@ -1,5 +1,5 @@
 /**
- * Middleware: locale routing only
+ * Proxy: locale routing only
  * - Normalises locale prefixes and redirects to the correct language.
  * - Intentionally does NOT manage visual-editing headers, cookies, or state —
  *   those live in server routes and the client bridge.
@@ -21,14 +21,18 @@ async function getLocale(
     headers.set('accept-language', acceptLanguage.replaceAll('_', '-'));
   }
 
-  const reformattedLocales = locales.map((locale) => locale.replaceAll('_', '-'));
+  const reformattedLocales = locales.map((locale) =>
+    locale.replaceAll('_', '-'),
+  );
   const headersObject = Object.fromEntries(headers.entries());
-  const languages = new Negotiator({ headers: headersObject }).languages(reformattedLocales);
+  const languages = new Negotiator({ headers: headersObject }).languages(
+    reformattedLocales,
+  );
 
   return match(languages, locales, fallbackLng);
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Check if there is any supported locale in the pathname
   const pathname = request.nextUrl.pathname;
   const locales = await getAvailableLocales();
@@ -38,7 +42,7 @@ export async function middleware(request: NextRequest) {
       !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
   );
 
-  //go to home in browser language if pathname & locale is missing
+  // go to home in browser language if pathname & locale is missing
   if (pathname === '/') {
     const locale = await getLocale(request, locales);
     const redirectUrl = new URL(`/${locale}/home`, request.url);
@@ -46,7 +50,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  //go to pathname in browser language if locale is missing but pathname is set
+  // go to pathname in browser language if locale is missing but pathname is set
   if (pathnameIsMissingLocale) {
     const locale = await getLocale(request, locales);
 

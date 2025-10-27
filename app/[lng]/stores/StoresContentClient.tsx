@@ -6,9 +6,9 @@
  */
 'use client';
 
+import DatoImage from '@/components/DatoImage';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { useState } from 'react';
-import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageType } from 'react-datocms';
 import type { PageProps, Query } from './meta';
 

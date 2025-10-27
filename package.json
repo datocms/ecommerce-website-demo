@@ -6,10 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . && biome check . --diagnostic-level=error",
     "format": "biome check . --apply-unsafe --diagnostic-level=error && biome format --diagnostic-level=error --write .",
     "generate-ts-types": "graphql-codegen --config graphql.config.ts",
-    "backfill-alt": "node scripts/backfill-upload-alt.mjs"
+    "backfill-alt": "node scripts/backfill-upload-alt.mjs",
+    "qa": "node scripts/quick-qa.mjs",
+    "typegen": "next typegen",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@datocms/cma-client-node": "^2.0.0",
@@ -34,10 +37,11 @@
     "i18next": "^23.4.1",
     "i18next-resources-to-backend": "^1.1.4",
     "jsdom": "^22.1.0",
+    "keyv": "^4.5.4",
     "language-name-map": "^0.3.0",
     "lucide-react": "^0.544.0",
     "negotiator": "^0.6.3",
-    "next": "^15.5.4",
+    "next": "^16.0.0",
     "next-themes": "^0.4.6",
     "react": "^19.1.1",
     "react-datocms": "^7.2.2",
@@ -47,6 +51,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.6.4",
+    "@eslint/eslintrc": "^3.3.1",
     "@graphql-codegen/cli": "^5.0.2",
     "@types/jsdom": "^21.1.7",
     "@types/language-name-map": "^0.3.0",
@@ -58,10 +63,13 @@
     "autoprefixer": "^10.4.13",
     "encoding": "^0.1.13",
     "eslint": "^9.36.0",
-    "eslint-config-next": "^15.5.4",
+    "eslint-config-next": "^16.0.0",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.2.4",
     "typescript": "^5.9.2"
   },
-  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8"
+  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8",
+  "engines": {
+    "node": ">=20.9.0"
+  }
 }

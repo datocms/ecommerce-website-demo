@@ -1,6 +1,6 @@
-import { type LayoutModelNotificationField } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { LayoutModelNotificationField } from '@/graphql/types/graphql';
 import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import {
   type Record,
   type StructuredText,

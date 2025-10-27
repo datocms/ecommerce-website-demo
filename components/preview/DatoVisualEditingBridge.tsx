@@ -21,12 +21,12 @@
  */
 'use client';
 
-import { useEffect, useState } from 'react';
 import {
+  type VisualEditingController,
   decodeStega,
   enableDatoVisualEditing,
-  type VisualEditingController,
 } from 'datocms-visual-editing';
+import { useEffect, useState } from 'react';
 
 /**
  * Bridge the imperative Visual Editing controller into React state so UI
@@ -76,6 +76,7 @@ const getSnapshot = () => ({ ...snapshot });
 
 const emit = () => {
   const current = getSnapshot();
+  // biome-ignore lint/complexity/noForEach: Simple fan-out to listeners; keep semantics unchanged
   listeners.forEach((listener) => listener(current));
 };
 
@@ -114,7 +115,7 @@ const registerDecode = () => {
 
 const clearDecode = () => {
   if (typeof window !== 'undefined') {
-    delete window.__DATOCMS_DECODE_STEGA__;
+    window.__DATOCMS_DECODE_STEGA__ = undefined;
   }
 };
 
@@ -270,7 +271,9 @@ export function toggleVisualEditing() {
 
 /** Hook used by UI/clients to observe controller state and actions. */
 export function useDatoVisualEditing() {
-  const [state, setState] = useState<VisualEditingSnapshot>(() => getSnapshot());
+  const [state, setState] = useState<VisualEditingSnapshot>(() =>
+    getSnapshot(),
+  );
   useEffect(() => subscribe(setState), []);
   return {
     ...state,

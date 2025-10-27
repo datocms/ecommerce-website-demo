@@ -8,11 +8,11 @@
 
 <!--datocms-autoinclude-header end-->
 
-# Ecommerce Visual Editing Demo (Next.js 15 + DatoCMS)
+# Ecommerce Visual Editing Demo (Next.js 16 + DatoCMS)
 
-This repository is a reference storefront that demonstrates how to deliver DatoCMS visual editing with the Next.js App Router (Next.js 15.5.x at the time of writing). The focus of this README is the visual editing experience: how it is wired, how the toggle behaves, and what you need to keep overlays working after local changes.
+This repository is a reference storefront that demonstrates how to deliver DatoCMS visual editing with the Next.js App Router (Next.js 16 at the time of writing). The focus of this README is the visual editing experience: how it is wired, how the toggle behaves, and what you need to keep overlays working after local changes.
 
-The data model, real-time subscription layer, and UI come from the standard ecommerce starter. All visual-editing-specific logic lives in the `app`, `components/preview`, `components/WithRealTimeUpdates`, and `middleware.ts` folders referenced below.
+The data model, real-time subscription layer, and UI come from the standard ecommerce starter. All visual-editing-specific logic lives in the `app`, `components/preview`, `components/WithRealTimeUpdates`, and `proxy.ts` folders referenced below.
 
 ## Demo
 
@@ -41,7 +41,11 @@ Live deployment: [https://ecommerce-website-demo-livid.vercel.app/](https://ecom
    - Preview secrets (`DRAFT_SECRET_TOKEN`, `SEO_SECRET_TOKEN`, `CACHE_INVALIDATION_SECRET_TOKEN`) can be any random string in local development.
    - `URL` defaults to `http://localhost:3000`; adjust if you run the dev server on another port.
 
-4. **Run the development server**:
+4. **Ensure Node.js 20.9+ (or 22.x) is used**:
+
+   This project now targets Next.js 16 which requires modern Node.js. Use the included `.nvmrc` (set to `22`) or any runtime ≥ 20.9.
+
+5. **Run the development server**:
 
    ```bash
    pnpm dev
@@ -92,9 +96,9 @@ Disabling the overlay keeps draft mode active while hiding the overlays. Re-enab
 - After each Listen update, the realtime wrapper calls `controller.refresh(scope)` so overlays re‑mark the updated subtree.
 - There is only one controller in the app. The realtime wrapper imports it with `getVisualEditingController()` and never passes `controllerOptions` (so it cannot create a second controller by mistake).
 
-### Middleware responsibilities
+### Proxy responsibilities
 
-`middleware.ts` only handles locale routing.
+`proxy.ts` only handles locale routing.
 
 - Normalises locales and redirects bare paths to the correct locale.
 - Leaves visual editing to server routes/query helpers and the client bridge — no custom headers or query params are added by middleware.

@@ -12,17 +12,17 @@
  */
 'use client';
 
-import {
-  getVisualEditingController,
-  refreshVisualEditing,
-} from '@/components/preview/DatoVisualEditingBridge';
-import { useDatoVisualEditing } from '@/components/preview/DatoVisualEditingBridge';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { subscribeToQuery } from 'datocms-listen';
 import { withContentLinkHeaders } from 'datocms-visual-editing';
 import { useDatoVisualEditingListen } from 'datocms-visual-editing/react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  getVisualEditingController,
+  refreshVisualEditing,
+  useDatoVisualEditing,
+} from '@/components/preview/DatoVisualEditingBridge';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 /**
  * Client component that keeps the server-rendered preview tree in sync with the
@@ -92,7 +92,6 @@ export default function WithRealTimeUpdates<
         variables,
         token,
         includeDrafts: true,
-        preview: true,
         ...(environment ? { environment } : {}),
         fetcher,
         onUpdate: (payload) => {
@@ -125,7 +124,7 @@ export default function WithRealTimeUpdates<
 
   // Track controller readiness so this component re-renders once the global
   // controller is mounted by the preview bridge.
-  const ve = useDatoVisualEditing();
+  const _ve = useDatoVisualEditing();
   const externalController = getVisualEditingController() ?? undefined;
 
   // Defer wiring the listen-hook until a controller exists to avoid the
@@ -135,16 +134,19 @@ export default function WithRealTimeUpdates<
   // mounted.
   const VisualEditingSync = useMemo(
     () =>
-      memo(function VisualEditingSyncInner() {
+      memo(function VisualEditingSyncInner({
+        controller,
+      }: {
+        controller: NonNullable<ReturnType<typeof getVisualEditingController>>;
+      }) {
         useDatoVisualEditingListen(subscribe, {
           scopeRef,
-          controller: externalController!,
+          controller,
           // initialRefresh: true by default; the hook will request a mark.
         });
         return null;
       }),
-    // Recreate if the subscribe function identity or ref changes.
-    [externalController, scopeRef, subscribe],
+    [subscribe],
   );
 
   // Render the server view into the exact node React hydrated. This preserves
@@ -152,7 +154,9 @@ export default function WithRealTimeUpdates<
   return (
     <div ref={scopeRef}>
       {children({ ...pageProps, data })}
-      {externalController ? <VisualEditingSync /> : null}
+      {externalController ? (
+        <VisualEditingSync controller={externalController} />
+      ) : null}
     </div>
   );
 }

@@ -1,6 +1,9 @@
-import { InitialParamsDocument, type SiteLocale } from '@/graphql/types/graphql';
-import queryDatoCMS from '@/utils/queryDatoCMS';
 import { unstable_cache as cache } from 'next/cache';
+import {
+  InitialParamsDocument,
+  type SiteLocale,
+} from '@/graphql/types/graphql';
+import queryDatoCMS from '@/utils/queryDatoCMS';
 
 export const getInitialParamsPublishedCached = cache(
   async (lng: SiteLocale, fallbackLng: SiteLocale) => {

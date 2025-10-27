@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
+export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -3494,7 +3494,7 @@ export type LayoutRecord = RecordInterface & {
   footerSubtitle?: Maybe<Scalars['String']['output']>;
   footerTitle?: Maybe<Scalars['String']['output']>;
   id: Scalars['ItemId']['output'];
-  logo: FileField;
+  logo: ImageFileField;
   mainColor: ColorField;
   menu: Array<LayoutModelMenuField>;
   notification?: Maybe<LayoutModelNotificationField>;
@@ -3624,7 +3624,6 @@ export type LegalPageModelFilter = {
   _locales?: InputMaybe<LocalesFilter>;
   _publicationScheduledAt?: InputMaybe<PublishedAtFilter>;
   _publishedAt?: InputMaybe<PublishedAtFilter>;
-  _stage?: InputMaybe<WorkflowWorkflowStageFilter>;
   _status?: InputMaybe<StatusFilter>;
   _unpublishingScheduledAt?: InputMaybe<PublishedAtFilter>;
   _updatedAt?: InputMaybe<UpdatedAtFilter>;
@@ -3673,7 +3672,6 @@ export type LegalPageRecord = RecordInterface & {
   _publishedAt: Scalars['DateTime']['output'];
   /** Generates SEO and Social card meta tags to be used in your frontend */
   _seoMetaTags: Array<Tag>;
-  _stage: WorkflowWorkflowStage;
   _status: ItemStatus;
   _unpublishingScheduledAt?: Maybe<Scalars['DateTime']['output']>;
   _updatedAt: Scalars['DateTime']['output'];
@@ -4024,7 +4022,6 @@ export type ProductModelFilter = {
   _locales?: InputMaybe<LocalesFilter>;
   _publicationScheduledAt?: InputMaybe<PublishedAtFilter>;
   _publishedAt?: InputMaybe<PublishedAtFilter>;
-  _stage?: InputMaybe<WorkflowWorkflowStageFilter>;
   _status?: InputMaybe<StatusFilter>;
   _unpublishingScheduledAt?: InputMaybe<PublishedAtFilter>;
   _updatedAt?: InputMaybe<UpdatedAtFilter>;
@@ -4152,7 +4149,6 @@ export type ProductRecord = RecordInterface & {
   _publishedAt: Scalars['DateTime']['output'];
   /** Generates SEO and Social card meta tags to be used in your frontend */
   _seoMetaTags: Array<Tag>;
-  _stage: WorkflowWorkflowStage;
   _status: ItemStatus;
   _unpublishingScheduledAt?: Maybe<Scalars['DateTime']['output']>;
   _updatedAt: Scalars['DateTime']['output'];
@@ -4950,7 +4946,6 @@ export type StoreModelFilter = {
   _locales?: InputMaybe<LocalesFilter>;
   _publicationScheduledAt?: InputMaybe<PublishedAtFilter>;
   _publishedAt?: InputMaybe<PublishedAtFilter>;
-  _stage?: InputMaybe<WorkflowWorkflowStageFilter>;
   _status?: InputMaybe<StatusFilter>;
   _unpublishingScheduledAt?: InputMaybe<PublishedAtFilter>;
   _updatedAt?: InputMaybe<UpdatedAtFilter>;
@@ -5006,7 +5001,6 @@ export type StoreRecord = RecordInterface & {
   _publishedAt: Scalars['DateTime']['output'];
   /** Generates SEO and Social card meta tags to be used in your frontend */
   _seoMetaTags: Array<Tag>;
-  _stage: WorkflowWorkflowStage;
   _status: ItemStatus;
   _unpublishingScheduledAt?: Maybe<Scalars['DateTime']['output']>;
   _updatedAt: Scalars['DateTime']['output'];
@@ -5595,24 +5589,6 @@ export enum VideoMp4Res {
   Medium = 'medium'
 }
 
-export enum WorkflowWorkflowStage {
-  ReadyToPublish = 'readyToPublish',
-  Review = 'review',
-  WorkInProgress = 'workInProgress'
-}
-
-/** Specifies how to filter by stage */
-export type WorkflowWorkflowStageFilter = {
-  /** Search the record with the specified stage */
-  eq?: InputMaybe<WorkflowWorkflowStage>;
-  /** Search records with the specified stagees */
-  in?: InputMaybe<Array<WorkflowWorkflowStage>>;
-  /** Exclude the record with the specified stage */
-  neq?: InputMaybe<WorkflowWorkflowStage>;
-  /** Search records without the specified stagees */
-  notIn?: InputMaybe<Array<WorkflowWorkflowStage>>;
-};
-
 export type FocalPoint = {
   __typename?: 'focalPoint';
   x: Scalars['FloatType']['output'];
@@ -5627,22 +5603,28 @@ export type HomeQueryVariables = Exact<{
 
 
 export type HomeQuery = { __typename?: 'Query', home?: (
-    { __typename?: 'HomeRecord', seo: Array<{ __typename?: 'Tag', attributes?: Record<string, string> | null, content?: string | null, tag: string }>, sections: Array<(
-      { __typename: 'CollectionCardShowcaseSectionRecord', id: string }
-      & { ' $fragmentRefs'?: { 'VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment': VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment;'CollectionCardShowcaseFragment': CollectionCardShowcaseFragment } }
-    ) | (
-      { __typename: 'DividerSectionRecord', id: string }
-      & { ' $fragmentRefs'?: { 'VisualEditingFields_DividerSectionRecord_Fragment': VisualEditingFields_DividerSectionRecord_Fragment;'DividerSectionFragment': DividerSectionFragment } }
-    ) | (
-      { __typename: 'HeroSectionRecord', id: string }
-      & { ' $fragmentRefs'?: { 'VisualEditingFields_HeroSectionRecord_Fragment': VisualEditingFields_HeroSectionRecord_Fragment;'HeroSectionFragment': HeroSectionFragment } }
-    ) | (
-      { __typename: 'MaterialShowcaseSectionRecord', id: string }
-      & { ' $fragmentRefs'?: { 'VisualEditingFields_MaterialShowcaseSectionRecord_Fragment': VisualEditingFields_MaterialShowcaseSectionRecord_Fragment;'MaterialShowcaseFragment': MaterialShowcaseFragment } }
-    ) | (
-      { __typename: 'TestimonialSectionRecord', id: string }
-      & { ' $fragmentRefs'?: { 'VisualEditingFields_TestimonialSectionRecord_Fragment': VisualEditingFields_TestimonialSectionRecord_Fragment;'TestimonialSectionFragment': TestimonialSectionFragment } }
-    )> }
+    { __typename?: 'HomeRecord', seo: Array<{ __typename?: 'Tag', attributes?: Record<string, string> | null, content?: string | null, tag: string }>, sections: Array<
+      | (
+        { __typename: 'CollectionCardShowcaseSectionRecord', id: string }
+        & { ' $fragmentRefs'?: { 'VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment': VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment;'CollectionCardShowcaseFragment': CollectionCardShowcaseFragment } }
+      )
+      | (
+        { __typename: 'DividerSectionRecord', id: string }
+        & { ' $fragmentRefs'?: { 'VisualEditingFields_DividerSectionRecord_Fragment': VisualEditingFields_DividerSectionRecord_Fragment;'DividerSectionFragment': DividerSectionFragment } }
+      )
+      | (
+        { __typename: 'HeroSectionRecord', id: string }
+        & { ' $fragmentRefs'?: { 'VisualEditingFields_HeroSectionRecord_Fragment': VisualEditingFields_HeroSectionRecord_Fragment;'HeroSectionFragment': HeroSectionFragment } }
+      )
+      | (
+        { __typename: 'MaterialShowcaseSectionRecord', id: string }
+        & { ' $fragmentRefs'?: { 'VisualEditingFields_MaterialShowcaseSectionRecord_Fragment': VisualEditingFields_MaterialShowcaseSectionRecord_Fragment;'MaterialShowcaseFragment': MaterialShowcaseFragment } }
+      )
+      | (
+        { __typename: 'TestimonialSectionRecord', id: string }
+        & { ' $fragmentRefs'?: { 'VisualEditingFields_TestimonialSectionRecord_Fragment': VisualEditingFields_TestimonialSectionRecord_Fragment;'TestimonialSectionFragment': TestimonialSectionFragment } }
+      )
+    > }
     & { ' $fragmentRefs'?: { 'VisualEditingFields_HomeRecord_Fragment': VisualEditingFields_HomeRecord_Fragment } }
   ) | null };
 
@@ -5676,13 +5658,16 @@ export type ProductQuery = { __typename?: 'Query', product?: (
     { __typename?: 'ProductRecord', name: string, price: number, sale: string, salePrice?: number | null, reviewAverage: number, numberOfReviews: number, id: string, seo: Array<{ __typename?: 'Tag', attributes?: Record<string, string> | null, content?: string | null, tag: string }>, featuredReviews: Array<{ __typename?: 'FeaturedReviewRecord', id: string, reviewerName: string, reviewDate: string, reviewScore: number, review: string }>, material: (
       { __typename?: 'MaterialRecord' }
       & { ' $fragmentRefs'?: { 'MaterialProductFragmentFragment': MaterialProductFragmentFragment } }
-    ), description?: { __typename?: 'ProductModelDescriptionField', value: unknown, blocks: Array<(
-        { __typename: 'FeaturedQuestionsSectionRecord', id: string }
-        & { ' $fragmentRefs'?: { 'QuestionSectionFragment': QuestionSectionFragment } }
-      ) | (
-        { __typename: 'ProductFeatureSectionRecord', id: string }
-        & { ' $fragmentRefs'?: { 'ProductInfoSectionFragment': ProductInfoSectionFragment } }
-      )> } | null, productImages: Array<{ __typename?: 'FileField', id: string, alt?: string | null, responsiveImage?: (
+    ), description?: { __typename?: 'ProductModelDescriptionField', value: unknown, blocks: Array<
+        | (
+          { __typename: 'FeaturedQuestionsSectionRecord', id: string }
+          & { ' $fragmentRefs'?: { 'QuestionSectionFragment': QuestionSectionFragment } }
+        )
+        | (
+          { __typename: 'ProductFeatureSectionRecord', id: string }
+          & { ' $fragmentRefs'?: { 'ProductInfoSectionFragment': ProductInfoSectionFragment } }
+        )
+      > } | null, productImages: Array<{ __typename?: 'FileField', id: string, alt?: string | null, responsiveImage?: (
         { __typename?: 'ResponsiveImage' }
         & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
       ) | null }>, brand: { __typename?: 'BrandRecord', name: string, id: string }, productVariations: Array<{ __typename?: 'ProductVariationRecord', id: string, availableSizes?: unknown | null, color: { __typename?: 'ColorField', hex: string } }>, relatedProducts: Array<(
@@ -5765,28 +5750,44 @@ export type LayoutQuery = { __typename?: 'Query', _site: { __typename?: 'Site', 
           & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
         ) | null } | null }
       & { ' $fragmentRefs'?: { 'VisualEditingFields_PopupRecord_Fragment': VisualEditingFields_PopupRecord_Fragment } }
-    ) | null, logo: { __typename?: 'FileField', url: string, alt?: string | null, responsiveImage?: (
+    ) | null, logo: { __typename?: 'ImageFileField', url: string, alt?: string | null, responsiveImage: (
         { __typename?: 'ResponsiveImage' }
         & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
-      ) | null }, notification?: { __typename?: 'LayoutModelNotificationField', value: unknown } | null, menu: Array<{ __typename?: 'DropdownMenuRecord', id: string, label: string, _modelApiKey: string, column: Array<{ __typename?: 'DropdownColumnRecord', label: string, id: string, item: Array<{ __typename?: 'BrandRecord', slug: string, id: string, _modelApiKey: string, name: string } | { __typename?: 'CollectionRecord', slug: string, id: string, _modelApiKey: string, name: string } | { __typename?: 'MaterialRecord', slug: string, id: string, _modelApiKey: string, name: string } | { __typename?: 'ProductRecord', slug: string, _modelApiKey: string, id: string, name: string }> }>, trending: { __typename?: 'BrandRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
-              { __typename?: 'ResponsiveImage' }
-              & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
-            ) | null } } } | { __typename?: 'CollectionRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
-              { __typename?: 'ResponsiveImage' }
-              & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
-            ) | null } } } | { __typename?: 'MaterialRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
-              { __typename?: 'ResponsiveImage' }
-              & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
-            ) | null } } }, newArrival: { __typename?: 'BrandRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
-              { __typename?: 'ResponsiveImage' }
-              & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
-            ) | null } } } | { __typename?: 'CollectionRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
-              { __typename?: 'ResponsiveImage' }
-              & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
-            ) | null } } } | { __typename?: 'MaterialRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
-              { __typename?: 'ResponsiveImage' }
-              & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
-            ) | null } } } } | { __typename?: 'LinkItemRecord', id: string, label: string, slug?: string | null, _modelApiKey: string }> }
+      ) }, notification?: { __typename?: 'LayoutModelNotificationField', value: unknown } | null, menu: Array<
+      | { __typename?: 'DropdownMenuRecord', id: string, label: string, _modelApiKey: string, column: Array<{ __typename?: 'DropdownColumnRecord', label: string, id: string, item: Array<
+            | { __typename?: 'BrandRecord', slug: string, id: string, _modelApiKey: string, name: string }
+            | { __typename?: 'CollectionRecord', slug: string, id: string, _modelApiKey: string, name: string }
+            | { __typename?: 'MaterialRecord', slug: string, id: string, _modelApiKey: string, name: string }
+            | { __typename?: 'ProductRecord', slug: string, _modelApiKey: string, id: string, name: string }
+          > }>, trending:
+          | { __typename?: 'BrandRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
+                  { __typename?: 'ResponsiveImage' }
+                  & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
+                ) | null } } }
+          | { __typename?: 'CollectionRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
+                  { __typename?: 'ResponsiveImage' }
+                  & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
+                ) | null } } }
+          | { __typename?: 'MaterialRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
+                  { __typename?: 'ResponsiveImage' }
+                  & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
+                ) | null } } }
+        , newArrival:
+          | { __typename?: 'BrandRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
+                  { __typename?: 'ResponsiveImage' }
+                  & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
+                ) | null } } }
+          | { __typename?: 'CollectionRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
+                  { __typename?: 'ResponsiveImage' }
+                  & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
+                ) | null } } }
+          | { __typename?: 'MaterialRecord', id: string, name: string, slug: string, _modelApiKey: string, details: { __typename?: 'FilterDetailRecord', image: { __typename?: 'FileField', alt?: string | null, responsiveImage?: (
+                  { __typename?: 'ResponsiveImage' }
+                  & { ' $fragmentRefs'?: { 'DatoImage_ResponsiveImageFragment': DatoImage_ResponsiveImageFragment } }
+                ) | null } } }
+         }
+      | { __typename?: 'LinkItemRecord', id: string, label: string, slug?: string | null, _modelApiKey: string }
+    > }
     & { ' $fragmentRefs'?: { 'VisualEditingFields_LayoutRecord_Fragment': VisualEditingFields_LayoutRecord_Fragment } }
   ) | null, generalInterface?: { __typename?: 'GeneralInterfaceRecord', currencySymbol?: string | null, trending?: string | null, new?: string | null, shopNow?: string | null, searchPlaceholder?: string | null, newsletter?: string | null, subscribeToOurNewsletter?: string | null, newsletterButton?: string | null, emailPlaceholder?: string | null, displayNewsletterFooter: boolean } | null, cartProducts: Array<(
     { __typename?: 'ProductRecord', id: string, name: string, price: number, sale: string, salePrice?: number | null, slug: string, brand: { __typename?: 'BrandRecord', name: string }, productImages: Array<{ __typename?: 'FileField', id: string, alt?: string | null, responsiveImage?: (
@@ -5898,7 +5899,39 @@ type VisualEditingFields_TestimonialRecord_Fragment = { __typename?: 'Testimonia
 
 type VisualEditingFields_TestimonialSectionRecord_Fragment = { __typename?: 'TestimonialSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_TestimonialSectionRecord_Fragment' };
 
-export type VisualEditingFieldsFragment = VisualEditingFields_BrandRecord_Fragment | VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment | VisualEditingFields_CollectionRecord_Fragment | VisualEditingFields_CookieNoticeRecord_Fragment | VisualEditingFields_DividerSectionRecord_Fragment | VisualEditingFields_DropdownColumnRecord_Fragment | VisualEditingFields_DropdownMenuRecord_Fragment | VisualEditingFields_FeaturedQuestionsSectionRecord_Fragment | VisualEditingFields_FeaturedReviewRecord_Fragment | VisualEditingFields_FilterDetailRecord_Fragment | VisualEditingFields_FooterColumnRecord_Fragment | VisualEditingFields_FooterItemRecord_Fragment | VisualEditingFields_GeneralInterfaceRecord_Fragment | VisualEditingFields_HeroSectionRecord_Fragment | VisualEditingFields_HomeRecord_Fragment | VisualEditingFields_LayoutRecord_Fragment | VisualEditingFields_LegalPageRecord_Fragment | VisualEditingFields_LinkItemRecord_Fragment | VisualEditingFields_MaterialRecord_Fragment | VisualEditingFields_MaterialShowcaseSectionRecord_Fragment | VisualEditingFields_PopupRecord_Fragment | VisualEditingFields_ProductFeatureSectionRecord_Fragment | VisualEditingFields_ProductQuestionRecord_Fragment | VisualEditingFields_ProductRecord_Fragment | VisualEditingFields_ProductVariationRecord_Fragment | VisualEditingFields_ShowcaseRecord_Fragment | VisualEditingFields_SimpleButtonRecord_Fragment | VisualEditingFields_SocialMediaIconRecord_Fragment | VisualEditingFields_StoreRecord_Fragment | VisualEditingFields_TestimonialRecord_Fragment | VisualEditingFields_TestimonialSectionRecord_Fragment;
+export type VisualEditingFieldsFragment =
+  | VisualEditingFields_BrandRecord_Fragment
+  | VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment
+  | VisualEditingFields_CollectionRecord_Fragment
+  | VisualEditingFields_CookieNoticeRecord_Fragment
+  | VisualEditingFields_DividerSectionRecord_Fragment
+  | VisualEditingFields_DropdownColumnRecord_Fragment
+  | VisualEditingFields_DropdownMenuRecord_Fragment
+  | VisualEditingFields_FeaturedQuestionsSectionRecord_Fragment
+  | VisualEditingFields_FeaturedReviewRecord_Fragment
+  | VisualEditingFields_FilterDetailRecord_Fragment
+  | VisualEditingFields_FooterColumnRecord_Fragment
+  | VisualEditingFields_FooterItemRecord_Fragment
+  | VisualEditingFields_GeneralInterfaceRecord_Fragment
+  | VisualEditingFields_HeroSectionRecord_Fragment
+  | VisualEditingFields_HomeRecord_Fragment
+  | VisualEditingFields_LayoutRecord_Fragment
+  | VisualEditingFields_LegalPageRecord_Fragment
+  | VisualEditingFields_LinkItemRecord_Fragment
+  | VisualEditingFields_MaterialRecord_Fragment
+  | VisualEditingFields_MaterialShowcaseSectionRecord_Fragment
+  | VisualEditingFields_PopupRecord_Fragment
+  | VisualEditingFields_ProductFeatureSectionRecord_Fragment
+  | VisualEditingFields_ProductQuestionRecord_Fragment
+  | VisualEditingFields_ProductRecord_Fragment
+  | VisualEditingFields_ProductVariationRecord_Fragment
+  | VisualEditingFields_ShowcaseRecord_Fragment
+  | VisualEditingFields_SimpleButtonRecord_Fragment
+  | VisualEditingFields_SocialMediaIconRecord_Fragment
+  | VisualEditingFields_StoreRecord_Fragment
+  | VisualEditingFields_TestimonialRecord_Fragment
+  | VisualEditingFields_TestimonialSectionRecord_Fragment
+;
 
 export type DatoImage_ResponsiveImageFragment = { __typename?: 'ResponsiveImage', src: string, srcSet: string, base64?: string | null, width: number, height: number, alt?: string | null, title?: string | null } & { ' $fragmentName'?: 'DatoImage_ResponsiveImageFragment' };
 

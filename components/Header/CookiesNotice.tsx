@@ -1,7 +1,7 @@
-import DatoImage from '@/components/DatoImage';
-import type { CookieNoticeRecord } from '@/graphql/types/graphql';
 import type { Dispatch, SetStateAction } from 'react';
 import type { ResponsiveImageType } from 'react-datocms';
+import DatoImage from '@/components/DatoImage';
+import type { CookieNoticeRecord } from '@/graphql/types/graphql';
 
 type PropTypes = {
   setCookies: Dispatch<SetStateAction<boolean>>;
@@ -26,6 +26,7 @@ const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
             viewBox="0 0 20 20"
             fill="currentColor"
           >
+            <title>Close</title>
             <path
               fillRule="evenodd"
               d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -62,22 +63,24 @@ const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
             </p>
 
             <div className="tex mt-6 sm:text-right">
-              <div
+              <button
+                type="button"
                 onClick={() => {
                   setCookies(false);
                 }}
-                className="inline-block cursor-pointer rounded-lg px-5 py-3 text-sm  font-medium text-slate-400"
+                className="inline-block rounded-lg px-5 py-3 text-sm font-medium text-slate-400"
               >
                 {cookieNotice.secondaryButtonLabel}
-              </div>
-              <div
+              </button>
+              <button
+                type="button"
                 onClick={() => {
                   setCookies(false);
                 }}
-                className="inline-block cursor-pointer rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white"
+                className="inline-block rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white"
               >
                 {cookieNotice.primaryButtonLabel}
-              </div>
+              </button>
             </div>
           </div>
         </div>

@@ -22,9 +22,9 @@
 'use client';
 
 import {
-  type VisualEditingController,
   decodeStega,
   enableDatoVisualEditing,
+  type VisualEditingController,
 } from 'datocms-visual-editing';
 import { useEffect, useState } from 'react';
 
@@ -76,8 +76,9 @@ const getSnapshot = () => ({ ...snapshot });
 
 const emit = () => {
   const current = getSnapshot();
-  // biome-ignore lint/complexity/noForEach: Simple fan-out to listeners; keep semantics unchanged
-  listeners.forEach((listener) => listener(current));
+  listeners.forEach((listener) => {
+    listener(current);
+  });
 };
 
 const updateSnapshot = (partial: Partial<VisualEditingSnapshot>) => {

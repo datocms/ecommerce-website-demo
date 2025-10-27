@@ -11,7 +11,7 @@ type PropTypes = {
   globalPageProps: GlobalPageProps;
 };
 
-import React, { type FC } from 'react';
+import type { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface StarRatingProps {
@@ -20,34 +20,42 @@ interface StarRatingProps {
 }
 
 const StarRating: FC<StarRatingProps> = ({ rating, editAttributes }) => {
-  const filledStars = Array.from({ length: Math.round(rating) });
-  const emptyStars = Array.from({ length: 5 - Math.round(rating) });
+  const filledKeys = Array.from(
+    { length: Math.round(rating) },
+    (_v, i) => `filled-${i}`,
+  );
+  const emptyKeys = Array.from(
+    { length: 5 - Math.round(rating) },
+    (_v, i) => `empty-${i}`,
+  );
   const editTagProps = editAttributes
     ? { ...editAttributes, 'data-datocms-edit-target': '' }
     : {};
 
   return (
     <div className="flex" {...editTagProps}>
-      {filledStars.map((_, index) => (
+      {filledKeys.map((k) => (
         <svg
-          key={`filled-star-${index}`}
+          key={k}
           xmlns="http://www.w3.org/2000/svg"
           className="text-yellow-400 h-5 w-5"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
+          <title>Star</title>
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       ))}
-      {emptyStars.map((_, index) => (
+      {emptyKeys.map((k) => (
         <svg
-          key={`empty-star-${index}`}
+          key={k}
           xmlns="http://www.w3.org/2000/svg"
           className="text-yellow-400 h-5 w-5"
           viewBox="0 0 20 20"
           fill="none"
           stroke="currentColor"
         >
+          <title>Star</title>
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       ))}
@@ -56,10 +64,12 @@ const StarRating: FC<StarRatingProps> = ({ rating, editAttributes }) => {
 };
 
 const Reviews = ({ data, globalPageProps }: PropTypes) => {
-  const { reviewButton, reviews } = getFragmentData(
+  const general = getFragmentData(
     ProductGeneralInterfaceFragmentDoc,
-    data.generalInterface!,
+    data.generalInterface ?? null,
   );
+  const reviewButton = general?.reviewButton;
+  const reviews = general?.reviews;
   const locale = globalPageProps.params.lng;
   const productEditingUrl = (data.product as { _editingUrl?: string | null })
     ?._editingUrl;
@@ -95,6 +105,7 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
+                  <title>Star</title>
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
               </div>
@@ -108,12 +119,12 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
             </span>
           </div>
 
-          <a
-            href="#"
+          <button
+            type="button"
             className="inline-block rounded-lg border bg-white px-4 py-2 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base"
           >
             {reviewButton}
-          </a>
+          </button>
         </div>
 
         <div className="divide-y">

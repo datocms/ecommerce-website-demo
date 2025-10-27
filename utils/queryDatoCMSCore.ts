@@ -60,11 +60,8 @@ export default async function queryDatoCMSCore<
   async function makeQueryId(input: string): Promise<string> {
     try {
       // Use Web Crypto API (Edge/Node >=18)
-      // @ts-ignore
       if (typeof crypto !== 'undefined' && crypto?.subtle?.digest) {
-        // @ts-ignore
         const enc = new TextEncoder();
-        // @ts-ignore
         const buf = await crypto.subtle.digest('SHA-1', enc.encode(input));
         const bytes = Array.from(new Uint8Array(buf));
         const b64 = btoa(String.fromCharCode(...bytes))

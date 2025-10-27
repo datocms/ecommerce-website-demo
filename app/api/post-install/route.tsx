@@ -1,4 +1,4 @@
-import { ApiError, type Client, buildClient } from '@datocms/cma-client-node';
+import { ApiError, buildClient, type Client } from '@datocms/cma-client-node';
 import { NextResponse } from 'next/server';
 
 const cors = {

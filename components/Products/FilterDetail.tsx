@@ -1,22 +1,22 @@
+import {
+  isList,
+  isListItem,
+  isThematicBreak,
+  type Record,
+  type StructuredText,
+} from 'datocms-structured-text-utils';
+import type { Maybe } from 'graphql/jsutils/Maybe';
+import {
+  renderNodeRule,
+  StructuredText as StructuredTextField,
+} from 'react-datocms/structured-text';
+import ReactMarkdown from 'react-markdown';
 import type { FragmentType } from '@/graphql/types';
 import type {
   DatoImage_ResponsiveImageFragmentDoc,
   SiteLocale,
 } from '@/graphql/types/graphql';
 import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
-import {
-  type Record,
-  type StructuredText,
-  isList,
-  isListItem,
-  isThematicBreak,
-} from 'datocms-structured-text-utils';
-import type { Maybe } from 'graphql/jsutils/Maybe';
-import {
-  StructuredText as StructuredTextField,
-  renderNodeRule,
-} from 'react-datocms/structured-text';
-import ReactMarkdown from 'react-markdown';
 import Highlighter from '../Common/Highlighter';
 import DatoImage from '../DatoImage';
 
@@ -73,6 +73,7 @@ const FilterDetail = ({
             </pattern>
           </defs>
           <svg x="50%" y={-1} className="overflow-visible fill-gray-50">
+            <title>Decorative grid</title>
             <path
               d="M-100.5 0h201v201h-201Z M699.5 0h201v201h-201Z M499.5 400h201v201h-201Z M-300.5 600h201v201h-201Z"
               strokeWidth={0}
@@ -127,7 +128,7 @@ const FilterDetail = ({
                         </div>
                       );
                     }),
-                    renderNodeRule(isThematicBreak, ({ children, key }) => {
+                    renderNodeRule(isThematicBreak, ({ key }) => {
                       return (
                         <hr
                           key={key}
@@ -137,11 +138,7 @@ const FilterDetail = ({
                     }),
                     renderNodeRule(isList, ({ children, key }) => {
                       return (
-                        <ul
-                          key={key}
-                          role="list"
-                          className="my-8 space-y-8 text-gray-600"
-                        >
+                        <ul key={key} className="my-8 space-y-8 text-gray-600">
                           {children}
                         </ul>
                       );

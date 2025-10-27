@@ -3,12 +3,7 @@
  * - Runs on the server; pulls SEO fragments from GraphQL with the same
  *   variables as the page and converts them to Next.js Metadata.
  */
-import { getFallbackLocale } from '@/app/i18n/settings';
-import type {
-  AsyncGlobalPageProps,
-  GlobalPageProps,
-} from '@/utils/globalPageProps';
-import queryDatoCMS from '@/utils/queryDatoCMS';
+
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
@@ -17,6 +12,12 @@ import {
   type TitleMetaLinkTag,
   toNextMetadata,
 } from 'react-datocms/seo';
+import { getFallbackLocale } from '@/app/i18n/settings';
+import type {
+  AsyncGlobalPageProps,
+  GlobalPageProps,
+} from '@/utils/globalPageProps';
+import queryDatoCMS from '@/utils/queryDatoCMS';
 import type { BuildVariablesFn } from './types';
 
 export function generateMetadataFn<

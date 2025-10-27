@@ -1,14 +1,14 @@
 'use client';
 
+import { Disclosure } from '@headlessui/react';
+import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
+import type { Maybe } from 'graphql/jsutils/Maybe';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import {
   InitialParamsFragmentDoc,
   ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
-import { Disclosure } from '@headlessui/react';
-import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
-import type { Maybe } from 'graphql/jsutils/Maybe';
-import { useRouter, useSearchParams } from 'next/navigation';
 
 type PropTypes = {
   initialParams: Maybe<FragmentType<typeof InitialParamsFragmentDoc>>;
@@ -28,7 +28,7 @@ const SideFilter = ({
   generalInterface,
 }: PropTypes) => {
   const router = useRouter();
-  const searchParams = useSearchParams()!;
+  const searchParams = useSearchParams();
   const paramaterCollectionsFiltered = paramaterCollections.filter(
     (parameter) => parameter !== '',
   );
@@ -88,7 +88,7 @@ const SideFilter = ({
   ];
 
   function exportQueryParameters(key: string, value: string) {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
     params.set(key, value);
     router.push(`?${params.toString()}`);
   }
@@ -103,14 +103,15 @@ const SideFilter = ({
               sortOption.value === '_publishedAt_DESC');
           return (
             <li key={sortOption.label}>
-              <div
+              <button
+                type="button"
                 className={`cursor-pointer ${isSelected ? 'font-bold' : ''}`}
                 onClick={() => {
                   exportQueryParameters('orderBy', sortOption.value);
                 }}
               >
                 {sortOption.label}
-              </div>
+              </button>
             </li>
           );
         })}
@@ -123,7 +124,7 @@ const SideFilter = ({
           key={section.id}
           className="border-b border-gray-200 py-6"
         >
-          {({ open, close }) => {
+          {({ open }) => {
             return (
               <>
                 <h3 className="-my-3 flow-root">

@@ -1,10 +1,8 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.6.4/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
+  "$schema": "https://biomejs.dev/schemas/2.3.1/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "files": {
-    "ignore": [".next", "graphql/types"]
+    "includes": ["**", "!**/.next", "!**/graphql/types"]
   },
   "linter": {
     "enabled": true,
@@ -47,6 +45,11 @@
   "javascript": {
     "formatter": {
       "quoteStyle": "single"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   }
 }

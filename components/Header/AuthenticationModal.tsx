@@ -29,7 +29,7 @@ const AuthenticationModal = ({
         return;
       }
       throw new Error('Wrong token!');
-    } catch (error) {
+    } catch (_error) {
       setInputValue('');
       setHasError(true);
     }

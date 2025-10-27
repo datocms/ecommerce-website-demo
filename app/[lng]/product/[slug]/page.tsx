@@ -3,16 +3,17 @@
  * - Generates static params for SSG, uses the same server/client wrapper
  *   pattern for preview.
  */
+
+import { notFound } from 'next/navigation';
 import getAvailableLocales from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import { ProductStaticParamsDocument } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
-import { notFound } from 'next/navigation';
 import Content from './Content';
+import { type PageProps, type Query, query, type Variables } from './meta';
 import RealTime from './RealTime';
-import { type PageProps, type Query, type Variables, query } from './meta';
 
 export async function generateStaticParams() {
   if (process.env.SKIP_SSG) {

@@ -1,9 +1,21 @@
 import React, { type ReactNode } from 'react';
 
-const Highlighter = (rawTagName: any, props: any, ...children: ReactNode[]) => {
+type TagName =
+  | keyof JSX.IntrinsicElements
+  | React.JSXElementConstructor<unknown>;
+type AnyProps = Record<string, unknown> & {
+  className?: string;
+  key?: React.Key;
+};
+
+const Highlighter = (
+  rawTagName: TagName,
+  props: AnyProps | null,
+  ...children: ReactNode[]
+) => {
   const normalizedChildren = React.Children.toArray(children);
 
-  if (rawTagName === 'mark') {
+  if ((rawTagName as string) === 'mark') {
     const { className, key: _ignoredKey, ...restProps } = props ?? {};
     const combinedClassName = [
       'inline rounded-sm bg-primary/25 px-1 py-1',
@@ -19,7 +31,11 @@ const Highlighter = (rawTagName: any, props: any, ...children: ReactNode[]) => {
     );
   }
 
-  return React.createElement(rawTagName, props, ...normalizedChildren);
+  return React.createElement(
+    rawTagName as React.ElementType,
+    props ?? {},
+    ...normalizedChildren,
+  );
 };
 
 export default Highlighter;

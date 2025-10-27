@@ -1,5 +1,8 @@
 'use client';
 
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { useState } from 'react';
 import { getFragmentData } from '@/graphql/types';
 import {
   ProductGeneralInterfaceFragmentDoc,
@@ -10,9 +13,6 @@ import {
   getProductPriceEditAttributes,
 } from '@/utils/datocmsVisualEditing';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { useState } from 'react';
 import DatoImage from '../DatoImage';
 
 type Props = {
@@ -116,7 +116,8 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                     );
 
                   return (
-                    <div
+                    <button
+                      type="button"
                       key={image.id}
                       className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 transition duration-200 hover:scale-105 hover:cursor-pointer"
                       onClick={() => {
@@ -133,7 +134,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                           objectPosition="50% 50%"
                         />
                       )}
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -158,8 +159,9 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                   </span>
                 )}
 
-                <a
-                  href="#"
+                <button
+                  type="button"
+                  aria-label="Add to favorites"
                   className="absolute right-4 top-4 inline-block rounded-lg border bg-white px-3.5 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-primary/30 transition duration-100 hover:bg-gray-100 focus-visible:ring active:text-gray-700 md:text-base"
                 >
                   <svg
@@ -169,6 +171,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
+                    <title>Favorite</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -176,7 +179,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                       d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                     />
                   </svg>
-                </a>
+                </button>
               </div>
             </div>
 
@@ -209,6 +212,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
+                    <title>Star</title>
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 </div>
@@ -279,9 +283,8 @@ const ProductView = ({ data, globalPageProps }: Props) => {
 
                 <div className="flex flex-wrap gap-3">
                   {allSizes.map((sizeOption) => {
-                    const availableIndex = selectedVariationSizes.findIndex(
-                      (item) => item === sizeOption,
-                    );
+                    const availableIndex =
+                      selectedVariationSizes.indexOf(sizeOption);
                     const sizeEditAttributes =
                       availableIndex > -1 && selectedVariationIndex > -1
                         ? getProductFieldEditAttributes(
@@ -382,6 +385,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
+                  <title>Shipping</title>
                   <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
                   <path
                     strokeLinecap="round"
@@ -395,19 +399,19 @@ const ProductView = ({ data, globalPageProps }: Props) => {
               </div>
 
               <div className="flex w-[90%] flex-col gap-2.5">
-                <a
-                  href="#"
+                <button
+                  type="button"
                   className="inline-block flex-1 rounded-lg bg-primary/90 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary/40 transition duration-100 hover:bg-primary focus-visible:ring active:bg-primary/50 sm:flex-none md:text-base"
                 >
                   {primaryButton}
-                </a>
+                </button>
 
-                <a
-                  href="#"
+                <button
+                  type="button"
                   className="inline-block rounded-lg bg-gray-200 px-8 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-300 focus-visible:ring active:text-gray-700 md:text-base"
                 >
                   {secondaryButton}
-                </a>
+                </button>
               </div>
             </div>
           </div>

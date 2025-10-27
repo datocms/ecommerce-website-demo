@@ -4,9 +4,10 @@
  * - `RealtimeUpdatesPage` is the client shell that streams updates.
  * - `BuildVariablesFn` lets pages derive query variables from params + locale.
  */
+
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import type { SiteLocale } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 
 export type BuildVariablesFn<
   PageProps extends GlobalPageProps,

@@ -18,15 +18,17 @@ export async function GET(request: Request) {
 
   // Avoid losing the cookie on redirect in an iframe; see enable route.
   const cookieStore = await cookies();
-  const cookie = cookieStore.get('__prerender_bypass')!;
-  cookieStore.set({
-    name: '__prerender_bypass',
-    value: cookie?.value,
-    httpOnly: true,
-    path: '/',
-    secure: true,
-    sameSite: 'none',
-  });
+  const cookie = cookieStore.get('__prerender_bypass');
+  if (cookie?.value) {
+    cookieStore.set({
+      name: '__prerender_bypass',
+      value: cookie.value,
+      httpOnly: true,
+      path: '/',
+      secure: true,
+      sameSite: 'none',
+    });
+  }
 
   redirect(url);
 }

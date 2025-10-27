@@ -1,17 +1,17 @@
-import Highlighter from '@/components/Common/Highlighter';
-import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
 import {
-  type Record,
-  type StructuredText,
   isHeading,
   isParagraph,
+  type Record,
+  type StructuredText,
 } from 'datocms-structured-text-utils';
 import { notFound } from 'next/navigation';
 import {
-  StructuredText as StructuredTextField,
   renderNodeRule,
+  StructuredText as StructuredTextField,
 } from 'react-datocms';
+import Highlighter from '@/components/Common/Highlighter';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
+import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
 import type { PageProps, Query } from './meta';
 
 type LegalContentViewProps = PageProps & {

@@ -13,7 +13,7 @@ export type AsyncGlobalPageProps<
   TSearchParams =
     | URLSearchParams
     | Record<string, string | string[] | undefined>,
-  TAsyncParams extends Record<string, any> = Record<string, string>,
+  TAsyncParams extends Record<string, unknown> = Record<string, string>,
 > = Omit<T, 'params'> & {
   params?: Promise<TAsyncParams>;
   searchParams?: Promise<TSearchParams | undefined>;

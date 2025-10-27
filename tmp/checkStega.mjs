@@ -1,8 +1,7 @@
-import { decodeStega, withContentLinkHeaders } from 'datocms-visual-editing';
-
 // Load .env/.env.local (best-effort) when running directly via Node
 import fs from 'node:fs';
 import path from 'node:path';
+import { decodeStega, withContentLinkHeaders } from 'datocms-visual-editing';
 
 function loadDotEnv(filename) {
   try {

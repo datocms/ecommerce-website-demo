@@ -6,10 +6,10 @@
  */
 'use client';
 
-import DatoImage from '@/components/DatoImage';
-import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { useState } from 'react';
 import type { ResponsiveImageType } from 'react-datocms';
+import DatoImage from '@/components/DatoImage';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
 
 // Client-only interactive view: handles carousel state while preserving stega

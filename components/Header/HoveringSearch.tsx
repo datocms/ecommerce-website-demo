@@ -1,8 +1,8 @@
 'use client';
 
-import type { SiteLocale } from '@/graphql/types/graphql';
 import { useRouter } from 'next/navigation';
 import { type Dispatch, type SetStateAction, useState } from 'react';
+import type { SiteLocale } from '@/graphql/types/graphql';
 
 type PropTypes = {
   lng: SiteLocale;

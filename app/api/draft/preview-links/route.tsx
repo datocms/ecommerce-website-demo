@@ -1,10 +1,16 @@
-import type { SiteLocale } from '@/graphql/types/graphql';
-import { headers as getHeaders } from 'next/headers';
 import type { NextRequest } from 'next/server';
+import type { SiteLocale } from '@/graphql/types/graphql';
+
+type DatoWebhookItemType = { attributes: { api_key: string } };
+type DatoWebhookItem = {
+  id: string;
+  attributes: { slug?: string };
+  meta: { status: string };
+};
 
 type generatePreviewUrlParams = {
-  item: any;
-  itemType: any;
+  item: DatoWebhookItem;
+  itemType: DatoWebhookItemType;
   locale: SiteLocale;
 };
 
@@ -40,7 +46,7 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   return new Response('ok', {
     status: 200,
     headers,
@@ -71,7 +77,7 @@ export async function POST(request: NextRequest) {
       : process.env.URL
   ) as string;
 
-  const isPublished = parsedRequest.item.meta.status === 'published';
+  const _isPublished = parsedRequest.item.meta.status === 'published';
 
   const previewLinks = [];
 

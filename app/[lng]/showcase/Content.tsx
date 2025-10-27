@@ -1,9 +1,9 @@
-import DatoImage from '@/components/DatoImage';
-import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { ResponsiveImageType } from 'react-datocms';
+import DatoImage from '@/components/DatoImage';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
+import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import type { PageProps, Query } from './meta';
 
 type ShowcaseContentViewProps = PageProps & {

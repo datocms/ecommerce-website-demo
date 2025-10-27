@@ -20,6 +20,7 @@ const SuccessPopUp = ({ setSuccessToast }: Props) => {
             stroke="currentColor"
             className="h-12 w-12"
           >
+            <title>Success</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -56,6 +57,7 @@ const SuccessPopUp = ({ setSuccessToast }: Props) => {
             stroke="currentColor"
             className="h-6 w-6"
           >
+            <title>Dismiss</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

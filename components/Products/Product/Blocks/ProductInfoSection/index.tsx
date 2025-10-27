@@ -1,3 +1,5 @@
+import type { Maybe } from 'graphql/jsutils/Maybe';
+import Link from 'next/link';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import {
@@ -6,8 +8,6 @@ import {
   ProductInfoSectionFragmentDoc,
 } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import type { Maybe } from 'graphql/jsutils/Maybe';
-import Link from 'next/link';
 
 type Props = {
   ProductInfoFragment: FragmentType<typeof ProductInfoSectionFragmentDoc>;

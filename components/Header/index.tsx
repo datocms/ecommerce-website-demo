@@ -1,5 +1,7 @@
 'use client';
 
+import { isEmptyDocument } from 'datocms-structured-text-utils';
+import { Suspense, useState } from 'react';
 import type {
   CookieNoticeRecord,
   LayoutModelNotificationField,
@@ -7,8 +9,6 @@ import type {
   PopupRecord,
 } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import { isEmptyDocument } from 'datocms-structured-text-utils';
-import { Suspense, useState } from 'react';
 import CategoryHeader from './CategoryHeader';
 import CookiesNotice from './CookiesNotice';
 import NotificationStrip from './NotificationStrip';
@@ -51,7 +51,10 @@ const Header = ({ data, globalPageProps }: Props) => {
           notification={
             data.layout?.notification as LayoutModelNotificationField
           }
-          layoutEditingUrl={(data.layout as any)?._editingUrl ?? null}
+          layoutEditingUrl={
+            ((data.layout as { _editingUrl?: string | null } | null) ?? null)
+              ?._editingUrl ?? null
+          }
           globalPageProps={globalPageProps}
           setNotificationStrip={setNotificationStrip}
         />

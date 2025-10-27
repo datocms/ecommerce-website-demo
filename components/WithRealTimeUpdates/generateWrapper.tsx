@@ -9,15 +9,15 @@
  * - Returns the realtime client wrapper when in draft mode; otherwise renders
  *   the server view directly.
  */
+
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { draftMode } from 'next/headers';
 import { getFallbackLocale } from '@/app/i18n/settings';
 import type {
   AsyncGlobalPageProps,
   GlobalPageProps,
 } from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { draftMode } from 'next/headers';
-import { Fragment } from 'react';
 import type {
   BuildVariablesFn,
   ContentPage,
@@ -124,10 +124,6 @@ export function generateWrapper<
       );
     }
 
-    return (
-      <Fragment>
-        <Content {...pageProps} data={data} />
-      </Fragment>
-    );
+    return <Content {...pageProps} data={data} />;
   };
 }

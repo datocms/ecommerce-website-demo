@@ -4,13 +4,13 @@
 // to preserve stega/_editingUrl markers. The LiveContent wrappers reuse this
 // view without replacing DOM nodes.
 
+import { notFound } from 'next/navigation';
 import DividerSection from '@/components/Sections/DividerSection';
 import Hero from '@/components/Sections/Hero';
 import MaterialShowcase from '@/components/Sections/MaterialShowcase';
 import ProductShowcase from '@/components/Sections/ProductShowcase';
 import TestimonialsSection from '@/components/Sections/Testimonials';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { notFound } from 'next/navigation';
 import type { PageProps, Query } from './meta';
 
 type ContentViewProps = PageProps & {

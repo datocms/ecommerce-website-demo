@@ -10,12 +10,12 @@ type PropTypes = {
 
 const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
   const router = useRouter();
-  const searchParams = useSearchParams()!;
+  const searchParams = useSearchParams();
   const pageSize = 12;
   const totalPages = Math.max(1, Math.ceil(numberOfProducts / pageSize));
 
   function exportQueryParameters(key: string, value: string) {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams?.toString() ?? '');
     params.set(key, value);
     router.push(`?${params.toString()}`);
   }

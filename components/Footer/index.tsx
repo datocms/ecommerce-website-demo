@@ -1,8 +1,8 @@
+import Link from 'next/link';
+import type { ResponsiveImageType } from 'react-datocms';
 import DatoImage from '@/components/DatoImage';
 import type { LayoutQuery } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import Link from 'next/link';
-import type { ResponsiveImageType } from 'react-datocms';
 import SvgRenderer from '../Common/SvgRenderer';
 
 type Props = {

@@ -34,16 +34,18 @@ export async function GET(request: NextRequest) {
   // Avoid losing the cookie on redirect inside an iframe by re-setting it with
   // `partitioned: true` (Chrome) and SameSite=None.
   const cookieStore = await cookies();
-  const cookie = cookieStore.get('__prerender_bypass')!;
-  cookieStore.set({
-    name: '__prerender_bypass',
-    value: cookie?.value,
-    httpOnly: true,
-    path: '/',
-    secure: true,
-    sameSite: 'none',
-    partitioned: true,
-  });
+  const cookie = cookieStore.get('__prerender_bypass');
+  if (cookie?.value) {
+    cookieStore.set({
+      name: '__prerender_bypass',
+      value: cookie.value,
+      httpOnly: true,
+      path: '/',
+      secure: true,
+      sameSite: 'none',
+      partitioned: true,
+    });
+  }
 
   redirect(redirectUrl.toString());
 }

@@ -14,13 +14,6 @@ import {
   ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
-import { getInitialParamsPublishedCached } from '@/utils/cachedQueries';
-import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
-import type {
-  AsyncGlobalPageProps,
-  GlobalPageProps,
-} from '@/utils/globalPageProps';
-import queryDatoCMS from '@/utils/queryDatoCMS';
 import type {
   StructuredText,
   Record as StructuredTextRecord,
@@ -28,6 +21,13 @@ import type {
 import { stripStega } from 'datocms-visual-editing';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
+import { getInitialParamsPublishedCached } from '@/utils/cachedQueries';
+import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
+import type {
+  AsyncGlobalPageProps,
+  GlobalPageProps,
+} from '@/utils/globalPageProps';
+import queryDatoCMS from '@/utils/queryDatoCMS';
 
 type PageProps = GlobalPageProps & {
   searchParams: {
@@ -81,6 +81,7 @@ const Page = async ({
   const fallbackLng = await getFallbackLocale();
   const pageNumber = Number.parseInt(
     firstValue(searchParamsRecord?.page) ?? '1',
+    10,
   );
   const orderBy: ProductModelOrderBy =
     (firstValue(searchParamsRecord?.orderBy) as
@@ -270,12 +271,12 @@ const Page = async ({
 
                     <div className="flex h-24 w-full items-center justify-between gap-2 overflow-hidden rounded-b-lg bg-primary/5 p-4">
                       <div className="flex flex-col justify-center">
-                        <a
-                          href="#"
+                        <Link
+                          href={`/${lng}/product/${product.slug}`}
                           className="lg:text-md overflow-hidden font-bold text-gray-800 transition duration-100 hover:text-gray-500"
                         >
                           {product.name ?? ''}
-                        </a>
+                        </Link>
                         <span className="text-sm text-gray-500">
                           {product.brand?.name ?? ''}
                         </span>

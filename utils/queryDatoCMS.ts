@@ -52,7 +52,7 @@ export default async function queryDatoCMS<
   }
 
   const normalizedOptions: QueryDatoCMSOptions =
-    typeof options === 'boolean' ? { isDraft: options } : options ?? {};
+    typeof options === 'boolean' ? { isDraft: options } : (options ?? {});
 
   const { isDraft, visualEditing } = normalizedOptions;
 
@@ -69,7 +69,7 @@ export default async function queryDatoCMS<
     try {
       const draft = await draftMode();
       draftEnabled = draft.isEnabled;
-    } catch (error) {
+    } catch (_error) {
       draftEnabled = false;
     }
   }
@@ -95,7 +95,7 @@ export default async function queryDatoCMS<
   }
 
   const fetchClient = includeVisualEditingMetadata
-    ? getFetchWithContentLinkHeaders(baseEditingUrl!)
+    ? getFetchWithContentLinkHeaders(baseEditingUrl as string)
     : fetch;
 
   // Preview/draft traffic should bypass cache; published traffic can be cached

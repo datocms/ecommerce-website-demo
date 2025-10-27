@@ -135,42 +135,42 @@ query Layout(
             name
             slug
             _modelApiKey
-          details {
-            image {
-              alt
-              responsiveImage {
-                ...DatoImage_responsiveImage
+            details {
+              image {
+                alt
+                responsiveImage {
+                  ...DatoImage_responsiveImage
+                }
               }
             }
-          }
           }
           ... on CollectionRecord {
             id
             name
             slug
             _modelApiKey
-          details {
-            image {
-              alt
-              responsiveImage {
-                ...DatoImage_responsiveImage
+            details {
+              image {
+                alt
+                responsiveImage {
+                  ...DatoImage_responsiveImage
+                }
               }
             }
-          }
           }
           ... on BrandRecord {
             id
             name
             slug
             _modelApiKey
-          details {
-            image {
-              alt
-              responsiveImage {
-                ...DatoImage_responsiveImage
+            details {
+              image {
+                alt
+                responsiveImage {
+                  ...DatoImage_responsiveImage
+                }
               }
             }
-          }
           }
         }
         newArrival {
@@ -179,42 +179,42 @@ query Layout(
             name
             slug
             _modelApiKey
-          details {
-            image {
-              alt
-              responsiveImage {
-                ...DatoImage_responsiveImage
+            details {
+              image {
+                alt
+                responsiveImage {
+                  ...DatoImage_responsiveImage
+                }
               }
             }
-          }
           }
           ... on CollectionRecord {
             id
             name
             slug
             _modelApiKey
-          details {
-            image {
-              alt
-              responsiveImage {
-                ...DatoImage_responsiveImage
+            details {
+              image {
+                alt
+                responsiveImage {
+                  ...DatoImage_responsiveImage
+                }
               }
             }
-          }
           }
           ... on BrandRecord {
             id
             name
             slug
             _modelApiKey
-          details {
-            image {
-              alt
-              responsiveImage {
-                ...DatoImage_responsiveImage
+            details {
+              image {
+                alt
+                responsiveImage {
+                  ...DatoImage_responsiveImage
+                }
               }
             }
-          }
           }
         }
       }
@@ -227,6 +227,7 @@ query Layout(
       }
     }
   }
+  # biome-ignore lint/suspicious/noDuplicateFields: _site selection repeated intentionally across fragments
   _site {
     locales
   }

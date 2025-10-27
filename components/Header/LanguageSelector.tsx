@@ -1,11 +1,11 @@
 'use client';
 
-import type { SiteLocale } from '@/graphql/types/graphql';
 import type { Maybe } from 'graphql/jsutils/Maybe';
 import { getLangNameFromCode } from 'language-name-map';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import { useState } from 'react';
+import type { SiteLocale } from '@/graphql/types/graphql';
 
 type Props = {
   languages: SiteLocale[];
@@ -17,25 +17,22 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
   const pathname = usePathname();
   const pathArray = pathname.split('/');
   const currentLocale = pathArray[1] as SiteLocale; //will be a SiteLocale because of the middleware redirect rules
-  const searchParams = useSearchParams()!;
+  const searchParams = useSearchParams();
+  const searchParamString = searchParams?.toString() ?? '';
 
   const pathString = pathArray.splice(2, pathArray.length).join('/');
 
   return (
     <div className="relative">
-      <div
-        onClick={() => {
-          isOpen ? setIsOpen(false) : setIsOpen(true);
-        }}
-        onBlur={() =>
-          setTimeout(() => {
-            setIsOpen(false);
-          }, 100)
-        }
-        className="ml-4 inline-flex w-full items-center overflow-hidden rounded-md bg-white transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300"
-      >
+      <div className="ml-4 inline-flex w-full items-center overflow-hidden rounded-md bg-white transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300">
         <button
           type="button"
+          onClick={() => setIsOpen((v) => !v)}
+          onBlur={() =>
+            setTimeout(() => {
+              setIsOpen(false);
+            }, 100)
+          }
           className="inline-flex w-full cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-center text-sm font-medium text-gray-800"
         >
           {getLangNameFromCode(currentLocale)?.name || currentLocale} (
@@ -56,7 +53,7 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
               className="inline-flex w-full cursor-pointer items-end justify-start rounded-lg text-center text-sm font-medium text-gray-900 hover:bg-gray-100"
             >
               <Link
-                href={`/${locale}/${pathString}?${searchParams.toString()}`}
+                href={`/${locale}/${pathString}${searchParamString ? `?${searchParamString}` : ''}`}
                 className="block w-full px-4 py-2 text-center text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
               >

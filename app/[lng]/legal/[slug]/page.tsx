@@ -1,14 +1,15 @@
 /** Legal page — SSG params + realtime preview when in draft mode. */
+
+import { notFound } from 'next/navigation';
 import getAvailableLocales from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import { LegalStaticParamsDocument } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
-import { notFound } from 'next/navigation';
 import Content from './Content';
+import { type PageProps, type Query, query, type Variables } from './meta';
 import RealTime from './RealTime';
-import { type PageProps, type Query, type Variables, query } from './meta';
 
 export async function generateStaticParams() {
   if (process.env.SKIP_SSG) {

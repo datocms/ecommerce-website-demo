@@ -2,20 +2,25 @@ import { buildClient } from '@datocms/cma-client-node';
 import { JSDOM } from 'jsdom';
 import type { NextRequest } from 'next/server';
 
+type CMAItem = { id: string; attributes: { slug?: string } };
+
 const findSlugAndPermalink = async (
-  item: any,
+  item: CMAItem,
   itemTypeApiKey: string,
   locale: string,
 ) => {
   switch (itemTypeApiKey) {
     case 'home':
-      return [item.slug, `/${locale}/`];
+      return [item.attributes.slug, `/${locale}/`];
     case 'showcase':
-      return [item.slug, `/${locale}/showcase`];
+      return [item.attributes.slug, `/${locale}/showcase`];
     case 'store':
-      return [item.slug, `/${locale}/stores`];
+      return [item.attributes.slug, `/${locale}/stores`];
     case 'product':
-      return [item.slug, `/${locale}/product/${item.slug}`];
+      return [
+        item.attributes.slug,
+        `/${locale}/product/${item.attributes.slug}`,
+      ];
     default:
       return [null, null];
   }
@@ -27,7 +32,7 @@ const headers = {
   'Access-Control-Allow-Methods': 'GET',
 };
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   return new Response('ok', {
     status: 200,
     headers,
@@ -64,7 +69,7 @@ export async function GET(req: NextRequest) {
     apiToken: process.env.DATOCMS_READONLY_API_TOKEN || '',
     environment: sandboxEnvironmentId,
   });
-  const item = await client.items.find(itemId);
+  const item = (await client.items.find(itemId)) as unknown as CMAItem;
 
   const [slug, permalink] = await findSlugAndPermalink(
     item,
@@ -74,7 +79,7 @@ export async function GET(req: NextRequest) {
 
   if (!permalink) {
     return new Response(
-      `Don\'t know which route corresponds to record #${itemId} (model: ${itemTypeApiKey})!`,
+      `Don't know which route corresponds to record #${itemId} (model: ${itemTypeApiKey})!`,
       {
         status: 422,
         headers,

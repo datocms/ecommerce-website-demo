@@ -1,13 +1,5 @@
 'use client';
 
-import DatoImage from '@/components/DatoImage';
-import type {
-  DropdownMenuRecord,
-  LayoutQuery,
-  LinkItemRecord,
-  SiteLocale,
-} from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -19,8 +11,15 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Fragment, Suspense, useRef, useState } from 'react';
 import type { ResponsiveImageType } from 'react-datocms';
+import DatoImage from '@/components/DatoImage';
+import type {
+  DropdownMenuRecord,
+  LayoutQuery,
+  LinkItemRecord,
+  SiteLocale,
+} from '@/graphql/types/graphql';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Cart from './Cart';
-import HoveringSearch from './HoveringSearch';
 import LanguageSelector from './LanguageSelector';
 
 type PropTypes = {
@@ -29,7 +28,9 @@ type PropTypes = {
   globalPageProps: GlobalPageProps;
 };
 
-function classNames(...classes: any) {
+function classNames(
+  ...classes: Array<string | number | false | null | undefined>
+) {
   return classes.filter(Boolean).join(' ');
 }
 
@@ -215,7 +216,6 @@ export default function CategoryHeader({
                                 {column.label}
                               </p>
                               <ul
-                                role="list"
                                 aria-labelledby={`${category.id}-${column.id}-heading-mobile`}
                                 className="mt-6 flex flex-col space-y-6"
                               >
@@ -352,7 +352,7 @@ export default function CategoryHeader({
                                           )}
                                           <p
                                             aria-hidden="true"
-                                            className="text-md mt-6 font-bold text-primary/80"
+                                            className="mt-6 font-bold text-primary/80 text-base"
                                           >
                                             {data.generalInterface?.trending}
                                           </p>
@@ -396,7 +396,7 @@ export default function CategoryHeader({
                                           )}
                                           <p
                                             aria-hidden="true"
-                                            className="text-md mt-6 font-bold text-primary/80"
+                                            className="mt-6 font-bold text-primary/80 text-base"
                                           >
                                             {data.generalInterface?.new}
                                           </p>
@@ -425,7 +425,6 @@ export default function CategoryHeader({
                                               {section.label}
                                             </p>
                                             <ul
-                                              role="list"
                                               aria-labelledby={`${section.label}-heading`}
                                               className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
                                             >
@@ -500,39 +499,40 @@ export default function CategoryHeader({
                         }
                       }}
                     />
-                    <a
-                      href="#"
+                    <button
+                      type="button"
+                      aria-label="Search"
+                      onClick={() => {
+                        if (!searchIsOpen) {
+                          setSerachIsOpen(true);
+                          searchBar.current?.focus();
+                          return;
+                        }
+                        if (!searchValue) {
+                          setSerachIsOpen(false);
+                          return;
+                        }
+                        router.push(
+                          `/${globalPageProps.params.lng}/products?productName=${searchValue}`,
+                        );
+                        setSerachIsOpen(false);
+                      }}
                       className="p-2 text-gray-400 hover:text-gray-500"
                     >
-                      <span className="sr-only">Search</span>
                       <MagnifyingGlassIcon
-                        onClick={() => {
-                          if (!searchIsOpen) {
-                            setSerachIsOpen(true);
-                            searchBar.current?.focus();
-                            return;
-                          }
-                          if (!searchValue) {
-                            setSerachIsOpen(false);
-                            return;
-                          }
-                          router.push(
-                            `/${globalPageProps.params.lng}/products?productName=${searchValue}`,
-                          );
-                          setSerachIsOpen(false);
-                        }}
                         className="h-6 w-6"
                         aria-hidden="true"
                       />
-                    </a>
+                    </button>
                   </div>
 
                   {/* Cart */}
-                  <div
-                    onClick={() => setCartIsOpen(true)}
-                    className="ml-4 flow-root lg:ml-6"
-                  >
-                    <a href="#" className="group -m-2 flex items-center p-2">
+                  <div className="ml-4 flow-root lg:ml-6">
+                    <button
+                      type="button"
+                      onClick={() => setCartIsOpen(true)}
+                      className="group -m-2 flex items-center p-2"
+                    >
                       <ShoppingBagIcon
                         className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                         aria-hidden="true"
@@ -541,7 +541,7 @@ export default function CategoryHeader({
                         0
                       </span>
                       <span className="sr-only">items in cart, view bag</span>
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>

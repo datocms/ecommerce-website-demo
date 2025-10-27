@@ -1,9 +1,9 @@
-import type { LayoutQuery } from '@/graphql/types/graphql';
-import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { type Dispatch, Fragment, type SetStateAction } from 'react';
+import type { LayoutQuery } from '@/graphql/types/graphql';
+import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import DatoImage from '../DatoImage';
 
 type CartProduct = LayoutQuery['cartProducts'][number];
@@ -94,7 +94,7 @@ export default function Cart({
                 <h1 className="text-3xl font-semibold text-primary">
                   This is a DatoCMS Demo
                 </h1>
-                <p className="text-md">
+                <p className="text-base">
                   To use the cart, and enable purchases, an integration with
                   Shopify or Commercelayer is necessary{' '}
                 </p>

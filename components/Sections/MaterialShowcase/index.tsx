@@ -1,8 +1,8 @@
+import Link from 'next/link';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { MaterialShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
-import Link from 'next/link';
 
 type Props = {
   fragment: FragmentType<typeof MaterialShowcaseFragmentDoc>;
@@ -22,7 +22,7 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
           {title}
         </h1>
 
-        <p className="text-md mx-auto mb-6 max-w-xl py-4 text-center leading-relaxed">
+        <p className="mx-auto mb-6 max-w-xl py-4 text-center leading-relaxed text-base">
           {description}
         </p>
 
@@ -32,7 +32,7 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
       </div>
 
       <div className="-mx-2 flex flex-col flex-wrap lg:flex-row">
-        {materials.map((material, index) => {
+        {materials.map((material, _index) => {
           return (
             <Link
               href={`/${globalPageProps.params.lng}/products?materials=${material.id}`}

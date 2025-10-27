@@ -1,7 +1,7 @@
-import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { notFound } from 'next/navigation';
-import StoresContentClient from './StoresContentClient';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
+import StoresContentClient from './StoresContentClient';
 
 // Server-side entry: validate data, then delegate to the client implementation.
 const Content: ContentPage<PageProps, Query> = ({ data, ...pageProps }) => {

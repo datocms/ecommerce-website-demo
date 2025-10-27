@@ -1,7 +1,5 @@
 query ProductStaticParams {
-  allProducts(
-    first: 100
-  ) {
+  allProducts(first: 100) {
     slug
   }
 }

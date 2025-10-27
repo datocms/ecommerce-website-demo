@@ -5,15 +5,16 @@
  * - Keeps middleware free from visual-editing concerns; draft detection lives
  *   here via `draftMode()`.
  */
-import ScrollToTop from '@/components/ScrollToTop';
+
 import DatoVisualEditingBridge from '@/components/preview/DatoVisualEditingBridge';
+import ScrollToTop from '@/components/ScrollToTop';
 import '@/styles/global.css';
+import { draftMode } from 'next/headers';
+import { Suspense } from 'react';
 import type {
   AsyncGlobalPageProps,
   GlobalPageProps,
 } from '@/utils/globalPageProps';
-import { draftMode } from 'next/headers';
-import { Suspense } from 'react';
 
 type Params = AsyncGlobalPageProps<GlobalPageProps> & {
   children: React.ReactNode;

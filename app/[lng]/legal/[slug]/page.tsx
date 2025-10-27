@@ -11,6 +11,9 @@ import { notFound } from 'next/navigation';
 import { type PageProps, type Query, type Variables, query } from './meta';
 
 export async function generateStaticParams() {
+  if (process.env.SKIP_SSG) {
+    return [];
+  }
   const locales = await getAvailableLocales();
   const { allLegalPages } = await queryDatoCMS(LegalStaticParamsDocument);
 
@@ -21,6 +24,7 @@ export async function generateStaticParams() {
     })),
   );
 }
+
 
 const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
   params,

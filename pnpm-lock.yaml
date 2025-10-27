@@ -41,12 +41,15 @@ importers:
       accept-language:
         specifier: ^3.0.18
         version: 3.0.20
+      datocms-listen:
+        specifier: ^0.1.15
+        version: 0.1.15(graphql@16.11.0)
       datocms-structured-text-utils:
         specifier: ^5.1.4
         version: 5.1.4
       datocms-visual-editing:
-        specifier: ^0.8.2
-        version: 0.8.2(react@19.1.1)
+        specifier: ^0.9.0
+        version: 0.9.0(react@19.1.1)
       framer-motion:
         specifier: ^12.23.22
         version: 12.23.22(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -1714,8 +1717,8 @@ packages:
   datocms-structured-text-utils@5.1.4:
     resolution: {integrity: sha512-CXpAvtZOwwW41EKf30ESUren0OQEHpQMMRe9LwrV7H1t/Zp5ic+ZhfsN+wkhAP4N8mAZ5an+Cyw09mVV8/X47Q==}
 
-  datocms-visual-editing@0.8.2:
-    resolution: {integrity: sha512-jQ5HP6DSLSxzuIYPlvNwD+EvNczPGagNcXGiPa72g9IvqMZUuVZBbzrlxp5GSKC+4hGwPpYU1HY4wmMsGgoy/g==}
+  datocms-visual-editing@0.9.0:
+    resolution: {integrity: sha512-HxIAHvZYm7gZW77Ux/mNLgW+mauZ9c0pM28E3+I7hXNA7YqHr4OA6CV0vJajXx1mTvbKYGEkddcz+mVJVbx9CA==}
     engines: {node: '>=18'}
     peerDependencies:
       react: '>=18'
@@ -5797,7 +5800,7 @@ snapshots:
     dependencies:
       array-flatten: 3.0.0
 
-  datocms-visual-editing@0.8.2(react@19.1.1):
+  datocms-visual-editing@0.9.0(react@19.1.1):
     dependencies:
       '@vercel/stega': 0.1.2
     optionalDependencies:

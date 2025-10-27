@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useState } from 'react';
+import { type Dispatch, type SetStateAction, type FormEvent, useState } from 'react';
 
 type Props = {
   setModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -30,6 +30,11 @@ const AuthenticationModal = ({
     }
   }
 
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await enableDraft();
+  };
+
   return (
     <div
       className="rounded-2xl border border-blue-100 bg-white p-4 shadow-lg sm:p-6 lg:p-8"
@@ -59,36 +64,39 @@ const AuthenticationModal = ({
       <p className="mt-4 text-gray-500">
         You will need a secret token to access the drafts, please add it bellow:
       </p>
-      <div>
-        <input
-          type="token"
-          value={inputValue}
-          onChange={(e) => {
-            setInputValue(e.target.value);
-            setHasError(false);
-          }}
-          id="UserToken"
-          className={`mt-4 w-full rounded-md border-2 border-gray-100 p-2 shadow-sm sm:text-sm${
-            hasError ? ' border-red-300' : ''
-          }`}
-        />
-        {hasError && <p className="mt-4 text-red-400">Incorrect token!</p>}
-      </div>
-      <div className="mt-6 sm:flex sm:gap-4">
-        <div
-          onClick={enableDraft}
-          className="inline-block w-full rounded-lg bg-primary px-5 py-3 text-center text-sm font-semibold text-white hover:cursor-pointer sm:w-auto"
-        >
-          Authenticate
+      <form onSubmit={handleSubmit}>
+        <div>
+          <input
+            type="token"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setHasError(false);
+            }}
+            id="UserToken"
+            className={`mt-4 w-full rounded-md border-2 border-gray-100 p-2 shadow-sm sm:text-sm${
+              hasError ? ' border-red-300' : ''
+            }`}
+          />
+          {hasError && <p className="mt-4 text-red-400">Incorrect token!</p>}
         </div>
+        <div className="mt-6 sm:flex sm:gap-4">
+          <button
+            type="submit"
+            className="inline-block w-full rounded-lg bg-primary px-5 py-3 text-center text-sm font-semibold text-white hover:cursor-pointer sm:w-auto"
+          >
+            Authenticate
+          </button>
 
-        <div
-          className="mt-2 inline-block w-full rounded-lg bg-gray-50 px-5 py-3 text-center text-sm font-semibold text-gray-500 hover:cursor-pointer sm:mt-0 sm:w-auto"
-          onClick={() => setModalOpen(false)}
-        >
-          Cancel
+          <button
+            type="button"
+            className="mt-2 inline-block w-full rounded-lg bg-gray-50 px-5 py-3 text-center text-sm font-semibold text-gray-500 hover:cursor-pointer sm:mt-0 sm:w-auto"
+            onClick={() => setModalOpen(false)}
+          >
+            Cancel
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

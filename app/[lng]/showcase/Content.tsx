@@ -8,6 +8,8 @@ import type { ResponsiveImageType } from 'react-datocms';
 import DatoImage from '@/components/DatoImage';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
+import { imageFillCoverProps } from '@/utils/imageProps';
+import { isOnSaleFlag } from '@/utils/productFields';
 import type { PageProps, Query } from './meta';
 
 type ShowcaseContentViewProps = PageProps & {
@@ -26,8 +28,8 @@ export function ShowcaseContentView({
   }
 
   const [firstNewProduct, secondNewProduct] = data.showcase.newProducts;
-  const firstProductIsOnSale = firstNewProduct.sale !== 'not_on_sale';
-  const secondProductIsOnSale = secondNewProduct.sale !== 'not_on_sale';
+  const firstProductIsOnSale = isOnSaleFlag(firstNewProduct.sale);
+  const secondProductIsOnSale = isOnSaleFlag(secondNewProduct.sale);
   const currencySymbol = data.generalInterface?.currencySymbol ?? '';
   const locale = globalPageProps.params.lng;
 
@@ -79,9 +81,7 @@ export function ShowcaseContentView({
               }
               altOverride={data.showcase.displays[0].alt ?? null}
               className="h-full w-full rounded-lg object-contain"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
+              {...imageFillCoverProps()}
             />
           </div>
           <div className="relative hidden h-screen w-full object-cover md:mt-32 md:block">
@@ -91,9 +91,7 @@ export function ShowcaseContentView({
               }
               altOverride={data.showcase.displays[1].alt ?? null}
               className="h-full w-full rounded-lg object-contain"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
+              {...imageFillCoverProps()}
             />
           </div>
         </div>
@@ -162,9 +160,7 @@ export function ShowcaseContentView({
                 }
                 altOverride={firstNewProduct.productImages[0].alt ?? null}
                 className="h-full w-full rounded-lg object-contain"
-                layout="fill"
-                objectFit="cover"
-                objectPosition="70% 30%"
+                {...imageFillCoverProps('70% 30%')}
               />
             </div>
             <div className="pt-6">
@@ -206,9 +202,7 @@ export function ShowcaseContentView({
                 }
                 altOverride={secondNewProduct.productImages[0].alt ?? null}
                 className="h-full w-full rounded-lg object-contain"
-                layout="fill"
-                objectFit="cover"
-                objectPosition="70% 30%"
+                {...imageFillCoverProps('70% 30%')}
               />
             </div>
             <div className="pt-6">
@@ -254,9 +248,7 @@ export function ShowcaseContentView({
                 }
                 altOverride={data.showcase.materialsDisplay[0].alt ?? null}
                 className="h-full w-full rounded-lg object-contain"
-                layout="fill"
-                objectFit="cover"
-                objectPosition="50% 50%"
+                {...imageFillCoverProps()}
               />
             </div>
           </div>
@@ -269,9 +261,7 @@ export function ShowcaseContentView({
                 }
                 altOverride={data.showcase.materialsDisplay[1].alt ?? null}
                 className="h-full w-full rounded-lg object-contain"
-                layout="fill"
-                objectFit="cover"
-                objectPosition="50% 50%"
+                {...imageFillCoverProps()}
               />
             </div>
             <div className="-mt-14 px-12 md:mt-0 md:py-24">

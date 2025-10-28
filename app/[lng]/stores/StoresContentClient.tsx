@@ -10,6 +10,7 @@ import { useState } from 'react';
 import type { ResponsiveImageType } from 'react-datocms';
 import DatoImage from '@/components/DatoImage';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
+import { imageFillCoverProps } from '@/utils/imageProps';
 import type { PageProps, Query } from './meta';
 
 // Client-only interactive view: handles carousel state while preserving stega
@@ -104,9 +105,7 @@ const StoresContentClient: ContentPage<PageProps, Query> = ({ data }) => {
             }
             altOverride={allStores[currentStore].storeImage?.alt ?? null}
             className="h-full w-full rounded-lg object-contain"
-            layout="fill"
-            objectFit="cover"
-            objectPosition="70% 30%"
+            {...imageFillCoverProps('70% 30%')}
           />
         </div>
       </div>

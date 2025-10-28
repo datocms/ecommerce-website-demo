@@ -54,3 +54,19 @@ export const getProductFieldEditAttributes = (
         locale,
       })
     : {};
+
+/**
+ * Convenience helper to compute wrapper props for an edit target. Returns
+ * `undefined` when `editingUrl` is falsy so callers can spread conditionally.
+ */
+export function buildEditWrapperProps(
+  editingUrl: string | null | undefined,
+  locale: string,
+  fieldPath: string | string[],
+): Record<string, string> | undefined {
+  if (!editingUrl) return undefined;
+  const attrs = getProductFieldEditAttributes(editingUrl, locale, fieldPath);
+  return Object.keys(attrs).length > 0
+    ? { ...(attrs as Record<string, string>), 'data-datocms-edit-target': '' }
+    : undefined;
+}

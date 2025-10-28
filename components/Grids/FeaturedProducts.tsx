@@ -10,6 +10,8 @@ import {
 } from '@/graphql/types/graphql';
 import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { imageFillCoverProps } from '@/utils/imageProps';
+import { isOnSaleFlag } from '@/utils/productFields';
 import DatoImage from '../DatoImage';
 
 type PropTypes = {
@@ -34,7 +36,7 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
       <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
         <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 md:gap-x-6 lg:grid-cols-3 xl:grid-cols-3">
           {data.product?.relatedProducts.map((product) => {
-            const isOnSale = product?.sale === 'on_sale';
+            const isOnSale = isOnSaleFlag(product?.sale);
             const editingUrl = (product as { _editingUrl?: string | null })
               ._editingUrl;
             const priceEditAttributes = getProductPriceEditAttributes(
@@ -62,9 +64,7 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
                       fragment={firstProductImage.responsiveImage}
                       altOverride={firstProductImage.alt ?? null}
                       className="h-full w-full object-contain"
-                      layout="fill"
-                      objectFit="cover"
-                      objectPosition="50% 50%"
+                      {...imageFillCoverProps()}
                     />
                   </div>
 

@@ -12,11 +12,11 @@ type PropTypes = {
   /** Active locale for the search results route. */
   lng: SiteLocale;
   /** Setter to close the floating search. */
-  setSerachIsOpen: Dispatch<SetStateAction<boolean>>;
+  setSearchIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 /** Simple search input that navigates on Enter and clears itself. */
-const HoveringSearch = ({ lng, setSerachIsOpen }: PropTypes) => {
+const HoveringSearch = ({ lng, setSearchIsOpen }: PropTypes) => {
   const [searchValue, setSearchValue] = useState('');
   const router = useRouter();
 
@@ -31,7 +31,7 @@ const HoveringSearch = ({ lng, setSerachIsOpen }: PropTypes) => {
         if (event.key === 'Enter') {
           router.push(`/${lng}/products?productName=${searchValue}`);
           setSearchValue('');
-          setSerachIsOpen(false);
+          setSearchIsOpen(false);
         }
       }}
     />

@@ -6,6 +6,7 @@
  */
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { pushQueryParam } from '@/utils/urlParams';
 
 type PropTypes = {
   /** Total number of matching products. */
@@ -21,11 +22,8 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
   const pageSize = 12;
   const totalPages = Math.max(1, Math.ceil(numberOfProducts / pageSize));
 
-  function exportQueryParameters(key: string, value: string) {
-    const params = new URLSearchParams(searchParams?.toString() ?? '');
-    params.set(key, value);
-    router.push(`?${params.toString()}`);
-  }
+  const setParam = (key: string, value: string) =>
+    pushQueryParam(router, searchParams, key, value);
 
   const pageNumbers = Array.from(
     { length: totalPages },
@@ -54,7 +52,7 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
               <button
                 type="button"
                 onClick={() => {
-                  exportQueryParameters('page', (currentPage - 1).toString());
+                  setParam('page', (currentPage - 1).toString());
                 }}
                 className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
               >
@@ -74,7 +72,7 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
                     isSelected ? ' bg-primary text-white' : ' text-gray-900'
                   }`}
                   onClick={() => {
-                    exportQueryParameters('page', pageNumber.toString());
+                    setParam('page', pageNumber.toString());
                   }}
                 >
                   {pageNumber}
@@ -85,7 +83,7 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
               <button
                 type="button"
                 onClick={() => {
-                  exportQueryParameters('page', (currentPage + 1).toString());
+                  setParam('page', (currentPage + 1).toString());
                 }}
                 className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
               >

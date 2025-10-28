@@ -13,12 +13,12 @@ import {
   ProductsDocument,
   ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
+import { imageFillCoverProps } from '@/utils/imageProps';
 import '@/styles/global.css';
 import type {
   StructuredText,
   Record as StructuredTextRecord,
 } from 'datocms-structured-text-utils';
-import { stripStega } from 'datocms-visual-editing';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
 import { getInitialParamsPublishedCached } from '@/utils/cachedQueries';
@@ -27,6 +27,7 @@ import type {
   AsyncGlobalPageProps,
   GlobalPageProps,
 } from '@/utils/globalPageProps';
+import { isOnSaleDraftTolerant } from '@/utils/productFields';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 
 type PageProps = GlobalPageProps & {
@@ -229,8 +230,7 @@ const Page = async ({
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {data.allProducts.map((product) => {
                 const firstProductImage = product.productImages[0];
-                const saleStatus = stripStega(product.sale ?? '');
-                const isOnSale = saleStatus === 'on_sale';
+                const isOnSale = isOnSaleDraftTolerant(product.sale);
                 const editingUrl = (product as { _editingUrl?: string | null })
                   ._editingUrl;
                 const priceEditAttributes = getProductPriceEditAttributes(
@@ -256,9 +256,7 @@ const Page = async ({
                           fragment={firstProductImage.responsiveImage}
                           altOverride={firstProductImage.alt ?? null}
                           className="h-full w-full object-contain"
-                          layout="fill"
-                          objectFit="cover"
-                          objectPosition="50% 50%"
+                          {...imageFillCoverProps()}
                         />
                       )}
 

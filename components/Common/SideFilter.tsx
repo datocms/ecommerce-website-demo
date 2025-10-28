@@ -13,6 +13,7 @@ import {
   InitialParamsFragmentDoc,
   ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
+import { pushQueryParam } from '@/utils/urlParams';
 
 type PropTypes = {
   /** Initial lists for filters (collections, brands, materials). */
@@ -97,11 +98,8 @@ const SideFilter = ({
     { label: sales, value: 'sale_DESC' },
   ];
 
-  function exportQueryParameters(key: string, value: string) {
-    const params = new URLSearchParams(searchParams?.toString() ?? '');
-    params.set(key, value);
-    router.push(`?${params.toString()}`);
-  }
+  const setParam = (key: string, value: string) =>
+    pushQueryParam(router, searchParams, key, value);
 
   return (
     <form className="mx-4 mb-8 text-center lg:mx-0 lg:mb-0 lg:text-left">
@@ -117,7 +115,7 @@ const SideFilter = ({
                 type="button"
                 className={`cursor-pointer ${isSelected ? 'font-bold' : ''}`}
                 onClick={() => {
-                  exportQueryParameters('orderBy', sortOption.value);
+                  setParam('orderBy', sortOption.value);
                 }}
               >
                 {sortOption.label}
@@ -175,7 +173,7 @@ const SideFilter = ({
                                     option.id,
                                   )
                                 ) {
-                                  exportQueryParameters(
+                                  setParam(
                                     'collections',
                                     paramaterCollectionsFiltered
                                       .filter(
@@ -187,7 +185,7 @@ const SideFilter = ({
                                   return;
                                 }
                                 paramaterCollectionsFiltered.push(option.id);
-                                exportQueryParameters(
+                                setParam(
                                   'collections',
                                   paramaterCollectionsFiltered.join('|'),
                                 );
@@ -196,7 +194,7 @@ const SideFilter = ({
                                 if (
                                   parameterBrandsFiltered.includes(option.id)
                                 ) {
-                                  exportQueryParameters(
+                                  setParam(
                                     'brands',
                                     parameterBrandsFiltered
                                       .filter(
@@ -208,7 +206,7 @@ const SideFilter = ({
                                   return;
                                 }
                                 parameterBrandsFiltered.push(option.id);
-                                exportQueryParameters(
+                                setParam(
                                   'brands',
                                   parameterBrandsFiltered.join('|'),
                                 );
@@ -217,7 +215,7 @@ const SideFilter = ({
                                 if (
                                   parameterMaterialsFiltered.includes(option.id)
                                 ) {
-                                  exportQueryParameters(
+                                  setParam(
                                     'materials',
                                     parameterMaterialsFiltered
                                       .filter(
@@ -228,7 +226,7 @@ const SideFilter = ({
                                   return;
                                 }
                                 parameterMaterialsFiltered.push(option.id);
-                                exportQueryParameters(
+                                setParam(
                                   'materials',
                                   parameterMaterialsFiltered.join('|'),
                                 );

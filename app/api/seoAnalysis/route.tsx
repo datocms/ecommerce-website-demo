@@ -1,4 +1,3 @@
-import { buildClient } from '@datocms/cma-client-node';
 import { JSDOM } from 'jsdom';
 import type { NextRequest } from 'next/server';
 
@@ -73,14 +72,43 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const client = buildClient({
-    apiToken: process.env.DATOCMS_READONLY_API_TOKEN || '',
-    environment: sandboxEnvironmentId,
-  });
-  const item = (await client.items.find(itemId)) as unknown as CMAItem;
+  // Fetch any missing data (e.g., slug for products) via GraphQL CDA using the
+  // read-only token to avoid requiring the Management API token.
+  let item: CMAItem | null = null;
+  if (itemTypeApiKey === 'product') {
+    const query = `
+      query ProductSlugById($id: ItemId, $locale: SiteLocale) {
+        product(filter: { id: { eq: $id } }, locale: $locale) { id slug }
+      }
+    `;
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: `Bearer ${process.env.DATOCMS_READONLY_API_TOKEN || ''}`,
+      'X-Exclude-Invalid': 'true',
+      'X-Include-Drafts': 'true',
+    };
+    if (sandboxEnvironmentId) headers['X-Environment'] = sandboxEnvironmentId;
+    const resp = await fetch('https://graphql.datocms.com/', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ query, variables: { id: itemId, locale } }),
+    });
+    if (resp.ok) {
+      const json = (await resp.json()) as {
+        data?: { product?: { id: string; slug?: string | null } | null };
+      };
+      const prod = json.data?.product;
+      if (prod)
+        item = {
+          id: prod.id,
+          attributes: { slug: prod.slug || undefined },
+        } as CMAItem;
+    }
+  }
 
   const [slug, permalink] = await findSlugAndPermalink(
-    item,
+    item ?? ({ id: itemId, attributes: {} } as CMAItem),
     itemTypeApiKey,
     locale,
   );

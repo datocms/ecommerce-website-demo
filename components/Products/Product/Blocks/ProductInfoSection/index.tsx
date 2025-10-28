@@ -8,6 +8,7 @@ import {
   ProductInfoSectionFragmentDoc,
 } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { imageCoverProps } from '@/utils/imageProps';
 
 type Props = {
   /** Product info fragment (bulleted attributes). */
@@ -184,8 +185,7 @@ const ProductInfoSection = ({
                     fragment={details.image.responsiveImage}
                     altOverride={details.image.alt}
                     className="h-full w-full object-cover object-center"
-                    objectFit="cover"
-                    objectPosition="50% 50%"
+                    {...imageCoverProps()}
                   />
                 </div>
               )}

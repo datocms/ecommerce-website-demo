@@ -6,6 +6,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { ResponsiveImageType } from 'react-datocms';
 import DatoImage from '@/components/DatoImage';
 import type { CookieNoticeRecord } from '@/graphql/types/graphql';
+import { imageFillCoverProps } from '@/utils/imageProps';
 
 type PropTypes = {
   /** State setter to close the notice. */
@@ -51,9 +52,7 @@ const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
               }
               altOverride={cookieNotice.cookieNoticeImage?.alt ?? null}
               className="h-full w-full object-contain"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
+              {...imageFillCoverProps()}
             />
           </div>
           {/* <img

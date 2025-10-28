@@ -7,6 +7,7 @@ import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { MaterialShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { imageFillCoverProps } from '@/utils/imageProps';
 
 type Props = {
   /** Material showcase fragment content. */
@@ -52,9 +53,7 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
                     fragment={material.details.image.responsiveImage}
                     altOverride={material.details.image.alt}
                     className="h-full w-full rounded-lg object-contain"
-                    layout="fill"
-                    objectFit="cover"
-                    objectPosition="50% 50%"
+                    {...imageFillCoverProps()}
                   />
                 </div>
               )}

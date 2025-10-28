@@ -69,15 +69,11 @@ export default function WithRealTimeUpdates<
 
   const queryDocument = useMemo(() => query, [query]);
 
-  // Wrap `fetch` so every Listen request includes `X-Base-Editing-Url`, which
-  // is required for `_editingUrl` to appear in responses.
+  // Wrap `fetch` so every Listen request includes visual-editing headers.
+  // Pass the baseEditingUrl directly to the helper instead of setting headers
+  // manually per request.
   const fetcher = useMemo(() => {
-    const client = withContentLinkHeaders(fetch);
-    return async (input: RequestInfo | URL, init?: RequestInit) => {
-      const headers = new Headers(init?.headers ?? {});
-      headers.set('X-Base-Editing-Url', baseEditingUrl);
-      return client(input, { ...init, headers });
-    };
+    return withContentLinkHeaders(fetch, baseEditingUrl);
   }, [baseEditingUrl]);
 
   // Subscribe to the DatoCMS Listen API. `subscribeToQuery` returns a Promise

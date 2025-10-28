@@ -20,7 +20,8 @@ import type {
   DatoImage_ResponsiveImageFragmentDoc,
   SiteLocale,
 } from '@/graphql/types/graphql';
-import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
+import { buildEditWrapperProps } from '@/utils/datocmsVisualEditing';
+import { imageFillCoverProps } from '@/utils/imageProps';
 import Highlighter from '../Common/Highlighter';
 import DatoImage from '../DatoImage';
 
@@ -54,17 +55,11 @@ const FilterDetail = ({
   descriptionEditingUrl,
   locale,
 }: PropTypes) => {
-  const descriptionEditAttributes = descriptionEditingUrl
-    ? getProductFieldEditAttributes(
-        descriptionEditingUrl,
-        locale,
-        'description',
-      )
-    : {};
-  const descriptionWrapperProps =
-    descriptionEditingUrl && Object.keys(descriptionEditAttributes).length > 0
-      ? { ...descriptionEditAttributes, 'data-datocms-edit-target': '' }
-      : undefined;
+  const descriptionWrapperProps = buildEditWrapperProps(
+    descriptionEditingUrl,
+    locale,
+    'description',
+  );
 
   return (
     <div className="relative isolate mx-auto max-w-7xl overflow-hidden bg-white px-6 py-12 lg:overflow-visible lg:px-0">
@@ -120,9 +115,7 @@ const FilterDetail = ({
               fragment={image}
               altOverride={imageAlt ?? null}
               className="relative h-full w-[48rem] max-w-none rounded-xl bg-gray-900 object-contain shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
+              {...imageFillCoverProps()}
             />
           )}
         </div>

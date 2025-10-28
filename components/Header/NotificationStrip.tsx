@@ -15,7 +15,7 @@ import {
   StructuredText as StructuredTextField,
 } from 'react-datocms/structured-text';
 import type { LayoutModelNotificationField } from '@/graphql/types/graphql';
-import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
+import { buildEditWrapperProps } from '@/utils/datocmsVisualEditing';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Highlighter from '../Common/Highlighter';
 
@@ -38,14 +38,11 @@ const NotificationStrip = ({
   layoutEditingUrl,
 }: Props) => {
   const locale = globalPageProps.params.lng;
-  const editAttributes =
-    layoutEditingUrl && locale
-      ? getProductFieldEditAttributes(layoutEditingUrl, locale, 'notification')
-      : {};
-  const wrapperProps =
-    layoutEditingUrl && Object.keys(editAttributes).length > 0
-      ? { ...editAttributes, 'data-datocms-edit-target': '' }
-      : undefined;
+  const wrapperProps = buildEditWrapperProps(
+    layoutEditingUrl,
+    locale,
+    'notification',
+  );
 
   return (
     <div className="bg-white pb-1">

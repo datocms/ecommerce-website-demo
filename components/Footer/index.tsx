@@ -7,6 +7,7 @@ import type { ResponsiveImageType } from 'react-datocms';
 import DatoImage from '@/components/DatoImage';
 import type { LayoutQuery } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { imageFillCoverProps } from '@/utils/imageProps';
 import SvgRenderer from '../Common/SvgRenderer';
 
 type Props = {
@@ -66,9 +67,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
                     }
                     altOverride={data.layout?.footerLogo?.alt ?? null}
                     className="h-full w-full object-contain"
-                    layout="fill"
-                    objectFit="cover"
-                    objectPosition="50% 50%"
+                    {...imageFillCoverProps()}
                   />
                 </Link>
                 <span className="relative inline-flex items-center gap-2 pl-2 text-lg font-semibold text-black md:text-2xl">

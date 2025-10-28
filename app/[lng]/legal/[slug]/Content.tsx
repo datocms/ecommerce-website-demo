@@ -15,7 +15,7 @@ import {
 } from 'react-datocms';
 import Highlighter from '@/components/Common/Highlighter';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
+import { buildEditWrapperProps } from '@/utils/datocmsVisualEditing';
 import type { PageProps, Query } from './meta';
 
 type LegalContentViewProps = PageProps & {
@@ -31,13 +31,11 @@ export function LegalContentView({ data, params }: LegalContentViewProps) {
   const locale = params.lng;
   const editingUrl =
     (data.legalPage as { _editingUrl?: string | null })?._editingUrl ?? null;
-  const contentEditAttributes = editingUrl
-    ? getProductFieldEditAttributes(editingUrl, locale, 'content')
-    : {};
-  const contentWrapperProps =
-    editingUrl && Object.keys(contentEditAttributes).length > 0
-      ? { ...contentEditAttributes, 'data-datocms-edit-target': '' }
-      : undefined;
+  const contentWrapperProps = buildEditWrapperProps(
+    editingUrl,
+    locale,
+    'content',
+  );
 
   return (
     <section className="mt-24 pb-[120px]">

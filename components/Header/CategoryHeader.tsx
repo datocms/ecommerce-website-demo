@@ -23,6 +23,7 @@ import type {
   SiteLocale,
 } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { imageFillCoverProps } from '@/utils/imageProps';
 import Cart from './Cart';
 import LanguageSelector from './LanguageSelector';
 
@@ -48,7 +49,7 @@ export default function CategoryHeader({
 }: PropTypes) {
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
-  const [searchIsOpen, setSerachIsOpen] = useState(false);
+  const [searchIsOpen, setSearchIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(
     searchParams?.get('productName') ?? '',
   );
@@ -158,9 +159,7 @@ export default function CategoryHeader({
                                       null
                                     }
                                     className="h-full w-full object-contain"
-                                    layout="fill"
-                                    objectFit="cover"
-                                    objectPosition="50% 50%"
+                                    {...imageFillCoverProps()}
                                   />
                                 </div>
                               )}
@@ -193,9 +192,7 @@ export default function CategoryHeader({
                                       null
                                     }
                                     className="h-full w-full object-contain"
-                                    layout="fill"
-                                    objectFit="cover"
-                                    objectPosition="50% 50%"
+                                    {...imageFillCoverProps()}
                                   />
                                 </div>
                               )}
@@ -502,7 +499,7 @@ export default function CategoryHeader({
                           router.push(
                             `/${globalPageProps.params.lng}/products?productName=${searchValue}`,
                           );
-                          setSerachIsOpen(false);
+                          setSearchIsOpen(false);
                         }
                       }}
                     />
@@ -511,18 +508,18 @@ export default function CategoryHeader({
                       aria-label="Search"
                       onClick={() => {
                         if (!searchIsOpen) {
-                          setSerachIsOpen(true);
+                          setSearchIsOpen(true);
                           searchBar.current?.focus();
                           return;
                         }
                         if (!searchValue) {
-                          setSerachIsOpen(false);
+                          setSearchIsOpen(false);
                           return;
                         }
                         router.push(
                           `/${globalPageProps.params.lng}/products?productName=${searchValue}`,
                         );
-                        setSerachIsOpen(false);
+                        setSearchIsOpen(false);
                       }}
                       className="p-2 text-gray-400 hover:text-gray-500"
                     >

@@ -7,6 +7,7 @@ import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { CollectionCardShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { imageFillCoverProps } from '@/utils/imageProps';
 
 type Props = {
   /** Collection showcase fragment content. */
@@ -51,9 +52,7 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
               fragment={collection[0].details.image.responsiveImage}
               altOverride={collection[0].details.image.alt}
               className="h-full w-full rounded-lg object-contain"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
+              {...imageFillCoverProps()}
             />
           </div>
         )}
@@ -85,9 +84,7 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
               fragment={collection[1].details.image.responsiveImage}
               altOverride={collection[1].details.image.alt}
               className="h-full w-full rounded-lg object-contain"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
+              {...imageFillCoverProps()}
             />
           </div>
         </div>
@@ -99,9 +96,7 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
               fragment={collection[2].details.image.responsiveImage}
               altOverride={collection[2].details.image.alt}
               className="h-full w-full rounded-lg object-contain"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
+              {...imageFillCoverProps()}
             />
           </div>
         </div>

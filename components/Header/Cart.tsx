@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { type Dispatch, Fragment, type SetStateAction } from 'react';
 import type { LayoutQuery } from '@/graphql/types/graphql';
 import { getProductPriceEditAttributes } from '@/utils/datocmsVisualEditing';
+import { imageFillCoverProps } from '@/utils/imageProps';
+import { isOnSaleWithPrice } from '@/utils/productFields';
 import DatoImage from '../DatoImage';
 
 type CartProduct = LayoutQuery['cartProducts'][number];
@@ -57,7 +59,7 @@ export default function Cart({
       return accumulator;
     }
 
-    const isOnSale = product.sale === 'on_sale' && product.salePrice != null;
+    const isOnSale = isOnSaleWithPrice(product.sale, product.salePrice);
     const price =
       isOnSale && product.salePrice != null ? product.salePrice : product.price;
 
@@ -164,9 +166,7 @@ export default function Cart({
                                         product.productImages[0]?.alt ?? null
                                       }
                                       className="h-full w-full object-cover object-center"
-                                      layout="fill"
-                                      objectFit="cover"
-                                      objectPosition="50% 50%"
+                                      {...imageFillCoverProps()}
                                     />
                                   </div>
 

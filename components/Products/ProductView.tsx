@@ -17,6 +17,8 @@ import {
   getProductPriceEditAttributes,
 } from '@/utils/datocmsVisualEditing';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { imageFillCoverProps } from '@/utils/imageProps';
+import { isOnSaleFlag } from '@/utils/productFields';
 import DatoImage from '../DatoImage';
 
 type Props = {
@@ -44,7 +46,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
     data.product.productImages[0],
   );
 
-  const isOnSale = data.product?.sale === 'on_sale';
+  const isOnSale = isOnSaleFlag(data.product?.sale);
   const locale = globalPageProps.params.lng;
   const productEditingUrl = (data.product as { _editingUrl?: string | null })
     ._editingUrl;
@@ -114,9 +116,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                             fragment={image.responsiveImage}
                             altOverride={image.alt ?? null}
                             className="h-full w-full object-contain"
-                            layout="fill"
-                            objectFit="cover"
-                            objectPosition="50% 50%"
+                            {...imageFillCoverProps()}
                           />
                         )}
                       </div>
@@ -153,9 +153,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                       fragment={selectedImage?.responsiveImage}
                       altOverride={selectedImage?.alt ?? null}
                       className="h-full w-full object-contain"
-                      layout="fill"
-                      objectFit="cover"
-                      objectPosition="50% 50%"
+                      {...imageFillCoverProps()}
                     />
                   )}
                 </div>

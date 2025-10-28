@@ -4,10 +4,13 @@
  */
 import Link from 'next/link';
 import type { Dispatch, SetStateAction } from 'react';
+import { useEffect } from 'react';
 import type { ResponsiveImageType } from 'react-datocms';
 import DatoImage from '@/components/DatoImage';
+
 import type { PopupRecord } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { imageFillCoverProps } from '@/utils/imageProps';
 
 type PropTypes = {
   /** State setter to close the popup. */
@@ -20,31 +23,44 @@ type PropTypes = {
 
 /** Display a full-screen marketing popup with image, copy, and CTA link. */
 const PopUpBanner = ({ setPopUp, popup, globalPageProps }: PropTypes) => {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPopUp(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [setPopUp]);
+
   return (
     <div>
-      <button
-        type="button"
-        aria-label="Close popup"
-        onClick={() => {
-          setPopUp(false);
+      {/* Backdrop */}
+      <div className="fixed inset-0 z-40 bg-slate-900/75" />
+      {/* Modal container; clicking the backdrop area (this container) closes */}
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center"
+        role="dialog"
+        aria-modal="true"
+        tabIndex={-1}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setPopUp(false);
         }}
         onKeyDown={(e) => {
-          if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+          if (
+            (e.key === 'Enter' || e.key === ' ') &&
+            e.target === e.currentTarget
+          ) {
+            e.preventDefault();
             setPopUp(false);
           }
         }}
-        className="fixed z-40 h-screen w-screen bg-slate-900 bg-opacity-75 "
-      />
-      <div className="fixed bottom-0 left-0 right-0 top-0 z-50 flex items-center justify-center">
+      >
         <section className="z-50 mx-auto my-auto w-3/4 overflow-hidden  rounded-lg bg-white shadow-2xl md:grid md:grid-cols-3 2xl:w-3/5">
           <div className="relative h-32 w-full object-cover md:h-full">
             <DatoImage
               data={popup.popupImage?.responsiveImage as ResponsiveImageType}
               altOverride={popup.popupImage?.alt ?? null}
               className="h-full w-full object-contain"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
+              {...imageFillCoverProps()}
             />
           </div>
 

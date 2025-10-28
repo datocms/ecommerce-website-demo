@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getFallbackLocale } from '@/app/i18n/settings';
 import DatoImage from '@/components/DatoImage';
 import { LayoutDocument, type LayoutQuery } from '@/graphql/types/graphql';
+import { imageCoverProps } from '@/utils/imageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 
 /** Choose a best-effort image to display on the 404 page. */
@@ -65,8 +66,7 @@ const NotFound = async () => {
                 fragment={notFoundImage.responsiveImage}
                 altOverride={notFoundImage.alt}
                 className="absolute inset-0 h-full w-full object-cover object-center"
-                objectFit="cover"
-                objectPosition="50% 50%"
+                {...imageCoverProps()}
               />
             )}
           </div>

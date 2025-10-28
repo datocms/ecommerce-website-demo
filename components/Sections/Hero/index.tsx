@@ -8,6 +8,7 @@ import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { HeroSectionFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
+import { imageCoverProps } from '@/utils/imageProps';
 
 type Props = {
   /** Section fragment from the homepage query. */
@@ -47,8 +48,7 @@ const Hero = ({ fragment, globalPageProps }: Props) => {
                 fragment={heroImage.responsiveImage}
                 altOverride={heroImage.alt}
                 className="h-full w-full object-cover object-center"
-                objectFit="cover"
-                objectPosition="50% 50%"
+                {...imageCoverProps()}
               />
             </div>
 
@@ -57,8 +57,7 @@ const Hero = ({ fragment, globalPageProps }: Props) => {
                 fragment={additionalImage.responsiveImage}
                 altOverride={additionalImage.alt}
                 className="h-full w-full object-cover object-center"
-                objectFit="cover"
-                objectPosition="50% 50%"
+                {...imageCoverProps()}
               />
             </div>
           </div>

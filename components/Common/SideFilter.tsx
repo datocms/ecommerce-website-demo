@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * @fileoverview Sidebar filters and sort controls for product listings.
+ * Writes selection to the URL query string; purely presentational.
+ */
 import { Disclosure } from '@headlessui/react';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import type { Maybe } from 'graphql/jsutils/Maybe';
@@ -11,15 +15,21 @@ import {
 } from '@/graphql/types/graphql';
 
 type PropTypes = {
+  /** Initial lists for filters (collections, brands, materials). */
   initialParams: Maybe<FragmentType<typeof InitialParamsFragmentDoc>>;
+  /** Labels for filter UI and sort options. */
   generalInterface: Maybe<
     FragmentType<typeof ProductsGeneralInterfaceFragmentDoc>
   >;
+  /** Currently selected collection ids (pipe-separated in URL). */
   paramaterCollections: string[];
+  /** Currently selected brand ids. */
   parameterBrands: string[];
+  /** Currently selected material ids. */
   parameterMaterials: string[];
 };
 
+/** Sidebar filter component with collapsible groups and sort options. */
 const SideFilter = ({
   initialParams,
   paramaterCollections,

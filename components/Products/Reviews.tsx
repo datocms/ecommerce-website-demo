@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Product reviews block showing average rating, count, and a
+ * few featured reviews. Adds inline edit attributes for fields.
+ */
 import { getFragmentData } from '@/graphql/types';
 import {
   ProductGeneralInterfaceFragmentDoc,
@@ -7,7 +11,9 @@ import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 type PropTypes = {
+  /** Product query payload with reviews. */
   data: ProductQuery;
+  /** Locale-aware page props. */
   globalPageProps: GlobalPageProps;
 };
 
@@ -15,7 +21,9 @@ import type { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface StarRatingProps {
+  /** Rating value used to fill stars (rounded). */
   rating: number;
+  /** Optional edit attributes wrapper for inline editing. */
   editAttributes?: Record<string, string>;
 }
 
@@ -63,6 +71,7 @@ const StarRating: FC<StarRatingProps> = ({ rating, editAttributes }) => {
   );
 };
 
+/** Render the review header and a list of featured reviews. */
 const Reviews = ({ data, globalPageProps }: PropTypes) => {
   const general = getFragmentData(
     ProductGeneralInterfaceFragmentDoc,

@@ -10,6 +10,13 @@ import { type NextRequest, NextResponse } from 'next/server';
 import getAvailableLocales, { getFallbackLocale } from './app/i18n/settings';
 import type { SiteLocale } from './graphql/types/graphql';
 
+/**
+ * Negotiate the best locale for a request from the `Accept-Language` header.
+ *
+ * @param request - Incoming request used to read headers
+ * @param locales - Locales supported by the site
+ * @returns Matched locale or the configured fallback
+ */
 async function getLocale(
   request: Request,
   locales: SiteLocale[],
@@ -32,6 +39,11 @@ async function getLocale(
   return match(languages, locales, fallbackLng);
 }
 
+/**
+ * Next.js middleware-like proxy that normalizes locale prefixes and redirects
+ * to language-specific routes. Visual-editing state is intentionally out of
+ * scope and handled in server routes and the preview bridge.
+ */
 export async function proxy(request: NextRequest) {
   // Check if there is any supported locale in the pathname
   const pathname = request.nextUrl.pathname;
@@ -65,6 +77,7 @@ export async function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
+/** Configure the matcher to exclude files, Next internals, and API routes. */
 export const config = {
   matcher: ['/((?!.*\\.|_next|api\\/).*)'],
 };

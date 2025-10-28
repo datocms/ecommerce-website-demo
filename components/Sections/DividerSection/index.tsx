@@ -1,13 +1,20 @@
+/**
+ * @fileoverview Divider section with headline, subtitle, decorative SVG and
+ * a localized CTA button.
+ */
 import Link from 'next/link';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { DividerSectionFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 type Props = {
+  /** Fragment providing text and button link. */
   fragment: FragmentType<typeof DividerSectionFragmentDoc>;
+  /** Locale-aware page props for links. */
   globalPageProps: GlobalPageProps;
 };
 
+/** Centered divider block used between content sections on the homepage. */
 export default function DividerSection({ fragment, globalPageProps }: Props) {
   const { preTitle, subtitle, title, button } = getFragmentData(
     DividerSectionFragmentDoc,

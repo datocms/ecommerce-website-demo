@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Three-up grid of materials with image tiles and links to
+ * filtered product listings.
+ */
 import Link from 'next/link';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
@@ -5,10 +9,13 @@ import { MaterialShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 type Props = {
+  /** Material showcase fragment content. */
   fragment: FragmentType<typeof MaterialShowcaseFragmentDoc>;
+  /** Locale-aware page props for building links. */
   globalPageProps: GlobalPageProps;
 };
 
+/** Render a grid of CMS-configured materials pointing to product filters. */
 const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
   const { title, description, subDescription, materials } = getFragmentData(
     MaterialShowcaseFragmentDoc,

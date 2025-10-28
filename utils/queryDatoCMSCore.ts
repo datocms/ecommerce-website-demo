@@ -2,11 +2,39 @@ import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { withContentLinkHeaders } from 'datocms-visual-editing';
 import { print } from 'graphql';
 
+/**
+ * Options supported by {@link queryDatoCMSCore}.
+ */
 type QueryOptions = {
+  /** If true, includes drafts and disables HTTP caching. */
   isDraft?: boolean;
+  /** Additional Next.js cache `tags` to attach to the request. */
   tags?: string[];
 };
 
+/**
+ * Low-level DatoCMS GraphQL query helper.
+ *
+ * - Adds Visual Editing headers via {@link withContentLinkHeaders} so
+ *   `_editingUrl` fields can be returned when requested by queries.
+ * - Generates a stable `queryId` derived from the printed query, variables and
+ *   draft flag; the id is included in the request's Next.js tag list for
+ *   targeted revalidation.
+ * - Returns the raw `x-cache-tags` header so callers can persist a mapping of
+ *   CDN cache-tag → query ids for on-demand invalidation.
+ *
+ * This function is environment-agnostic and does not depend on `draftMode()`.
+ * Prefer {@link utils/queryDatoCMS.ts | queryDatoCMS} for app usage.
+ *
+ * @template TResult - GraphQL result data shape
+ * @template TVariables - GraphQL variables shape
+ * @param document - Typed GraphQL document node to execute
+ * @param variables - Variables for the GraphQL query
+ * @param isDraftOrOpts - Boolean to include drafts or an options bag
+ * @returns Object containing the parsed `data`, a stable `queryId`, and the
+ *          `cacheTagsHeader` value if present
+ * @throws If `DATOCMS_READONLY_API_TOKEN` is missing or the request fails
+ */
 export default async function queryDatoCMSCore<
   TResult = unknown,
   TVariables = Record<string, unknown>,

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Hero section with two images, title/subtitle and featured
+ * collection links plus social icons.
+ */
 import Link from 'next/link';
 import SvgRenderer from '@/components/Common/SvgRenderer';
 import DatoImage from '@/components/DatoImage';
@@ -6,10 +10,13 @@ import { HeroSectionFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 type Props = {
+  /** Section fragment from the homepage query. */
   fragment: FragmentType<typeof HeroSectionFragmentDoc>;
+  /** Locale-aware props for building localized links. */
   globalPageProps: GlobalPageProps;
 };
 
+/** Render the hero for the homepage with CMS-provided content. */
 const Hero = ({ fragment, globalPageProps }: Props) => {
   const {
     heroTitle,

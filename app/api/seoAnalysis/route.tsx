@@ -32,6 +32,7 @@ const headers = {
   'Access-Control-Allow-Methods': 'GET',
 };
 
+/** CORS preflight for SEO analysis endpoint. */
 export async function OPTIONS(_request: NextRequest) {
   return new Response('ok', {
     status: 200,
@@ -39,6 +40,13 @@ export async function OPTIONS(_request: NextRequest) {
   });
 }
 
+/**
+ * Fetch a page preview and return minimal SEO metadata to the DatoCMS UI.
+ *
+ * Requires `?token=` to match `SEO_SECRET_TOKEN` and additional query string
+ * params:
+ * - `itemId`, `itemTypeId`, `itemTypeApiKey`, `locale`, `sandboxEnvironmentId`.
+ */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 

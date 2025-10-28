@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Small modal prompting for the draft secret token. Calls the
+ * draft enable route, refreshes on success, and shows a success toast.
+ */
 import {
   type Dispatch,
   type FormEvent,
@@ -6,11 +10,15 @@ import {
 } from 'react';
 
 type Props = {
+  /** Setter to close the modal. */
   setModalOpen: Dispatch<SetStateAction<boolean>>;
+  /** Router refresh fn to pull new server-rendered content. */
   refresh: () => void;
+  /** Callback to show a transient success toast. */
   triggerSuccessToast: () => void;
 };
 
+/** Modal form used to authenticate into draft mode. */
 const AuthenticationModal = ({
   setModalOpen,
   refresh,

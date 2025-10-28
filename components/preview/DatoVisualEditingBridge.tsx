@@ -270,7 +270,12 @@ export function toggleVisualEditing() {
   }
 }
 
-/** Hook used by UI/clients to observe controller state and actions. */
+/**
+ * React hook to observe controller state and expose toggle helpers.
+ *
+ * @returns Snapshot with `ready`, `enabled`, and `isDraft` plus
+ * `enable/disable/toggle` methods.
+ */
 export function useDatoVisualEditing() {
   const [state, setState] = useState<VisualEditingSnapshot>(() =>
     getSnapshot(),

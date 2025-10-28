@@ -12,6 +12,15 @@ type ProductPriceEditOptions = {
   fieldPath?: ProductPriceFieldPath;
 };
 
+/**
+ * Build edit attributes for the product price field so the element becomes an
+ * inline edit target under Visual Editing.
+ *
+ * @param editingUrl - `_editingUrl` for the record; when falsy, returns `{}`
+ * @param locale - Active locale for the field
+ * @param options - Optional field override (defaults to `price`)
+ * @returns Plain object with data-attributes to spread on an element
+ */
 export const getProductPriceEditAttributes = (
   editingUrl: string | null | undefined,
   locale: string,
@@ -25,6 +34,14 @@ export const getProductPriceEditAttributes = (
       })
     : {};
 
+/**
+ * Build edit attributes for an arbitrary field path on a product record.
+ *
+ * @param editingUrl - `_editingUrl` for the record; when falsy, returns `{}`
+ * @param locale - Active locale for the field
+ * @param fieldPath - Field path or array of nested path segments
+ * @returns Plain object with data-attributes to spread on an element
+ */
 export const getProductFieldEditAttributes = (
   editingUrl: string | null | undefined,
   locale: string,

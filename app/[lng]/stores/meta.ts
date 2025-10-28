@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Types and query exported for the Stores route.
+ */
 import {
   StoresDocument,
   type StoresQuery,

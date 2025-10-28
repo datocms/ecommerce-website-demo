@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Showcase page content shared by server and realtime client.
+ * Highlights collections and new products with localized links.
+ */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { ResponsiveImageType } from 'react-datocms';
@@ -12,6 +16,7 @@ type ShowcaseContentViewProps = PageProps & {
 
 // Shared view between server render and client realtime layer. The client
 // renderer draws the same JSX so the DOM node identities remain stable.
+/** Render the showcase hero, collections, and new products list. */
 export function ShowcaseContentView({
   data,
   ...globalPageProps
@@ -282,6 +287,7 @@ export function ShowcaseContentView({
 }
 
 // Server guard to keep control-flow helpers (`notFound`) on the server.
+/** Server guard around the shared showcase view. */
 const Content: ContentPage<PageProps, Query> = (props) => {
   if (!props.data.showcase) {
     notFound();

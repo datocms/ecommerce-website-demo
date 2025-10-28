@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Detail view for a collection/material/brand filter. Renders a
+ * hero image and rich description with styled structured text.
+ */
 import {
   isList,
   isListItem,
@@ -21,16 +25,25 @@ import Highlighter from '../Common/Highlighter';
 import DatoImage from '../DatoImage';
 
 type PropTypes = {
+  /** Title of the entity (name). */
   name: string;
+  /** Short subtitle (Markdown supported). */
   subtitle: string;
+  /** Optional type label (e.g., "Material"). */
   type: Maybe<string>;
+  /** Optional responsive image fragment for the hero image. */
   image: Maybe<FragmentType<typeof DatoImage_ResponsiveImageFragmentDoc>>;
+  /** Alternate text for the image. */
   imageAlt?: string | null;
+  /** Structured description content. */
   description: Maybe<StructuredText<Record, Record>>;
+  /** `_editingUrl` for the record to enable inline editing of description. */
   descriptionEditingUrl: string | null;
+  /** Active locale for edit attributes. */
   locale: SiteLocale;
 };
 
+/** Presentational details for a selected filter entity. */
 const FilterDetail = ({
   name,
   type,

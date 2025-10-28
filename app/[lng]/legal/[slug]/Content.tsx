@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Legal page content renderer used by server and realtime
+ * client. Renders structured text with headings and paragraphs.
+ */
 import {
   isHeading,
   isParagraph,
@@ -18,6 +22,7 @@ type LegalContentViewProps = PageProps & {
   data: Query;
 };
 
+/** Render the legal page content with inline edit attributes when available. */
 export function LegalContentView({ data, params }: LegalContentViewProps) {
   if (!data.legalPage) {
     return null;
@@ -84,6 +89,7 @@ export function LegalContentView({ data, params }: LegalContentViewProps) {
 }
 
 // Server component retains control over routing helpers.
+/** Server entry that validates the record and renders the shared view. */
 const Content: ContentPage<PageProps, Query> = (props) => {
   if (!props.data.legalPage) {
     notFound();

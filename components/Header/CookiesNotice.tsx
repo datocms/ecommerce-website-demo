@@ -1,13 +1,20 @@
+/**
+ * @fileoverview Cookie notice card with image and primary/secondary actions.
+ * Dismiss only toggles visibility; no persistence is implemented here.
+ */
 import type { Dispatch, SetStateAction } from 'react';
 import type { ResponsiveImageType } from 'react-datocms';
 import DatoImage from '@/components/DatoImage';
 import type { CookieNoticeRecord } from '@/graphql/types/graphql';
 
 type PropTypes = {
+  /** State setter to close the notice. */
   setCookies: Dispatch<SetStateAction<boolean>>;
+  /** CMS-sourced cookie notice content. */
   cookieNotice: CookieNoticeRecord;
 };
 
+/** Presentational cookie notice displayed in the bottom-left corner. */
 const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
   return (
     <div className="pointer-events-none fixed bottom-0 left-0 z-20 p-4">

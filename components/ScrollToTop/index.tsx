@@ -1,9 +1,8 @@
 /**
- * Floating Preview Controls
+ * @fileoverview Floating preview toolbox.
  * - Exposes a button to enter/leave draft mode (via server routes).
  * - When draft mode is active, exposes a toggle that calls the shared visual
- *   editing controller directly. State is persisted in localStorage so it
- *   survives navigations.
+ *   editing controller directly. State is persisted in localStorage.
  */
 'use client';
 

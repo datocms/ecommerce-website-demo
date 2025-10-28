@@ -9,6 +9,10 @@ import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import type { SiteLocale } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
+/**
+ * Function signature used by pages to derive GraphQL variables from the page
+ * props and the resolved fallback locale.
+ */
 export type BuildVariablesFn<
   PageProps extends GlobalPageProps,
   TVariables = Record<string, unknown>,

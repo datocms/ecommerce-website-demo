@@ -1,0 +1,39 @@
+name: docs-check
+
+on:
+  pull_request:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  typedoc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build TypeDoc
+        run: pnpm docs
+
+      - name: Fail if docs changed
+        run: |
+          CHANGES=$(git status --porcelain docs/api || true)
+          if [ -n "$CHANGES" ]; then
+            echo "Docs are out of date. Run 'pnpm docs' and commit changes." >&2
+            git --no-pager status --porcelain docs/api
+            exit 1
+          fi

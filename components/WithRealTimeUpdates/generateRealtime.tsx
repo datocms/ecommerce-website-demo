@@ -18,6 +18,14 @@ export function generateRealtimeComponent<
 }: {
   clientContentComponent: ClientContentPage<PageProps, TResult>;
 }) {
+  /**
+   * Create a client component bound to a specific route/view that will render
+   * server data and subscribe to DatoCMS Listen for realtime updates.
+   *
+   * @template PageProps - Page props that include locale params
+   * @template TResult - GraphQL result shape for the view
+   * @template TVariables - GraphQL variables type used by the query
+   */
   const component: RealtimeUpdatesPage<PageProps, TResult, TVariables> = (
     props,
   ) => {

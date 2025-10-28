@@ -16,7 +16,7 @@ The data model, real-time subscription layer, and UI come from the standard ecom
 
 ## Demo
 
-Live deployment: [https://ecommerce-website-demo-livid.vercel.app/](https://ecommerce-website-demo-livid.vercel.app/)
+Example deployment: [https://ecommerce-website-demo-livid.vercel.app/](https://ecommerce-website-demo-livid.vercel.app/) (for reference only; your fork or environment may differ).
 
 ## Getting Started
 
@@ -41,17 +41,37 @@ Live deployment: [https://ecommerce-website-demo-livid.vercel.app/](https://ecom
    - Preview secrets (`DRAFT_SECRET_TOKEN`, `SEO_SECRET_TOKEN`, `CACHE_INVALIDATION_SECRET_TOKEN`) can be any random string in local development.
    - `URL` defaults to `http://localhost:3000`; adjust if you run the dev server on another port.
 
-4. **Ensure Node.js 20.9+ (or 22.x) is used**:
+4. **Generate GraphQL types (when the schema changes)**:
+
+   ```bash
+   pnpm generate-ts-types
+   ```
+
+   This refreshes `graphql/types/` based on the remote schema.
+
+5. **Ensure Node.js 20.9+ (or 22.x) is used**:
 
    This project now targets Next.js 16 which requires modern Node.js. Use the included `.nvmrc` (set to `22`) or any runtime ≥ 20.9.
 
-5. **Run the development server**:
+6. **Run the development server**:
 
    ```bash
    pnpm dev
    ```
 
    The site listens on [http://localhost:3000](http://localhost:3000) by default.
+
+## Documentation
+
+This codebase uses TSDoc/JSDoc comments throughout utilities, API routes, and shared components. You can generate browsable HTML docs with:
+
+```
+pnpm docs
+```
+
+The output is written to `docs/api/`. Authoring guidelines and examples live in `docs/Documentation.md`.
+
+CI will check docs freshness on pull requests via `.github/workflows/docs-check.yml`. If a PR fails with “Docs are out of date,” run `pnpm docs` locally and commit the changes under `docs/api/`.
 
 ## Visual Editing Workflow
 
@@ -74,6 +94,71 @@ Visual editing activates when:
 3. GraphQL requests are issued with visual-editing headers. In draft mode we always request stega payloads, and the client-side controller decides whether overlays render.
 
 The toggle state is stored in `localStorage` (`datocms.visual-editing.enabled`). It defaults to “disabled” the first time you enter draft mode in a browser session and persists across navigations until you turn it on.
+
+### How This Repo Implements Visual Editing
+
+- Single controller pattern: `components/preview/DatoVisualEditingBridge.tsx` owns the only controller, mounted in `app/layout.tsx` before page content. No other component creates controllers.
+- Requests include stega metadata: all preview requests go through `utils/queryDatoCMS.ts`, which wraps `fetch` with `withContentLinkHeaders` whenever draft mode is on so `_editingUrl` is present.
+- Realtime keeps overlays in sync: `components/WithRealTimeUpdates/index.tsx` listens to DatoCMS Listen and calls `refreshVisualEditing(scope)` after each update to re‑mark the changed subtree.
+- DOM stability: the client “LiveContent” components re‑render the same JSX that the server produced, so marker positions remain stable and overlays don’t jump.
+
+### Managing Images
+
+- Component: `components/DatoImage/index.tsx` is a thin wrapper over `react-datocms`’s `<Image />`, with a typed fragment mode and an optional `altOverride` used across the UI.
+- Visual editing and images: overlays target the fields that render the image; you usually mark a nearby wrapper if you want a specific element to act as the edit target. For example, we mark prices and structured text explicitly but keep images as pure markup.
+- Debugging responsive images:
+  - Enable client logs via `?debugImages=1` or `localStorage['debug:images']='1'` (dev is on by default).
+  - Helpers live in `utils/debugFlags.ts` and `utils/debugImages.ts` (see `logClientResponsiveImage`, `logServerResponsiveImages`).
+
+### Managing Structured Text
+
+- Rendering: we use `react-datocms/structured-text` and a small renderer helper `components/Common/Highlighter.tsx` to style `<mark>` tags.
+- Localized Next links: in places like `components/Header/NotificationStrip.tsx` we transform `link` nodes into `<Link />` to keep locale prefixes.
+- Marking edit targets: we compute edit attributes with `getProductFieldEditAttributes(editingUrl, locale, 'content')` and spread them on a wrapper element that renders the structured text, then add `data-datocms-edit-target`:
+
+```tsx
+const attrs = getProductFieldEditAttributes(editingUrl, locale, 'notification');
+const wrapperProps = attrs ? { ...attrs, 'data-datocms-edit-target': '' } : {};
+<div {...wrapperProps}>
+  <StructuredText data={notification.value} />
+</div>
+```
+
+### Managing Number Fields (e.g., Price)
+
+- Helpers: `utils/datocmsVisualEditing.ts` exposes `getProductPriceEditAttributes()` and `getProductFieldEditAttributes()` which build the minimal `data-*` attributes Visual Editing needs.
+- Usage: spread attributes on the exact element that displays the value and add `data-datocms-edit-target`.
+
+```tsx
+// Regular price
+<span {...getProductPriceEditAttributes(editingUrl, locale)} data-datocms-edit-target>
+  {currencySymbol} {product.price}
+</span>
+
+// Sale price (field path override)
+<span {...getProductPriceEditAttributes(editingUrl, locale, { fieldPath: 'sale_price' })}
+      data-datocms-edit-target>
+  {currencySymbol} {product.salePrice}
+</span>
+```
+
+- Deep paths and arrays: pass an array for nested fields (e.g., a variation’s color or list entries). Example from the product page:
+
+```tsx
+const colorAttrs = getProductFieldEditAttributes(editingUrl, locale, [
+  'product_variations',
+  variationIndex.toString(),
+  'color',
+]);
+<span {...colorAttrs} data-datocms-edit-target />
+```
+
+### Gotchas Recap
+
+- Don’t create more than one controller; reuse the global one.
+- Don’t remove or replace the server DOM in the client; reuse the same view.
+- Always include `NEXT_PUBLIC_DATO_BASE_EDITING_URL` when requesting `_editingUrl`.
+- After SSE updates, call `refreshVisualEditing(scope)` to rescan markers.
 
 ### Enabling overlays locally
 

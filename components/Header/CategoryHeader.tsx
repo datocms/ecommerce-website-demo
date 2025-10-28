@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * @fileoverview Responsive navigation header with locale selector, search,
+ * flyout menus, and a demo cart overlay. Purely presentational.
+ */
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -23,8 +27,11 @@ import Cart from './Cart';
 import LanguageSelector from './LanguageSelector';
 
 type PropTypes = {
+  /** Available locales to pass to the selector. */
   languages: SiteLocale[];
+  /** Layout query payload containing menu/categories and assets. */
   data: LayoutQuery;
+  /** Locale-aware page props for links and formatting. */
   globalPageProps: GlobalPageProps;
 };
 

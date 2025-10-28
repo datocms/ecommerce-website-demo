@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Reusable section title with optional Markdown paragraph.
+ */
 import type { Maybe } from 'graphql/jsutils/Maybe';
 import ReactMarkdown from 'react-markdown';
 
@@ -8,10 +11,15 @@ const SectionTitle = ({
   center,
   mb = '100px',
 }: {
+  /** Section heading text. */
   title: string;
+  /** Optional Markdown paragraph below the title. */
   paragraph: Maybe<string>;
+  /** Max width for the container. */
   width?: string;
+  /** Center alignment toggle. */
   center?: boolean;
+  /** Bottom margin. */
   mb?: string;
 }) => {
   return (

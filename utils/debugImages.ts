@@ -1,8 +1,9 @@
-/*
+/**
  * Debug helpers for DatoCMS responsive image URLs.
- * - Client: call `logClientResponsiveImage()` from the DatoImage component.
- * - Server: call `logServerResponsiveImages()` on GraphQL responses to capture
- *           any responsiveImage objects returned by queries.
+ *
+ * - Client: call {@link logClientResponsiveImage} from the DatoImage component.
+ * - Server: call {@link logServerResponsiveImages} on GraphQL responses to
+ *   capture any `responsiveImage` objects returned by queries.
  */
 
 type ResponsiveImageLike = {
@@ -35,6 +36,16 @@ function validateUrl(u: string | null | undefined) {
   }
 }
 
+/**
+ * Emit a structured console log for a client-rendered responsive image.
+ *
+ * Includes sample `srcSet` URL, host checks, and any extra labels to make it
+ * easy to filter logs in the browser console.
+ *
+ * @param where - Logical location label (e.g. component name)
+ * @param data - Responsive image object returned by GraphQL
+ * @param extra - Optional metadata to include in the log entry
+ */
 export function logClientResponsiveImage(
   where: string,
   data: ResponsiveImageLike,
@@ -94,6 +105,14 @@ function shouldLogClient(
   return haystacks.some((s) => s.includes(filter));
 }
 
+/**
+ * Scan an arbitrary GraphQL payload and log a sample of found
+ * `responsiveImage` objects. Useful for verifying that URLs are well-formed in
+ * server logs, and for spotting unexpected hosts.
+ *
+ * @param payload - Arbitrary GraphQL result payload
+ * @param opts - Optional route label and flags to include in the log entry
+ */
 export function logServerResponsiveImages(
   payload: unknown,
   opts?: { route?: string; visualEditing?: boolean; draft?: boolean },
@@ -149,6 +168,11 @@ export function logServerResponsiveImages(
   console.log(JSON.stringify(out));
 }
 
+/**
+ * Log a small sample of the document's `<img>` elements, optionally filtered
+ * by substring match on the URL. Helpful to confirm real DOM state after
+ * hydration and image loading.
+ */
 export function logDocumentImagesSample(opts?: {
   filter?: string | null;
   limit?: number | null;

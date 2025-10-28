@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Demo cart side-panel. Renders a read-only list of products,
+ * totals, and checkout link. Integrations (Shopify, Commerce Layer) are out
+ * of scope for this demo.
+ */
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
@@ -9,10 +14,15 @@ import DatoImage from '../DatoImage';
 type CartProduct = LayoutQuery['cartProducts'][number];
 
 type PropTypes = {
+  /** Whether the panel is visible. */
   open: boolean;
+  /** Setter to open/close the panel. */
   setOpen: Dispatch<SetStateAction<boolean>>;
+  /** Products to display in the cart (first image is used). */
   products: CartProduct[];
+  /** Currency symbol to prefix prices. */
   currencySymbol: string;
+  /** Active locale for links and edit attributes. */
   locale: string;
 };
 
@@ -20,6 +30,7 @@ const DEFAULT_QUANTITY = 1;
 
 const formatPrice = (value: number) => value.toFixed(2);
 
+/** Presentational cart drawer with subtotal calculation. */
 export default function Cart({
   open,
   setOpen,

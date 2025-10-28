@@ -1,11 +1,17 @@
+/**
+ * @fileoverview Q&A grid for product pages. Renders questions and Markdown
+ * answers from a fragment.
+ */
 import ReactMarkdown from 'react-markdown';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { QuestionSectionFragmentDoc } from '@/graphql/types/graphql';
 
 type Props = {
+  /** Fragment containing list of questions/answers. */
   fragment: FragmentType<typeof QuestionSectionFragmentDoc>;
 };
 
+/** Render a 2-column grid of questions with Markdown answers. */
 const QuestionsSection = ({ fragment }: Props) => {
   const { questions } = getFragmentData(QuestionSectionFragmentDoc, fragment);
 

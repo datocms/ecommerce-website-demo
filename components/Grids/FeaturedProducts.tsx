@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Grid of related/featured products with price display and
+ * localized links. Adds edit attributes for price fields.
+ */
 import Link from 'next/link';
 import { getFragmentData } from '@/graphql/types';
 import {
@@ -9,10 +13,13 @@ import type { GlobalPageProps } from '@/utils/globalPageProps';
 import DatoImage from '../DatoImage';
 
 type PropTypes = {
+  /** Product query used to read related products. */
   data: ProductQuery;
+  /** Locale-aware page props for link building. */
   globalPageProps: GlobalPageProps;
 };
 
+/** Render a responsive grid of featured products. */
 const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
   const general = getFragmentData(
     ProductGeneralInterfaceFragmentDoc,

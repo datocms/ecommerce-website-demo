@@ -9,6 +9,13 @@ import { cookies, draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { NextRequest } from 'next/server';
 
+/**
+ * Enable Next draft-mode for embedded/iframe preview flows.
+ *
+ * Query parameters:
+ * - `token`: must match `DRAFT_SECRET_TOKEN`
+ * - `url`: absolute path to redirect to after enabling
+ */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 

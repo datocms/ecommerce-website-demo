@@ -1,13 +1,20 @@
 'use client';
 
+/**
+ * @fileoverview Paginated control that updates the `page` query parameter and
+ * shows a result range summary. Purely presentational.
+ */
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 type PropTypes = {
+  /** Total number of matching products. */
   numberOfProducts: number;
+  /** Currently selected page (1-based). */
   currentPage: number;
 };
 
+/** Pagination UI with previous/next and numbered page buttons. */
 const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
   const router = useRouter();
   const searchParams = useSearchParams();

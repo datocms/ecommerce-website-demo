@@ -14,8 +14,12 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
+/**
+ * Map of DatoCMS CDN cache-tag → array of Next.js `queryId` tags.
+ */
 type TagToQueryIds = Record<string, string[]>;
 
+/** Resolve the absolute file path for the cache-tag store. */
 function getStorePath() {
   const p =
     process.env.DATOCMS_CACHE_TAGS_PATH ||
@@ -23,10 +27,12 @@ function getStorePath() {
   return p;
 }
 
+/** Ensure the parent directory exists for `filePath`. */
 async function ensureDir(filePath: string) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
 }
 
+/** Read the JSON tag store from disk; returns an empty object if missing. */
 async function readStore(): Promise<TagToQueryIds> {
   try {
     const p = getStorePath();
@@ -37,6 +43,7 @@ async function readStore(): Promise<TagToQueryIds> {
   }
 }
 
+/** Atomically write the JSON tag store to disk. */
 async function writeStore(store: TagToQueryIds) {
   const p = getStorePath();
   await ensureDir(p);
@@ -45,12 +52,30 @@ async function writeStore(store: TagToQueryIds) {
   await fs.rename(tmp, p);
 }
 
+/**
+ * Push a value into an array if not already present, keeping a soft cap.
+ * @param arr - Target array
+ * @param value - Value to add
+ * @param max - Maximum number of entries to retain
+ */
 function addToArrayUnique(arr: string[], value: string, max = 500) {
   if (!arr.includes(value)) arr.push(value);
   // prevent unbounded growth in demos
   if (arr.length > max) arr.splice(0, arr.length - max);
 }
 
+/**
+ * Persist a mapping between the CDN cache tags returned by the Content
+ * Delivery API and the internal Next.js `queryId` tag for the executed
+ * request.
+ *
+ * Store shape is a simple many-to-many index so later invalidation requests
+ * can translate a set of CDN tags into the concrete `queryId` strings to pass
+ * to Next's `revalidateTag`.
+ *
+ * @param queryId - The stable tag generated for the GraphQL request
+ * @param rawHeader - Raw `x-cache-tags` header value
+ */
 export async function recordCacheTagsForQuery(
   queryId: string,
   rawHeader: string | null,
@@ -73,6 +98,11 @@ export async function recordCacheTagsForQuery(
   await writeStore(store);
 }
 
+/**
+ * Look up all `queryId` tags associated with a set of CDN cache tags.
+ * @param tags - Array of cache tags from DatoCMS webhooks
+ * @returns De-duplicated list of `queryId` tags to revalidate
+ */
 export async function findQueryIdsForTags(tags: string[]): Promise<string[]> {
   if (tags.length === 0) return [];
   const store = await readStore();

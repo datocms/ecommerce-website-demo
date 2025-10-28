@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * @fileoverview Product detail page view. Handles image gallery selection,
+ * color/size selection UI, and renders edit attributes for key fields.
+ */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useState } from 'react';
@@ -16,12 +20,15 @@ import type { GlobalPageProps } from '@/utils/globalPageProps';
 import DatoImage from '../DatoImage';
 
 type Props = {
+  /** Full product query payload for the detail page. */
   data: ProductQuery;
+  /** Locale-aware page props for links and formatting. */
   globalPageProps: GlobalPageProps;
 };
 
 const allSizes = ['xs', 's', 'm', 'l', 'xl'];
 
+/** Presentational detail view for a single product. */
 const ProductView = ({ data, globalPageProps }: Props) => {
   if (!data.product) notFound();
 

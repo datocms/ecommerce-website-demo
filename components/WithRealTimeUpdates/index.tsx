@@ -31,6 +31,10 @@ import type { GlobalPageProps } from '@/utils/globalPageProps';
  * editing controller to rescan the page.
  */
 
+/**
+ * Props for the realtime wrapper. Parameterized by the page's props, the
+ * GraphQL result shape, and the variables shape.
+ */
 type Props<PageProps extends GlobalPageProps, TResult, TVariables> = {
   initialData: TResult;
   query: TypedDocumentNode<TResult, TVariables> | string;

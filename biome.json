@@ -2,7 +2,13 @@
   "$schema": "https://biomejs.dev/schemas/2.3.1/schema.json",
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "files": {
-    "includes": ["**", "!**/.next", "!**/graphql/types"]
+    "includes": [
+      "**",
+      "!**/.next",
+      "!**/graphql/types",
+      "!**/docs",
+      "!next-env.d.ts"
+    ]
   },
   "linter": {
     "enabled": true,

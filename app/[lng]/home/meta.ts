@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Strongly-typed query/types exported for the Home route.
+ */
 import {
   HomeDocument,
   type HomeQuery,

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Structured-text renderer helper that styles <mark> tags with
+ * a consistent highlight look. Falls back to `React.createElement` for other
+ * tags.
+ */
 import React, { type ReactNode } from 'react';
 
 type TagName =
@@ -8,6 +13,12 @@ type AnyProps = Record<string, unknown> & {
   key?: React.Key;
 };
 
+/**
+ * Render a tag with optional highlight style for `<mark>` nodes.
+ * @param rawTagName - Intrinsic tag name or component reference
+ * @param props - Props for the element
+ * @param children - Children passed from the structured-text renderer
+ */
 const Highlighter = (
   rawTagName: TagName,
   props: AnyProps | null,

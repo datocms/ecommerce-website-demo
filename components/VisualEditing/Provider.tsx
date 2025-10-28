@@ -11,6 +11,11 @@ type Props = {
   children: React.ReactNode;
 };
 
+/**
+ * Convenience provider that enables Visual Editing when `isDraft` is true.
+ * Prefer the bridge-based approach for full control and a single controller
+ * instance across the app.
+ */
 export default function VisualEditingProvider({ isDraft, children }: Props) {
   useEffect(() => {
     if (!isDraft) return;

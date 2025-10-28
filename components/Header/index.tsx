@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * @fileoverview Top-of-page header composition. Wires notification strip,
+ * popup banner, cookie notice, the main category header, and locale handling.
+ */
 import { isEmptyDocument } from 'datocms-structured-text-utils';
 import { Suspense, useState } from 'react';
 import type {
@@ -15,10 +19,13 @@ import NotificationStrip from './NotificationStrip';
 import PopUpBanner from './PopUpBanner';
 
 type Props = {
+  /** Layout query containing menus, general interface and assets. */
   data: LayoutQuery;
+  /** Locale-aware page props. */
   globalPageProps: GlobalPageProps;
 };
 
+/** Compose header UI blocks and conditionally render them from CMS data. */
 const Header = ({ data, globalPageProps }: Props) => {
   // Navbar toggle
   const [notificationStrip, setNotificationStrip] = useState(

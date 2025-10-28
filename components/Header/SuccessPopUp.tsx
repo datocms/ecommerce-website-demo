@@ -1,9 +1,15 @@
+/**
+ * @fileoverview Lightweight success toast used after enabling draft/preview.
+ * Purely visual; closes itself via the provided state setter.
+ */
 import type { Dispatch, SetStateAction } from 'react';
 
 type Props = {
+  /** Set to false to hide the toast. */
   setSuccessToast: Dispatch<SetStateAction<boolean>>;
 };
 
+/** Presentational success toast with icon and dismiss control. */
 const SuccessPopUp = ({ setSuccessToast }: Props) => {
   return (
     <div

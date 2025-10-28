@@ -8,6 +8,13 @@ import { draftMode } from 'next/headers';
  */
 import { NextResponse } from 'next/server';
 
+/**
+ * Enable draft mode from a simple link.
+ *
+ * Query parameters:
+ * - `secret`: must match `DRAFT_SECRET_TOKEN`
+ * - `path`: absolute path to redirect to after enabling (defaults to `/`)
+ */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const secret = searchParams.get('secret');

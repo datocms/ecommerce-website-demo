@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Dismissible top notification bar that renders structured text
+ * and turns inline links into localized Next.js links. Adds edit attributes
+ * when `_editingUrl` is available.
+ */
 import {
   isLink,
   type Record,
@@ -15,12 +20,17 @@ import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Highlighter from '../Common/Highlighter';
 
 type Props = {
+  /** Structured text field for the notification message. */
   notification: LayoutModelNotificationField;
+  /** Setter used to hide the strip. */
   setNotificationStrip: React.Dispatch<SetStateAction<boolean>>;
+  /** Locale and route info for building links. */
   globalPageProps: GlobalPageProps;
+  /** `_editingUrl` for the layout record to enable inline edit targets. */
   layoutEditingUrl: string | null;
 };
 
+/** Render a localized, editable notification strip with a dismiss button. */
 const NotificationStrip = ({
   notification,
   globalPageProps,

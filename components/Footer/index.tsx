@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Site footer with newsletter signup, social links, column
+ * navigation, and copyright. Fully presentational.
+ */
 import Link from 'next/link';
 import type { ResponsiveImageType } from 'react-datocms';
 import DatoImage from '@/components/DatoImage';
@@ -6,10 +10,13 @@ import type { GlobalPageProps } from '@/utils/globalPageProps';
 import SvgRenderer from '../Common/SvgRenderer';
 
 type Props = {
+  /** Layout query for footer assets and copy. */
   data: LayoutQuery;
+  /** Locale-aware page props for link building. */
   globalPageProps: GlobalPageProps;
 };
 
+/** Render a responsive footer powered by CMS content. */
 const Footer = ({ data, globalPageProps }: Props) => {
   return (
     <footer className="mx-auto max-w-7xl bg-white pt-4 sm:pt-6 lg:pt-8">

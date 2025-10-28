@@ -4,10 +4,17 @@ import { enableDatoVisualEditing } from 'datocms-visual-editing';
 import { useRouter } from 'next/navigation';
 import { useCallback, useRef, useState } from 'react';
 
+/** Props for {@link EnableVisualEditingButton}. */
 type Props = {
   className?: string;
 };
 
+/**
+ * Button that boots the Visual Editing overlays and refreshes the route.
+ *
+ * Useful for local testing when the bridge/layout is not controlling the
+ * controller lifecycle.
+ */
 export default function EnableVisualEditingButton({ className }: Props) {
   const [busy, setBusy] = useState(false);
   const onceRef = useRef(false);

@@ -6,6 +6,12 @@
 import { cookies, draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+/**
+ * Disable Next draft-mode and redirect back to the provided URL.
+ *
+ * Query parameters:
+ * - `url`: absolute path to redirect to after disabling
+ */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 

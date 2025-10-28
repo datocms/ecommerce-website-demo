@@ -1,0 +1,20 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["utils", "components", "app/i18n", "app/api", "proxy.ts"],
+  "exclude": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "graphql/types/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ],
+  "excludeExternals": true,
+  "excludePrivate": false,
+  "excludeProtected": false,
+  "readme": "README.md",
+  "categorizeByGroup": true,
+  "sort": ["source-order"],
+  "tsconfig": "tsconfig.json",
+  "githubPages": false,
+  "out": "docs/api"
+}

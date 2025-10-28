@@ -46,6 +46,7 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
+/** CORS preflight for preview-links endpoint. */
 export async function OPTIONS(_request: NextRequest) {
   return new Response('ok', {
     status: 200,
@@ -53,6 +54,12 @@ export async function OPTIONS(_request: NextRequest) {
   });
 }
 
+/**
+ * Generate preview URLs for a DatoCMS webhook payload.
+ *
+ * Expects a JSON body with `item`, `itemType`, and `locale`. Requires
+ * `?token=` to match `DRAFT_SECRET_TOKEN`.
+ */
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 

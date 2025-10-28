@@ -1,9 +1,14 @@
+/**
+ * @fileoverview 404 page that pulls a fallback image from the Layout query
+ * and offers a link back home.
+ */
 import Link from 'next/link';
 import { getFallbackLocale } from '@/app/i18n/settings';
 import DatoImage from '@/components/DatoImage';
 import { LayoutDocument, type LayoutQuery } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 
+/** Choose a best-effort image to display on the 404 page. */
 const resolveNotFoundImage = (layout?: LayoutQuery['layout']) => {
   const candidates = [
     layout?.popup?.popupImage,
@@ -20,6 +25,7 @@ const resolveNotFoundImage = (layout?: LayoutQuery['layout']) => {
   return null;
 };
 
+/** Render a friendly not-found page with a home link. */
 const NotFound = async () => {
   const fallbackLocale = await getFallbackLocale();
   const data = await queryDatoCMS(LayoutDocument, {

@@ -1,14 +1,21 @@
 'use client';
 
+/**
+ * @fileoverview Lightweight floating search input used on mobile layouts.
+ * Pushes to the products route with `productName` query on Enter.
+ */
 import { useRouter } from 'next/navigation';
 import { type Dispatch, type SetStateAction, useState } from 'react';
 import type { SiteLocale } from '@/graphql/types/graphql';
 
 type PropTypes = {
+  /** Active locale for the search results route. */
   lng: SiteLocale;
+  /** Setter to close the floating search. */
   setSerachIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
+/** Simple search input that navigates on Enter and clears itself. */
 const HoveringSearch = ({ lng, setSerachIsOpen }: PropTypes) => {
   const [searchValue, setSearchValue] = useState('');
   const router = useRouter();

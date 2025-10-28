@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Home page content renderer used by both server and realtime
+ * client. Renders sections based on the union fragment type.
+ */
 'use client';
 
 // NOTE: Keep the shared view markup identical across server and client renders
@@ -19,6 +23,10 @@ type ContentViewProps = PageProps & {
 
 // Pure view that assumes data has already been validated. We reuse this from the
 // client realtime wrapper so overlays stay consistent across renders.
+/**
+ * Render the homepage sections with localized links and images.
+ * @param data - Query payload for the home page
+ */
 export function HomeContentView({
   data,
   ...globalPageProps
@@ -78,6 +86,7 @@ export function HomeContentView({
 }
 
 // Server component: guard against missing data and render the shared view.
+/** Server entry that validates data, then renders the shared view. */
 const Content: ContentPage<PageProps, Query> = (props) => {
   if (!props.data.home) {
     notFound();

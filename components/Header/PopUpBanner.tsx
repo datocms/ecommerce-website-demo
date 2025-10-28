@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Marketing popup banner rendered as a modal overlay.
+ * Dismisses on click, Escape, Enter, or Space. Fully presentational.
+ */
 import Link from 'next/link';
 import type { Dispatch, SetStateAction } from 'react';
 import type { ResponsiveImageType } from 'react-datocms';
@@ -6,11 +10,15 @@ import type { PopupRecord } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 type PropTypes = {
+  /** State setter to close the popup. */
   setPopUp: Dispatch<SetStateAction<boolean>>;
+  /** Popup content coming from DatoCMS. */
   popup: PopupRecord;
+  /** Locale-aware page props for link building. */
   globalPageProps: GlobalPageProps;
 };
 
+/** Display a full-screen marketing popup with image, copy, and CTA link. */
 const PopUpBanner = ({ setPopUp, popup, globalPageProps }: PropTypes) => {
   return (
     <div>

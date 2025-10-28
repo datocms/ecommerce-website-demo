@@ -41,6 +41,19 @@ export function generateWrapper<
   realtimeComponent: RealtimeUpdatesPage<PageProps, TResult, TVariables>;
   onData?: (data: TResult, context: { pageProps: PageProps }) => void;
 }) {
+  /**
+   * Server component wrapper factory for locale-aware pages.
+   *
+   * - Fetches the initial GraphQL payload on the server using the provided
+   *   `query` and `buildVariables()`.
+   * - When draft mode is on, it returns the client wrapper that wires the view
+   *   to DatoCMS Listen and Visual Editing; otherwise it renders the content
+   *   directly as a server component.
+   *
+   * @template PageProps - Page props that include locale params
+   * @template TResult - GraphQL result data shape
+   * @template TVariables - GraphQL variables shape
+   */
   return async function Page(unsanitizedPageProps: AsyncPageProps<PageProps>) {
     const fallbackLocale = await getFallbackLocale();
     const { isEnabled: isDraft } = await draftMode();

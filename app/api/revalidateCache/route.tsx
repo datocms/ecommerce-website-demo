@@ -1,6 +1,11 @@
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
+/**
+ * On-demand ISR: revalidate all routes tagged with `datocms`.
+ *
+ * Requires `?token=` to match `CACHE_INVALIDATION_SECRET_TOKEN`.
+ */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const token = req.nextUrl.searchParams.get('token');
 

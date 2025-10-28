@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Product/collection showcase grid with a large hero tile and
+ * two supporting images. Call-to-action links are localized.
+ */
 import Link from 'next/link';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
@@ -5,10 +9,13 @@ import { CollectionCardShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 type Props = {
+  /** Collection showcase fragment content. */
   fragment: FragmentType<typeof CollectionCardShowcaseFragmentDoc>;
+  /** Locale-aware page props for link building. */
   globalPageProps: GlobalPageProps;
 };
 
+/** Grid showcase of a highlighted collection with supporting imagery. */
 const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
   const { direction, pretitle, title, description, button, collection } =
     getFragmentData(CollectionCardShowcaseFragmentDoc, fragment);

@@ -45,6 +45,25 @@ export default async function queryDatoCMS<
   variables?: TVariables,
   options?: QueryDatoCMSOptions | boolean,
 ): Promise<TResult> {
+  /**
+   * Execute a GraphQL query against DatoCMS with sensible app defaults.
+   *
+   * Behaviour
+   * - Detects Next draft mode when `options.isDraft` is omitted and uses it to
+   *   automatically include preview content and disable cache.
+   * - When `options.visualEditing` is true, wraps `fetch` via
+   *   {@link withContentLinkHeaders} so `_editingUrl` is populated for fields
+   *   that request it and adds the appropriate headers.
+   * - For non-draft traffic, enables Next.js response caching with the
+   *   `datocms` tag so routes can be revalidated via tag.
+   *
+   * @template TResult, TVariables
+   * @param document - Typed GraphQL document to execute
+   * @param variables - Variables for the GraphQL operation
+   * @param options - Boolean for `isDraft` or an option bag
+   * @returns The parsed GraphQL `data` field
+   * @throws If the API token is missing or the request returns errors
+   */
   if (!process.env.DATOCMS_READONLY_API_TOKEN) {
     throw new Error(
       'Missing DatoCMS API token: make sure a DATOCMS_READONLY_API_TOKEN environment variable is set!',

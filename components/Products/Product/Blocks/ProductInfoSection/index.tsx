@@ -10,16 +10,21 @@ import {
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
 type Props = {
+  /** Product info fragment (bulleted attributes). */
   ProductInfoFragment: FragmentType<typeof ProductInfoSectionFragmentDoc>;
+  /** Optional material fragment for the featured card. */
   MaterialFragment: Maybe<
     FragmentType<typeof MaterialProductFragmentFragmentDoc>
   >;
+  /** Locale-aware page props for links. */
   globalPageProps: GlobalPageProps;
+  /** General interface texts (labels). */
   generalInterfaceFragment: Maybe<
     FragmentType<typeof ProductGeneralInterfaceFragmentDoc>
   >;
 };
 
+/** Render informational chips and a material promo card for the product. */
 const ProductInfoSection = ({
   ProductInfoFragment,
   MaterialFragment,
@@ -204,3 +209,7 @@ const ProductInfoSection = ({
 };
 
 export default ProductInfoSection;
+/**
+ * @fileoverview Product information bullets (materials, style, weather,
+ * occasions) with an optional featured material card linking to products.
+ */

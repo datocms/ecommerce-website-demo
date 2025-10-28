@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * @fileoverview Top-of-page header composition. Wires notification strip,
+ * Top-of-page header composition. Wires notification strip,
  * popup banner, cookie notice, the main category header, and locale handling.
  */
 import { isEmptyDocument } from 'datocms-structured-text-utils';
@@ -18,7 +18,7 @@ import CookiesNotice from './CookiesNotice';
 import NotificationStrip from './NotificationStrip';
 import PopUpBanner from './PopUpBanner';
 
-type Props = {
+export type Props = {
   /** Layout query containing menus, general interface and assets. */
   data: LayoutQuery;
   /** Locale-aware page props. */

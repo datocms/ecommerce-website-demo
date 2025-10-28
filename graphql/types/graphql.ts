@@ -5837,67 +5837,67 @@ export type LocalesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type LocalesQuery = { __typename?: 'Query', _site: { __typename?: 'Site', locales: Array<SiteLocale> } };
 
-type VisualEditingFields_BrandRecord_Fragment = { __typename?: 'BrandRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_BrandRecord_Fragment' };
+export type VisualEditingFields_BrandRecord_Fragment = { __typename?: 'BrandRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_BrandRecord_Fragment' };
 
-type VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment = { __typename?: 'CollectionCardShowcaseSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment' };
+export type VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment = { __typename?: 'CollectionCardShowcaseSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_CollectionCardShowcaseSectionRecord_Fragment' };
 
-type VisualEditingFields_CollectionRecord_Fragment = { __typename?: 'CollectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_CollectionRecord_Fragment' };
+export type VisualEditingFields_CollectionRecord_Fragment = { __typename?: 'CollectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_CollectionRecord_Fragment' };
 
-type VisualEditingFields_CookieNoticeRecord_Fragment = { __typename?: 'CookieNoticeRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_CookieNoticeRecord_Fragment' };
+export type VisualEditingFields_CookieNoticeRecord_Fragment = { __typename?: 'CookieNoticeRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_CookieNoticeRecord_Fragment' };
 
-type VisualEditingFields_DividerSectionRecord_Fragment = { __typename?: 'DividerSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_DividerSectionRecord_Fragment' };
+export type VisualEditingFields_DividerSectionRecord_Fragment = { __typename?: 'DividerSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_DividerSectionRecord_Fragment' };
 
-type VisualEditingFields_DropdownColumnRecord_Fragment = { __typename?: 'DropdownColumnRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_DropdownColumnRecord_Fragment' };
+export type VisualEditingFields_DropdownColumnRecord_Fragment = { __typename?: 'DropdownColumnRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_DropdownColumnRecord_Fragment' };
 
-type VisualEditingFields_DropdownMenuRecord_Fragment = { __typename?: 'DropdownMenuRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_DropdownMenuRecord_Fragment' };
+export type VisualEditingFields_DropdownMenuRecord_Fragment = { __typename?: 'DropdownMenuRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_DropdownMenuRecord_Fragment' };
 
-type VisualEditingFields_FeaturedQuestionsSectionRecord_Fragment = { __typename?: 'FeaturedQuestionsSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FeaturedQuestionsSectionRecord_Fragment' };
+export type VisualEditingFields_FeaturedQuestionsSectionRecord_Fragment = { __typename?: 'FeaturedQuestionsSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FeaturedQuestionsSectionRecord_Fragment' };
 
-type VisualEditingFields_FeaturedReviewRecord_Fragment = { __typename?: 'FeaturedReviewRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FeaturedReviewRecord_Fragment' };
+export type VisualEditingFields_FeaturedReviewRecord_Fragment = { __typename?: 'FeaturedReviewRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FeaturedReviewRecord_Fragment' };
 
-type VisualEditingFields_FilterDetailRecord_Fragment = { __typename?: 'FilterDetailRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FilterDetailRecord_Fragment' };
+export type VisualEditingFields_FilterDetailRecord_Fragment = { __typename?: 'FilterDetailRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FilterDetailRecord_Fragment' };
 
-type VisualEditingFields_FooterColumnRecord_Fragment = { __typename?: 'FooterColumnRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FooterColumnRecord_Fragment' };
+export type VisualEditingFields_FooterColumnRecord_Fragment = { __typename?: 'FooterColumnRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FooterColumnRecord_Fragment' };
 
-type VisualEditingFields_FooterItemRecord_Fragment = { __typename?: 'FooterItemRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FooterItemRecord_Fragment' };
+export type VisualEditingFields_FooterItemRecord_Fragment = { __typename?: 'FooterItemRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_FooterItemRecord_Fragment' };
 
-type VisualEditingFields_GeneralInterfaceRecord_Fragment = { __typename?: 'GeneralInterfaceRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_GeneralInterfaceRecord_Fragment' };
+export type VisualEditingFields_GeneralInterfaceRecord_Fragment = { __typename?: 'GeneralInterfaceRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_GeneralInterfaceRecord_Fragment' };
 
-type VisualEditingFields_HeroSectionRecord_Fragment = { __typename?: 'HeroSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_HeroSectionRecord_Fragment' };
+export type VisualEditingFields_HeroSectionRecord_Fragment = { __typename?: 'HeroSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_HeroSectionRecord_Fragment' };
 
-type VisualEditingFields_HomeRecord_Fragment = { __typename?: 'HomeRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_HomeRecord_Fragment' };
+export type VisualEditingFields_HomeRecord_Fragment = { __typename?: 'HomeRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_HomeRecord_Fragment' };
 
-type VisualEditingFields_LayoutRecord_Fragment = { __typename?: 'LayoutRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_LayoutRecord_Fragment' };
+export type VisualEditingFields_LayoutRecord_Fragment = { __typename?: 'LayoutRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_LayoutRecord_Fragment' };
 
-type VisualEditingFields_LegalPageRecord_Fragment = { __typename?: 'LegalPageRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_LegalPageRecord_Fragment' };
+export type VisualEditingFields_LegalPageRecord_Fragment = { __typename?: 'LegalPageRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_LegalPageRecord_Fragment' };
 
-type VisualEditingFields_LinkItemRecord_Fragment = { __typename?: 'LinkItemRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_LinkItemRecord_Fragment' };
+export type VisualEditingFields_LinkItemRecord_Fragment = { __typename?: 'LinkItemRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_LinkItemRecord_Fragment' };
 
-type VisualEditingFields_MaterialRecord_Fragment = { __typename?: 'MaterialRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_MaterialRecord_Fragment' };
+export type VisualEditingFields_MaterialRecord_Fragment = { __typename?: 'MaterialRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_MaterialRecord_Fragment' };
 
-type VisualEditingFields_MaterialShowcaseSectionRecord_Fragment = { __typename?: 'MaterialShowcaseSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_MaterialShowcaseSectionRecord_Fragment' };
+export type VisualEditingFields_MaterialShowcaseSectionRecord_Fragment = { __typename?: 'MaterialShowcaseSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_MaterialShowcaseSectionRecord_Fragment' };
 
-type VisualEditingFields_PopupRecord_Fragment = { __typename?: 'PopupRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_PopupRecord_Fragment' };
+export type VisualEditingFields_PopupRecord_Fragment = { __typename?: 'PopupRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_PopupRecord_Fragment' };
 
-type VisualEditingFields_ProductFeatureSectionRecord_Fragment = { __typename?: 'ProductFeatureSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ProductFeatureSectionRecord_Fragment' };
+export type VisualEditingFields_ProductFeatureSectionRecord_Fragment = { __typename?: 'ProductFeatureSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ProductFeatureSectionRecord_Fragment' };
 
-type VisualEditingFields_ProductQuestionRecord_Fragment = { __typename?: 'ProductQuestionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ProductQuestionRecord_Fragment' };
+export type VisualEditingFields_ProductQuestionRecord_Fragment = { __typename?: 'ProductQuestionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ProductQuestionRecord_Fragment' };
 
-type VisualEditingFields_ProductRecord_Fragment = { __typename?: 'ProductRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ProductRecord_Fragment' };
+export type VisualEditingFields_ProductRecord_Fragment = { __typename?: 'ProductRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ProductRecord_Fragment' };
 
-type VisualEditingFields_ProductVariationRecord_Fragment = { __typename?: 'ProductVariationRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ProductVariationRecord_Fragment' };
+export type VisualEditingFields_ProductVariationRecord_Fragment = { __typename?: 'ProductVariationRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ProductVariationRecord_Fragment' };
 
-type VisualEditingFields_ShowcaseRecord_Fragment = { __typename?: 'ShowcaseRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ShowcaseRecord_Fragment' };
+export type VisualEditingFields_ShowcaseRecord_Fragment = { __typename?: 'ShowcaseRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_ShowcaseRecord_Fragment' };
 
-type VisualEditingFields_SimpleButtonRecord_Fragment = { __typename?: 'SimpleButtonRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_SimpleButtonRecord_Fragment' };
+export type VisualEditingFields_SimpleButtonRecord_Fragment = { __typename?: 'SimpleButtonRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_SimpleButtonRecord_Fragment' };
 
-type VisualEditingFields_SocialMediaIconRecord_Fragment = { __typename?: 'SocialMediaIconRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_SocialMediaIconRecord_Fragment' };
+export type VisualEditingFields_SocialMediaIconRecord_Fragment = { __typename?: 'SocialMediaIconRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_SocialMediaIconRecord_Fragment' };
 
-type VisualEditingFields_StoreRecord_Fragment = { __typename?: 'StoreRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_StoreRecord_Fragment' };
+export type VisualEditingFields_StoreRecord_Fragment = { __typename?: 'StoreRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_StoreRecord_Fragment' };
 
-type VisualEditingFields_TestimonialRecord_Fragment = { __typename?: 'TestimonialRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_TestimonialRecord_Fragment' };
+export type VisualEditingFields_TestimonialRecord_Fragment = { __typename?: 'TestimonialRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_TestimonialRecord_Fragment' };
 
-type VisualEditingFields_TestimonialSectionRecord_Fragment = { __typename?: 'TestimonialSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_TestimonialSectionRecord_Fragment' };
+export type VisualEditingFields_TestimonialSectionRecord_Fragment = { __typename?: 'TestimonialSectionRecord', _editingUrl?: string | null } & { ' $fragmentName'?: 'VisualEditingFields_TestimonialSectionRecord_Fragment' };
 
 export type VisualEditingFieldsFragment =
   | VisualEditingFields_BrandRecord_Fragment

@@ -1,11 +1,11 @@
 /**
- * @fileoverview Testimonials section with title and a set of quotes.
+ * Testimonials section with title and a set of quotes.
  */
 import ReactMarkdown from 'react-markdown';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { TestimonialSectionFragmentDoc } from '@/graphql/types/graphql';
 
-type Props = {
+export type Props = {
   /** Fragment providing title and testimonial entries. */
   fragment: FragmentType<typeof TestimonialSectionFragmentDoc>;
 };

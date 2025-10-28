@@ -1,5 +1,5 @@
 /**
- * @fileoverview Stores page: server entry that validates data and delegates to
+ * Stores page: server entry that validates data and delegates to
  * a client-only view for interactivity while preserving server markup shape.
  */
 import { notFound } from 'next/navigation';

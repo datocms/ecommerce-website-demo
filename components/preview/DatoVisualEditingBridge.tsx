@@ -41,7 +41,7 @@ declare global {
   }
 }
 
-type Props = {
+export type Props = {
   baseEditingUrl: string;
   environment?: string;
   isDraft?: boolean;

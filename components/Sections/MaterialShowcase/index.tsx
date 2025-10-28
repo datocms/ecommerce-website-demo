@@ -1,5 +1,5 @@
 /**
- * @fileoverview Three-up grid of materials with image tiles and links to
+ * Three-up grid of materials with image tiles and links to
  * filtered product listings.
  */
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import { MaterialShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { imageFillCoverProps } from '@/utils/imageProps';
 
-type Props = {
+export type Props = {
   /** Material showcase fragment content. */
   fragment: FragmentType<typeof MaterialShowcaseFragmentDoc>;
   /** Locale-aware page props for building links. */

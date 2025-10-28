@@ -1,14 +1,14 @@
 'use client';
 
 /**
- * @fileoverview Paginated control that updates the `page` query parameter and
+ * Paginated control that updates the `page` query parameter and
  * shows a result range summary. Purely presentational.
  */
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { pushQueryParam } from '@/utils/urlParams';
 
-type PropTypes = {
+export type PropTypes = {
   /** Total number of matching products. */
   numberOfProducts: number;
   /** Currently selected page (1-based). */

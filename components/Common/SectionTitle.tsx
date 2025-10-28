@@ -1,5 +1,5 @@
 /**
- * @fileoverview Reusable section title with optional Markdown paragraph.
+ * Reusable section title with optional Markdown paragraph.
  */
 import type { Maybe } from 'graphql/jsutils/Maybe';
 import ReactMarkdown from 'react-markdown';

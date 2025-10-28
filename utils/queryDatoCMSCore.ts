@@ -5,7 +5,7 @@ import { print } from 'graphql';
 /**
  * Options supported by {@link queryDatoCMSCore}.
  */
-type QueryOptions = {
+export type QueryOptions = {
   /** If true, includes drafts and disables HTTP caching. */
   isDraft?: boolean;
   /** Additional Next.js cache `tags` to attach to the request. */
@@ -24,7 +24,7 @@ type QueryOptions = {
  *   CDN cache-tag → query ids for on-demand invalidation.
  *
  * This function is environment-agnostic and does not depend on `draftMode()`.
- * Prefer {@link utils/queryDatoCMS.ts | queryDatoCMS} for app usage.
+ * Prefer the higher-level `queryDatoCMS` helper for app usage.
  *
  * @template TResult - GraphQL result data shape
  * @template TVariables - GraphQL variables shape

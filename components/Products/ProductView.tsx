@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * @fileoverview Product detail page view. Handles image gallery selection,
+ * Product detail page view. Handles image gallery selection,
  * color/size selection UI, and renders edit attributes for key fields.
  */
 import Link from 'next/link';
@@ -21,7 +21,7 @@ import { imageFillCoverProps } from '@/utils/imageProps';
 import { isOnSaleFlag } from '@/utils/productFields';
 import DatoImage from '../DatoImage';
 
-type Props = {
+export type Props = {
   /** Full product query payload for the detail page. */
   data: ProductQuery;
   /** Locale-aware page props for links and formatting. */

@@ -35,7 +35,7 @@ import type { GlobalPageProps } from '@/utils/globalPageProps';
  * Props for the realtime wrapper. Parameterized by the page's props, the
  * GraphQL result shape, and the variables shape.
  */
-type Props<PageProps extends GlobalPageProps, TResult, TVariables> = {
+export type Props<PageProps extends GlobalPageProps, TResult, TVariables> = {
   initialData: TResult;
   query: TypedDocumentNode<TResult, TVariables> | string;
   variables: TVariables;

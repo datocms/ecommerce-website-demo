@@ -1,5 +1,5 @@
 /**
- * @fileoverview Product/collection showcase grid with a large hero tile and
+ * Product/collection showcase grid with a large hero tile and
  * two supporting images. Call-to-action links are localized.
  */
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import { CollectionCardShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { imageFillCoverProps } from '@/utils/imageProps';
 
-type Props = {
+export type Props = {
   /** Collection showcase fragment content. */
   fragment: FragmentType<typeof CollectionCardShowcaseFragmentDoc>;
   /** Locale-aware page props for link building. */

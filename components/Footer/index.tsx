@@ -1,5 +1,5 @@
 /**
- * @fileoverview Site footer with newsletter signup, social links, column
+ * Site footer with newsletter signup, social links, column
  * navigation, and copyright. Fully presentational.
  */
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { imageFillCoverProps } from '@/utils/imageProps';
 import SvgRenderer from '../Common/SvgRenderer';
 
-type Props = {
+export type Props = {
   /** Layout query for footer assets and copy. */
   data: LayoutQuery;
   /** Locale-aware page props for link building. */

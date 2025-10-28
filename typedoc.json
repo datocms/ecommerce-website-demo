@@ -1,10 +1,17 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["utils", "components", "app/i18n", "app/api", "proxy.ts"],
+  "entryPoints": [
+    "utils",
+    "components",
+    "app/i18n",
+    "app/api",
+    "graphql/types",
+    "proxy.ts"
+  ],
+  "entryPointStrategy": "expand",
   "exclude": [
     "**/node_modules/**",
     "**/.next/**",
-    "graphql/types/**",
     "**/*.test.ts",
     "**/*.test.tsx"
   ],
@@ -16,5 +23,10 @@
   "sort": ["source-order"],
   "tsconfig": "tsconfig.json",
   "githubPages": false,
+  "externalSymbolLinkMappings": {
+    "datocms-visual-editing": {
+      "withContentLinkHeaders": "#"
+    }
+  },
   "out": "docs/api"
 }

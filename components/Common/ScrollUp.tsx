@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * @fileoverview Tiny helper/component that scrolls the document to top on
+ * Tiny helper/component that scrolls the document to top on
  * mount. Useful after client-side navigation when the page should reset.
  */
 import { useEffect } from 'react';

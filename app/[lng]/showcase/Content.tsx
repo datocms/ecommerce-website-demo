@@ -1,5 +1,5 @@
 /**
- * @fileoverview Showcase page content shared by server and realtime client.
+ * Showcase page content shared by server and realtime client.
  * Highlights collections and new products with localized links.
  */
 import Link from 'next/link';

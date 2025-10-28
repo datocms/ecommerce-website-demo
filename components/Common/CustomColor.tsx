@@ -1,9 +1,9 @@
 'use client';
 
 /**
- * @fileoverview Injects a CSS custom property for the primary color at runtime.
+ * Injects a CSS custom property for the primary color at runtime.
  */
-type Props = {
+export type Props = {
   /** Red channel (0–255). */
   r: number;
   /** Green channel (0–255). */

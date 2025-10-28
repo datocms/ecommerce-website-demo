@@ -6,7 +6,7 @@ import { DatoImage_ResponsiveImageFragmentDoc } from '@/graphql/types/graphql';
  * Props for {@link DatoImage}. Accepts either a full `responsiveImage` object
  * via `data`, or a GraphQL fragment reference via `fragment`.
  */
-type Props =
+export type Props =
   | (ImagePropTypes & { altOverride?: string | null })
   | (Omit<ImagePropTypes, 'data'> & {
       fragment: FragmentType<typeof DatoImage_ResponsiveImageFragmentDoc>;

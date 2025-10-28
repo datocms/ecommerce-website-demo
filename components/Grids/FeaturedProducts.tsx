@@ -1,5 +1,5 @@
 /**
- * @fileoverview Grid of related/featured products with price display and
+ * Grid of related/featured products with price display and
  * localized links. Adds edit attributes for price fields.
  */
 import Link from 'next/link';
@@ -14,7 +14,7 @@ import { imageFillCoverProps } from '@/utils/imageProps';
 import { isOnSaleFlag } from '@/utils/productFields';
 import DatoImage from '../DatoImage';
 
-type PropTypes = {
+export type PropTypes = {
   /** Product query used to read related products. */
   data: ProductQuery;
   /** Locale-aware page props for link building. */

@@ -6,7 +6,7 @@
  *   capture any `responsiveImage` objects returned by queries.
  */
 
-type ResponsiveImageLike = {
+export type ResponsiveImageLike = {
   src?: string | null;
   srcSet?: string | null;
   width?: number | null;
@@ -172,6 +172,9 @@ export function logServerResponsiveImages(
  * Log a small sample of the document's `<img>` elements, optionally filtered
  * by substring match on the URL. Helpful to confirm real DOM state after
  * hydration and image loading.
+ *
+ * @param opts - Optional filter and limit; `filter` matches against URL.
+ * @returns Nothing. Emits a JSON line to the console when images are found.
  */
 export function logDocumentImagesSample(opts?: {
   filter?: string | null;

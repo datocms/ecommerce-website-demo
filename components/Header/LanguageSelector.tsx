@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * @fileoverview Locale switcher that preserves the current path and query
+ * Locale switcher that preserves the current path and query
  * string. Shows the language display name and optional currency symbol.
  */
 import type { Maybe } from 'graphql/jsutils/Maybe';
@@ -11,7 +11,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import type { SiteLocale } from '@/graphql/types/graphql';
 
-type Props = {
+export type Props = {
   /** List of supported locales to render as options. */
   languages: SiteLocale[];
   /** Optional currency symbol to display next to the current locale. */

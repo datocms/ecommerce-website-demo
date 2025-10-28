@@ -1,5 +1,5 @@
 /**
- * @fileoverview Small modal prompting for the draft secret token. Calls the
+ * Small modal prompting for the draft secret token. Calls the
  * draft enable route, refreshes on success, and shows a success toast.
  */
 import {
@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 
-type Props = {
+export type Props = {
   /** Setter to close the modal. */
   setModalOpen: Dispatch<SetStateAction<boolean>>;
   /** Router refresh fn to pull new server-rendered content. */

@@ -30,8 +30,10 @@ export type AsyncGlobalPageProps<
 
 /**
  * Build a localized, absolute path from page props.
- * @param globalPageProps - Props that include the locale param
- * @param path - Optional path suffix starting with `/`
+ *
+ * @param globalPageProps - Props that include the locale param.
+ * @param path - Optional path suffix starting with `/`.
+ * @returns A string like `"/en/home"`.
  * @example
  * buildUrl({ params: { lng: 'en' } }, '/home'); // "/en/home"
  */

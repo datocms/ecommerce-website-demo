@@ -1,5 +1,5 @@
 /**
- * @fileoverview 404 page that pulls a fallback image from the Layout query
+ * 404 page that pulls a fallback image from the Layout query
  * and offers a link back home.
  */
 import Link from 'next/link';

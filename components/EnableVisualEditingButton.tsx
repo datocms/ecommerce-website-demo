@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useRef, useState } from 'react';
 
 /** Props for {@link EnableVisualEditingButton}. */
-type Props = {
+export type Props = {
   className?: string;
 };
 

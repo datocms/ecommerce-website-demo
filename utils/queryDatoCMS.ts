@@ -17,7 +17,7 @@ import { withContentLinkHeaders } from 'datocms-visual-editing';
 import { print } from 'graphql';
 import { draftMode } from 'next/headers';
 
-type QueryDatoCMSOptions = {
+export type QueryDatoCMSOptions = {
   isDraft?: boolean;
   visualEditing?: boolean;
 };

@@ -1,14 +1,14 @@
 /**
- * @fileoverview Structured-text renderer helper that styles <mark> tags with
+ * Structured-text renderer helper that styles <mark> tags with
  * a consistent highlight look. Falls back to `React.createElement` for other
  * tags.
  */
 import React, { type ReactNode } from 'react';
 
-type TagName =
+export type TagName =
   | keyof JSX.IntrinsicElements
   | React.JSXElementConstructor<unknown>;
-type AnyProps = Record<string, unknown> & {
+export type AnyProps = Record<string, unknown> & {
   className?: string;
   key?: React.Key;
 };

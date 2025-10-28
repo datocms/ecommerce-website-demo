@@ -1,5 +1,5 @@
 /**
- * @fileoverview Divider section with headline, subtitle, decorative SVG and
+ * Divider section with headline, subtitle, decorative SVG and
  * a localized CTA button.
  */
 import Link from 'next/link';
@@ -7,7 +7,7 @@ import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { DividerSectionFragmentDoc } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
-type Props = {
+export type Props = {
   /** Fragment providing text and button link. */
   fragment: FragmentType<typeof DividerSectionFragmentDoc>;
   /** Locale-aware page props for links. */

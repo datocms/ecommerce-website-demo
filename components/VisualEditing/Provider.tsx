@@ -6,7 +6,7 @@ import {
 } from 'datocms-visual-editing';
 import { useEffect } from 'react';
 
-type Props = {
+export type Props = {
   isDraft: boolean;
   children: React.ReactNode;
 };

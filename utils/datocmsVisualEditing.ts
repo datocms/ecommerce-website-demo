@@ -6,9 +6,9 @@
  */
 import { buildEditTagAttributes } from 'datocms-visual-editing';
 
-type ProductPriceFieldPath = 'price' | 'sale_price';
+export type ProductPriceFieldPath = 'price' | 'sale_price';
 
-type ProductPriceEditOptions = {
+export type ProductPriceEditOptions = {
   fieldPath?: ProductPriceFieldPath;
 };
 

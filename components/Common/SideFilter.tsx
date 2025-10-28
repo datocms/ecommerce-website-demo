@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * @fileoverview Sidebar filters and sort controls for product listings.
+ * Sidebar filters and sort controls for product listings.
  * Writes selection to the URL query string; purely presentational.
  */
 import { Disclosure } from '@headlessui/react';
@@ -15,7 +15,7 @@ import {
 } from '@/graphql/types/graphql';
 import { pushQueryParam } from '@/utils/urlParams';
 
-type PropTypes = {
+export type PropTypes = {
   /** Initial lists for filters (collections, brands, materials). */
   initialParams: Maybe<FragmentType<typeof InitialParamsFragmentDoc>>;
   /** Labels for filter UI and sort options. */

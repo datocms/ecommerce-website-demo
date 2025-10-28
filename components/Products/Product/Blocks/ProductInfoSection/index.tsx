@@ -10,7 +10,7 @@ import {
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { imageCoverProps } from '@/utils/imageProps';
 
-type Props = {
+export type Props = {
   /** Product info fragment (bulleted attributes). */
   ProductInfoFragment: FragmentType<typeof ProductInfoSectionFragmentDoc>;
   /** Optional material fragment for the featured card. */
@@ -210,6 +210,6 @@ const ProductInfoSection = ({
 
 export default ProductInfoSection;
 /**
- * @fileoverview Product information bullets (materials, style, weather,
+ * Product information bullets (materials, style, weather,
  * occasions) with an optional featured material card linking to products.
  */

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Detail view for a collection/material/brand filter. Renders a
+ * Detail view for a collection/material/brand filter. Renders a
  * hero image and rich description with styled structured text.
  */
 import {
@@ -25,7 +25,7 @@ import { imageFillCoverProps } from '@/utils/imageProps';
 import Highlighter from '../Common/Highlighter';
 import DatoImage from '../DatoImage';
 
-type PropTypes = {
+export type PropTypes = {
   /** Title of the entity (name). */
   name: string;
   /** Short subtitle (Markdown supported). */

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Cookie notice card with image and primary/secondary actions.
+ * Cookie notice card with image and primary/secondary actions.
  * Dismiss only toggles visibility; no persistence is implemented here.
  */
 import type { Dispatch, SetStateAction } from 'react';
@@ -8,7 +8,7 @@ import DatoImage from '@/components/DatoImage';
 import type { CookieNoticeRecord } from '@/graphql/types/graphql';
 import { imageFillCoverProps } from '@/utils/imageProps';
 
-type PropTypes = {
+export type PropTypes = {
   /** State setter to close the notice. */
   setCookies: Dispatch<SetStateAction<boolean>>;
   /** CMS-sourced cookie notice content. */

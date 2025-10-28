@@ -1,5 +1,5 @@
 /**
- * @fileoverview Product reviews block showing average rating, count, and a
+ * Product reviews block showing average rating, count, and a
  * few featured reviews. Adds inline edit attributes for fields.
  */
 import { getFragmentData } from '@/graphql/types';
@@ -10,7 +10,7 @@ import {
 import { getProductFieldEditAttributes } from '@/utils/datocmsVisualEditing';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
-type PropTypes = {
+export type PropTypes = {
   /** Product query payload with reviews. */
   data: ProductQuery;
   /** Locale-aware page props. */

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Legal page content renderer used by server and realtime
+ * Legal page content renderer used by server and realtime
  * client. Renders structured text with headings and paragraphs.
  */
 import {

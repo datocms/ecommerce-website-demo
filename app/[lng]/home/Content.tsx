@@ -1,5 +1,5 @@
 /**
- * @fileoverview Home page content renderer used by both server and realtime
+ * Home page content renderer used by both server and realtime
  * client. Renders sections based on the union fragment type.
  */
 'use client';

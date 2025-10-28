@@ -1,5 +1,5 @@
 /**
- * @fileoverview Demo cart side-panel. Renders a read-only list of products,
+ * Demo cart side-panel. Renders a read-only list of products,
  * totals, and checkout link. Integrations (Shopify, Commerce Layer) are out
  * of scope for this demo.
  */
@@ -13,9 +13,9 @@ import { imageFillCoverProps } from '@/utils/imageProps';
 import { isOnSaleWithPrice } from '@/utils/productFields';
 import DatoImage from '../DatoImage';
 
-type CartProduct = LayoutQuery['cartProducts'][number];
+export type CartProduct = LayoutQuery['cartProducts'][number];
 
-type PropTypes = {
+export type PropTypes = {
   /** Whether the panel is visible. */
   open: boolean;
   /** Setter to open/close the panel. */

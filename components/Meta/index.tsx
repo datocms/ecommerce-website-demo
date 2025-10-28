@@ -1,9 +1,9 @@
 /**
- * @fileoverview Minimal meta tags and favicon pulled from the Layout query.
+ * Minimal meta tags and favicon pulled from the Layout query.
  */
 import type { LayoutQuery } from '@/graphql/types/graphql';
 
-type PropTypes = {
+export type PropTypes = {
   /** Layout query payload used to read Global SEO and favicon. */
   data: LayoutQuery;
 };

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Types and query exported for the Stores route.
+ * Types and query exported for the Stores route.
  */
 import {
   StoresDocument,

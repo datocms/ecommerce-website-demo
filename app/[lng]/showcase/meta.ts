@@ -1,5 +1,5 @@
 /**
- * @fileoverview Types and query exported for the Showcase route.
+ * Types and query exported for the Showcase route.
  */
 import {
   ShowcaseDocument,

@@ -24,11 +24,12 @@ import type {
   RealtimeUpdatesPage,
 } from './types';
 
-type AsyncPageProps<PageProps extends GlobalPageProps> = AsyncGlobalPageProps<
-  PageProps,
-  URLSearchParams | Record<string, string | string[] | undefined>,
-  Record<string, string>
->;
+export type AsyncPageProps<PageProps extends GlobalPageProps> =
+  AsyncGlobalPageProps<
+    PageProps,
+    URLSearchParams | Record<string, string | string[] | undefined>,
+    Record<string, string>
+  >;
 
 export function generateWrapper<
   PageProps extends GlobalPageProps,

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Dismissible top notification bar that renders structured text
+ * Dismissible top notification bar that renders structured text
  * and turns inline links into localized Next.js links. Adds edit attributes
  * when `_editingUrl` is available.
  */
@@ -19,7 +19,7 @@ import { buildEditWrapperProps } from '@/utils/datocmsVisualEditing';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import Highlighter from '../Common/Highlighter';
 
-type Props = {
+export type Props = {
   /** Structured text field for the notification message. */
   notification: LayoutModelNotificationField;
   /** Setter used to hide the strip. */

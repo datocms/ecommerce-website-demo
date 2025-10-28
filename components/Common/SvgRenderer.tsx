@@ -1,14 +1,14 @@
 'use client';
 
 /**
- * @fileoverview Fetches and renders an SVG from a same-origin URL into the
+ * Fetches and renders an SVG from a same-origin URL into the
  * DOM. Intended for small icon sprites hosted in the project. Avoids <img> so
  * the SVG inherits currentColor styles.
  */
 import type { URL } from 'node:url';
 import { useEffect, useState } from 'react';
 
-type Props = {
+export type Props = {
   /** URL of the SVG to fetch (string or WHATWG URL). */
   url: string | URL;
 };

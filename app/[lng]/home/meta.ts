@@ -1,5 +1,5 @@
 /**
- * @fileoverview Strongly-typed query/types exported for the Home route.
+ * Strongly-typed query/types exported for the Home route.
  */
 import {
   HomeDocument,

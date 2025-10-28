@@ -1,5 +1,5 @@
 /**
- * @fileoverview Types and query exported for the per-locale layout route.
+ * Types and query exported for the per-locale layout route.
  */
 import {
   LayoutDocument,

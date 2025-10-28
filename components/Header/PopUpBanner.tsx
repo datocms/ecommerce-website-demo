@@ -1,5 +1,5 @@
 /**
- * @fileoverview Marketing popup banner rendered as a modal overlay.
+ * Marketing popup banner rendered as a modal overlay.
  * Dismisses on click, Escape, Enter, or Space. Fully presentational.
  */
 import Link from 'next/link';
@@ -12,7 +12,7 @@ import type { PopupRecord } from '@/graphql/types/graphql';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { imageFillCoverProps } from '@/utils/imageProps';
 
-type PropTypes = {
+export type PropTypes = {
   /** State setter to close the popup. */
   setPopUp: Dispatch<SetStateAction<boolean>>;
   /** Popup content coming from DatoCMS. */

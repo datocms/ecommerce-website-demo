@@ -9,7 +9,6 @@
     "lint": "eslint . && biome check . --diagnostic-level=error",
     "format": "biome check . --write --unsafe && biome format --diagnostic-level=error --write .",
     "generate-ts-types": "graphql-codegen --config graphql.config.ts",
-    "backfill-alt": "node scripts/backfill-upload-alt.mjs",
     "qa": "node scripts/quick-qa.mjs",
     "typegen": "next typegen",
     "typecheck": "tsc --noEmit",

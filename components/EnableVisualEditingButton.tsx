@@ -30,7 +30,6 @@ export default function EnableVisualEditingButton({ className }: Props) {
           baseEditingUrl:
             process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL ||
             'https://ecommerce-website-openai-app.admin.datocms.com/',
-          devPanel: true,
         });
         // Make sure server-rendered content includes stega (if it didn't already)
         router.refresh();

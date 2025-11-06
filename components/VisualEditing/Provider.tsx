@@ -24,8 +24,8 @@ export default function VisualEditingProvider({ isDraft, children }: Props) {
         process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL ||
         'https://ecommerce-website-openai-app.admin.datocms.com/';
 
-      // Boot overlays/dev panel. `activate: 'query'` enables when ?edit=1 is present.
-      enableDatoVisualEditing({ baseEditingUrl, devPanel: true });
+      // Boot overlays. `activate: 'query'` enables when ?edit=1 is present.
+      enableDatoVisualEditing({ baseEditingUrl });
 
       // Clean stega characters after hydration, while keeping overlays clickable.
       enableDatoAutoClean();

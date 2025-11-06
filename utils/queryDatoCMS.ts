@@ -22,6 +22,52 @@ export type QueryDatoCMSOptions = {
   visualEditing?: boolean;
 };
 
+// Retry helper for handling DatoCMS rate limits (HTTP 429)
+async function fetchWithRetries(
+  fetchFn: typeof fetch,
+  url: string,
+  init: RequestInit,
+  maxRetries = 5,
+): Promise<Response> {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const response = await fetchFn(url, init);
+    if (response.ok) return response;
+
+    if (response.status === 429 && attempt < maxRetries - 1) {
+      // Try to respect Retry-After header or DatoCMS JSON payload `details.reset`
+      let delayMs = 1000 * Math.pow(2, attempt);
+
+      const retryAfter = response.headers.get('Retry-After');
+      if (retryAfter) {
+        const asNumber = Number(retryAfter);
+        if (!Number.isNaN(asNumber)) {
+          delayMs = Math.max(0, asNumber * 1000);
+        } else {
+          const asDate = new Date(retryAfter).getTime();
+          if (!Number.isNaN(asDate)) delayMs = Math.max(0, asDate - Date.now());
+        }
+      } else {
+        try {
+          const bodyText = await response.text();
+          const parsed = JSON.parse(bodyText);
+          const resetSec = parsed?.data?.[0]?.attributes?.details?.reset;
+          if (typeof resetSec === 'number' && resetSec >= 0) {
+            delayMs = Math.max(0, resetSec * 1000);
+          }
+        } catch {}
+      }
+      // Add small jitter
+      delayMs += Math.floor(Math.random() * 250);
+      await new Promise((r) => setTimeout(r, delayMs));
+      continue;
+    }
+
+    return response;
+  }
+  // Final attempt fallback
+  return fetchFn(url, init);
+}
+
 // Cache the wrapped fetch so repeated calls don’t allocate extra wrappers.
 const getFetchWithContentLinkHeaders = (() => {
   let cachedClient: typeof fetch | null = null;
@@ -121,7 +167,7 @@ export default async function queryDatoCMS<
   // and tagged for on-demand revalidation.
   const shouldBypassCache = includeVisualEditingMetadata || draftEnabled;
 
-  const response = await fetchClient('https://graphql.datocms.com/', {
+  const response = await fetchWithRetries(fetchClient, 'https://graphql.datocms.com/', {
     cache: shouldBypassCache ? 'no-store' : 'force-cache',
     ...(shouldBypassCache ? {} : { next: { tags: ['datocms'] } }),
     method: 'POST',

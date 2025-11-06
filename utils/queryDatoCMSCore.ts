@@ -12,6 +12,49 @@ export type QueryOptions = {
   tags?: string[];
 };
 
+// Retry helper for handling DatoCMS rate limits (HTTP 429)
+async function fetchWithRetries(
+  fetchFn: typeof fetch,
+  url: string,
+  init: RequestInit,
+  maxRetries = 5,
+): Promise<Response> {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const response = await fetchFn(url, init);
+    if (response.ok) return response;
+
+    if (response.status === 429 && attempt < maxRetries - 1) {
+      let delayMs = 1000 * Math.pow(2, attempt);
+
+      const retryAfter = response.headers.get('Retry-After');
+      if (retryAfter) {
+        const asNumber = Number(retryAfter);
+        if (!Number.isNaN(asNumber)) {
+          delayMs = Math.max(0, asNumber * 1000);
+        } else {
+          const asDate = new Date(retryAfter).getTime();
+          if (!Number.isNaN(asDate)) delayMs = Math.max(0, asDate - Date.now());
+        }
+      } else {
+        try {
+          const bodyText = await response.text();
+          const parsed = JSON.parse(bodyText);
+          const resetSec = parsed?.data?.[0]?.attributes?.details?.reset;
+          if (typeof resetSec === 'number' && resetSec >= 0) {
+            delayMs = Math.max(0, resetSec * 1000);
+          }
+        } catch {}
+      }
+      delayMs += Math.floor(Math.random() * 250);
+      await new Promise((r) => setTimeout(r, delayMs));
+      continue;
+    }
+
+    return response;
+  }
+  return fetchFn(url, init);
+}
+
 /**
  * Low-level DatoCMS GraphQL query helper.
  *
@@ -107,7 +150,7 @@ export default async function queryDatoCMSCore<
   }
   const queryId = await makeQueryId(qInput);
 
-  const response = await veFetch('https://graphql.datocms.com/', {
+  const response = await fetchWithRetries(veFetch, 'https://graphql.datocms.com/', {
     cache: isDraft ? 'no-store' : 'force-cache',
     next: { tags: ['datocms', queryId, ...extraTags] },
     method: 'POST',

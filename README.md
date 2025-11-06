@@ -75,6 +75,8 @@ CI will check docs freshness on pull requests via `.github/workflows/docs-check.
 
 ## Visual Editing Workflow
 
+For a deeper guide with APIs, examples, and best practices, see the external documentation: [datocms-visual-editing](https://github.com/marcelofinamorvieira/datocms-visual-editing).
+
 Architecture at a glance:
 
 - Server (data + headers)

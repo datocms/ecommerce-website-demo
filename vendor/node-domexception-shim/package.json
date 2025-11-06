@@ -1,0 +1,7 @@
+{
+  "name": "node-domexception",
+  "version": "1.0.1-shim.0",
+  "private": true,
+  "main": "index.js",
+  "license": "MIT"
+}

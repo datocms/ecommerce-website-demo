@@ -14,7 +14,6 @@
 
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { subscribeToQuery } from 'datocms-listen';
-import { withContentLinkHeaders } from 'datocms-visual-editing';
 import { useDatoVisualEditingListen } from 'datocms-visual-editing/react';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import {
@@ -69,13 +68,6 @@ export default function WithRealTimeUpdates<
 
   const queryDocument = useMemo(() => query, [query]);
 
-  // Wrap `fetch` so every Listen request includes visual-editing headers.
-  // Pass the baseEditingUrl directly to the helper instead of setting headers
-  // manually per request.
-  const fetcher = useMemo(() => {
-    return withContentLinkHeaders(fetch, baseEditingUrl);
-  }, [baseEditingUrl]);
-
   // Subscribe to the DatoCMS Listen API. `subscribeToQuery` returns a Promise
   // of an unsubscribe; normalise into a sync cleanup for React effects.
   const subscribe = useCallback(
@@ -93,7 +85,9 @@ export default function WithRealTimeUpdates<
         token,
         includeDrafts: true,
         ...(environment ? { environment } : {}),
-        fetcher,
+        contentLink: 'vercel-v1',
+        baseEditingUrl,
+        excludeInvalid: true,
         onUpdate: (payload) => {
           setData(payload.response.data);
           onUpdate?.();
@@ -119,7 +113,7 @@ export default function WithRealTimeUpdates<
         });
       };
     },
-    [environment, fetcher, queryDocument, token, variables],
+    [baseEditingUrl, environment, queryDocument, token, variables],
   );
 
   // Track controller readiness so this component re-renders once the global

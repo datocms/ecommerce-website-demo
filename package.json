@@ -15,6 +15,7 @@
     "docs": "typedoc"
   },
   "dependencies": {
+    "@datocms/cda-client": "^0.2.7",
     "@datocms/cma-client-node": "^5.1.24",
     "@formatjs/intl-localematcher": "^0.6.2",
     "@graphql-codegen/typed-document-node": "^6.0.2",
@@ -28,11 +29,10 @@
     "accept-language": "^3.0.20",
     "datocms-listen": "^1.0.2",
     "datocms-structured-text-utils": "^5.1.6",
-    "datocms-visual-editing": "^1.1.0",
+    "datocms-visual-editing": "^1.2.1",
     "framer-motion": "^12.23.24",
     "gql": "^1.1.2",
     "graphql": "^16.11.0",
-    "graphql-request": "^7.3.1",
     "heroicons": "^2.2.0",
     "i18next": "^25.6.0",
     "i18next-resources-to-backend": "^1.2.1",

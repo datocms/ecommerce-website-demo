@@ -2,86 +2,22 @@
  * queryDatoCMS
  *
  * Server-side helper to call the DatoCMS GraphQL API with sensible defaults:
- * - Attaches `X-Include-Drafts: true` when draft mode is active.
- * - When visual-editing metadata is requested, wraps `fetch` with
- *   `withContentLinkHeaders`, which sets `X-Visual-Editing` and
- *   `X-Base-Editing-Url` (required for `_editingUrl`). The wrapper is cached
- *   per base URL to avoid re-creating clients.
+ * - Attaches `includeDrafts` when draft mode is active.
+ * - When visual-editing metadata is requested, enables Content Link headers so
+ *   `_editingUrl` fields resolve and Visual Editing overlays can attach.
  * - Disables caching for preview/draft requests and enables Next.js tag-based
  *   caching otherwise.
  */
 import 'server-only';
 
+import { executeQuery } from '@datocms/cda-client';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { withContentLinkHeaders } from 'datocms-visual-editing';
-import { print } from 'graphql';
 import { draftMode } from 'next/headers';
 
 export type QueryDatoCMSOptions = {
   isDraft?: boolean;
   visualEditing?: boolean;
 };
-
-// Retry helper for handling DatoCMS rate limits (HTTP 429)
-async function fetchWithRetries(
-  fetchFn: typeof fetch,
-  url: string,
-  init: RequestInit,
-  maxRetries = 5,
-): Promise<Response> {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    const response = await fetchFn(url, init);
-    if (response.ok) return response;
-
-    if (response.status === 429 && attempt < maxRetries - 1) {
-      // Try to respect Retry-After header or DatoCMS JSON payload `details.reset`
-      let delayMs = 1000 * Math.pow(2, attempt);
-
-      const retryAfter = response.headers.get('Retry-After');
-      if (retryAfter) {
-        const asNumber = Number(retryAfter);
-        if (!Number.isNaN(asNumber)) {
-          delayMs = Math.max(0, asNumber * 1000);
-        } else {
-          const asDate = new Date(retryAfter).getTime();
-          if (!Number.isNaN(asDate)) delayMs = Math.max(0, asDate - Date.now());
-        }
-      } else {
-        try {
-          const bodyText = await response.text();
-          const parsed = JSON.parse(bodyText);
-          const resetSec = parsed?.data?.[0]?.attributes?.details?.reset;
-          if (typeof resetSec === 'number' && resetSec >= 0) {
-            delayMs = Math.max(0, resetSec * 1000);
-          }
-        } catch {}
-      }
-      // Add small jitter
-      delayMs += Math.floor(Math.random() * 250);
-      await new Promise((r) => setTimeout(r, delayMs));
-      continue;
-    }
-
-    return response;
-  }
-  // Final attempt fallback
-  return fetchFn(url, init);
-}
-
-// Cache the wrapped fetch so repeated calls don’t allocate extra wrappers.
-const getFetchWithContentLinkHeaders = (() => {
-  let cachedClient: typeof fetch | null = null;
-  let cachedBaseEditingUrl: string | null = null;
-
-  return (baseEditingUrl: string) => {
-    if (!cachedClient || cachedBaseEditingUrl !== baseEditingUrl) {
-      cachedClient = withContentLinkHeaders(fetch, baseEditingUrl);
-      cachedBaseEditingUrl = baseEditingUrl;
-    }
-
-    return cachedClient;
-  };
-})();
 
 export default async function queryDatoCMS<
   TResult = unknown,
@@ -91,25 +27,6 @@ export default async function queryDatoCMS<
   variables?: TVariables,
   options?: QueryDatoCMSOptions | boolean,
 ): Promise<TResult> {
-  /**
-   * Execute a GraphQL query against DatoCMS with sensible app defaults.
-   *
-   * Behaviour
-   * - Detects Next draft mode when `options.isDraft` is omitted and uses it to
-   *   automatically include preview content and disable cache.
-   * - When `options.visualEditing` is true, wraps `fetch` via
-   *   {@link withContentLinkHeaders} so `_editingUrl` is populated for fields
-   *   that request it and adds the appropriate headers.
-   * - For non-draft traffic, enables Next.js response caching with the
-   *   `datocms` tag so routes can be revalidated via tag.
-   *
-   * @template TResult, TVariables
-   * @param document - Typed GraphQL document to execute
-   * @param variables - Variables for the GraphQL operation
-   * @param options - Boolean for `isDraft` or an option bag
-   * @returns The parsed GraphQL `data` field
-   * @throws If the API token is missing or the request returns errors
-   */
   if (!process.env.DATOCMS_READONLY_API_TOKEN) {
     throw new Error(
       'Missing DatoCMS API token: make sure a DATOCMS_READONLY_API_TOKEN environment variable is set!',
@@ -120,13 +37,6 @@ export default async function queryDatoCMS<
     typeof options === 'boolean' ? { isDraft: options } : (options ?? {});
 
   const { isDraft, visualEditing } = normalizedOptions;
-
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    'X-Exclude-Invalid': 'true',
-    Authorization: `Bearer ${process.env.DATOCMS_READONLY_API_TOKEN}`,
-  };
 
   let draftEnabled = Boolean(isDraft);
 
@@ -139,18 +49,14 @@ export default async function queryDatoCMS<
     }
   }
 
-  // Visual-editing metadata is enabled in draft mode unless explicitly
+  // Visual Editing metadata is enabled in draft mode unless explicitly
   // overridden via the `visualEditing` option.
   const includeVisualEditingMetadata = visualEditing ?? draftEnabled;
 
-  if (draftEnabled) {
-    headers['X-Include-Drafts'] = 'true';
-  }
-
-  let baseEditingUrl: string | null = null;
+  let baseEditingUrl: string | undefined;
 
   if (includeVisualEditingMetadata) {
-    baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL ?? null;
+    baseEditingUrl = process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL ?? undefined;
 
     if (!baseEditingUrl) {
       throw new Error(
@@ -159,37 +65,23 @@ export default async function queryDatoCMS<
     }
   }
 
-  const fetchClient = includeVisualEditingMetadata
-    ? getFetchWithContentLinkHeaders(baseEditingUrl as string)
-    : fetch;
-
   // Preview/draft traffic should bypass cache; published traffic can be cached
   // and tagged for on-demand revalidation.
   const shouldBypassCache = includeVisualEditingMetadata || draftEnabled;
 
-  const response = await fetchWithRetries(fetchClient, 'https://graphql.datocms.com/', {
-    cache: shouldBypassCache ? 'no-store' : 'force-cache',
-    ...(shouldBypassCache ? {} : { next: { tags: ['datocms'] } }),
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ query: print(document), variables }),
+  const requestInitOptions: (Partial<RequestInit> & {
+    next?: { tags: string[] };
+  }) | undefined = shouldBypassCache
+    ? { cache: 'no-store' }
+    : { cache: 'force-cache', next: { tags: ['datocms'] } };
+
+  return executeQuery(document, {
+    token: process.env.DATOCMS_READONLY_API_TOKEN,
+    includeDrafts: draftEnabled,
+    excludeInvalid: true,
+    contentLink: includeVisualEditingMetadata ? 'vercel-v1' : undefined,
+    baseEditingUrl,
+    variables,
+    requestInitOptions,
   });
-
-  if (!response.ok) {
-    const body = await response.text();
-
-    throw new Error(`Invalid status code: ${response.status}\n${body}`);
-  }
-
-  const body = (await response.json()) as
-    | { data: TResult }
-    | { errors: unknown[] };
-
-  if ('errors' in body) {
-    throw new Error(
-      `Invalid GraphQL request: ${JSON.stringify(body.errors, null, 2)}`,
-    );
-  }
-
-  return body.data;
 }

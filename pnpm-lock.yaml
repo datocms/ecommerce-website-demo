@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@datocms/cda-client':
+        specifier: ^0.2.7
+        version: 0.2.7(graphql@16.12.0)
       '@datocms/cma-client-node':
         specifier: ^5.1.24
         version: 5.1.26
@@ -51,8 +54,8 @@ importers:
         specifier: ^5.1.6
         version: 5.1.6
       datocms-visual-editing:
-        specifier: ^1.1.0
-        version: 1.1.0(react@19.2.0)
+        specifier: ^1.2.1
+        version: 1.2.1(react@19.2.0)
       framer-motion:
         specifier: ^12.23.24
         version: 12.23.24(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -62,9 +65,6 @@ importers:
       graphql:
         specifier: ^16.11.0
         version: 16.12.0
-      graphql-request:
-        specifier: ^7.3.1
-        version: 7.3.1(graphql@16.12.0)
       heroicons:
         specifier: ^2.2.0
         version: 2.2.0
@@ -1825,8 +1825,8 @@ packages:
   datocms-structured-text-utils@5.1.6:
     resolution: {integrity: sha512-LDk8R5byWmBmK5dIWiTvfPe7pBn9xkZ3VMxevsoNuiffVsz2T3SgtdqNBnGIKaEmxJ3dln/IvxSbkvULf1Y9Eg==}
 
-  datocms-visual-editing@1.1.0:
-    resolution: {integrity: sha512-9Tk1WQHwZiH9lBNnlKJyr7ravwhlm6TWEQncj0Lpz6Jn+IRQG/6oPD4JN7Omlr+EhDNLEsW4qIfVM1q3sYDKLA==}
+  datocms-visual-editing@1.2.1:
+    resolution: {integrity: sha512-NKz2y8GXIw3++n9fMjY3bDnbDVnuCqCDNT7QtLt4ELRbq7IyvEoeMew7rS0wtxaaQx4llf3JBHDYvIcE9+/ffw==}
     engines: {node: '>=18'}
     peerDependencies:
       react: '>=18'
@@ -2306,11 +2306,6 @@ packages:
     peerDependenciesMeta:
       cosmiconfig-toml-loader:
         optional: true
-
-  graphql-request@7.3.1:
-    resolution: {integrity: sha512-GdinBsBVYrWzwEvOlzadrV5j8mdOc9ZT8In9QyRIZaxbhkTL08j35yNbPp96jAacYzjeD/hKKy2E2RGI7c7Yug==}
-    peerDependencies:
-      graphql: 14 - 16
 
   graphql-tag@2.12.6:
     resolution: {integrity: sha512-FdSNcu2QQcWnM2VNvSCCDCVS5PpPqpzgFT8+GXzqJuoDd0CBncxCY278u4mhRO7tMgo2JjgJA5aZ+nWSQ/Z+xg==}
@@ -5864,7 +5859,7 @@ snapshots:
     dependencies:
       array-flatten: 3.0.0
 
-  datocms-visual-editing@1.1.0(react@19.2.0):
+  datocms-visual-editing@1.2.1(react@19.2.0):
     dependencies:
       '@vercel/stega': 0.1.2
     optionalDependencies:
@@ -6493,11 +6488,6 @@ snapshots:
       - typescript
       - uWebSockets.js
       - utf-8-validate
-
-  graphql-request@7.3.1(graphql@16.12.0):
-    dependencies:
-      '@graphql-typed-document-node/core': 3.2.0(graphql@16.12.0)
-      graphql: 16.12.0
 
   graphql-tag@2.12.6(graphql@16.12.0):
     dependencies:

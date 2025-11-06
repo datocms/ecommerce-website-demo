@@ -1,7 +1,8 @@
 // Load .env/.env.local (best-effort) when running directly via Node
 import fs from 'node:fs';
 import path from 'node:path';
-import { decodeStega, withContentLinkHeaders } from 'datocms-visual-editing';
+import { executeQuery } from '@datocms/cda-client';
+import { decodeStega } from 'datocms-visual-editing';
 
 function loadDotEnv(filename) {
   try {
@@ -38,30 +39,16 @@ if (!TOKEN || !BASE) {
   process.exit(1);
 }
 
-const fetchDato = withContentLinkHeaders(fetch, BASE);
-
 async function gql(query, variables = {}, { includeDrafts = true } = {}) {
-  const res = await fetchDato('https://graphql.datocms.com/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: `Bearer ${TOKEN}`,
-      ...(includeDrafts ? { 'X-Include-Drafts': 'true' } : {}),
-    },
-    body: JSON.stringify({ query, variables }),
+  return executeQuery(query, {
+    token: TOKEN,
+    includeDrafts,
+    excludeInvalid: true,
+    contentLink: 'vercel-v1',
+    baseEditingUrl: BASE,
+    variables,
+    requestInitOptions: { cache: 'no-store' },
   });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GraphQL error ${res.status}:\n${text}`);
-  }
-
-  const body = await res.json();
-  if (body.errors) {
-    throw new Error(JSON.stringify(body.errors, null, 2));
-  }
-  return body.data;
 }
 
 const QUERY = /* GraphQL */ `

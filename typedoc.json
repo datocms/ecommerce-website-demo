@@ -23,10 +23,5 @@
   "sort": ["source-order"],
   "tsconfig": "tsconfig.json",
   "githubPages": false,
-  "externalSymbolLinkMappings": {
-    "datocms-visual-editing": {
-      "withContentLinkHeaders": "#"
-    }
-  },
   "out": "docs/api"
 }

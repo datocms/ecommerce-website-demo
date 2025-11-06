@@ -1,5 +1,5 @@
+import { rawExecuteQuery } from '@datocms/cda-client';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { withContentLinkHeaders } from 'datocms-visual-editing';
 import { print } from 'graphql';
 
 /**
@@ -12,54 +12,11 @@ export type QueryOptions = {
   tags?: string[];
 };
 
-// Retry helper for handling DatoCMS rate limits (HTTP 429)
-async function fetchWithRetries(
-  fetchFn: typeof fetch,
-  url: string,
-  init: RequestInit,
-  maxRetries = 5,
-): Promise<Response> {
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    const response = await fetchFn(url, init);
-    if (response.ok) return response;
-
-    if (response.status === 429 && attempt < maxRetries - 1) {
-      let delayMs = 1000 * Math.pow(2, attempt);
-
-      const retryAfter = response.headers.get('Retry-After');
-      if (retryAfter) {
-        const asNumber = Number(retryAfter);
-        if (!Number.isNaN(asNumber)) {
-          delayMs = Math.max(0, asNumber * 1000);
-        } else {
-          const asDate = new Date(retryAfter).getTime();
-          if (!Number.isNaN(asDate)) delayMs = Math.max(0, asDate - Date.now());
-        }
-      } else {
-        try {
-          const bodyText = await response.text();
-          const parsed = JSON.parse(bodyText);
-          const resetSec = parsed?.data?.[0]?.attributes?.details?.reset;
-          if (typeof resetSec === 'number' && resetSec >= 0) {
-            delayMs = Math.max(0, resetSec * 1000);
-          }
-        } catch {}
-      }
-      delayMs += Math.floor(Math.random() * 250);
-      await new Promise((r) => setTimeout(r, delayMs));
-      continue;
-    }
-
-    return response;
-  }
-  return fetchFn(url, init);
-}
-
 /**
  * Low-level DatoCMS GraphQL query helper.
  *
- * - Adds Visual Editing headers via {@link withContentLinkHeaders} so
- *   `_editingUrl` fields can be returned when requested by queries.
+ * - Provides Content Link metadata (via `@datocms/cda-client`) so `_editingUrl`
+ *   fields resolve for Visual Editing overlays.
  * - Generates a stable `queryId` derived from the printed query, variables and
  *   draft flag; the id is included in the request's Next.js tag list for
  *   targeted revalidation.
@@ -96,29 +53,16 @@ export default async function queryDatoCMSCore<
     );
   }
 
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    'X-Exclude-Invalid': 'true',
-    // Ask Dato to include fine-grained cache tags in the response headers.
-    'X-Cache-Tags': 'true',
-    Authorization: `Bearer ${process.env.DATOCMS_READONLY_API_TOKEN}`,
-  };
-
   const isDraft =
     typeof isDraftOrOpts === 'object'
       ? Boolean(isDraftOrOpts?.isDraft)
       : Boolean(isDraftOrOpts);
 
-  if (isDraft) headers['X-Include-Drafts'] = 'true';
-
-  // Add Visual Editing headers: require a base URL for Dato deep links
   // Use the DatoCMS Admin base URL for deep links; can be overridden via env
   const baseUrl =
     process.env.NEXT_PUBLIC_DATO_BASE_EDITING_URL ||
     process.env.DATO_BASE_EDITING_URL ||
     'https://ecommerce-website-openai-app.admin.datocms.com/';
-  const veFetch = withContentLinkHeaders(fetch, baseUrl);
 
   const extraTags =
     typeof isDraftOrOpts === 'object' && Array.isArray(isDraftOrOpts.tags)
@@ -150,30 +94,27 @@ export default async function queryDatoCMSCore<
   }
   const queryId = await makeQueryId(qInput);
 
-  const response = await fetchWithRetries(veFetch, 'https://graphql.datocms.com/', {
+  const requestInitOptions: Partial<RequestInit> & {
+    next: { tags: string[] };
+  } = {
     cache: isDraft ? 'no-store' : 'force-cache',
     next: { tags: ['datocms', queryId, ...extraTags] },
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ query: print(document), variables }),
-  });
+  };
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Invalid status code: ${response.status}\n${body}`);
-  }
+  const [data, response] = await rawExecuteQuery<TResult, TVariables>(document, {
+    token: process.env.DATOCMS_READONLY_API_TOKEN,
+    includeDrafts: isDraft,
+    excludeInvalid: true,
+    contentLink: 'vercel-v1',
+    baseEditingUrl: baseUrl,
+    returnCacheTags: true,
+    variables,
+    requestInitOptions,
+  });
 
   const cacheTagsHeader =
     response.headers.get('x-cache-tags') ||
     response.headers.get('X-Cache-Tags');
 
-  const body = (await response.json()) as
-    | { data: TResult }
-    | { errors: unknown[] };
-
-  if ('errors' in body) {
-    throw new Error(`Invalid GraphQL request: ${body.errors}`);
-  }
-
-  return { data: body.data, queryId, cacheTagsHeader };
+  return { data, queryId, cacheTagsHeader };
 }

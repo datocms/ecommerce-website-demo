@@ -8,277 +8,72 @@
 
 <!--datocms-autoinclude-header end-->
 
-# Ecommerce Visual Editing Demo (Next.js 16 + DatoCMS)
+# An Ecommerce Website Demo using Next.js 16 and DatoCMS
 
-This repository is a reference storefront that demonstrates how to deliver DatoCMS visual editing with the Next.js App Router (Next.js 16 at the time of writing). The focus of this README is the visual editing experience: how it is wired, how the toggle behaves, and what you need to keep overlays working after local changes.
+This example showcases a TypeScript Next.js 16 website with App Router (app) — using [DatoCMS](https://www.datocms.com/) as the data source.
 
-The data model, real-time subscription layer, and UI come from the standard ecommerce starter. All visual-editing-specific logic lives in the `app`, `components/preview`, `components/WithRealTimeUpdates`, and `proxy.ts` folders referenced below.
+It uses GraphQL CodeGen to type all of the requests comming from Dato automatically: [See how it works here](https://www.datocms.com/blog/how-to-generate-typescript-types-from-graphql)
 
 ## Demo
 
-Example deployment: [https://ecommerce-website-demo-livid.vercel.app/](https://ecommerce-website-demo-livid.vercel.app/) (for reference only; your fork or environment may differ).
+Have a look at the end result live:
 
-## Getting Started
+### [https://ecommerce-website-demo-livid.vercel.app/](https://ecommerce-website-demo-livid.vercel.app/)
 
-1. **Clone the project** (or deploy it via the “Deploy with DatoCMS” button on the starter page).
-2. **Install dependencies** using the same package manager declared in `package.json`:
+## How to use
 
-   ```bash
-   pnpm install
-   ```
+### Quick start
 
-3. **Copy environment variables**:
+1. [Create an account on DatoCMS](https://datocms.com).
 
-   ```bash
-   cp .env.example .env.local
-   ```
+2. Make sure that you have set up the [Github integration on Vercel](https://vercel.com/docs/git/vercel-for-github).
 
-   Required values:
+3. Let DatoCMS set everything up for you clicking this button below:
 
-   - `DATOCMS_READONLY_API_TOKEN` – read-only Content Delivery token.
-   - `NEXT_PUBLIC_DATO_BASE_EDITING_URL` – your project dashboard URL (`https://<project>.admin.datocms.com`). Mandatory whenever a query requests `_editingUrl`.
-   - `NEXT_PUBLIC_DATO_ENVIRONMENT` – optional, only if you preview a non-default environment.
-   - Preview secrets (`DRAFT_SECRET_TOKEN`, `SEO_SECRET_TOKEN`, `CACHE_INVALIDATION_SECRET_TOKEN`) can be any random string in local development.
-   - `URL` defaults to `http://localhost:3000`; adjust if you run the dev server on another port.
+[![Deploy with DatoCMS](https://dashboard.datocms.com/deploy/button.svg)](https://dashboard.datocms.com/deploy?repo=marcelofinamorvieira%2Fecommerce-website-demo%3Amain)
 
-4. **Generate GraphQL types (when the schema changes)**:
+### Local setup
 
-   ```bash
-   pnpm generate-ts-types
-   ```
+Once the setup of the project and repo is done, clone the repo locally.
 
-   This refreshes `graphql/types/` based on the remote schema.
+#### Set up environment variables
 
-5. **Ensure Node.js 20.9+ (or 22.x) is used**:
+In your DatoCMS' project, go to the **Settings** menu at the top and click **API tokens**.
 
-   This project now targets Next.js 16 which requires modern Node.js. Use the included `.nvmrc` (set to `22`) or any runtime ≥ 20.9.
+Then click **Read-only API token** and copy the token.
 
-6. **Run the development server**:
+Next, copy the `.env.example` file in this directory to `.env` (which will be ignored by Git):
 
-   ```bash
-   pnpm dev
-   ```
-
-   The site listens on [http://localhost:3000](http://localhost:3000) by default.
-
-## Documentation
-
-This codebase uses TSDoc/JSDoc comments throughout utilities, API routes, and shared components. You can generate browsable HTML docs with:
-
-```
-pnpm docs
+```bash
+cp .env.local.sample .env.local
 ```
 
-The output is written to `docs/api/`. Authoring guidelines and examples live in `docs/Documentation.md`.
+and set the `DATOCMS_READONLY_API_TOKEN` variable as the API token you just copied.
 
-CI will check docs freshness on pull requests via `.github/workflows/docs-check.yml`. If a PR fails with “Docs are out of date,” run `pnpm docs` locally and commit the changes under `docs/api/`.
+Also then set a secret token that is being used for WebPreviews, SEO Previews and Cache invalidation:
 
-## Visual Editing Workflow
-
-For a deeper guide with APIs, examples, and best practices, see the external documentation: [datocms-visual-editing](https://github.com/marcelofinamorvieira/datocms-visual-editing).
-
-Architecture at a glance:
-
-- Server (data + headers)
-  - `components/WithRealTimeUpdates/generateWrapper.tsx` detects `draftMode()` and always requests visual‑editing metadata while preview is on.
-- `utils/queryDatoCMS.ts` attaches `X-Visual-Editing` and `X-Base-Editing-Url` via `@datocms/cda-client`’s Content Link support whenever visual editing metadata is requested so `_editingUrl` is present in responses.
-- Client (single global controller)
-  - `components/preview/DatoVisualEditingBridge.tsx` creates one controller for the whole app. It mounts in `app/layout.tsx` before `{children}` so realtime listeners find it on first render. Activation is deferred by two `requestAnimationFrame`s + a short timeout to avoid hydration races.
-- Client (realtime streaming)
-  - `components/WithRealTimeUpdates/index.tsx` subscribes to DatoCMS Listen. On each update it reuses the server DOM (same view component) and calls `controller.refresh(scope)` to rescan stega markers. It reuses the global controller — it never creates its own.
-- UI (toggle)
-  - `components/ScrollToTop/index.tsx` exposes an “Enable/Disable Visual Editing” button that talks to the global controller only. No cookies/URL params are changed; overlay state persists in `localStorage` (`datocms.visual-editing.enabled`).
-
-Visual editing activates when:
-
-1. **Draft mode** (preview cookies `__prerender_bypass` and `__next_preview_data`) is set. Visit `/api/draft?secret=<DRAFT_SECRET_TOKEN>&path=/<locale>/home` to enable it.
-2. A **base editing URL** is configured – `NEXT_PUBLIC_DATO_BASE_EDITING_URL` must point to your project dashboard so overlays can deep-link back to DatoCMS.
-3. GraphQL requests are issued with visual-editing headers. In draft mode we always request stega payloads, and the client-side controller decides whether overlays render.
-
-The toggle state is stored in `localStorage` (`datocms.visual-editing.enabled`). It defaults to “disabled” the first time you enter draft mode in a browser session and persists across navigations until you turn it on.
-
-### How This Repo Implements Visual Editing
-
-- Single controller pattern: `components/preview/DatoVisualEditingBridge.tsx` owns the only controller, mounted in `app/layout.tsx` before page content. No other component creates controllers.
-- Requests include stega metadata: all preview requests go through `utils/queryDatoCMS.ts`, which uses `@datocms/cda-client` with Content Link metadata whenever draft mode is on so `_editingUrl` is present.
-- Realtime keeps overlays in sync: `components/WithRealTimeUpdates/index.tsx` listens to DatoCMS Listen and calls `refreshVisualEditing(scope)` after each update to re‑mark the changed subtree.
-- DOM stability: the client “LiveContent” components re‑render the same JSX that the server produced, so marker positions remain stable and overlays don’t jump.
-
-### Managing Images
-
-- Component: `components/DatoImage/index.tsx` is a thin wrapper over `react-datocms`’s `<Image />`, with a typed fragment mode and an optional `altOverride` used across the UI.
-- Visual editing and images: overlays target the fields that render the image; you usually mark a nearby wrapper if you want a specific element to act as the edit target. For example, we mark prices and structured text explicitly but keep images as pure markup.
-- Debugging responsive images:
-  - Enable client logs via `?debugImages=1` or `localStorage['debug:images']='1'` (dev is on by default).
-  - Helpers live in `utils/debugFlags.ts` and `utils/debugImages.ts` (see `logClientResponsiveImage`, `logServerResponsiveImages`).
-
-### Managing Structured Text
-
-- Rendering: we use `react-datocms/structured-text` and a small renderer helper `components/Common/Highlighter.tsx` to style `<mark>` tags.
-- Localized Next links: in places like `components/Header/NotificationStrip.tsx` we transform `link` nodes into `<Link />` to keep locale prefixes.
-- Marking edit targets: we compute edit attributes with `getProductFieldEditAttributes(editingUrl, locale, 'content')` and spread them on a wrapper element that renders the structured text, then add `data-datocms-edit-target`:
-
-```tsx
-const attrs = getProductFieldEditAttributes(editingUrl, locale, 'notification');
-const wrapperProps = attrs ? { ...attrs, 'data-datocms-edit-target': '' } : {};
-<div {...wrapperProps}>
-  <StructuredText data={notification.value} />
-</div>
+```
+URL=http://localhost:3000
+SEO_SECRET_TOKEN=superSecretToken
+DRAFT_SECRET_TOKEN=superSecretToken
+CACHE_INVALIDATION_SECRET_TOKEN=superSecretToken
+DATOCMS_READONLY_API_TOKEN=
+NEXT_PUBLIC_DATO_BASE_EDITING_URL=https://YOURPROJECT.admin.datocms.com
+NEXT_PUBLIC_DATO_ENVIRONMENT=
 ```
 
-### Managing Number Fields (e.g., Price)
+#### Run your project locally
 
-- Helpers: `utils/datocmsVisualEditing.ts` exposes `getProductPriceEditAttributes()` and `getProductFieldEditAttributes()` which build the minimal `data-*` attributes Visual Editing needs.
-- Usage: spread attributes on the exact element that displays the value and add `data-datocms-edit-target`.
-
-```tsx
-// Regular price
-<span {...getProductPriceEditAttributes(editingUrl, locale)} data-datocms-edit-target>
-  {currencySymbol} {product.price}
-</span>
-
-// Sale price (field path override)
-<span {...getProductPriceEditAttributes(editingUrl, locale, { fieldPath: 'sale_price' })}
-      data-datocms-edit-target>
-  {currencySymbol} {product.salePrice}
-</span>
+```bash
+npm install
+npm run dev
 ```
 
-- Deep paths and arrays: pass an array for nested fields (e.g., a variation’s color or list entries). Example from the product page:
+Your blog should be up and running on [http://localhost:3000](http://localhost:3000)!
 
-```tsx
-const colorAttrs = getProductFieldEditAttributes(editingUrl, locale, [
-  'product_variations',
-  variationIndex.toString(),
-  'color',
-]);
-<span {...colorAttrs} data-datocms-edit-target />
-```
+## VS Code
 
-### Gotchas Recap
-
-- Don’t create more than one controller; reuse the global one.
-- Don’t remove or replace the server DOM in the client; reuse the same view.
-- Always include `NEXT_PUBLIC_DATO_BASE_EDITING_URL` when requesting `_editingUrl`.
-- After SSE updates, call `refreshVisualEditing(scope)` to rescan markers.
-
-### Enabling overlays locally
-
-1. Start the dev server and open `/en/home` (or another locale).
-2. Hit `/api/draft?secret=<your-secret>&path=/en/home` in the same browser session.
-3. You’ll land back on the storefront with the floating control exposed (bottom-right). Visual editing stays off until you enable it manually; click **Enable Visual Editing** when you’re ready to see overlays.
-
-Disabling the overlay keeps draft mode active while hiding the overlays. Re-enabling restores them instantly without a full remount.
-
-### How the toggle works (single‑controller pattern)
-
-- The toggle is a thin UI that talks to the global controller (`components/preview/DatoVisualEditingBridge.tsx`). No URL params or cookies are used; state is kept in `localStorage` so it persists across navigations.
-- The server always fetches `_editingUrl` when in draft; enabling/disabling the overlay never remounts the page — it only turns the controller on/off.
-- The bridge defers `enable()` until hydration settles. Enabling too early can produce the dev warning “no editable elements were detected after enable()”. The defer avoids this.
-- When disabled, the controller stays mounted and the `<html>` element reflects state via `data-datocms-visual-editing`. Re‑enabling is instant.
-
-### Realtime + overlays: keeping both working
-
-- Realtime updates render the exact same view the server used (see `app/[lng]/**/LiveContent.tsx`). React patches content in place; it does not replace the DOM nodes that carry stega markers.
-- After each Listen update, the realtime wrapper calls `controller.refresh(scope)` so overlays re‑mark the updated subtree.
-- There is only one controller in the app. The realtime wrapper imports it with `getVisualEditingController()` and never passes `controllerOptions` (so it cannot create a second controller by mistake).
-
-### Proxy responsibilities
-
-`proxy.ts` only handles locale routing.
-
-- Normalises locales and redirects bare paths to the correct locale.
-- Leaves visual editing to server routes/query helpers and the client bridge — no custom headers or query params are added by middleware.
-
-### Key files to inspect
-
-- `components/preview/DatoVisualEditingBridge.tsx` — single global controller; enable/disable/toggle/refresh and hydration delay.
-- `app/layout.tsx` — mounts the bridge before `{children}` so listeners find the controller on first render.
-- `components/WithRealTimeUpdates/index.tsx` — Listen subscription; reuses the global controller and calls `refresh(scope)` after each update.
-- `components/WithRealTimeUpdates/generateWrapper.tsx` — server wrapper that injects `visualEditing: true` during draft and chooses realtime vs server render.
-- `utils/queryDatoCMS.ts` — uses `@datocms/cda-client` to attach Content Link metadata when visual editing is on; disables caching for preview traffic.
-- `components/ScrollToTop/index.tsx` — floating toggle that controls the controller only (persisted in `localStorage`).
-- `app/[lng]/**/LiveContent.tsx` — client renderers that reuse their server views; crucial for DOM reuse.
-
-### Responsive images & stega data
-
-DatoCMS stores stega payloads on the original upload fields (`Upload.alt`, structured text, etc.). To keep overlays working on responsive images:
-
-- Request both the upload `alt` and the `responsiveImage` fragment.
-- Render the decoded string directly (do not call `stripStega`).
-- Ensure editors populate alt text for every asset that should be editable.
-
-## Realtime Updates + Visual Editing (App Router)
-
-DatoCMS’ realtime Listen API can run alongside Visual Editing overlays as long as the initial markup still comes from the server. The pattern used in this demo keeps the server in charge of fetching stega-rich data, and adds a thin client “island” that streams updates without triggering page refreshes.
-
-### Why a server-first render?
-
-- `queryDatoCMS` (via `@datocms/cda-client`) already attaches the `X-Base-Editing-Url` header and returns `_editingUrl` metadata; Visual Editing breaks if those headers are missing even once.
-- Server components stay free to call `draftMode()`, `notFound()`, and locale helpers.
-- The Visual Editing bridge expects the DOM it hydrates to contain stega attributes. Replaying the same React view on the client ensures overlays stay aligned as data changes.
-
-### Implementation checklist
-
-1. **Keep the page layout as a Server Component**  
-   - Example: `app/[lng]/home/Content.tsx` calls `notFound()` and renders `HomeContentView`.  
-   - This component receives GraphQL data from `generateWrapper` and runs exactly once per request.
-
-2. **Extract a pure “view” function**  
-   - Share the JSX that renders the page (`HomeContentView`, `ProductContentView`, etc.) so the server and client paths use identical markup and keep stega attributes intact.
-
-3. **Create a lightweight client wrapper**  
-   - Example: `app/[lng]/home/LiveContent.tsx` simply re-exports the shared view with `'use client'`.  
-   - These files never fetch data; they just render the payload received from the realtime stream.
-
-4. **Wrap the route with `generateWrapper` and `generateRealtimeComponent`**  
-   - `generateWrapper` (server) fetches preview data, ensures `_editingUrl` is requested, and passes it to the realtime component whenever draft mode is enabled.  
-   - `generateRealtimeComponent` returns a small client component that renders once with the server payload and then calls `useDatoVisualEditingListen` to keep the DOM in sync with Dato’s SSE stream.  
-   - Because the same DOM node is reused, the visual-editing controller can simply refresh the tree—no duplicate “fallback” markup is needed.
-
-5. **Provide draft-only realtime bridges**  
-   - Each route exports a `RealTime.tsx` client component (e.g. `app/[lng]/home/RealTime.tsx`) that passes the client view to `generateRealtimeComponent`.
-
-6. **Ensure the Listen subscription sends `X-Base-Editing-Url` and reuse the global controller**
-   - `components/WithRealTimeUpdates/index.tsx` passes Content Link options to the Listen client so the preview stream includes `_editingUrl` on every payload.
-   - It imports the shared controller via `getVisualEditingController()` and passes it to `useDatoVisualEditingListen` (no `controllerOptions`).
-   - On each update, it merges new data into React state, re-renders the same view, and calls `refresh(scope)` so overlays re‑mark the subtree.
-
-7. **Expose the preview token only in draft mode**  
-   - `generateWrapper` guards the client listener with `isDraft && DATOCMS_READONLY_API_TOKEN` so production bundles never ship secrets.
-
-### Files to study
-
-- `components/preview/DatoVisualEditingBridge.tsx` — controller lifecycle and hydration delay.
-- `components/WithRealTimeUpdates/index.tsx` — Listen + overlay refresh using the shared controller.
-- `components/WithRealTimeUpdates/generateWrapper.tsx` — server wrapper for draft/deterministic variables.
-- `app/[lng]/**/LiveContent.tsx` — client renderers that reuse the server view.
-- `app/[lng]/**/RealTime.tsx` — route-scoped client shell created by `generateRealtimeComponent`.
-
-### Common pitfalls
-
-- Two controllers racing (bridge + realtime) → overlays “disappear” after ~1s. Fix: do not pass `controllerOptions` in the realtime hook; reuse the global controller.
-- DOM replacement after hydration (e.g. keyed remounts, `dynamic(..., { ssr: false })`) → “no editables” warning. Fix: reuse the exact server view in the client and avoid keyed wrapper swaps.
-- Missing `X-Base-Editing-Url` on any request while in draft → `_editingUrl` absent and overlays won’t mark. Fix: keep `@datocms/cda-client` Content Link enabled on both server and client requests.
-- Stripping stega strings before rendering — overlays can’t find targets. Fix: don’t call `stripStega` on fields you want to edit visually.
-
-## Troubleshooting
-
-| Symptom | Likely cause | Fix |
-| --- | --- | --- |
-| Overlay never enables | Missing `NEXT_PUBLIC_DATO_BASE_EDITING_URL` or draft cookies | Verify `.env.local`, restart dev server, re-run `/api/draft?...` |
-| Overlays vanish ~1s after enabling | Two controllers racing or DOM got replaced | Reuse the global controller only; ensure client renders the same view the server used |
-| “no editable elements were detected after enable()” | Enabled too early, before hydration/stream settled | Keep the bridge delay; avoid keyed remounts or `ssr: false` wrappers; mount the bridge before `{children}` |
-| Live updates apply but overlays don’t move | Not calling `refresh(scope)` after SSE update | Realtime wrapper already does this; ensure it receives the global controller |
-| Overlays flip off when re-entering draft | `localStorage` persisted disabled state | Re-enable once or clear `datocms.visual-editing.enabled` |
-
-## Contributing
-
-Pull requests that improve the visual editing UX are welcome. Please run `pnpm lint` before committing and include reproduction steps for any visual editing changes so we can verify overlay behaviour across locales and devices.
-
-## Editor Tooling
-
-For a better authoring experience install the [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql) extension. It provides schema-aware completions for the generated `.graphql` documents used throughout this repo.
+It's strongly suggested to install the [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql) extension, to get autocomplete suggestions, validation against schema, and many more niceties when working with your GraphQL queries.
 
 <!--datocms-autoinclude-footer start-->
 

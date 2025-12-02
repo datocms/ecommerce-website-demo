@@ -7,6 +7,7 @@ import type {
   BuildVariablesFn,
   ContentPage,
   RealtimeUpdatesPage,
+  ResolvedPageProps,
 } from './types';
 
 export function generateWrapper<
@@ -21,12 +22,19 @@ export function generateWrapper<
 }) {
   return async function Page(unsanitizedPageProps: PageProps) {
     const fallbackLocale = await getFallbackLocale();
-    const { isEnabled: isDraft } = draftMode();
+    const { isEnabled: isDraft } = await draftMode();
 
-    const { searchParams, ...pagePropsWithoutSearchParams } =
+    // Await params since they are now Promises in Next.js 16
+    const resolvedParams = await unsanitizedPageProps.params;
+
+    const { searchParams, params, ...pagePropsWithoutSearchParamsAndParams } =
       unsanitizedPageProps as PageProps & { searchParams: unknown };
 
-    const pageProps = pagePropsWithoutSearchParams as unknown as PageProps;
+    // Create resolved page props with awaited params
+    const pageProps = {
+      ...pagePropsWithoutSearchParamsAndParams,
+      params: resolvedParams,
+    } as unknown as ResolvedPageProps<PageProps>;
 
     const variables =
       options.buildVariables?.({

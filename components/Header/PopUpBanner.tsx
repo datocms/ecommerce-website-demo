@@ -1,5 +1,5 @@
 import type { PopupRecord } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import type { Dispatch, SetStateAction } from 'react';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
@@ -7,7 +7,7 @@ import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 type PropTypes = {
   setPopUp: Dispatch<SetStateAction<boolean>>;
   popup: PopupRecord;
-  globalPageProps: GlobalPageProps;
+  globalPageProps: ResolvedGlobalPageProps;
 };
 
 const PopUpBanner = ({ setPopUp, popup, globalPageProps }: PropTypes) => {

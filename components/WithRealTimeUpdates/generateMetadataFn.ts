@@ -9,7 +9,7 @@ import {
   type TitleMetaLinkTag,
   toNextMetadata,
 } from 'react-datocms/seo';
-import type { BuildVariablesFn } from './types';
+import type { BuildVariablesFn, ResolvedPageProps } from './types';
 
 export function generateMetadataFn<
   PageProps extends GlobalPageProps,
@@ -26,11 +26,19 @@ export function generateMetadataFn<
     pageProps: PageProps,
   ): Promise<Metadata> {
     const fallbackLocale = await getFallbackLocale();
-    const { isEnabled: isDraft } = draftMode();
+    const { isEnabled: isDraft } = await draftMode();
+
+    // Await params since they are now Promises in Next.js 16
+    const resolvedParams = await pageProps.params;
+
+    const resolvedPageProps = {
+      ...pageProps,
+      params: resolvedParams,
+    } as unknown as ResolvedPageProps<PageProps>;
 
     const variables =
       options.buildVariables?.({
-        ...pageProps,
+        ...resolvedPageProps,
         fallbackLocale,
       }) || ({} as TVariables);
 

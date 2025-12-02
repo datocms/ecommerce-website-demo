@@ -1,12 +1,12 @@
 import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { CollectionCardShowcaseFragmentDoc } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 
 type Props = {
   fragment: FragmentType<typeof CollectionCardShowcaseFragmentDoc>;
-  globalPageProps: GlobalPageProps;
+  globalPageProps: ResolvedGlobalPageProps;
 };
 
 const ProductShowcase = ({ fragment, globalPageProps }: Props) => {

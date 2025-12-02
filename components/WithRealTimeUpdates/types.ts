@@ -1,12 +1,17 @@
 import type { SiteLocale } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { GlobalPageProps, ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+
+// Type for resolved page props (after awaiting params)
+export type ResolvedPageProps<T extends GlobalPageProps> = Omit<T, 'params'> & {
+  params: Awaited<T['params']>;
+};
 
 export type BuildVariablesFn<
   PageProps extends GlobalPageProps,
   TVariables = Record<string, unknown>,
 > = (
-  context: PageProps & {
+  context: ResolvedPageProps<PageProps> & {
     fallbackLocale: SiteLocale;
   },
 ) => TVariables;
@@ -17,7 +22,7 @@ export type RealtimeUpdatesPage<
   TVariables = Record<string, unknown>,
 > = (props: {
   initialData: TResult;
-  pageProps: PageProps;
+  pageProps: ResolvedPageProps<PageProps>;
   variables: TVariables;
   query: TypedDocumentNode<TResult, TVariables>;
   token: string;
@@ -28,7 +33,10 @@ export type ContentPage<
   PageProps extends GlobalPageProps,
   TResult = unknown,
 > = (
-  props: PageProps & {
+  props: ResolvedPageProps<PageProps> & {
     data: TResult;
   },
 ) => React.ReactNode;
+
+// Re-export for convenience
+export type { ResolvedGlobalPageProps };

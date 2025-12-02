@@ -26,7 +26,7 @@ async function getLocale(
   return match(languages, locales, fallbackLng);
 }
 
-export async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   // Check if there is any supported locale in the pathname
   const pathname = request.nextUrl.pathname;
   const locales = await getAvailableLocales();
@@ -57,3 +57,5 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: ['/((?!.*\\.|_next|api\\/).*)'],
 };
+
+

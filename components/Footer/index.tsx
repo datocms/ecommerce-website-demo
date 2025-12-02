@@ -1,12 +1,12 @@
 import type { LayoutQuery } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
 import SvgRenderer from '../Common/SvgRenderer';
 
 type Props = {
   data: LayoutQuery;
-  globalPageProps: GlobalPageProps;
+  globalPageProps: ResolvedGlobalPageProps;
 };
 
 const Footer = ({ data, globalPageProps }: Props) => {

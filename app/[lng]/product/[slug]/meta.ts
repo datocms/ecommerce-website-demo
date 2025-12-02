@@ -3,12 +3,12 @@ import {
   type ProductQuery,
   type ProductQueryVariables,
 } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
 
-export type PageProps = GlobalPageProps & {
-  params: {
+export type PageProps = {
+  params: Promise<{
+    lng: string;
     slug: string;
-  };
+  }>;
 };
 
 export type Query = ProductQuery;

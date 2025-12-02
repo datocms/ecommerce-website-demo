@@ -1,5 +1,4 @@
 import { buildClient } from '@datocms/cma-client-node';
-import got from 'got';
 import { JSDOM } from 'jsdom';
 import type { NextRequest } from 'next/server';
 
@@ -89,7 +88,8 @@ export async function GET(req: NextRequest) {
       : process.env.URL
   ) as string;
 
-  const { body } = await got(new URL(permalink, baseUrl).toString());
+  const response = await fetch(new URL(permalink, baseUrl).toString());
+  const body = await response.text();
 
   const { document } = new JSDOM(body).window;
   const contentEl = document.querySelector('body');

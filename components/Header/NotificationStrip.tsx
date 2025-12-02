@@ -2,7 +2,7 @@ import {
   type LayoutModelNotificationField,
   SiteLocale,
 } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import {
   type Record,
   type StructuredText,
@@ -19,7 +19,7 @@ import Highlighter from '../Common/Highlighter';
 type Props = {
   notification: LayoutModelNotificationField;
   setNotificationStrip: React.Dispatch<SetStateAction<boolean>>;
-  globalPageProps: GlobalPageProps;
+  globalPageProps: ResolvedGlobalPageProps;
 };
 
 const NotificationStrip = ({

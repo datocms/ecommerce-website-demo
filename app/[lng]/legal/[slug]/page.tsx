@@ -2,7 +2,7 @@ import getAvailableLocales from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
-import { LegalStaticParamsDocument } from '@/graphql/types/graphql';
+import { LegalStaticParamsDocument, type SiteLocale } from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import Content from './Content';
 import RealTime from './RealTime';
@@ -13,7 +13,7 @@ export async function generateStaticParams() {
   const { allLegalPages } = await queryDatoCMS(LegalStaticParamsDocument);
 
   return allLegalPages.flatMap((legal) =>
-    locales.map((lng): PageProps['params'] => ({
+    locales.map((lng) => ({
       slug: legal.slug,
       lng,
     })),
@@ -24,7 +24,7 @@ const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
   params,
   fallbackLocale,
 }) => ({
-  locale: params.lng,
+  locale: params.lng as SiteLocale,
   fallbackLocale: [fallbackLocale],
   slug: params.slug,
 });

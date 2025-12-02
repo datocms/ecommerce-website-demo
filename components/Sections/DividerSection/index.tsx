@@ -1,11 +1,11 @@
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { DividerSectionFragmentDoc } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 
 type Props = {
   fragment: FragmentType<typeof DividerSectionFragmentDoc>;
-  globalPageProps: GlobalPageProps;
+  globalPageProps: ResolvedGlobalPageProps;
 };
 
 export default function DividerSection({ fragment, globalPageProps }: Props) {

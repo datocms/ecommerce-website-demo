@@ -1,18 +1,19 @@
 import ScrollToTop from '@/components/ScrollToTop';
 import '@/styles/global.css';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
 import { draftMode } from 'next/headers';
 
-type Params = GlobalPageProps & {
+type Params = {
   children: React.ReactNode;
 };
 
-export default function RootLayout({ children, params: { lng } }: Params) {
-  const { isEnabled: isDraft } = draftMode();
+export default async function RootLayout({ children }: Params) {
+  const { isEnabled: isDraft } = await draftMode();
   return (
-    <html lang={lng}>
-      <body className={'tracking-tight antialiased'}>{children}</body>
-      <ScrollToTop isDraft={isDraft} />
+    <html>
+      <body className={'tracking-tight antialiased'}>
+        {children}
+        <ScrollToTop isDraft={isDraft} />
+      </body>
     </html>
   );
 }

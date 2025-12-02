@@ -6,7 +6,7 @@ import type {
   LayoutQuery,
   PopupRecord,
 } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import { isEmptyDocument } from 'datocms-structured-text-utils';
 import { Suspense, useState } from 'react';
 import CategoryHeader from './CategoryHeader';
@@ -16,7 +16,7 @@ import PopUpBanner from './PopUpBanner';
 
 type Props = {
   data: LayoutQuery;
-  globalPageProps: GlobalPageProps;
+  globalPageProps: ResolvedGlobalPageProps;
 };
 
 const Header = ({ data, globalPageProps }: Props) => {

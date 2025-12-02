@@ -3,7 +3,10 @@ import React from 'react';
 const Highlighter = (rawTagName: any, props: any, ...children: any) => {
   if (rawTagName === 'mark')
     return (
-      <mark className={'inline rounded-sm bg-primary/25 px-1 py-1'}>
+      <mark
+        key={props?.key}
+        className={'inline rounded-sm bg-primary/25 px-1 py-1'}
+      >
         {children}
       </mark>
     );

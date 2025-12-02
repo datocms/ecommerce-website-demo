@@ -12,40 +12,43 @@ import {
   ProductModelOrderBy,
   ProductsDocument,
   ProductsGeneralInterfaceFragmentDoc,
+  type SiteLocale,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import type { Record, StructuredText } from 'datocms-structured-text-utils';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
 
-type PageProps = GlobalPageProps & {
-  params: {
+type PageProps = {
+  params: Promise<{
+    lng: string;
     slug: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     page?: string;
     orderBy?: ProductModelOrderBy;
     productName?: string;
     collections?: string;
     brands?: string;
     materials?: string;
-  };
+  }>;
 };
 
-const Page = async ({ params: { lng }, searchParams }: PageProps) => {
-  const { isEnabled } = draftMode();
+const Page = async ({ params, searchParams }: PageProps) => {
+  const { lng } = await params;
+  const resolvedSearchParams = await searchParams;
+  const { isEnabled } = await draftMode();
   const fallbackLng = await getFallbackLocale();
-  const pageNumber = Number.parseInt(searchParams?.page ?? '1');
+  const pageNumber = Number.parseInt(resolvedSearchParams?.page ?? '1');
   const orderBy: ProductModelOrderBy =
-    searchParams?.orderBy ?? ProductModelOrderBy.CreatedAtAsc;
-  const nameSearch = searchParams?.productName ?? '';
+    resolvedSearchParams?.orderBy ?? ProductModelOrderBy.CreatedAtAsc;
+  const nameSearch = resolvedSearchParams?.productName ?? '';
 
   const initialParams = await queryDatoCMS(
     InitialParamsDocument,
     {
-      locale: lng,
+      locale: lng as SiteLocale,
       fallbackLocale: [fallbackLng],
     },
     isEnabled,
@@ -54,7 +57,7 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
   const { allBrands, allCollections, allMaterials } =
     getFragmentData(InitialParamsFragmentDoc, initialParams) ?? {};
 
-  const collectionParams = searchParams?.collections
+  const collectionParams = resolvedSearchParams?.collections
     ?.split('|')
     .filter((collection) => collection.length);
 
@@ -63,7 +66,7 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
       ? allCollections.map((collection) => collection.id)
       : collectionParams;
 
-  const brandParams = searchParams?.brands
+  const brandParams = resolvedSearchParams?.brands
     ?.split('|')
     .filter((brand) => brand.length);
 
@@ -72,7 +75,7 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
       ? allBrands.map((brand) => brand.id)
       : brandParams;
 
-  const materialParams = searchParams?.materials
+  const materialParams = resolvedSearchParams?.materials
     ?.split('|')
     .filter((material) => material.length);
   const materials =
@@ -83,7 +86,7 @@ const Page = async ({ params: { lng }, searchParams }: PageProps) => {
   const data = await queryDatoCMS(
     ProductsDocument,
     {
-      locale: lng,
+      locale: lng as SiteLocale,
       fallbackLocale: [fallbackLng],
       skip: (pageNumber - 1) * 12,
       orderBy: orderBy,

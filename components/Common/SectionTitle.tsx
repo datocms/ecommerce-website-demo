@@ -1,5 +1,5 @@
 import type { Maybe } from 'graphql/jsutils/Maybe';
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
+import Markdown from 'react-markdown';
 
 const SectionTitle = ({
   title,
@@ -24,7 +24,7 @@ const SectionTitle = ({
           {title}
         </h2>
         <div className="text-base !leading-relaxed text-body-color md:text-lg">
-          <ReactMarkdown>{paragraph || ''}</ReactMarkdown>
+          <Markdown>{paragraph || ''}</Markdown>
         </div>
       </div>
     </>

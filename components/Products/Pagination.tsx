@@ -24,6 +24,7 @@ const Pagination = ({ numberOfProducts, currentPage }: PropTypes) => {
     const isSelected = pageNumber === currentPage;
     pageItems.push(
       <button
+        key={pageNumber}
         type="button"
         aria-current="page"
         className={`relative inline-flex cursor-pointer items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 focus-visible:outline-primary/80${

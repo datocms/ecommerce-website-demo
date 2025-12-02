@@ -3,13 +3,13 @@ import {
   ProductGeneralInterfaceFragmentDoc,
   type ProductQuery,
 } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import DatoImage from '../DatoImage';
 
 type PropTypes = {
   data: ProductQuery;
-  globalPageProps: GlobalPageProps;
+  globalPageProps: ResolvedGlobalPageProps;
 };
 
 const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {

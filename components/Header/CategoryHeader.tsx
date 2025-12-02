@@ -6,7 +6,7 @@ import type {
   LinkItemRecord,
   SiteLocale,
 } from '@/graphql/types/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -25,7 +25,7 @@ import LanguageSelector from './LanguageSelector';
 type PropTypes = {
   languages: SiteLocale[];
   data: LayoutQuery;
-  globalPageProps: GlobalPageProps;
+  globalPageProps: ResolvedGlobalPageProps;
 };
 
 function classNames(...classes: any) {
@@ -336,16 +336,13 @@ export default function CategoryHeader({
                                           >
                                             {data.generalInterface?.trending}
                                           </p>
-                                          <a
-                                            href={'item.href'} //change
-                                            className="6 mt-1 block font-medium text-gray-900"
-                                          >
+                                          <div className="mt-1 block font-medium text-gray-900">
                                             <span
                                               className="absolute inset-0 z-10"
                                               aria-hidden="true"
                                             />
                                             {category.newArrival?.name}
-                                          </a>
+                                          </div>
                                           <p
                                             aria-hidden="true"
                                             className="mt-1"

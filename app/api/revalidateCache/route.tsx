@@ -9,7 +9,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    revalidateTag('datocms');
+    revalidateTag('datocms', 'max');
   } catch (error) {
     return NextResponse.json({
       status: 500,

@@ -15,8 +15,8 @@ export default async function queryDatoCMS<
     includeDrafts: isDraft,
     excludeInvalid: true,
     requestInitOptions: {
-      cache: 'force-cache',
-      next: { tags: ['datocms'] },
+      cache: isDraft ? 'no-store' : 'force-cache',
+      next: isDraft ? undefined : { tags: ['datocms'] },
     },
   });
 }

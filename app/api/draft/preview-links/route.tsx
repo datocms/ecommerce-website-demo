@@ -71,21 +71,21 @@ export async function POST(request: NextRequest) {
       : process.env.URL
   ) as string;
 
-  const isPublished = parsedRequest.item.meta.status === 'published';
-
   const previewLinks = [];
 
-  if (parsedRequest.item.meta.status !== 'draft')
-    previewLinks.push({
-      label: 'Published version',
-      url: `${baseUrl}/api/draft/disable?url=${url}`,
-    });
-
-  if (parsedRequest.item.meta.status !== 'published')
+  if (parsedRequest.item.meta.status !== 'published') {
     previewLinks.push({
       label: 'Draft version',
       url: `${baseUrl}/api/draft/enable?url=${url}&token=${token}`,
     });
+  }
+
+  if (parsedRequest.item.meta.status !== 'draft') {
+    previewLinks.push({
+      label: 'Published version',
+      url: `${baseUrl}/api/draft/disable?url=${url}`,
+    });
+  }
 
   return new Response(JSON.stringify({ previewLinks }), {
     status: 200,

@@ -1,8 +1,8 @@
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import { draftMode } from 'next/headers';
 import { getFallbackLocale } from '@/app/i18n/settings';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { draftMode } from 'next/headers';
 import type {
   BuildVariablesFn,
   ContentPage,

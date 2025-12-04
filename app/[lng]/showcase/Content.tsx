@@ -1,7 +1,7 @@
-import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({

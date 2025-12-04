@@ -1,5 +1,5 @@
 import { buildClient } from '@datocms/cma-client-node';
-import { JSDOM } from 'jsdom';
+import { parseHTML } from 'linkedom';
 import type { NextRequest } from 'next/server';
 
 const findSlugAndPermalink = async (
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
 
   if (!permalink) {
     return new Response(
-      `Don\'t know which route corresponds to record #${itemId} (model: ${itemTypeApiKey})!`,
+      `Don't know which route corresponds to record #${itemId} (model: ${itemTypeApiKey})!`,
       {
         status: 422,
         headers,
@@ -91,7 +91,8 @@ export async function GET(req: NextRequest) {
   const response = await fetch(new URL(permalink, baseUrl).toString());
   const body = await response.text();
 
-  const { document } = new JSDOM(body).window;
+  const { document } = parseHTML(body);
+
   const contentEl = document.querySelector('body');
   if (!contentEl)
     return new Response('No content found', { status: 422, headers });

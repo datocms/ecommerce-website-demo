@@ -1,8 +1,8 @@
+import Link from 'next/link';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { CollectionCardShowcaseFragmentDoc } from '@/graphql/types/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import Link from 'next/link';
 
 type Props = {
   fragment: FragmentType<typeof CollectionCardShowcaseFragmentDoc>;

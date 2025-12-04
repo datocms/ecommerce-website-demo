@@ -1,6 +1,6 @@
-import type { CookieNoticeRecord } from '@/graphql/types/graphql';
 import type { Dispatch, SetStateAction } from 'react';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import type { CookieNoticeRecord } from '@/graphql/types/graphql';
 
 type PropTypes = {
   setCookies: Dispatch<SetStateAction<boolean>>;

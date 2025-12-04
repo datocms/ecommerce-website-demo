@@ -1,5 +1,7 @@
 'use client';
 
+import { isEmptyDocument } from 'datocms-structured-text-utils';
+import { Suspense, useState } from 'react';
 import type {
   CookieNoticeRecord,
   LayoutModelNotificationField,
@@ -7,8 +9,6 @@ import type {
   PopupRecord,
 } from '@/graphql/types/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import { isEmptyDocument } from 'datocms-structured-text-utils';
-import { Suspense, useState } from 'react';
 import CategoryHeader from './CategoryHeader';
 import CookiesNotice from './CookiesNotice';
 import NotificationStrip from './NotificationStrip';

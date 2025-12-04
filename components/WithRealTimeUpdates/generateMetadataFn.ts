@@ -1,6 +1,3 @@
-import { getFallbackLocale } from '@/app/i18n/settings';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
-import queryDatoCMS from '@/utils/queryDatoCMS';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
@@ -9,6 +6,9 @@ import {
   type TitleMetaLinkTag,
   toNextMetadata,
 } from 'react-datocms/seo';
+import { getFallbackLocale } from '@/app/i18n/settings';
+import type { GlobalPageProps } from '@/utils/globalPageProps';
+import queryDatoCMS from '@/utils/queryDatoCMS';
 import type { BuildVariablesFn, ResolvedPageProps } from './types';
 
 export function generateMetadataFn<

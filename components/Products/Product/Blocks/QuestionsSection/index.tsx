@@ -1,7 +1,6 @@
+import ReactMarkdown from 'react-markdown';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { QuestionSectionFragmentDoc } from '@/graphql/types/graphql';
-
-import ReactMarkdown from 'react-markdown';
 
 type Props = {
   fragment: FragmentType<typeof QuestionSectionFragmentDoc>;

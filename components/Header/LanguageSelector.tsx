@@ -1,11 +1,11 @@
 'use client';
 
-import type { SiteLocale } from '@/graphql/types/graphql';
 import type { Maybe } from 'graphql/jsutils/Maybe';
 import { getLangNameFromCode } from 'language-name-map';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
+import type { SiteLocale } from '@/graphql/types/graphql';
 
 type Props = {
   languages: SiteLocale[];

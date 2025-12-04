@@ -2,11 +2,14 @@ import getAvailableLocales from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
-import { LegalStaticParamsDocument, type SiteLocale } from '@/graphql/types/graphql';
+import {
+  LegalStaticParamsDocument,
+  type SiteLocale,
+} from '@/graphql/types/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import Content from './Content';
+import { type PageProps, type Query, query, type Variables } from './meta';
 import RealTime from './RealTime';
-import { type PageProps, type Query, type Variables, query } from './meta';
 
 export async function generateStaticParams() {
   const locales = await getAvailableLocales();

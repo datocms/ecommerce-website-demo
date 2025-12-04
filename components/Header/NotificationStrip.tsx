@@ -1,19 +1,19 @@
 import {
-  type LayoutModelNotificationField,
-  SiteLocale,
-} from '@/graphql/types/graphql';
-import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import {
+  isLink,
   type Record,
   type StructuredText,
-  isLink,
 } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import type { SetStateAction } from 'react';
 import {
-  StructuredText as StructuredTextField,
   renderNodeRule,
+  StructuredText as StructuredTextField,
 } from 'react-datocms/structured-text';
+import {
+  type LayoutModelNotificationField,
+  SiteLocale,
+} from '@/graphql/types/graphql';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Highlighter from '../Common/Highlighter';
 
 type Props = {

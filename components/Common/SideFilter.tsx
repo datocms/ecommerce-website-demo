@@ -1,14 +1,14 @@
 'use client';
 
+import { Disclosure } from '@headlessui/react';
+import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
+import type { Maybe } from 'graphql/jsutils/Maybe';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import {
   InitialParamsFragmentDoc,
   ProductsGeneralInterfaceFragmentDoc,
 } from '@/graphql/types/graphql';
-import { Disclosure } from '@headlessui/react';
-import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
-import type { Maybe } from 'graphql/jsutils/Maybe';
-import { useRouter, useSearchParams } from 'next/navigation';
 
 type PropTypes = {
   initialParams: Maybe<FragmentType<typeof InitialParamsFragmentDoc>>;

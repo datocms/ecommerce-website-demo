@@ -15,10 +15,10 @@ import {
   type SiteLocale,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
-import queryDatoCMS from '@/utils/queryDatoCMS';
 import type { Record, StructuredText } from 'datocms-structured-text-utils';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
+import queryDatoCMS from '@/utils/queryDatoCMS';
 
 type PageProps = {
   params: Promise<{

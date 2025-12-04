@@ -1,8 +1,8 @@
-import type { PopupRecord } from '@/graphql/types/graphql';
-import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import type { Dispatch, SetStateAction } from 'react';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import type { PopupRecord } from '@/graphql/types/graphql';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 
 type PropTypes = {
   setPopUp: Dispatch<SetStateAction<boolean>>;

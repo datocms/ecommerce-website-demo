@@ -1,12 +1,5 @@
 'use client';
 
-import type {
-  DropdownMenuRecord,
-  LayoutQuery,
-  LinkItemRecord,
-  SiteLocale,
-} from '@/graphql/types/graphql';
-import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -18,6 +11,13 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Fragment, Suspense, useRef, useState } from 'react';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import type {
+  DropdownMenuRecord,
+  LayoutQuery,
+  LinkItemRecord,
+  SiteLocale,
+} from '@/graphql/types/graphql';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Cart from './Cart';
 import HoveringSearch from './HoveringSearch';
 import LanguageSelector from './LanguageSelector';

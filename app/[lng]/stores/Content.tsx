@@ -1,8 +1,8 @@
 'use client';
 
-import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { useState } from 'react';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({ data }) => {

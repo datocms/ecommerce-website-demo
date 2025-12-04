@@ -1,9 +1,9 @@
+import Link from 'next/link';
 import SvgRenderer from '@/components/Common/SvgRenderer';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
 import { HeroSectionFragmentDoc } from '@/graphql/types/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import Link from 'next/link';
 
 type Props = {
   fragment: FragmentType<typeof HeroSectionFragmentDoc>;

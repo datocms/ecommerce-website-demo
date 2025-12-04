@@ -1,18 +1,18 @@
-import type { FragmentType } from '@/graphql/types';
-import type { DatoImage_ResponsiveImageFragmentDoc } from '@/graphql/types/graphql';
 import {
-  type Record,
-  type StructuredText,
   isList,
   isListItem,
   isThematicBreak,
+  type Record,
+  type StructuredText,
 } from 'datocms-structured-text-utils';
 import type { Maybe } from 'graphql/jsutils/Maybe';
 import {
-  StructuredText as StructuredTextField,
   renderNodeRule,
+  StructuredText as StructuredTextField,
 } from 'react-datocms/structured-text';
 import ReactMarkdown from 'react-markdown';
+import type { FragmentType } from '@/graphql/types';
+import type { DatoImage_ResponsiveImageFragmentDoc } from '@/graphql/types/graphql';
 import Highlighter from '../Common/Highlighter';
 import DatoImage from '../DatoImage';
 

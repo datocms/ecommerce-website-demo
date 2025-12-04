@@ -1,7 +1,7 @@
-import type { LayoutQuery } from '@/graphql/types/graphql';
-import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Link from 'next/link';
 import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import type { LayoutQuery } from '@/graphql/types/graphql';
+import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import SvgRenderer from '../Common/SvgRenderer';
 
 type Props = {

@@ -19,6 +19,9 @@ export function asSiteLocale(lng: string): SiteLocale {
   return lng as SiteLocale;
 }
 
-export function buildUrl(globalPageProps: ResolvedGlobalPageProps, path?: string) {
+export function buildUrl(
+  globalPageProps: ResolvedGlobalPageProps,
+  path?: string,
+) {
   return `/${globalPageProps.params.lng}${path || ''}`;
 }

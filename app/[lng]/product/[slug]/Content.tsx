@@ -1,12 +1,12 @@
+import { isHeading, isList, isListItem } from 'datocms-structured-text-utils';
+import { notFound } from 'next/navigation';
+import { renderNodeRule, StructuredText } from 'react-datocms';
 import FeaturedProducts from '@/components/Grids/FeaturedProducts';
 import ProductInfoSection from '@/components/Products/Product/Blocks/ProductInfoSection';
 import QuestionsSection from '@/components/Products/Product/Blocks/QuestionsSection';
 import ProductView from '@/components/Products/ProductView';
 import Reviews from '@/components/Products/Reviews';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { isHeading, isList, isListItem } from 'datocms-structured-text-utils';
-import { notFound } from 'next/navigation';
-import { StructuredText, renderNodeRule } from 'react-datocms';
 import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({

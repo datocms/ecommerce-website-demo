@@ -1,14 +1,14 @@
 'use client';
 
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { useState } from 'react';
 import { getFragmentData } from '@/graphql/types';
 import {
   ProductGeneralInterfaceFragmentDoc,
   type ProductQuery,
 } from '@/graphql/types/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { useState } from 'react';
 import DatoImage from '../DatoImage';
 
 type Props = {

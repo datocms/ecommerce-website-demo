@@ -1,10 +1,10 @@
+import Link from 'next/link';
 import { getFragmentData } from '@/graphql/types';
 import {
   ProductGeneralInterfaceFragmentDoc,
   type ProductQuery,
 } from '@/graphql/types/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import Link from 'next/link';
 import DatoImage from '../DatoImage';
 
 type PropTypes = {

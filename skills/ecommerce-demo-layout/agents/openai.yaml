@@ -1,0 +1,8 @@
+# synced_from_name: ecommerce-demo-layout
+# synced_from_description_sha256: e5d9ef4a99627de3a2d8826e69686519dc31c039d687502748f2468ae93a0879
+interface:
+  display_name: "Ecommerce Demo Layout"
+  short_description: "Adjust ecommerce demo shared layout"
+  default_prompt: "Use $ecommerce-demo-layout to change the header, footer, popup, banner, cookie notice, navigation, logo, or other shared layout in this starter."
+policy:
+  allow_implicit_invocation: true

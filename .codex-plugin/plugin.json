@@ -1,0 +1,19 @@
+{
+  "name": "ecommerce-demo-skills",
+  "version": "0.1.0",
+  "description": "Project-local skills for the DatoCMS ecommerce website demo starter.",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Ecommerce Demo Skills",
+    "shortDescription": "DatoCMS ecommerce starter workflows",
+    "longDescription": "Project-local skills for homepage sections, catalog behavior, and record-backed page preview workflows in the DatoCMS ecommerce website demo starter.",
+    "developerName": "DatoCMS",
+    "category": "Development",
+    "capabilities": ["Write"],
+    "defaultPrompt": [
+      "Add a homepage section to this ecommerce starter.",
+      "Update product catalog behavior in this starter.",
+      "Add a record-backed page route with preview."
+    ]
+  }
+}

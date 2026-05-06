@@ -9,12 +9,13 @@
     "longDescription": "Project-local skills for homepage sections, catalog behavior, record-backed page preview workflows, and shared layout surfaces in the DatoCMS ecommerce website demo starter.",
     "developerName": "DatoCMS",
     "category": "Development",
-    "capabilities": ["Write"],
+    "capabilities": [
+      "Write"
+    ],
     "defaultPrompt": [
       "Add a homepage section to this ecommerce starter.",
       "Update product catalog behavior in this starter.",
-      "Add a record-backed page route with preview.",
-      "Change the header, footer, popup, or other shared layout in this starter."
+      "Change shared layout, page routing, or preview setup in this starter."
     ]
   }
 }

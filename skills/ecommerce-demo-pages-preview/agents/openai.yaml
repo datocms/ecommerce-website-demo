@@ -1,0 +1,8 @@
+# synced_from_name: ecommerce-demo-pages-preview
+# synced_from_description_sha256: 5bbfc2858489b93151277df91cbf6c51675aa3c4542050234101ea9365b43251
+interface:
+  display_name: "Ecommerce Demo Pages Preview"
+  short_description: "Add ecommerce demo page previews"
+  default_prompt: "Use $ecommerce-demo-pages-preview to add a record-backed route with preview mapping in this starter."
+policy:
+  allow_implicit_invocation: true

@@ -31,6 +31,7 @@ Before schema or content operations:
 - Product detail query: `app/[lng]/product/[slug]/query.graphql`.
 - Listing filters use collections, brands, and materials.
 - URL query params include `page`, `orderBy`, `productName`, `collections`, `brands`, and `materials`.
+- Pagination is listing behavior: preserve active query params and reset or clamp stale `page` values after filter/sort changes.
 - Header category links are built from layout menu records and use `_modelApiKey` plus record ids.
 - Product variants provide colors and available sizes for the product detail UI.
 
@@ -85,6 +86,7 @@ Before schema or content operations:
 
 - Listing query variables remain typed.
 - URL query params remain stable.
-- Filter counts and pagination still work.
+- Filter counts, pagination links, and pagination range text still work.
+- Check page 1, page 2 or last page, zero-result, and out-of-range `page` states when changing listing filters, sorting, or counts.
 - Product detail pages still generate static params.
 - GraphQL type generation passes after query changes.

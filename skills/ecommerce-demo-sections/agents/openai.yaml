@@ -1,0 +1,8 @@
+# synced_from_name: ecommerce-demo-sections
+# synced_from_description_sha256: e96764f760e7fa98cc957e5054d85021e906456d2740119471cabbf042c3966c
+interface:
+  display_name: "Ecommerce Demo Sections"
+  short_description: "Add ecommerce demo home sections"
+  default_prompt: "Use $ecommerce-demo-sections to add or adjust a homepage section in this starter."
+policy:
+  allow_implicit_invocation: true

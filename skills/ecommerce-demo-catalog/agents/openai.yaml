@@ -1,0 +1,8 @@
+# synced_from_name: ecommerce-demo-catalog
+# synced_from_description_sha256: fcc791aca556b11965d1c610c1f5a5f5f381c047bf826e4544887428598f22eb
+interface:
+  display_name: "Ecommerce Demo Catalog"
+  short_description: "Tune ecommerce demo product catalog"
+  default_prompt: "Use $ecommerce-demo-catalog to change product listing, filter, or detail behavior in this starter."
+policy:
+  allow_implicit_invocation: true

@@ -15,6 +15,7 @@ import {
   type SiteLocale,
 } from '@/graphql/types/graphql';
 import '@/styles/global.css';
+import { stripStega } from '@datocms/content-link';
 import type { Record, StructuredText } from 'datocms-structured-text-utils';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
@@ -164,7 +165,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
           <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
               {data.allProducts.map((product) => {
-                const isOnSale = product.sale === 'on_sale';
+                const isOnSale = stripStega(product.sale) === 'on_sale';
                 return (
                   <div
                     key={product.id}

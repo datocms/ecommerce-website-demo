@@ -1,3 +1,4 @@
+import { stripStega } from '@datocms/content-link';
 import Link from 'next/link';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentType, getFragmentData } from '@/graphql/types';
@@ -13,7 +14,12 @@ const ProductShowcase = ({ fragment, globalPageProps }: Props) => {
   const { direction, pretitle, title, description, button, collection } =
     getFragmentData(CollectionCardShowcaseFragmentDoc, fragment);
 
-  const left = direction === 'left';
+  /**
+   * DatoCMS Content Link can add invisible editing markers to draft text.
+   * Keep those markers when rendering content, but strip them before exact
+   * string logic, URL building, metadata, IDs, or third-party payloads.
+   */
+  const left = stripStega(direction || '') === 'left';
 
   return (
     <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-4 md:h-screen md:grid-cols-4 md:grid-rows-2">

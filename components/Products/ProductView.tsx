@@ -1,5 +1,6 @@
 'use client';
 
+import { stripStega } from '@datocms/content-link';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useState } from 'react';
@@ -33,7 +34,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
     data.product.productImages[0],
   );
 
-  const isOnSale = data.product?.sale === 'on_sale';
+  const isOnSale = stripStega(data.product?.sale || '') === 'on_sale';
 
   const {
     sale,

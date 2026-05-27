@@ -1,8 +1,11 @@
+import { stripStega } from '@datocms/content-link';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import DatoImage from '@/components/DatoImage';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
-import DatoImage from '@/components/DatoImage';
+
+const isOnSale = (sale: string) => stripStega(sale) !== 'not_on_sale';
 
 const Content: ContentPage<PageProps, Query> = ({
   data,
@@ -109,10 +112,10 @@ const Content: ContentPage<PageProps, Query> = ({
               <h3>{data.showcase.newProducts[0].name}</h3>
               <div className="">
                 {data.generalInterface?.currencySymbol}
-                {data.showcase.newProducts[0].sale !== 'not_on_sale'
+                {isOnSale(data.showcase.newProducts[0].sale)
                   ? data.showcase.newProducts[0].salePrice
                   : data.showcase.newProducts[0].price}
-                {data.showcase.newProducts[0].sale !== 'not_on_sale' && (
+                {isOnSale(data.showcase.newProducts[0].sale) && (
                   <span className="ml-4 text-red-400 line-through">
                     {data.generalInterface?.currencySymbol}
                     {data.showcase.newProducts[0].price}
@@ -140,10 +143,10 @@ const Content: ContentPage<PageProps, Query> = ({
               <h3>{data.showcase.newProducts[1].name}</h3>
               <div className="">
                 {data.generalInterface?.currencySymbol}
-                {data.showcase.newProducts[1].sale !== 'not_on_sale'
+                {isOnSale(data.showcase.newProducts[1].sale)
                   ? data.showcase.newProducts[1].salePrice
                   : data.showcase.newProducts[1].price}
-                {data.showcase.newProducts[1].sale !== 'not_on_sale' && (
+                {isOnSale(data.showcase.newProducts[1].sale) && (
                   <span className="ml-4 text-red-400 line-through">
                     {data.generalInterface?.currencySymbol}
                     {data.showcase.newProducts[1].price}

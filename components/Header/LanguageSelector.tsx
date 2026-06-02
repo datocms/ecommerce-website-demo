@@ -4,7 +4,7 @@ import type { Maybe } from 'graphql/jsutils/Maybe';
 import { getLangNameFromCode } from 'language-name-map';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { SiteLocale } from '@/graphql/types/graphql';
 
 type Props = {
@@ -14,16 +14,60 @@ type Props = {
 
 const LanguageSelector = ({ languages, currencySymbol }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [productSlugs, setProductSlugs] = useState<Record<string, string>>({});
   const pathname = usePathname();
-  const pathArray = pathname.split('/');
-  const currentLocale = pathArray[1] as SiteLocale; //will be a SiteLocale because of the middleware redirect rules
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const currentLocale = pathSegments[0] as SiteLocale; //will be a SiteLocale because of the middleware redirect rules
   const searchParams = useSearchParams()!;
+  const currentProductSlug =
+    pathSegments[1] === 'product' ? pathSegments[2] : null;
 
-  const pathString = pathArray.splice(2, pathArray.length).join('/');
+  const pathString = pathSegments.slice(1).join('/');
+  const queryString = searchParams.toString();
+
+  useEffect(() => {
+    if (!currentProductSlug) {
+      setProductSlugs({});
+      return;
+    }
+
+    const controller = new AbortController();
+
+    fetch(
+      `/api/product-slug-map?locale=${encodeURIComponent(
+        currentLocale,
+      )}&slug=${encodeURIComponent(currentProductSlug)}`,
+      { signal: controller.signal },
+    )
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (data?.slugs) {
+          setProductSlugs(data.slugs);
+        }
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') {
+          setProductSlugs({});
+        }
+      });
+
+    return () => controller.abort();
+  }, [currentLocale, currentProductSlug]);
+
+  const hrefForLocale = (locale: SiteLocale) => {
+    const localizedPath =
+      currentProductSlug && productSlugs[locale]
+        ? `product/${productSlugs[locale]}`
+        : pathString;
+    const href = `/${locale}${localizedPath ? `/${localizedPath}` : ''}`;
+
+    return queryString ? `${href}?${queryString}` : href;
+  };
 
   return (
     <div className="relative">
-      <div
+      <button
+        type="button"
         onClick={() => {
           isOpen ? setIsOpen(false) : setIsOpen(true);
         }}
@@ -32,16 +76,11 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
             setIsOpen(false);
           }, 100)
         }
-        className="ml-4 inline-flex w-full items-center overflow-hidden rounded-md bg-white transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300"
+        className="ml-4 inline-flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-md bg-white px-4 py-2 text-center text-sm font-medium text-gray-800 transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300"
       >
-        <button
-          type="button"
-          className="inline-flex w-full cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-center text-sm font-medium text-gray-800"
-        >
-          {getLangNameFromCode(currentLocale)?.name || currentLocale} (
-          {currencySymbol})
-        </button>
-      </div>
+        {getLangNameFromCode(currentLocale)?.name || currentLocale} (
+        {currencySymbol})
+      </button>
 
       <div
         className={`absolute end-0 left-5 z-10 mt-1 w-28 rounded-md border border-gray-100 bg-white shadow-lg${
@@ -56,12 +95,12 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
               className="inline-flex w-full cursor-pointer items-end justify-start rounded-lg text-center text-sm font-medium text-gray-900 hover:bg-gray-100"
             >
               <Link
-                href={`/${locale}/${pathString}?${searchParams.toString()}`}
+                href={hrefForLocale(locale)}
                 className="block w-full px-4 py-2 text-center text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
               >
                 <div className="w-full text-center">
-                  {getLangNameFromCode(locale)?.name || currentLocale}
+                  {getLangNameFromCode(locale)?.name || locale}
                 </div>
               </Link>
             </div>

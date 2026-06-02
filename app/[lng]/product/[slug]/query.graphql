@@ -17,6 +17,11 @@ query Product(
     price
     sale
     salePrice
+    slug
+    _allSlugLocales {
+      locale
+      value
+    }
     reviewAverage
     numberOfReviews
     featuredReviews {

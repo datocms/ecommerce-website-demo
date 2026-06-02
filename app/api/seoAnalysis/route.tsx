@@ -1,21 +1,24 @@
 import { buildClient } from '@datocms/cma-client-node';
 import { parseHTML } from 'linkedom';
 import type { NextRequest } from 'next/server';
+import { localizedString } from '@/utils/localizedField';
 
 const findSlugAndPermalink = async (
   item: any,
   itemTypeApiKey: string,
   locale: string,
 ) => {
+  const slug = localizedString(item.slug, locale);
+
   switch (itemTypeApiKey) {
     case 'home':
-      return [item.slug, `/${locale}/`];
+      return [slug, `/${locale}/`];
     case 'showcase':
-      return [item.slug, `/${locale}/showcase`];
+      return [slug, `/${locale}/showcase`];
     case 'store':
-      return [item.slug, `/${locale}/stores`];
+      return [slug, `/${locale}/stores`];
     case 'product':
-      return [item.slug, `/${locale}/product/${item.slug}`];
+      return slug ? [slug, `/${locale}/product/${slug}`] : [null, null];
     default:
       return [null, null];
   }

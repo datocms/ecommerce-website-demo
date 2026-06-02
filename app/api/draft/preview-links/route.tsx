@@ -1,6 +1,7 @@
 import { headers as getHeaders } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import type { SiteLocale } from '@/graphql/types/graphql';
+import { localizedString } from '@/utils/localizedField';
 
 type generatePreviewUrlParams = {
   item: any;
@@ -20,10 +21,14 @@ const generatePreviewUrl = ({
       return `/${locale}/showcase`;
     case 'store':
       return `/${locale}/stores`;
-    case 'product':
-      return `/${locale}/product/${item.attributes.slug}`;
-    case 'legal_page':
-      return `/${locale}/legal/${item.attributes.slug}`;
+    case 'product': {
+      const slug = localizedString(item.attributes.slug, locale);
+      return slug ? `/${locale}/product/${slug}` : undefined;
+    }
+    case 'legal_page': {
+      const slug = localizedString(item.attributes.slug, locale);
+      return slug ? `/${locale}/legal/${slug}` : undefined;
+    }
     case 'brand':
       return `/${locale}/products?brands=${item.id}`;
     case 'material':

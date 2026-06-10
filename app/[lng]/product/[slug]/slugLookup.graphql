@@ -1,13 +1,5 @@
-query ProductSlugLookup(
-  $slug: String
-  $locale: SiteLocale
-  $fallbackLocale: [SiteLocale!]
-) {
-  product(
-    filter: { slug: { eq: $slug } }
-    locale: $locale
-    fallbackLocales: $fallbackLocale
-  ) {
+query ProductSlugLookup {
+  allProducts(first: 100) {
     id
     slug
     _allSlugLocales {

@@ -4,7 +4,7 @@ import type { Maybe } from 'graphql/jsutils/Maybe';
 import { getLangNameFromCode } from 'language-name-map';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { SiteLocale } from '@/graphql/types/graphql';
 
 type Props = {
@@ -15,6 +15,7 @@ type Props = {
 const LanguageSelector = ({ languages, currencySymbol }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [productSlugs, setProductSlugs] = useState<Record<string, string>>({});
+  const selectorRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const pathSegments = pathname.split('/').filter(Boolean);
   const currentLocale = pathSegments[0] as SiteLocale; //will be a SiteLocale because of the middleware redirect rules
@@ -26,12 +27,14 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
   const queryString = searchParams.toString();
 
   useEffect(() => {
+    setProductSlugs({});
+
     if (!currentProductSlug) {
-      setProductSlugs({});
       return;
     }
 
     const controller = new AbortController();
+    let ignore = false;
 
     fetch(
       `/api/product-slug-map?locale=${encodeURIComponent(
@@ -39,20 +42,49 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
       )}&slug=${encodeURIComponent(currentProductSlug)}`,
       { signal: controller.signal },
     )
-      .then((response) => (response.ok ? response.json() : null))
+      .then((response) => (response.ok ? response.json() : { slugs: {} }))
       .then((data) => {
-        if (data?.slugs) {
-          setProductSlugs(data.slugs);
+        if (!ignore) {
+          setProductSlugs(data?.slugs || {});
         }
       })
       .catch((error) => {
-        if (error.name !== 'AbortError') {
+        if (error.name !== 'AbortError' && !ignore) {
           setProductSlugs({});
         }
       });
 
-    return () => controller.abort();
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
   }, [currentLocale, currentProductSlug]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!selectorRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   const hrefForLocale = (locale: SiteLocale) => {
     const localizedPath =
@@ -65,17 +97,12 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={selectorRef}>
       <button
         type="button"
-        onClick={() => {
-          isOpen ? setIsOpen(false) : setIsOpen(true);
-        }}
-        onBlur={() =>
-          setTimeout(() => {
-            setIsOpen(false);
-          }, 100)
-        }
+        onClick={() => setIsOpen((currentIsOpen) => !currentIsOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
         className="ml-4 inline-flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-md bg-white px-4 py-2 text-center text-sm font-medium text-gray-800 transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300"
       >
         {getLangNameFromCode(currentLocale)?.name || currentLocale} (
@@ -96,6 +123,8 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
             >
               <Link
                 href={hrefForLocale(locale)}
+                prefetch={false}
+                onClick={() => setIsOpen(false)}
                 className="block w-full px-4 py-2 text-center text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
               >

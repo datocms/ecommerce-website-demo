@@ -1,4 +1,3 @@
-import getAvailableLocales from '@/app/i18n/settings';
 import {
   ProductSlugLookupDocument,
   type SiteLocale,
@@ -55,45 +54,58 @@ export async function resolveProductSlug({
   fallbackLocale: SiteLocale;
   isDraft: boolean;
 }) {
-  const locales = await getAvailableLocales();
-  const searchLocales = [
-    locale,
-    ...locales.filter((candidateLocale) => candidateLocale !== locale),
-  ] as SiteLocale[];
-
-  for (const searchLocale of searchLocales) {
-    const data = await queryDatoCMS(
-      ProductSlugLookupDocument,
-      {
-        slug,
-        locale: searchLocale,
-        fallbackLocale: [fallbackLocale],
-      },
-      isDraft,
-    );
-
-    if (!data.product) {
-      continue;
+  const data = await queryDatoCMS(
+    ProductSlugLookupDocument,
+    undefined,
+    isDraft,
+  );
+  const slugIndex = new Map<
+    string,
+    {
+      productId: string;
+      slugs: ProductSlugMap;
+      matchedLocale: SiteLocale;
     }
+  >();
 
+  for (const product of data.allProducts) {
     const slugs = buildProductSlugMap(
-      data.product._allSlugLocales,
-      searchLocale,
-      data.product.slug,
+      product._allSlugLocales,
+      fallbackLocale,
+      product.slug,
     );
-    const localizedSlug = slugForLocale(slugs, locale, fallbackLocale);
 
-    if (!localizedSlug) {
-      return null;
+    for (const [matchedLocale, productSlug] of Object.entries(slugs)) {
+      if (productSlug && !slugIndex.has(productSlug)) {
+        slugIndex.set(productSlug, {
+          productId: product.id,
+          slugs,
+          matchedLocale: matchedLocale as SiteLocale,
+        });
+      }
     }
-
-    return {
-      productId: data.product.id,
-      slugs,
-      localizedSlug,
-      matchedLocale: searchLocale,
-    };
   }
 
-  return null;
+  const matchedProduct = slugIndex.get(slug);
+
+  if (!matchedProduct) {
+    return null;
+  }
+
+  const localizedSlug = slugForLocale(
+    matchedProduct.slugs,
+    locale,
+    fallbackLocale,
+  );
+
+  if (!localizedSlug) {
+    return null;
+  }
+
+  return {
+    productId: matchedProduct.productId,
+    slugs: matchedProduct.slugs,
+    localizedSlug,
+    matchedLocale: matchedProduct.matchedLocale,
+  };
 }

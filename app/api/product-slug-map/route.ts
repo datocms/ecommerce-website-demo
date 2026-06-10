@@ -1,6 +1,6 @@
 import { draftMode } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
-import { getFallbackLocale } from '@/app/i18n/settings';
+import getAvailableLocales from '@/app/i18n/settings';
 import type { SiteLocale } from '@/graphql/types/graphql';
 import { resolveProductSlug } from '@/utils/productSlugs';
 
@@ -16,7 +16,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const fallbackLocale = await getFallbackLocale();
+  const locales = await getAvailableLocales();
+
+  if (!locales.includes(locale as SiteLocale)) {
+    return NextResponse.json({ error: 'Unsupported locale' }, { status: 422 });
+  }
+
+  const fallbackLocale = locales[0];
   const { isEnabled: isDraft } = await draftMode();
   const resolved = await resolveProductSlug({
     slug,

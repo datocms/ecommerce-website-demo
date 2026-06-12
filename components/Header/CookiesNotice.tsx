@@ -1,5 +1,8 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { Image as DatoImage, type ResponsiveImageType } from 'react-datocms';
+import {
+  Image as DatoImage,
+  type ResponsiveImageType,
+} from 'react-datocms/image';
 import type { CookieNoticeRecord } from '@/graphql/types/graphql';
 
 type PropTypes = {

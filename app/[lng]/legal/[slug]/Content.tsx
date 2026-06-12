@@ -5,7 +5,7 @@ import {
   type StructuredText,
 } from 'datocms-structured-text-utils';
 import { notFound } from 'next/navigation';
-import { renderNodeRule } from 'react-datocms';
+import { renderNodeRule } from 'react-datocms/structured-text';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';

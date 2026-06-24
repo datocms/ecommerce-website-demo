@@ -1,8 +1,10 @@
 import { cookies, draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { isSafeRedirectUrl } from '@/utils/isSafeRedirectUrl';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+  const requestUrl = new URL(request.url);
+  const { searchParams } = requestUrl;
 
   const url = searchParams.get('redirect');
 
@@ -10,6 +12,9 @@ export async function GET(request: Request) {
   draft.disable();
 
   if (!url) return new Response('Draft mode is disabled');
+
+  if (!isSafeRedirectUrl(url, requestUrl))
+    return new Response('URL must be relative!', { status: 422 });
 
   //to avoid losing the cookie on redirect in the iFrame
   const cookieStore = await cookies();

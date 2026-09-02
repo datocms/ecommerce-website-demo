@@ -53,11 +53,10 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+  // The token is sent by the plugin as a request header (see /api/post-install)
+  const token = request.headers.get('authorization')?.replace(/^Bearer /, '');
 
-  const token = searchParams.get('token');
-
-  if (token !== process.env.DRAFT_SECRET_TOKEN)
+  if (!token || token !== process.env.DRAFT_SECRET_TOKEN)
     return new Response('Invalid token', { status: 401 });
 
   const parsedRequest = await request.json();
@@ -81,6 +80,7 @@ export async function POST(request: NextRequest) {
   if (parsedRequest.item.meta.status !== 'published') {
     previewLinks.push({
       label: 'Draft version',
+      // Opened by a browser, where we cannot set headers
       url: `${baseUrl}/api/draft/enable?token=${token}&redirect=${url}`,
     });
   }

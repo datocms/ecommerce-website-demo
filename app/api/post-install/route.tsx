@@ -1,4 +1,4 @@
-import { ApiError, buildClient, type Client } from '@datocms/cma-client-node';
+import { buildClient, type Client } from '@datocms/cma-client-node';
 import { NextResponse } from 'next/server';
 
 const cors = {
@@ -18,8 +18,6 @@ export async function OPTIONS() {
   return new Response('OK', cors);
 }
 
-const secretToken = 'superSecretToken';
-
 async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
   const webPreviewsPlugin = await client.plugins.create({
     package_name: 'datocms-plugin-web-previews',
@@ -30,10 +28,22 @@ async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
       frontends: [
         {
           name: 'Production',
-          previewWebhook: `${baseUrl}/api/draft/preview-links?token=${secretToken}`,
+          previewWebhook: new URL(
+            '/api/draft/preview-links',
+            baseUrl,
+          ).toString(),
+          // The secret travels in a header: an URL ends up in logs, proxies and
+          // in the plugin settings, where every collaborator can read it
+          customHeaders: [
+            {
+              name: 'Authorization',
+              value: `Bearer ${process.env.DRAFT_SECRET_TOKEN}`,
+            },
+          ],
           visualEditing: {
+            // Opened by a browser, where we cannot set headers
             enableDraftModeUrl: new URL(
-              `/api/draft/enable?token=${secretToken}`,
+              `/api/draft/enable?token=${process.env.DRAFT_SECRET_TOKEN}`,
               baseUrl,
             ).toString(),
             initialPath: '/',
@@ -52,7 +62,13 @@ async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
 
 //   await client.plugins.update(seoPlugin.id, {
 //     parameters: {
-//       htmlGeneratorUrl: `${baseUrl}/api/seoAnalysis?token=${secretToken}`,
+//       htmlGeneratorUrl: new URL('/api/seoAnalysis', baseUrl).toString(),
+//       customHeaders: [
+//         {
+//           name: 'Authorization',
+//           value: `Bearer ${process.env.SEO_SECRET_TOKEN}`,
+//         },
+//       ],
 //       autoApplyToFieldsWithApiKey: 'seo_analysis',
 //       setSeoReadabilityAnalysisFieldExtensionId: true,
 //     },
@@ -62,9 +78,11 @@ async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
 async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
   await client.webhooks.create({
     name: '🔄 Cache Revalidation',
-    url: `${baseUrl}/api/revalidateCache?token=${secretToken}`,
+    url: new URL('/api/revalidateCache', baseUrl).toString(),
     custom_payload: null,
-    headers: {},
+    headers: {
+      Authorization: `Bearer ${process.env.CACHE_INVALIDATION_SECRET_TOKEN}`,
+    },
     events: [
       {
         filters: [],
@@ -90,6 +108,22 @@ async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
   });
 }
 
+/**
+ * The DatoCMS API token arrives in the request body, so without this check the
+ * endpoint would happily write our secret tokens into any project a caller
+ * names, and the caller could then read them back from their own project.
+ */
+async function ensureSameProject(client: Client, ourApiToken: string) {
+  const ourClient = buildClient({ apiToken: ourApiToken });
+
+  const [callerProject, ourProject] = await Promise.all([
+    client.site.find(),
+    ourClient.site.find(),
+  ]);
+
+  return callerProject.id === ourProject.id;
+}
+
 export async function POST(request: Request) {
   const body = await request.json();
 
@@ -102,6 +136,13 @@ export async function POST(request: Request) {
   ) as string;
 
   try {
+    if (!(await ensureSameProject(client, process.env.DATOCMS_CMA_TOKEN!))) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid token' },
+        { status: 401, ...cors },
+      );
+    }
+
     await Promise.all([
       installWebPreviewsPlugin(client, baseUrl),
       createCacheInvalidationWebhook(client, baseUrl),
@@ -109,18 +150,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true }, cors);
   } catch (error) {
-    if (error instanceof ApiError) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: error.message,
-          request: error.request,
-          response: error.response,
-        },
-        { status: 500, ...cors },
-      );
-    }
+    // Never return the error: the DatoCMS client stores the failed request in
+    // it, Authorization header and payload included
+    console.error(error);
 
-    return NextResponse.json({ success: false }, { status: 500, ...cors });
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500, ...cors },
+    );
   }
 }

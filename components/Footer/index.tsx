@@ -1,7 +1,6 @@
 'use client';
 
 import { stripStega } from '@datocms/content-link';
-import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { Suspense, useEffect, useRef } from 'react';
 import { RSCImage } from 'react-datocms/rsc-image';
@@ -18,9 +17,9 @@ type Props = {
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-// The giant wordmark, fitted to the content width. Bricolage has an optical-size axis,
-// so glyph widths are not linear in font size: measure the ink at the current size and
-// rescale until it converges, then shift the ink onto the content's left edge.
+// The giant wordmark, fitted to the content width: measure the ink at a reference size and
+// rescale (Geist's widths are linear in size, so one step converges; the loop also covers
+// fallback fonts), then shift the ink onto the content's left edge.
 const Wordmark = ({ text }: { text: string }) => {
   const ref = useRef<HTMLParagraphElement>(null);
   const plain = stripStega(text).trim();
@@ -65,11 +64,11 @@ const Wordmark = ({ text }: { text: string }) => {
     <p
       ref={ref}
       aria-hidden="true"
-      className="giant text-sage select-none"
+      className="giant pb-6 select-none md:pb-10"
       // Close to the fitted size before the script runs: the content width at about
-      // 0.43em per glyph
+      // 0.46em per glyph
       style={{
-        fontSize: `calc((min(100vw, 90rem) - 2 * var(--gutter)) / ${Math.max(plain.length, 1) * 0.43})`,
+        fontSize: `calc((min(100vw, 90rem) - 2 * var(--gutter)) / ${Math.max(plain.length, 1) * 0.46})`,
       }}
     >
       {text}
@@ -96,79 +95,50 @@ const Footer = ({ data, globalPageProps }: Props) => {
 
   return (
     <>
-      <footer className="surface-forest mt-(--section-gap) rounded-t-card">
-        <div className="shell pt-16 lg:pt-20">
-          <div className="grid gap-12 xl:grid-cols-12 xl:gap-x-10">
-            {showNewsletter && (
-              <div className="xl:col-span-5">
+      <footer className="surface-ink mt-(--section-gap)">
+        {showNewsletter && (
+          <>
+            <div className="shell grid gap-10 pt-(--band-y) pb-16 lg:grid-cols-12 lg:gap-4 lg:pb-20">
+              <div className="lg:col-span-6">
                 {generalInterface?.newsletter && (
-                  <p className="pretitle bg-butter">
+                  <p className="eyebrow text-mute">
                     {generalInterface.newsletter}
                   </p>
                 )}
-                <h2 className="title-lg mt-6 max-w-[12em]">
+                <h2 className="title-statement mt-4 max-w-[37.5rem] first:mt-0">
                   {generalInterface?.subscribeToOurNewsletter}
                 </h2>
-                <form
-                  onSubmit={(e) => e.preventDefault()}
-                  className="mt-8 flex max-w-120 gap-2"
-                >
-                  <label htmlFor="footer-newsletter-email" className="sr-only">
-                    {generalInterface?.emailPlaceholder ?? 'Email'}
-                  </label>
-                  <input
-                    id="footer-newsletter-email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder={generalInterface?.emailPlaceholder ?? 'Email'}
-                    className="input-line h-14 min-w-0 flex-1 px-6"
-                  />
-                  <button type="submit" className="btn-butter h-14 shrink-0">
-                    {generalInterface?.newsletterButton}
-                    <ArrowRightIcon
-                      aria-hidden="true"
-                      className="stroke-[2.4]"
-                    />
-                  </button>
-                </form>
               </div>
-            )}
-
-            {columns.length > 0 && (
-              <div
-                className={[
-                  'grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4',
-                  showNewsletter
-                    ? 'xl:col-span-6 xl:col-start-7 xl:pt-3'
-                    : 'xl:col-span-12',
-                ].join(' ')}
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="flex self-end lg:col-span-5 lg:col-start-8"
               >
-                {columns.map((column) => (
-                  <div key={column.id} className="min-w-0">
-                    <h2 className="eyebrow hyphens-auto wrap-break-word text-butter">
-                      {column.label}
-                    </h2>
-                    <ul className="mt-5 grid gap-3">
-                      {column.footerItem.map((item) => (
-                        <li key={item.id}>
-                          <Link
-                            href={`/${lng}/${stripStega(item.slug)}`}
-                            className="text-base hyphens-auto wrap-break-word text-cream/85 transition-colors duration-150 hover:text-white"
-                          >
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                <label htmlFor="footer-newsletter-email" className="sr-only">
+                  {generalInterface?.emailPlaceholder ?? 'Email'}
+                </label>
+                <input
+                  id="footer-newsletter-email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder={generalInterface?.emailPlaceholder ?? 'Email'}
+                  className="input-line h-14 min-w-0 flex-1"
+                />
+                <button type="submit" className="btn h-14 shrink-0 px-8">
+                  {generalInterface?.newsletterButton}
+                </button>
+              </form>
+            </div>
+            <div className="shell">
+              <div className="h-px bg-line" />
+            </div>
+          </>
+        )}
 
-          {/* Brand row: logo tile and subtitle, socials on the right */}
-          <div className="mt-16 flex flex-col gap-6 border-t border-white/15 pt-8 sm:flex-row sm:items-center sm:justify-between lg:mt-20">
-            <div className="flex items-center gap-4">
+        <div
+          className={`shell grid gap-12 pb-16 lg:grid-cols-12 lg:gap-4 ${showNewsletter ? 'pt-16' : 'pt-(--band-y)'}`}
+        >
+          <div className="lg:col-span-4">
+            {(footerLogo || footerTitle) && (
               <Link
                 href={`/${lng}/home`}
                 aria-label={
@@ -178,27 +148,32 @@ const Footer = ({ data, globalPageProps }: Props) => {
                       ? undefined
                       : 'Home'
                 }
-                className="grid size-14 shrink-0 place-items-center rounded-image bg-cream"
+                className="inline-flex outline-offset-4"
               >
                 {footerLogo && (
                   <RSCImage
                     data={footerTitle ? { ...footerLogo, alt: '' } : footerLogo}
                     usePlaceholder={false}
                     sizes="40px"
-                    imgClassName="mix-blend-multiply"
+                    imgClassName="logo-white"
                     imgStyle={{ height: '2.5rem', width: 'auto' }}
                   />
                 )}
+                {!footerLogo && footerTitle && (
+                  <span className="title-item tracking-[-0.03em]">
+                    {footerTitle}
+                  </span>
+                )}
               </Link>
-              {data.layout?.footerSubtitle && (
-                <p className="max-w-[30ch] text-md leading-snug font-medium text-pretty text-cream/85">
-                  {data.layout.footerSubtitle}
-                </p>
-              )}
-            </div>
-
+            )}
+            {data.layout?.footerSubtitle && (
+              <p className="mt-6 max-w-[18.75rem] text-md text-pretty text-mute first:mt-0">
+                {data.layout.footerSubtitle}
+              </p>
+            )}
             {socials.length > 0 && (
-              <div className="flex gap-2">
+              // -ml-3: the first glyph sits on the content edge
+              <div className="mt-8 -ml-3 flex first:mt-0">
                 {socials.map((social) => (
                   <a
                     key={social.id}
@@ -208,7 +183,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
                     aria-label={
                       stripStega(social.name ?? '') || stripStega(social.url)
                     }
-                    className="icon-btn size-12 bg-white/10 text-cream ring-1 ring-white/15 hover:bg-butter hover:bg-none hover:text-ink"
+                    className="icon-btn"
                   >
                     <SvgRenderer url={social.icon.url} />
                   </a>
@@ -217,50 +192,68 @@ const Footer = ({ data, globalPageProps }: Props) => {
             )}
           </div>
 
-          {footerTitle && (
-            <div className="mt-10 overflow-x-clip pb-4 lg:mt-14 lg:pb-6">
-              <Wordmark text={footerTitle} />
+          {columns.length > 0 && (
+            // From md the tracks never shrink below their longest word (1fr keeps an auto
+            // minimum and the links stop hyphenating), so a German compound stays whole; below
+            // xl the group also takes the spare column beside the brand block
+            <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-[repeat(4,1fr)] lg:col-span-8 lg:col-start-5 xl:col-span-7 xl:col-start-6">
+              {columns.map((column) => (
+                <div key={column.id} className="min-w-0 md:min-w-auto">
+                  <h2 className="eyebrow hyphens-auto wrap-break-word">
+                    {column.label}
+                  </h2>
+                  <ul className="mt-5 space-y-3.5">
+                    {column.footerItem.map((item) => (
+                      <li key={item.id}>
+                        <Link
+                          href={`/${lng}/${stripStega(item.slug)}`}
+                          className="text-sm hyphens-auto wrap-break-word text-mute transition-colors duration-150 hover:text-white md:hyphens-manual"
+                        >
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           )}
         </div>
 
-        {/* Legal bar: while the fixed draft toggle shows (it steps aside for the cookie
-            notice), the bar is the toggle plus its bottom offset above and below, so at
-            the page end the toggle comes to rest centred in it, right of the language switch.
-            Phones stack the copyright over the switch, which lines up with the toggle. */}
-        <div className="bg-forest-deep">
+        {footerTitle && (
+          <div className="shell overflow-x-clip">
+            <Wordmark text={footerTitle} />
+          </div>
+        )}
+
+        {/* Legal bar. The fixed draft toggle (48px, 16px off the bottom edge) comes to rest
+            centred in it at the page end: the bar is 80px from md, and on phones the language
+            switch lines up with it. The right padding keeps the bar's content clear of it. */}
+        <div className="border-t border-line">
           <div
-            className={[
-              'shell flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2 text-xs text-cream/75',
-              cookieBar
-                ? ''
-                : 'min-h-[calc(3rem+2*var(--inset))] max-sm:flex-col max-sm:items-start max-sm:justify-center max-sm:pt-4 max-sm:pb-[calc(var(--inset)+0.125rem)]',
-            ].join(' ')}
+            className="shell flex flex-col items-start gap-1 pt-5 pb-4.5 text-xs text-mute md:min-h-20 md:flex-row md:items-center md:justify-between md:gap-6 md:py-3"
             style={{
               paddingRight:
-                'max(var(--gutter), calc(var(--draft-toggle-w, 0px) + min(var(--draft-toggle-w, 0px), var(--inset)) + var(--gutter) - max(0px, (100vw - 90rem) / 2)))',
+                'max(var(--gutter), calc(var(--draft-toggle-w, 0px) + min(var(--draft-toggle-w, 0px), 1.5rem) + var(--gutter) - max(0px, (100vw - 90rem) / 2)))',
             }}
           >
             <p className="text-balance tabular-nums">
               {data.layout?.copyrightText}
             </p>
-            {/* On the right edge even when it wraps; on the left under the copyright when stacked */}
-            <div className={cookieBar ? 'ml-auto' : 'ml-auto max-sm:ml-0'}>
-              <Suspense>
-                <LanguageSelector
-                  languages={data._site.locales}
-                  currencySymbol={generalInterface?.currencySymbol}
-                  placement={cookieBar ? 'above-end' : 'above-start-sm-end'}
-                  tone="dark"
-                  className="-mx-3 min-h-11 rounded-full px-3 text-cream hover:bg-white/10 aria-expanded:bg-white/10"
-                />
-              </Suspense>
-            </div>
+            <Suspense>
+              <LanguageSelector
+                languages={data._site.locales}
+                currencySymbol={generalInterface?.currencySymbol}
+                placement="above-start-md-end"
+                chevron
+                className="-mx-2.5 min-h-11 px-2.5 text-ink-2 hover:text-white aria-expanded:text-white [&>svg:first-child]:size-4"
+              />
+            </Suspense>
           </div>
         </div>
       </footer>
 
-      {/* After the footer, so the sticky card comes to rest under it */}
+      {/* After the footer, so the sticky bar comes to rest under it */}
       {cookieBar && <CookiesNotice cookieNotice={cookieNotice} />}
     </>
   );

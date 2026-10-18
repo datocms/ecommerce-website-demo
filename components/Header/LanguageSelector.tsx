@@ -1,6 +1,10 @@
 'use client';
 
-import { CheckIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  GlobeAltIcon,
+} from '@heroicons/react/24/outline';
 import { getLangNameFromCode } from 'language-name-map';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -10,28 +14,33 @@ import type { SiteLocale } from '@/app/i18n/settings';
 type Props = {
   languages: SiteLocale[];
   currencySymbol?: string | null;
-  /** Where the list opens: below the strip/nav trigger, above the mobile menu and footer ones */
-  placement?: 'below-end' | 'above-start' | 'above-end' | 'above-start-sm-end';
-  /** light: ink text (butter, white, cream); dark: cream text (forest) */
-  tone?: 'light' | 'dark';
-  /** Extra classes for the trigger (pill fills, heights) */
+  /** Where the list opens: below the header trigger, above the mobile menu and footer ones */
+  placement?: 'below-end' | 'above-start' | 'above-end' | 'above-start-md-end';
+  /** A chevron after the label (the footer's switch) */
+  chevron?: boolean;
+  /** Classes for the "EN / $" label, e.g. to keep it for screen readers only on narrow bars */
+  labelClassName?: string;
+  /** Extra classes for the trigger (heights, paddings, borders) */
   className?: string;
   onNavigate?: () => void;
 };
 
 const PLACEMENT = {
-  'below-end': 'top-full right-0 mt-2',
+  // The header's: its 40px trigger is centred in the 72px bar, so 16px down the list's ink
+  // top edge lies on the header's hairline, where the mega menu hangs too
+  'below-end': 'top-full right-0 mt-4',
   'above-start': 'bottom-full left-0 mb-2',
   'above-end': 'bottom-full right-0 mb-2',
-  // A trigger on the left edge on phones, on the right edge from sm
-  'above-start-sm-end': 'bottom-full left-0 mb-2 sm:right-0 sm:left-auto',
+  // A trigger on the left edge on phones, on the right edge from md
+  'above-start-md-end': 'bottom-full left-0 mb-2 md:right-0 md:left-auto',
 };
 
 const LanguageSelector = ({
   languages,
   currencySymbol,
   placement = 'below-end',
-  tone = 'light',
+  chevron = false,
+  labelClassName,
   className,
   onNavigate,
 }: Props) => {
@@ -135,35 +144,39 @@ const LanguageSelector = ({
         aria-expanded={isOpen}
         aria-controls={listId}
         className={[
-          'group inline-flex items-center gap-1 font-semibold whitespace-nowrap transition-colors',
+          'group inline-flex items-center gap-1.5 font-medium whitespace-nowrap transition-colors duration-150',
           className,
         ]
           .filter(Boolean)
           .join(' ')}
       >
-        <span className="sr-only">Language and currency: </span>
-        {currentLocale?.replaceAll('_', '-').toUpperCase()}
-        {currencySymbol && (
-          <>
-            <span
-              aria-hidden="true"
-              className={tone === 'dark' ? 'text-cream/70' : 'text-muted'}
-            >
-              /
-            </span>
-            {currencySymbol}
-          </>
+        <GlobeAltIcon aria-hidden="true" className="size-4.5 shrink-0" />
+        <span className={labelClassName}>
+          <span className="sr-only">Language and currency: </span>
+          {currentLocale?.replaceAll('_', '-').toUpperCase()}
+          {currencySymbol && (
+            <>
+              <span aria-hidden="true" className="px-1 text-mute">
+                /
+              </span>
+              {currencySymbol}
+            </>
+          )}
+        </span>
+        {chevron && (
+          <ChevronDownIcon
+            aria-hidden="true"
+            className="size-3.5 shrink-0 stroke-2 transition-transform duration-200 group-aria-expanded:rotate-180"
+          />
         )}
-        <ChevronDownIcon
-          aria-hidden="true"
-          className="size-3.75 shrink-0 stroke-[2.4] transition-transform duration-200 group-aria-expanded:rotate-180"
-        />
       </button>
 
+      {/* A white popover with an ink edge (like the draft-mode one) on every surface: the edge
+          stays visible over the footer's white wordmark, and the ring is reset to ink */}
       <ul
         id={listId}
         hidden={!isOpen}
-        className={`absolute z-50 w-56 rounded-card bg-white p-2 text-ink shadow-pop [--focus-ring:var(--color-ink)] ${PLACEMENT[placement]}`}
+        className={`absolute z-50 w-56 border border-ink bg-white p-1 text-ink [--focus-ring:var(--color-ink)] ${PLACEMENT[placement]}`}
       >
         {languages.map((locale) => {
           const bcp47 = locale.replaceAll('_', '-');
@@ -179,20 +192,16 @@ const LanguageSelector = ({
                   setIsOpen(false);
                   onNavigate?.();
                 }}
-                className="flex min-h-11 items-center justify-between gap-4 rounded-md px-3 py-2 text-base font-medium transition-colors duration-150 hover:bg-cream aria-[current=true]:bg-cream"
+                className="flex min-h-11 items-center justify-between gap-4 px-3 text-base transition-colors duration-150 hover:bg-mist focus-visible:outline-offset-[-2px] aria-[current=true]:font-semibold"
               >
                 <span lang={bcp47}>
                   {getLangNameFromCode(locale)?.native || locale}
                 </span>
-                {current ? (
+                {current && (
                   <CheckIcon
                     aria-hidden="true"
-                    className="size-4 shrink-0 stroke-[2.4]"
+                    className="size-4.5 shrink-0 stroke-2"
                   />
-                ) : (
-                  <span className="text-xs font-semibold text-muted">
-                    {bcp47.toUpperCase()}
-                  </span>
                 )}
               </Link>
             </li>

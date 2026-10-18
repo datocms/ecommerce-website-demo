@@ -12,7 +12,7 @@ import { draftMode } from 'next/headers';
 import Link from 'next/link';
 import { getFallbackLocale, type SiteLocale } from '@/app/i18n/settings';
 import ProductCard from '@/components/Common/ProductCard';
-import SideFilter, { SortChips } from '@/components/Common/SideFilter';
+import SideFilter, { SortTabs } from '@/components/Common/SideFilter';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import FilterDetail from '@/components/Products/FilterDetail';
 import { ProductsGeneralInterfaceFragment } from '@/components/Products/GeneralInterface/fragments';
@@ -277,22 +277,24 @@ const Page = async ({ params, searchParams }: PageProps) => {
         lng={lng}
         narrowed={narrowed}
         framed={Boolean(singleFilter)}
-        sort={<SortChips generalInterface={data.generalInterface} />}
+        sort={<SortTabs generalInterface={data.generalInterface} />}
         searchChip={
           nameSearch ? (
+            // 36px on the toolbar's 56px row; the pseudo-element makes the hit area 44px.
+            // On phones and beside the tabs at lg the magnifier gives its room to the query
             <Link
               href={hrefWithout('productName', 'page')}
               aria-label={`Clear search “${nameSearch}”`}
-              className="chip min-w-0 gap-2 pr-1.5 pl-4"
+              className="relative inline-flex h-9 min-w-0 items-center gap-2 bg-mist pr-1 pl-3 text-sm font-medium transition-colors duration-150 after:absolute after:inset-x-0 after:-inset-y-1 hover:bg-line"
             >
               <MagnifyingGlassIcon
                 aria-hidden="true"
-                className="stroke-[2.4] text-muted"
+                className="size-4 shrink-0 stroke-2 text-mute max-sm:hidden lg:max-xl:hidden"
               />
               <span className="min-w-0 truncate">“{nameSearch}”</span>
               <span
                 aria-hidden="true"
-                className="grid size-8 shrink-0 place-items-center rounded-full bg-cream [&>svg]:size-[0.9375rem] [&>svg]:stroke-[2.6]"
+                className="grid size-7 shrink-0 place-items-center [&>svg]:size-4 [&>svg]:stroke-2"
               >
                 <XMarkIcon />
               </span>
@@ -308,11 +310,12 @@ const Page = async ({ params, searchParams }: PageProps) => {
           parameterMaterials={materials}
         />
       </ProductFilters>
-      <section className="shell mt-5 lg:mt-6">
+      {/* Focus scrolls links clear of the header and, from lg, of the stuck toolbar too */}
+      <section className="shell pt-8 lg:pt-10 lg:[&_a]:scroll-mt-[calc(3.5rem+1px)]">
         {data.allProducts.length > 0 ? (
           // Cards space their rows with --card-row-gap; the negative margin
           // takes the last row's back
-          <div className="-mb-(--card-row-gap) grid grid-cols-2 gap-x-3 [--card-row-gap:0.75rem] sm:gap-x-4 sm:[--card-row-gap:1rem] md:grid-cols-3 xl:grid-cols-4">
+          <div className="-mb-(--card-row-gap) grid grid-cols-2 gap-x-3 [--card-row-gap:2.5rem] md:grid-cols-3 md:gap-x-4 lg:[--card-row-gap:3.5rem] xl:grid-cols-4">
             {data.allProducts.map((product, index) => {
               return (
                 <ProductCard
@@ -327,26 +330,30 @@ const Page = async ({ params, searchParams }: PageProps) => {
                   onSale={stripStega(product.sale) === 'on_sale'}
                   currencySymbol={currencySymbol ?? ''}
                   saleLabel={sale}
-                  sizes="(min-width: 1440px) 320px, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 46vw"
+                  sizes="(min-width: 1440px) 330px, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 46vw"
                   priority={!singleFilter && index < 4}
                   titleAs="h2"
+                  data-datocms-content-link-group
                 />
               );
             })}
           </div>
         ) : (
-          <div className="flex flex-col items-center rounded-card bg-white px-6 py-16 text-center sm:py-24">
+          // A mist well where the grid would be
+          <div className="flex flex-col items-center bg-mist px-6 py-20 text-center lg:py-28">
             <span
               aria-hidden="true"
-              className="grid size-18 place-items-center rounded-full bg-oat [&>svg]:size-7"
+              className="grid size-16 place-items-center bg-white [&>svg]:size-6.5"
             >
               <MagnifyingGlassIcon />
             </span>
-            <h2 className="title-md mt-7 max-w-[16em]">{emptyState.title}</h2>
-            <p className="mt-4 max-w-[40ch] text-md text-pretty text-muted tabular-nums sm:text-lg">
+            <h2 className="title-card mt-8 max-w-[14em] text-balance">
+              {emptyState.title}
+            </h2>
+            <p className="mt-4 max-w-[40ch] text-md text-pretty text-ink-2 tabular-nums">
               {emptyState.body}
             </p>
-            <Link href={emptyState.href} className="btn-primary mt-8">
+            <Link href={emptyState.href} className="btn mt-8">
               {count > 0 && <ArrowLeftIcon aria-hidden="true" />}
               {emptyState.cta}
               {count === 0 && <ArrowRightIcon aria-hidden="true" />}

@@ -1,7 +1,6 @@
 import { stripStega } from '@datocms/content-link';
 import {
   isList,
-  isThematicBreak,
   type Record,
   type StructuredText,
 } from 'datocms-structured-text-utils';
@@ -19,14 +18,15 @@ type PropTypes = {
   type: string | null | undefined;
   image: FragmentOf<typeof ResponsiveImageFragment> | null | undefined;
   description: StructuredText<Record, Record> | null | undefined;
-  /** The image is a logo: shown whole on a white card, never cropped */
+  /** The image is a logo: shown whole on mist, never cropped */
   logo?: boolean;
 };
 
-const SIZES =
-  '(min-width: 1440px) 560px, (min-width: 1280px) 38vw, (min-width: 768px) 50vw, 100vw';
+// Share of the well's width a logo may take. Its height share (--logo-h) is larger on phones,
+// whose well is a short band: there the logo still spans 60% of the width.
+const LOGO_SHARE = 60;
 
-// Advance widths of the display face at title sizes, in em, rounded up
+// Advance widths of the title face, in em, erring wide so a word always fits
 const advance = (char: string) =>
   /[.,'’iíìïjlI]/.test(char)
     ? 0.25
@@ -56,113 +56,98 @@ const FilterDetail = ({
   subtitle,
   logo = false,
 }: PropTypes) => {
-  // From xl the photo spans the forest card and the description, at most a
-  // screen tall: beside a long description it stays in view instead of being
-  // cropped to a sliver. Without a description the forest card stretches to it
-  const media = image
-    ? [
-        'relative overflow-hidden rounded-card md:aspect-auto md:min-h-[22rem] lg:min-h-[24rem] xl:col-span-5 xl:min-h-[36rem]',
-        description
-          ? 'xl:sticky xl:top-[calc(var(--header-h)+1rem)] xl:row-span-2 xl:h-[min(100%,calc(100dvh-var(--header-h)-2rem))] xl:self-start'
-          : '',
-        logo
-          ? 'aspect-square bg-white sm:aspect-[4/3]'
-          : 'aspect-[4/5] bg-oat sm:aspect-[4/3]',
-      ].join(' ')
-    : '';
   const logoData =
     image && logo ? readFragment(ResponsiveImageFragment, image) : null;
   const titleWidth = widestWord(stripStega(name));
 
   return (
-    <section lang={lng} className="shell pt-1">
-      <div
-        className={`grid gap-3 sm:gap-4 xl:grid-cols-12 ${image ? 'md:grid-cols-2' : ''} ${image && description ? 'xl:grid-rows-[auto_1fr]' : ''}`}
-      >
+    // Phones and tablets open on the photo, edge to edge under the header
+    <section
+      lang={lng}
+      className={`shell ${image ? 'lg:pt-10' : 'pt-(--page-top)'}`}
+    >
+      <div className="grid lg:grid-cols-12 lg:gap-4">
         {image && (
-          <div className={media}>
+          // Heights, not aspect ratios: a ratio would hand the screen-height cap on
+          // to the width and pull the photo off the right edge. From lg the well
+          // runs as tall as the text, at most a screen tall, and stays in view
+          // while a longer description scrolls. A logo needs less room than a photo,
+          // so on tablets its well stays a wide band
+          <div
+            className={`relative -mx-(--gutter) overflow-hidden bg-mist lg:sticky lg:top-[calc(var(--header-h)+2.5rem)] lg:col-span-5 lg:mx-0 lg:h-auto lg:max-h-[calc(100svh-var(--header-h)-5rem)] lg:min-h-[min(35rem,calc(100svh-var(--header-h)-5rem))] ${logo ? 'h-[min(75vw,62svh)] md:h-[min(50vw,62svh)]' : 'h-[min(125vw,62svh)] md:h-[min(75vw,62svh)]'}`}
+          >
             {logoData ? (
-              // Sized against both sides of the card, so a logo of any shape
-              // fits whole and keeps its rounded corners; on phones it centres
-              // above the overlapping forest card
-              <div className="absolute inset-0 grid place-items-center pb-20 [container-type:size] sm:pb-0">
+              // Sized against both sides of the well, so a logo of any shape fits
+              // whole. Multiply blends a white backdrop into the mist; a logo drawn on its
+              // own tinted square keeps that square, a tile inside the well.
+              <div className="absolute inset-0 grid place-items-center [container-type:size] [--logo-h:80] md:[--logo-h:60]">
                 <div
-                  className="relative overflow-hidden rounded-nav"
+                  className="relative"
                   style={{
                     aspectRatio: `${logoData.width} / ${logoData.height}`,
-                    width: `min(76cqw, ${(76 * logoData.width) / logoData.height}cqh, 30rem)`,
+                    width: `min(${LOGO_SHARE}cqw, calc(var(--logo-h) * ${(logoData.width / logoData.height).toFixed(4)}cqh), 25rem)`,
                   }}
                 >
                   <DatoImage
                     fragment={image}
                     layout="fill"
-                    objectFit="cover"
-                    sizes="(min-width: 1280px) 30rem, (min-width: 768px) 38vw, 76vw"
+                    objectFit="contain"
+                    imgClassName="mix-blend-multiply"
+                    sizes="(min-width: 1024px) 25rem, 60vw"
                     priority
                   />
                 </div>
               </div>
             ) : (
-              // Portraits keep the head in frame when the card turns landscape
+              // Portraits keep the head in frame when the well turns landscape
               <DatoImage
                 fragment={image}
                 layout="fill"
                 objectFit="cover"
                 objectPosition="50% 20%"
-                sizes={SIZES}
+                sizes="(min-width: 1440px) 560px, (min-width: 1024px) 38vw, 100vw"
                 priority
               />
             )}
           </div>
         )}
         <div
-          className={`relative z-10 flex flex-col rounded-card surface-forest p-(--panel-pad) [container-type:inline-size] ${image ? 'mx-2 -mt-20 shadow-pop sm:mx-0 sm:mt-0 sm:shadow-none xl:col-span-7' : 'xl:col-span-12'}`}
+          className={`[container-type:inline-size] ${image ? 'pt-8 lg:col-span-6 lg:col-start-7 lg:pt-0' : 'lg:col-span-8'}`}
         >
-          {type && <p className="pretitle self-start bg-butter">{type}</p>}
-          {/* Bottom-aligned when the card stretches beside the photo */}
-          <div className={`mt-auto ${type ? 'pt-6' : ''}`}>
-            <h1 className="h-xl hyphens-auto">
-              {/* A long single word (German compounds) shrinks to fit the
-                  card instead of breaking mid-word */}
-              <span
-                className="block tracking-[-0.025em]"
-                style={
-                  titleWidth
-                    ? {
-                        fontSize: `min(1em, ${(100 / titleWidth).toFixed(2)}cqi)`,
-                      }
-                    : undefined
-                }
-              >
-                {name}
-              </span>
-            </h1>
-            {subtitle && (
-              <div className="mt-5 max-w-[34em] text-lg font-medium text-pretty text-cream/85 [&>p+p]:mt-3">
-                <ReactMarkdown>{subtitle}</ReactMarkdown>
-              </div>
-            )}
-          </div>
-        </div>
-        {description && (
-          <div
-            className={`rounded-card bg-white p-(--panel-pad) ${image ? 'md:col-span-2 xl:col-span-7' : 'xl:col-span-12'}`}
-          >
+          {type && <p className="eyebrow">{type}</p>}
+          {/* Words never break: a long single word (German compounds) shrinks to
+              fit the column instead */}
+          <h1 className={`title-display hyphens-manual ${type ? 'mt-4' : ''}`}>
+            <span
+              className="block"
+              style={
+                titleWidth
+                  ? {
+                      fontSize: `min(1em, ${(100 / titleWidth).toFixed(2)}cqi)`,
+                    }
+                  : undefined
+              }
+            >
+              {name}
+            </span>
+          </h1>
+          {subtitle && (
+            <div className="mt-5 max-w-[30em] text-xl leading-[1.42] text-pretty text-ink-2 xl:text-2xl [&>p+p]:mt-3">
+              <ReactMarkdown>{subtitle}</ReactMarkdown>
+            </div>
+          )}
+          {description && (
             <DatoStructuredText
               data={description}
-              className="prose-dato"
+              className="prose-dato mt-10 max-w-[66ch] border-t border-line pt-8 lg:mt-12"
               customNodeRules={[
                 renderNodeRule(isList, ({ children, key }) => (
                   <ul key={key}>{children}</ul>
                 )),
-                // Rules span the card, not the text measure
-                renderNodeRule(isThematicBreak, ({ key }) => (
-                  <hr key={key} className="my-8 border-line" />
-                )),
               ]}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );

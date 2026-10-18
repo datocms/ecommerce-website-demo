@@ -4,7 +4,7 @@ import type { ComponentPropsWithoutRef } from 'react';
 import DatoImage from '@/components/DatoImage';
 import { ProductGeneralInterfaceFragment } from '@/components/Products/Product/GeneralInferface/fragments';
 import { MaterialProductFragment } from '@/components/Products/Product/Material/fragments';
-import { IMG_ZOOM, TILE_LINK } from '@/components/Sections/ui';
+import { IMG_ZOOM, MEDIA } from '@/components/Sections/ui';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import { ProductInfoSectionFragment } from './fragments';
@@ -53,18 +53,23 @@ const ProductInfoSection = ({
     { key: 'occasions', label: occasionsString, value: occasions },
   ];
 
+  // Specs on a mist well beside the material photo, both the same height so the row tiles.
+  // Without a material the specs run the full width, four across from lg. At lg the photo starts
+  // on the buy box's line (column 7 plus 48px) and the specs grow by the same 48px to meet it.
   return (
-    <section {...rest} className="grid gap-3 sm:gap-4 lg:grid-cols-12 lg:gap-5">
+    <section {...rest} className="grid gap-3 lg:grid-cols-12 lg:gap-4">
       <dl
-        className={`surface-forest grid grid-cols-2 gap-x-6 gap-y-7 rounded-card p-(--card-pad) sm:gap-x-10 lg:p-(--panel-pad) ${id ? 'lg:col-span-8' : 'lg:col-span-full'}`}
+        className={`grid grid-cols-2 gap-x-8 gap-y-6 bg-mist p-6 sm:p-10 xl:gap-x-12 xl:p-14 ${id ? 'lg:col-span-6 lg:-mr-12 xl:col-span-7 xl:mr-0' : 'lg:col-span-full lg:grid-cols-4'}`}
       >
         {specs.map((spec) => (
           <div
             key={spec.key}
-            className="min-w-0 border-t border-white/15 pt-5 [&:nth-child(-n+2)]:border-t-0 [&:nth-child(-n+2)]:pt-0"
+            className={`min-w-0 border-t border-ink/15 pt-6 [&:nth-child(-n+2)]:border-t-0 [&:nth-child(-n+2)]:pt-0 ${id ? '' : 'lg:border-t-0 lg:pt-0'}`}
           >
-            <dt className="eyebrow text-butter">{spec.label}</dt>
-            <dd className="title-sm mt-2 leading-[1.1] wrap-break-word hyphens-auto [hyphenate-limit-chars:12_4_4] sm:text-[1.75rem] lg:text-[1.5rem] xl:text-[2rem] [&_p]:m-0">
+            <dt className="text-sm text-mute">{spec.label}</dt>
+            <dd
+              className={`title-item mt-2 leading-[1.1] wrap-break-word hyphens-auto [hyphenate-limit-chars:12_4_4] sm:title-card [&_p]:m-0 ${id ? 'lg:title-item xl:title-card' : ''}`}
+            >
               {spec.value}
             </dd>
           </div>
@@ -74,35 +79,37 @@ const ProductInfoSection = ({
       {id && (
         <Link
           href={`/${globalPageProps.params.lng}/products?materials=${id}`}
-          className={`${TILE_LINK} lg:col-span-4`}
+          className={`group ${MEDIA} block aspect-[4/3] md:aspect-[16/9] lg:col-span-6 lg:ml-12 lg:aspect-auto xl:col-span-5 xl:ml-0`}
         >
-          {/* The photo matches the spec card's corners; the link's focus ring is drawn on it */}
-          <div className="@container relative aspect-[4/3] overflow-hidden rounded-card bg-oat group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-ink group-focus-visible:outline-solid md:aspect-[16/9] lg:aspect-auto lg:h-full">
-            {details?.image.responsiveImage && (
-              <DatoImage
-                fragment={details.image.responsiveImage}
-                layout="fill"
-                objectFit="cover"
-                sizes="(min-width: 1440px) 450px, (min-width: 1024px) 32vw, 100vw"
-                className={IMG_ZOOM}
-              />
-            )}
-            {/* Fits its content: a pill with More beside the name, or More under it on narrow photos */}
-            <span className="absolute bottom-4 left-4 z-10 grid max-w-[calc(100%-2rem)] grid-cols-[minmax(0,1fr)] items-center justify-items-start gap-x-1.5 gap-y-1 rounded-sheet bg-white p-1.5 text-md font-bold shadow-card @min-[20.5rem]:grid-flow-col">
-              <span className="flex min-h-9 items-center pr-1.5 pl-3.5 leading-snug wrap-anywhere hyphens-auto [hyphenate-limit-chars:12_4_4] last:pr-3.5">
-                {name}
-              </span>
-              {more && (
-                <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-ink pr-3 pl-3.5 text-xs whitespace-nowrap text-cream">
+          {details?.image.responsiveImage && (
+            <DatoImage
+              fragment={details.image.responsiveImage}
+              layout="fill"
+              objectFit="cover"
+              sizes="(min-width: 1440px) 560px, (min-width: 1280px) 40vw, (min-width: 1024px) 42vw, 100vw"
+              className={IMG_ZOOM}
+            />
+          )}
+          {/* The material name and More share one white label on the photo, so nothing hangs
+              under it and the row stays one clean edge */}
+          <span className="absolute bottom-3 left-3 z-10 inline-flex min-h-11 max-w-[calc(100%-1.5rem)] items-center gap-3 bg-white px-4 py-2 text-sm font-semibold">
+            <span className="min-w-0 wrap-break-word">{name}</span>
+            {more && (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="h-4 w-px shrink-0 bg-line"
+                />
+                <span className="inline-flex shrink-0 items-center gap-1.5">
                   {more}
                   <ArrowRightIcon
                     aria-hidden="true"
-                    className="size-[0.9375rem] stroke-[2.4]"
+                    className="size-4 stroke-2 transition-transform duration-200 group-hover:translate-x-0.5"
                   />
                 </span>
-              )}
-            </span>
-          </div>
+              </>
+            )}
+          </span>
         </Link>
       )}
     </section>

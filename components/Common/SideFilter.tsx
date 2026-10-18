@@ -41,7 +41,7 @@ type FilterKey = 'collections' | 'materials' | 'brands';
 
 // Pending query: quick successive clicks build on each other instead of on the
 // URL of the navigation that hasn't landed yet
-function usePendingQueryState() {
+function usePendingQueryState(onPush?: (query: string) => void) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -54,8 +54,10 @@ function usePendingQueryState() {
     const params = new URLSearchParams(query);
     params.set(key, value);
     params.delete('page');
-    setQuery(params.toString());
-    router.push(`?${params.toString()}`, { scroll: false });
+    const next = params.toString();
+    setQuery(next);
+    onPush?.(next);
+    router.push(`?${next}`, { scroll: false });
   }
 
   return { pendingParams: new URLSearchParams(query), exportQueryParameters };
@@ -65,9 +67,16 @@ const PendingQueryContext = createContext<ReturnType<
   typeof usePendingQueryState
 > | null>(null);
 
-/** Lets the toolbar sort chips and the drawer build on the same pending query */
-export function PendingQueryProvider({ children }: { children: ReactNode }) {
-  const pendingQuery = usePendingQueryState();
+/** Lets the toolbar sort tabs and the drawer build on the same pending query */
+export function PendingQueryProvider({
+  children,
+  onPush,
+}: {
+  children: ReactNode;
+  /** Called with each query a sort or filter change navigates to */
+  onPush?: (query: string) => void;
+}) {
+  const pendingQuery = usePendingQueryState(onPush);
   return (
     <PendingQueryContext.Provider value={pendingQuery}>
       {children}
@@ -82,89 +91,68 @@ function usePendingQuery() {
   return pendingQuery;
 }
 
-function SortButtons({
-  generalInterface,
-  current,
-  onSelect,
-  className = '',
-}: {
-  generalInterface: GeneralInterface;
-  current: string | null;
-  onSelect: (value: string) => void;
-  className?: string;
-}) {
+function getSortOptions(generalInterface: GeneralInterface) {
   const { newArrivals, mostPopular, topRated, price, sales } =
     readFragment(ProductsGeneralInterfaceFragment, generalInterface) ?? {};
 
-  const sortOptions = [
+  return [
     { label: newArrivals, value: '_publishedAt_DESC' },
     { label: mostPopular, value: 'numberOfReviews_DESC' },
     { label: topRated, value: 'reviewAverage_DESC' },
     { label: price, value: 'price_DESC' },
     { label: sales, value: 'sale_DESC' },
   ];
-
-  return sortOptions.map((sortOption) => {
-    const isSelected = current === sortOption.value;
-    return (
-      <button
-        key={sortOption.value}
-        type="button"
-        value={sortOption.value}
-        aria-pressed={isSelected}
-        onClick={() => onSelect(sortOption.value)}
-        className={`chip shrink-0 ${className}`}
-      >
-        {isSelected && (
-          <CheckIcon aria-hidden="true" className="stroke-[2.4]" />
-        )}
-        {sortOption.label}
-      </button>
-    );
-  });
 }
 
-/** The sort chips of the listing toolbar */
-export function SortChips({
+/** The sort tabs of the listing toolbar: the header nav's ink bar, on the toolbar's hairline */
+export function SortTabs({
   generalInterface,
 }: {
   generalInterface: GeneralInterface;
 }) {
   const { pendingParams, exportQueryParameters } = usePendingQuery();
   const current = pendingParams.get('orderBy');
+  const sortOptions = getSortOptions(generalInterface);
 
-  // Where the row scrolls (below lg), bring the selected chip into view without
-  // moving the page
+  // Where the row scrolls, bring the selected tab into view without moving the page
   const scroller = useRef<HTMLFieldSetElement>(null);
   useEffect(() => {
     const row = scroller.current;
-    const chip =
+    const tab =
       current && row?.querySelector(`button[value="${CSS.escape(current)}"]`);
-    if (!row || !chip) return;
+    if (!row || !tab) return;
     const rowBox = row.getBoundingClientRect();
-    const chipBox = chip.getBoundingClientRect();
-    if (chipBox.left < rowBox.left || chipBox.right > rowBox.right)
+    const tabBox = tab.getBoundingClientRect();
+    if (tabBox.left < rowBox.left || tabBox.right > rowBox.right)
       row.scrollLeft +=
-        chipBox.left + chipBox.width / 2 - (rowBox.left + rowBox.width / 2);
+        tabBox.left + tabBox.width / 2 - (rowBox.left + rowBox.width / 2);
   }, [current]);
 
   return (
+    // One pixel taller than its row, so the bars cover the toolbar's bottom hairline
     <fieldset
       ref={scroller}
       aria-label="Sort"
-      className="no-scrollbar flex min-w-0 scroll-px-(--gutter) items-center gap-2 overflow-x-auto px-(--gutter) py-1 lg:flex-wrap lg:overflow-visible lg:pr-0 lg:pl-1"
+      className="no-scrollbar -mb-px flex h-[calc(3rem+1px)] min-w-0 scroll-px-(--gutter) gap-2 overflow-x-auto px-(--gutter) lg:h-[calc(3.5rem+1px)] lg:gap-3 lg:px-0"
     >
       <span
         aria-hidden="true"
-        className="grid h-10.5 shrink-0 place-items-center pr-1 text-muted lg:border-l lg:border-line lg:pl-3 [&>svg]:size-[1.125rem]"
+        className="grid shrink-0 place-items-center text-mute [&>svg]:size-[1.125rem]"
       >
         <ArrowsUpDownIcon />
       </span>
-      <SortButtons
-        generalInterface={generalInterface}
-        current={current}
-        onSelect={(value) => exportQueryParameters('orderBy', value)}
-      />
+      {sortOptions.map((sortOption) => (
+        <button
+          key={sortOption.value}
+          type="button"
+          value={sortOption.value}
+          aria-pressed={current === sortOption.value}
+          onClick={() => exportQueryParameters('orderBy', sortOption.value)}
+          className="relative inline-flex shrink-0 items-center px-2 text-sm font-medium whitespace-nowrap text-ink-2 transition-colors duration-150 outline-offset-[-2px] after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:bg-ink after:opacity-0 after:transition-opacity after:duration-150 hover:text-ink hover:after:opacity-100 aria-pressed:text-ink aria-pressed:after:opacity-100"
+        >
+          {sortOption.label}
+        </button>
+      ))}
     </fieldset>
   );
 }
@@ -232,6 +220,8 @@ const SideFilter = ({
   // so the drawer never opens fully folded
   const anyNarrowed = groups.some((group) => group.narrowed);
 
+  const current = pendingParams.get('orderBy');
+
   return (
     <div>
       <fieldset
@@ -240,16 +230,27 @@ const SideFilter = ({
       >
         <span
           aria-hidden="true"
-          className="grid size-10.5 place-items-center text-muted [&>svg]:size-[1.125rem]"
+          className="grid size-11 place-items-center text-mute [&>svg]:size-[1.125rem]"
         >
           <ArrowsUpDownIcon />
         </span>
-        <SortButtons
-          generalInterface={generalInterface}
-          current={pendingParams.get('orderBy')}
-          onSelect={(value) => exportQueryParameters('orderBy', value)}
-          className="bg-cream shadow-none"
-        />
+        {getSortOptions(generalInterface).map((sortOption) => {
+          const isSelected = current === sortOption.value;
+          return (
+            <button
+              key={sortOption.value}
+              type="button"
+              aria-pressed={isSelected}
+              onClick={() => exportQueryParameters('orderBy', sortOption.value)}
+              className="chip shrink-0"
+            >
+              {isSelected && (
+                <CheckIcon aria-hidden="true" className="stroke-2" />
+              )}
+              {sortOption.label}
+            </button>
+          );
+        })}
       </fieldset>
 
       {groups.map((section, index) => {
@@ -264,31 +265,30 @@ const SideFilter = ({
             {({ open }) => (
               <>
                 <h3>
-                  <DisclosureButton className="group flex min-h-17 w-full items-center justify-between gap-4 py-3 text-left">
-                    <span className="title-sm flex items-center gap-2.5">
+                  <DisclosureButton className="group flex min-h-16 w-full items-center justify-between gap-4 py-2 text-left">
+                    <span className="title-item flex items-center gap-3">
                       {section.name}
                       {narrowed && (
-                        <span className="grid h-6 min-w-6 shrink-0 place-items-center rounded-full bg-ink px-1.5 font-sans text-xs font-bold tracking-normal text-cream tabular-nums">
+                        <span className="tag-dark min-h-6 px-1.5">
                           <span className="sr-only"> (</span>
                           {checked}
                           <span className="sr-only"> applied)</span>
                         </span>
                       )}
                     </span>
-                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-cream transition-colors duration-150 [&>svg]:size-[1.0625rem] [&>svg]:stroke-[2.4] group-hover:bg-ink group-hover:text-cream">
-                      {open ? (
-                        <MinusIcon aria-hidden="true" />
-                      ) : (
-                        <PlusIcon aria-hidden="true" />
-                      )}
+                    <span
+                      aria-hidden="true"
+                      className="grid size-9 shrink-0 place-items-center border border-line transition-colors duration-150 group-hover:border-ink [&>svg]:size-[1.125rem] [&>svg]:stroke-2"
+                    >
+                      {open ? <MinusIcon /> : <PlusIcon />}
                     </span>
                   </DisclosureButton>
                 </h3>
-                <DisclosurePanel className="pb-5">
-                  <ul className="-mx-2 grid grid-cols-2 gap-x-2">
+                <DisclosurePanel className="pb-6">
+                  <ul className="grid grid-cols-2 gap-x-4">
                     {options.map((option) => (
                       <li key={option.id}>
-                        <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-2 text-base font-medium transition-colors duration-150 hover:bg-cream">
+                        <label className="group/option flex min-h-11 cursor-pointer items-center gap-3 text-base">
                           <input
                             type="checkbox"
                             name={`${section.id}[]`}
@@ -297,7 +297,7 @@ const SideFilter = ({
                             onChange={() => toggleOption(section.id, option.id)}
                             className="checkbox"
                           />
-                          <span className="min-w-0 py-2 leading-tight">
+                          <span className="min-w-0 py-2 leading-tight hyphens-auto wrap-break-word underline-offset-4 group-hover/option:underline">
                             {option.name}
                           </span>
                         </label>

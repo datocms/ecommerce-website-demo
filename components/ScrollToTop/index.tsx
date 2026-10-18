@@ -56,8 +56,9 @@ export default function ScrollToTop({ isDraft }: Props) {
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* On the gutter line; it steps aside while the cookie notice is open */}
-      <div className="fixed right-(--gutter) bottom-(--inset) z-40 [body:has(#cookie-notice)_&]:hidden">
+      {/* On the gutter line, 16px off the bottom edge: at the page end it comes to rest centred
+          in the footer's legal bar. It steps aside while the cookie notice is open. */}
+      <div className="fixed right-(--gutter) bottom-4 z-40 [body:has(#cookie-notice)_&]:hidden">
         <button
           ref={toggleRef}
           type="button"
@@ -67,20 +68,19 @@ export default function ScrollToTop({ isDraft }: Props) {
           }}
           aria-expanded={!isDraft ? modalOpen : undefined}
           aria-controls={!isDraft ? 'draft-auth' : undefined}
-          className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-white pr-5 pl-4 text-base font-bold whitespace-nowrap text-ink shadow-card ring-1 ring-line transition-shadow duration-150 hover:ring-ink max-sm:w-12 max-sm:px-0"
+          // White with an ink edge, so it reads on the white page and on the black footer;
+          // the focus ring is drawn inside it for the same reason
+          className="inline-flex h-12 items-center justify-center gap-2.5 border border-ink bg-white px-5 text-sm font-semibold whitespace-nowrap text-ink transition-colors duration-150 hover:bg-mist focus-visible:outline-offset-[-5px] max-sm:w-12 max-sm:px-0"
         >
           {isDraft ? (
             <span className="grid size-4.5 place-items-center">
               <span
                 aria-hidden="true"
-                className="size-2.5 shrink-0 rounded-full bg-accent-graphic ring-4 ring-accent-graphic/20 forced-colors:bg-[CanvasText]"
+                className="size-2 shrink-0 bg-ink forced-colors:bg-[CanvasText]"
               />
             </span>
           ) : (
-            <LockClosedIcon
-              aria-hidden="true"
-              className="size-4.5 stroke-[2.2]"
-            />
+            <LockClosedIcon aria-hidden="true" className="size-4.5" />
           )}
           <span className="max-sm:sr-only">
             {isDraft ? 'Enter published mode' : 'Enter draft mode'}

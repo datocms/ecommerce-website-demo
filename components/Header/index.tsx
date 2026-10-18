@@ -6,7 +6,6 @@ import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import CategoryHeader from './CategoryHeader';
 import { useCookieNoticeOpen } from './CookiesNotice';
-import LanguageSelector from './LanguageSelector';
 import NotificationStrip, {
   type LayoutNotification,
 } from './NotificationStrip';
@@ -51,16 +50,6 @@ const Header = ({ data, globalPageProps }: Props) => {
             dismissed.strip = true;
             setNotificationStrip(false);
           }}
-          localeSwitch={
-            <Suspense>
-              <LanguageSelector
-                languages={data._site.locales}
-                currencySymbol={data.generalInterface?.currencySymbol}
-                // A 32px pill with a 44px hit area
-                className="relative -mx-2 min-h-8 rounded-full px-2 after:absolute after:inset-x-0 after:-inset-y-1.5 hover:bg-ink/10 aria-expanded:bg-ink/10"
-              />
-            </Suspense>
-          }
         />
       )}
       <Suspense>
@@ -68,8 +57,6 @@ const Header = ({ data, globalPageProps }: Props) => {
           globalPageProps={globalPageProps}
           languages={data._site.locales}
           data={data}
-          // Without the strip, the bar carries the language switch until its search field shows
-          showLocale={!notificationStrip}
         />
       </Suspense>
 

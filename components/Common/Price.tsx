@@ -6,7 +6,7 @@ type PriceProps = {
   salePrice?: number | null;
   onSale: boolean;
   currencySymbol: string;
-  /** sm: 17px (cards), md: 20px (spotlights), lg: 24px, 26px from sm (product page) */
+  /** sm: 16px (cards), md: 18px (spotlights), lg: 24px (product page) */
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   srSaleLabel?: string;
@@ -27,12 +27,8 @@ export default function Price({
   return (
     <p
       className={[
-        'flex flex-wrap items-baseline gap-x-2 tabular-nums',
-        {
-          sm: 'text-md',
-          md: 'text-xl',
-          lg: 'text-2xl sm:text-[1.625rem] sm:leading-8',
-        }[size],
+        'flex flex-wrap items-baseline gap-x-2 font-semibold tabular-nums',
+        { sm: 'text-base', md: 'text-lg', lg: 'text-2xl' }[size],
         className,
       ]
         .filter(Boolean)
@@ -40,17 +36,21 @@ export default function Price({
     >
       {showSale ? (
         <>
-          <span className="font-bold text-sale">
+          <span className="text-sale">
             <span className="sr-only">{srSaleLabel}: </span>
             {formatPrice(currencySymbol, salePrice)}
           </span>
-          <s className="font-medium text-muted">
+          {/* Regular weight and smaller: 15px beside a 16px card price, 18px beside the
+              product page's 24px */}
+          <s
+            className={`font-normal text-mute ${size === 'lg' ? 'text-[0.75em]' : 'text-[0.9375em]'}`}
+          >
             <span className="sr-only">{srOriginalLabel}: </span>
             {formatPrice(currencySymbol, price)}
           </s>
         </>
       ) : (
-        <span className="font-bold">{formatPrice(currencySymbol, price)}</span>
+        <span>{formatPrice(currencySymbol, price)}</span>
       )}
     </p>
   );

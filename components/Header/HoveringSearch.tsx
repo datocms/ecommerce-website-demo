@@ -14,9 +14,17 @@ type PropTypes = {
   open: boolean;
   onClose: () => void;
   placeholder: string;
+  /** Height the sheet covers at least: the strip and header above the page */
+  minHeight?: number;
 };
 
-const HoveringSearch = ({ lng, open, onClose, placeholder }: PropTypes) => {
+const HoveringSearch = ({
+  lng,
+  open,
+  onClose,
+  placeholder,
+  minHeight,
+}: PropTypes) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -38,26 +46,30 @@ const HoveringSearch = ({ lng, open, onClose, placeholder }: PropTypes) => {
     >
       <DialogBackdrop
         transition
-        className="fixed inset-0 bg-ink/30 backdrop-blur-xs transition duration-300 ease-out data-closed:opacity-0"
+        className="fixed inset-0 bg-ink/30 transition-opacity duration-300 ease-out data-closed:opacity-0"
       />
-      {/* A cream sheet hanging from the top edge */}
+      {/* A white sheet hanging from the top edge */}
       <DialogPanel
         transition
-        className="fixed inset-x-0 top-0 rounded-b-sheet bg-cream shadow-pop transition duration-400 ease-drawer data-leave:duration-250 data-closed:-translate-y-full"
+        className="fixed inset-x-0 top-0 border-b border-line bg-white transition duration-300 ease-drawer data-leave:duration-200 data-closed:-translate-y-full"
       >
-        <div className="shell flex min-h-[calc(var(--header-h)+3.75rem)] items-center gap-2 py-6 sm:gap-3 sm:py-10">
-          <search className="flex min-w-0 flex-1">
+        <div
+          className="shell flex items-center gap-2 py-6 sm:gap-4 sm:py-8 lg:py-10"
+          style={{ minHeight }}
+        >
+          <search className="min-w-0 flex-1">
+            {/* The 2px rule is the field: ink while it has focus */}
             <form
               onSubmit={handleSubmit}
-              className="flex h-16 min-w-0 flex-1 items-center gap-2.5 rounded-full bg-white pr-2 pl-5 ring-1 ring-border-strong transition-shadow duration-150 has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-ink sm:h-18 sm:gap-3 sm:pl-7"
+              className="flex items-center gap-3 border-b-2 border-line-strong pb-2 transition-colors duration-150 has-[input:focus]:border-ink lg:gap-4"
             >
+              <MagnifyingGlassIcon
+                aria-hidden="true"
+                className="hidden size-6 shrink-0 text-mute sm:block"
+              />
               <label htmlFor="site-search" className="sr-only">
                 {placeholder}
               </label>
-              <MagnifyingGlassIcon
-                aria-hidden="true"
-                className="size-5 shrink-0 stroke-[2.2] text-muted"
-              />
               <input
                 id="site-search"
                 name="productName"
@@ -67,14 +79,16 @@ const HoveringSearch = ({ lng, open, onClose, placeholder }: PropTypes) => {
                 data-autofocus
                 defaultValue={searchParams.get('productName') ?? ''}
                 placeholder={placeholder}
-                className="h-full min-w-0 flex-1 bg-transparent text-[1.1875rem] font-medium text-ink outline-none placeholder:text-muted sm:text-[1.375rem] [&::-webkit-search-cancel-button]:appearance-none"
+                // 17px under 360px, so every locale's placeholder still fits whole beside the
+                // two buttons at 320
+                className="h-12 min-w-0 flex-1 bg-transparent text-xl font-medium tracking-[-0.02em] text-ink outline-none placeholder:text-mute max-[22.5rem]:text-md sm:h-16 sm:text-2xl lg:text-[2rem] [&::-webkit-search-cancel-button]:appearance-none"
               />
               <button
                 type="submit"
                 aria-label="Search"
-                className="icon-btn bg-ink text-cream sm:size-14 [&>svg]:stroke-[2.4]"
+                className="btn btn-sm size-11 shrink-0 px-0 lg:size-13 lg:min-h-13 lg:[&>svg]:size-4.5"
               >
-                <ArrowRightIcon aria-hidden="true" />
+                <ArrowRightIcon aria-hidden="true" className="stroke-2" />
               </button>
             </form>
           </search>
@@ -82,7 +96,8 @@ const HoveringSearch = ({ lng, open, onClose, placeholder }: PropTypes) => {
             type="button"
             onClick={onClose}
             aria-label="Close search"
-            className="icon-btn size-12 bg-white sm:size-14 [&>svg]:stroke-[2.4]"
+            // mb: centred on the field rather than on the field plus its rule
+            className="icon-btn mb-2.5 lg:size-13 [&>svg]:size-6"
           >
             <XMarkIcon aria-hidden="true" />
           </button>

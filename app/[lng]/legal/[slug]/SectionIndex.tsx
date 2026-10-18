@@ -6,7 +6,7 @@ export type Section = { id: string; title: string };
 
 // The index follows the reader: the current section is the last one whose heading has passed a
 // line a quarter of the way down the screen, the one an index link just parked under the header,
-// or the last one in view once the page can't scroll any further. It only shows from xl
+// or the last one in view once the page can't scroll any further. It only shows from lg
 const SectionIndex = ({
   label,
   sections,
@@ -18,7 +18,7 @@ const SectionIndex = ({
   const ids = sections.map((section) => section.id).join(' ');
 
   useEffect(() => {
-    const wide = window.matchMedia('(min-width: 80rem)');
+    const wide = window.matchMedia('(min-width: 64rem)');
     const headings = ids.split(' ').map((id) => document.getElementById(id));
     let frame = 0;
     const update = () => {
@@ -61,15 +61,20 @@ const SectionIndex = ({
     };
   }, [ids]);
 
+  // Each row draws its stretch of the rail, so the current section's 2px bar can sit on it
+  // without leaving the scroll box (which would clip it)
   return (
-    <nav aria-label={label} className="hidden xl:col-span-3 xl:block">
-      <ol className="no-scrollbar sticky top-[calc(var(--header-h)+1rem)] grid max-h-[calc(100svh-var(--header-h)-2rem)] gap-0.5 overflow-y-auto rounded-card bg-white p-3">
+    <nav
+      aria-label={label}
+      className="hidden lg:col-span-4 lg:block lg:pr-8 xl:col-span-3 xl:pr-0"
+    >
+      <ol className="no-scrollbar sticky top-[calc(var(--header-h)+2rem)] max-h-[calc(100svh-var(--header-h)-4rem)] overflow-y-auto">
         {sections.map((section, index) => (
-          <li key={section.id}>
+          <li key={section.id} className="border-l">
             <a
               href={`#${section.id}`}
               aria-current={index === active ? 'true' : undefined}
-              className="flex min-h-11 items-center rounded-md px-3 py-2 text-sm font-semibold text-muted transition-colors duration-150 hover:bg-cream hover:text-ink aria-[current=true]:bg-cream aria-[current=true]:text-ink"
+              className="-ml-px flex min-h-11 items-center border-l-2 border-transparent py-2 pl-5 text-sm leading-snug text-mute transition-colors duration-150 hover:text-ink focus-visible:outline-offset-[-2px] aria-[current=true]:border-ink aria-[current=true]:font-semibold aria-[current=true]:text-ink"
             >
               {section.title}
             </a>

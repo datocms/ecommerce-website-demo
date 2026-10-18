@@ -15,6 +15,7 @@ import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
 import Price from '@/components/Common/Price';
 import StarRating from '@/components/Common/StarRating';
 import { ProductGeneralInterfaceFragment } from '@/components/Products/Product/GeneralInferface/fragments';
+import { PDP_RAIL } from '@/components/Products/Product/ui';
 import { readFragment } from '@/lib/datocms/graphql';
 import { contrast, hexToRgb, WHITE } from '@/utils/color';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
@@ -122,58 +123,62 @@ const ProductView = ({ data, globalPageProps }: Props) => {
     setCurrentSlide(Math.min(Math.max(slide, 0), images.length - 1));
   };
 
-  // Phones swipe one photo at a time, tablets two. From lg the photos stack beside the buy box,
-  // and from xl three or more pair up (an odd first one spans the row)
+  // Phones swipe one photo at a time and tablets two, edge to edge. From lg they stack beside the
+  // buy box; three or more keep the lead photo full width and pair the rest (a last odd one spans
+  // the row too), so a long gallery doesn't turn into a column of huge photos
   const paired = images.length >= 3;
-  const oddImageCount = images.length % 2 === 1;
+  const spansRow = (index: number) =>
+    !paired ||
+    index === 0 ||
+    (index === images.length - 1 && images.length % 2 === 0);
 
   return (
-    <div className="shell grid gap-3 pt-1 sm:gap-4 lg:grid-cols-12 lg:gap-5">
-      <div className="relative min-w-0 lg:col-span-7">
+    <div className="shell grid lg:grid-cols-12 lg:gap-4 lg:pt-8">
+      <div className="relative -mx-(--gutter) min-w-0 lg:col-span-6 lg:mx-0">
         <section
           ref={galleryRef}
           aria-label={product.name}
           tabIndex={galleryScrolls ? 0 : undefined}
           onScroll={handleGalleryScroll}
-          className={`no-scrollbar peer flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-nav focus-visible:outline-hidden lg:grid lg:snap-none lg:gap-4 lg:overflow-visible ${paired ? 'xl:grid-cols-2' : ''}`}
+          className={`no-scrollbar peer flex snap-x snap-mandatory gap-1 overflow-x-auto focus-visible:outline-hidden lg:grid lg:snap-none lg:gap-4 lg:overflow-visible ${paired ? 'lg:grid-cols-2' : ''}`}
         >
-          {images.map((image, index) => {
-            const spansRow = paired && oddImageCount && index === 0;
-            return (
-              <div
-                key={image.id}
-                className={`relative aspect-[4/5] w-full shrink-0 snap-start overflow-hidden rounded-nav bg-oat sm:w-[calc((100%-0.75rem)/2)] lg:w-auto ${spansRow ? 'xl:col-span-2' : ''}`}
-              >
-                {image.responsiveImage && (
-                  <DatoImage
-                    fragment={image.responsiveImage}
-                    layout="fill"
-                    objectFit="cover"
-                    sizes={
-                      paired && !spansRow
-                        ? '(min-width: 1440px) 390px, (min-width: 1280px) 28vw, (min-width: 1024px) 55vw, (min-width: 640px) 50vw, 100vw'
-                        : '(min-width: 1440px) 790px, (min-width: 1024px) 55vw, (min-width: 640px) 50vw, 100vw'
-                    }
-                    priority={index === 0}
-                  />
-                )}
-                {index === 0 && isOnSale && sale && (
-                  <span className="badge absolute top-4 left-4 z-10 bg-sale text-white">
-                    {sale}
-                  </span>
-                )}
-              </div>
-            );
-          })}
+          {images.map((image, index) => (
+            <div
+              key={image.id}
+              className={`relative aspect-[4/5] w-full shrink-0 snap-start overflow-hidden bg-mist lg:w-auto ${images.length > 1 ? 'sm:w-[calc(50%-0.125rem)]' : ''} ${paired && spansRow(index) ? 'lg:col-span-2' : ''}`}
+            >
+              {image.responsiveImage && (
+                <DatoImage
+                  fragment={image.responsiveImage}
+                  layout="fill"
+                  objectFit="cover"
+                  sizes={
+                    spansRow(index)
+                      ? '(min-width: 1440px) 672px, (min-width: 1024px) 47vw, (min-width: 640px) 50vw, 100vw'
+                      : '(min-width: 1440px) 328px, (min-width: 1024px) 23vw, (min-width: 640px) 50vw, 100vw'
+                  }
+                  priority={index === 0}
+                />
+              )}
+              {/* While the photo bleeds, the tag sits on the text's gutter */}
+              {index === 0 && isOnSale && sale && (
+                <span className="tag-dark absolute top-(--gutter) left-(--gutter) z-10 lg:top-4 lg:left-4">
+                  {sale}
+                </span>
+              )}
+            </div>
+          ))}
         </section>
+        {/* The scroller runs edge to edge on phones, so its focus ring is drawn inside it: ink
+            with a white line inside, visible on light and dark photo edges alike */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10 hidden rounded-nav outline-2 outline-offset-2 outline-ink peer-focus-visible:block"
+          className="pointer-events-none absolute inset-0 z-10 hidden border-4 border-white outline-2 -outline-offset-2 outline-ink peer-focus-visible:block"
         />
         {images.length > 1 && (
           <span
             aria-hidden="true"
-            className="badge absolute right-4 bottom-4 z-10 sm:hidden"
+            className="tag absolute right-(--gutter) bottom-(--gutter) z-10 sm:hidden"
           >
             {currentSlide + 1} / {images.length}
           </span>
@@ -181,7 +186,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
         {images.length > 2 && (
           <span
             aria-hidden="true"
-            className="badge absolute right-4 bottom-4 z-10 hidden sm:inline-flex lg:hidden"
+            className="tag absolute right-(--gutter) bottom-(--gutter) z-10 hidden sm:inline-flex lg:hidden"
           >
             {currentSlide + 1}–{Math.min(currentSlide + 2, images.length)} /{' '}
             {images.length}
@@ -189,7 +194,6 @@ const ProductView = ({ data, globalPageProps }: Props) => {
         )}
       </div>
 
-      {/* Tablets: product and shipping on the left, options on the right */}
       <div
         ref={buyBoxRef}
         style={
@@ -197,134 +201,139 @@ const ProductView = ({ data, globalPageProps }: Props) => {
             ? ({ '--buy-box-h': `${buyBoxHeight}px` } as CSSProperties)
             : undefined
         }
-        className="rounded-card bg-white p-(--card-pad) md:grid md:grid-cols-2 md:grid-rows-[auto_1fr] md:gap-x-10 lg:sticky lg:top-[min(calc(var(--header-h)_+_1rem),calc(100vh_-_var(--buy-box-h,0px)_-_1rem))] lg:col-span-5 lg:block lg:self-start"
+        className={`pt-7 md:pt-8 lg:sticky lg:top-[min(calc(var(--header-h)_+_2rem),calc(100vh_-_var(--buy-box-h,0px)_-_2rem))] lg:self-start lg:pt-0 ${PDP_RAIL}`}
       >
-        <div>
-          <Link
-            href={`/${globalPageProps.params.lng}/products?brands=${product.brand.id}`}
-            className="eyebrow inline-flex min-h-6 items-center underline-offset-4 hover:underline"
-          >
-            {product.brand?.name}
-          </Link>
-          <h1 className="title-lg mt-3">{product.name}</h1>
+        {/* Both links reach 44px through ::after, so their focus rings hug the text */}
+        <Link
+          href={`/${globalPageProps.params.lng}/products?brands=${product.brand.id}`}
+          className="eyebrow relative block w-fit underline-offset-4 after:absolute after:-inset-y-2.5 after:inset-x-0 hover:underline"
+        >
+          {product.brand?.name}
+        </Link>
+        {/* 44px between lg and xl, where the buy box is narrowest; pretty keeps compound names
+            whole where balance would split them at their hyphen */}
+        <h1 className="title-section mt-3 text-pretty lg:max-xl:text-[2.75rem]">
+          {product.name}
+        </h1>
+        <a
+          href="#reviews"
+          className="group relative mt-4 flex min-h-6 w-fit items-center gap-2.5 text-sm after:absolute after:-inset-y-2.5 after:inset-x-0"
+        >
+          <StarRating value={product.reviewAverage} size={16} />
+          <span className="text-ink-2 underline decoration-line underline-offset-4 transition-colors group-hover:text-ink group-hover:decoration-ink">
+            <span className="tabular-nums">{product.numberOfReviews}</span>{' '}
+            {reviews}
+          </span>
+        </a>
 
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-            <div>
-              <Price
-                price={product.price}
-                salePrice={product.salePrice}
-                onSale={isOnSale}
-                currencySymbol={currencySymbol ?? ''}
-                size="lg"
-              />
-              {priceUndertext && (
-                <p className="mt-0.5 text-sm text-muted">{priceUndertext}</p>
-              )}
-            </div>
-            <a
-              href="#reviews"
-              className="inline-flex min-h-11 items-center gap-2.5 rounded-full bg-cream pr-4 pl-3.5 text-sm font-semibold transition-colors hover:bg-oat"
+        <div className="mt-6">
+          <Price
+            price={product.price}
+            salePrice={product.salePrice}
+            onSale={isOnSale}
+            currencySymbol={currencySymbol ?? ''}
+            size="lg"
+          />
+          {priceUndertext && (
+            <p className="mt-1 text-sm text-mute">{priceUndertext}</p>
+          )}
+        </div>
+
+        {/* Tablets: colour and size side by side, then the two actions side by side */}
+        <div className="mt-8 border-t border-line pt-6 md:grid md:grid-cols-2 md:gap-x-10 lg:block">
+          <div>
+            <p id="pdp-color-label" className="text-sm font-semibold">
+              {color}
+            </p>
+            <fieldset
+              aria-labelledby="pdp-color-label"
+              className="mt-3 flex min-w-0 flex-wrap gap-2"
             >
-              <StarRating value={product.reviewAverage} size={16} />
-              <span className="tabular-nums">
-                {product.numberOfReviews} {reviews}
+              {variations.map((variation) => {
+                const hex = stripStega(variation.color.hex);
+                const rgb = hexToRgb(hex);
+                const light = rgb ? contrast(rgb, WHITE) < 3 : false;
+                const selected = variation.id === selectedVariation?.id;
+                return (
+                  // Selected: a 2px ink frame and a tick, so it reads apart from the outer focus ring
+                  <button
+                    key={variation.id}
+                    type="button"
+                    aria-label={`${color ?? 'Color'}: ${hex}`}
+                    aria-pressed={selected}
+                    onClick={() => selectVariation(variation)}
+                    className="grid size-12 place-items-center border border-line transition-colors hover:border-ink aria-pressed:border-2 aria-pressed:border-ink"
+                  >
+                    <span
+                      style={{ backgroundColor: hex }}
+                      className={`grid size-9 place-items-center forced-color-adjust-none ${light ? 'border border-line-strong text-ink' : 'text-white'}`}
+                    >
+                      {selected && (
+                        <CheckIcon
+                          aria-hidden="true"
+                          className="size-[1.125rem] stroke-[2.25]"
+                        />
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </fieldset>
+          </div>
+
+          <div className="mt-6 md:mt-0 lg:mt-6">
+            <p id="pdp-size-label" className="text-sm font-semibold">
+              {size}{' '}
+              <span className="ml-1 font-medium text-mute tabular-nums">
+                {selectedSize?.toUpperCase()}
               </span>
-            </a>
+            </p>
+            <fieldset
+              aria-labelledby="pdp-size-label"
+              className="mt-3 grid min-w-0 grid-cols-5 gap-2"
+            >
+              {allSizes.map((sizeOption) => {
+                const available = availableSizes.includes(sizeOption);
+                return (
+                  <button
+                    key={sizeOption}
+                    type="button"
+                    disabled={!available}
+                    aria-pressed={
+                      available ? selectedSize === sizeOption : undefined
+                    }
+                    onClick={() => setSelectedSize(sizeOption)}
+                    className="chip h-12 px-0 text-base font-semibold tabular-nums"
+                  >
+                    {sizeOption.toUpperCase()}
+                  </button>
+                );
+              })}
+            </fieldset>
           </div>
         </div>
 
-        <div className="mt-6 border-t border-line pt-6 md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:border-t-0 md:pt-1 lg:mt-6 lg:border-t lg:pt-6">
-          <p id="pdp-color-label" className="text-sm font-bold">
-            {color}
-          </p>
-          <fieldset
-            aria-labelledby="pdp-color-label"
-            className="mt-2 -ml-1.5 flex min-w-0 flex-wrap gap-1"
-          >
-            {variations.map((variation) => {
-              const hex = stripStega(variation.color.hex);
-              const rgb = hexToRgb(hex);
-              const light = rgb ? contrast(rgb, WHITE) < 3 : false;
-              const selected = variation.id === selectedVariation?.id;
-              return (
-                // Selected: an inner ink ring and a tick, so it reads apart from the outer focus ring
-                <button
-                  key={variation.id}
-                  type="button"
-                  aria-label={`${color ?? 'Color'}: ${hex}`}
-                  aria-pressed={selected}
-                  onClick={() => selectVariation(variation)}
-                  className="grid size-12 place-items-center rounded-full ring-ink/30 transition-shadow ring-inset hover:ring-2 aria-pressed:ring-2 aria-pressed:ring-ink"
-                >
-                  <span
-                    style={{ backgroundColor: hex }}
-                    className={`grid size-9 place-items-center rounded-full ring-1 ring-inset ${light ? 'text-ink ring-border-strong' : 'text-white ring-ink/15'} forced-color-adjust-none`}
-                  >
-                    {selected && (
-                      <CheckIcon
-                        aria-hidden="true"
-                        className="size-[1.125rem] stroke-[2.4]"
-                      />
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </fieldset>
-
-          <p id="pdp-size-label" className="mt-5 text-sm font-bold">
-            {size}{' '}
-            <span className="ml-1 font-semibold text-muted tabular-nums">
-              {selectedSize?.toUpperCase()}
-            </span>
-          </p>
-          <fieldset
-            aria-labelledby="pdp-size-label"
-            className="mt-3 grid min-w-0 grid-cols-5 gap-2"
-          >
-            {allSizes.map((sizeOption) => {
-              const available = availableSizes.includes(sizeOption);
-              return (
-                <button
-                  key={sizeOption}
-                  type="button"
-                  disabled={!available}
-                  aria-pressed={
-                    available ? selectedSize === sizeOption : undefined
-                  }
-                  onClick={() => setSelectedSize(sizeOption)}
-                  className="chip h-12 px-0 text-base font-bold tabular-nums"
-                >
-                  {sizeOption.toUpperCase()}
-                </button>
-              );
-            })}
-          </fieldset>
-
-          <div className="mt-6 grid gap-2">
-            <div className="flex gap-2">
-              <button type="button" className="btn-primary flex-1">
-                {primaryButton}
-              </button>
-              <button
-                type="button"
-                aria-label="Add to wishlist"
-                className="icon-btn size-13 bg-white ring-1 ring-line ring-inset"
-              >
-                <HeartIcon aria-hidden="true" />
-              </button>
-            </div>
-            <button type="button" className="btn-secondary w-full">
-              {secondaryButton}
+        <div className="mt-8 grid gap-2 md:grid-cols-2 lg:grid-cols-1">
+          <div className="flex gap-2">
+            <button type="button" className="btn flex-1">
+              {primaryButton}
+            </button>
+            <button
+              type="button"
+              aria-label="Add to wishlist"
+              className="icon-btn size-13 border border-line-strong transition-colors hover:border-ink"
+            >
+              <HeartIcon aria-hidden="true" />
             </button>
           </div>
+          <button type="button" className="btn-line w-full">
+            {secondaryButton}
+          </button>
         </div>
 
         {shippingText && (
-          <p className="mt-5 flex items-center gap-3 rounded-nav bg-cream p-3 text-sm font-semibold md:col-start-1 md:row-start-2 md:self-end">
-            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white">
-              <TruckIcon aria-hidden="true" className="size-[1.125rem]" />
-            </span>
+          <p className="mt-6 flex items-center gap-3 border-t border-line pt-5 text-sm font-medium">
+            <TruckIcon aria-hidden="true" className="size-5 shrink-0" />
             {shippingText}
           </p>
         )}

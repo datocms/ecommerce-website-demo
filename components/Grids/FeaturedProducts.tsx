@@ -17,20 +17,23 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
   const relatedProducts = data.product?.relatedProducts ?? [];
   if (relatedProducts.length === 0) return null;
 
-  // Below md a flex snap rail that bleeds off the right edge; each card sits in its own 4-row grid,
-  // so a short name leaves no gap. From md the wrappers drop out and the cards share the grid's rows
+  // Below md a snap rail that runs edge to edge; each card sits in its own 4-row grid, so a short
+  // name leaves no gap. The rail's 8px of block padding (taken back with -my-2) leaves room for the
+  // cards' focus ring, which the scroller would otherwise clip. From md the wrappers drop out and
+  // the cards share the grid's rows (names, brands and prices line up), aligned to the shell's
+  // content edges
   const fourUp = relatedProducts.length >= 4;
 
   return (
     <section className="pt-(--section-gap)">
       <div
-        className={`rail no-scrollbar flex snap-x snap-mandatory gap-x-3 overflow-x-auto py-1 sm:gap-x-4 md:-mb-4 md:grid md:snap-none md:grid-cols-3 md:overflow-visible md:py-0 md:[--card-row-gap:1rem] ${fourUp ? 'xl:grid-cols-4' : ''}`}
+        className={`rail no-scrollbar -my-2 flex snap-x snap-mandatory gap-x-3 overflow-x-auto py-2 md:-mb-(--card-row-gap) md:mt-0 md:grid md:snap-none md:grid-cols-3 md:gap-x-4 md:overflow-visible md:py-0 md:[--card-row-gap:2rem] lg:[--card-row-gap:2.5rem] ${fourUp ? 'xl:grid-cols-4' : ''}`}
       >
         {relatedProducts.map((product) => {
           return (
             <div
               key={product.id}
-              className="grid w-[72vw] max-w-[18.75rem] shrink-0 snap-start grid-rows-[auto_auto_auto_1fr] sm:w-[18.75rem] md:contents"
+              className="grid w-[72vw] shrink-0 snap-start grid-rows-[auto_auto_1fr_auto] sm:w-[40vw] md:contents"
             >
               <ProductCard
                 href={`/${globalPageProps.params.lng}/product/${stripStega(product.slug)}`}
@@ -43,7 +46,7 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
                 onSale={stripStega(product.sale || '') === 'on_sale'}
                 currencySymbol={currencySymbol ?? ''}
                 saleLabel={sale}
-                sizes={`(min-width: 1440px) ${fourUp ? '340px' : '450px'}, (min-width: 1280px) ${fourUp ? '24vw' : '32vw'}, (min-width: 768px) 32vw, min(72vw, 300px)`}
+                sizes={`(min-width: 1440px) ${fourUp ? '330px' : '445px'}, (min-width: 1280px) ${fourUp ? '24vw' : '32vw'}, (min-width: 768px) 32vw, (min-width: 640px) 40vw, 72vw`}
                 titleAs="p"
                 data-datocms-content-link-group
               />

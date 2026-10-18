@@ -21,8 +21,11 @@ type ProductCardProps = {
   sizes: string;
   priority?: boolean;
   titleAs?: 'h2' | 'h3' | 'p';
+  /** md: 16px name (grids, rails); lg: 18px name, 20px from lg, and 18px price (spotlights) */
+  size?: 'md' | 'lg';
 } & Omit<ComponentPropsWithoutRef<typeof Link>, 'href' | 'children'>;
 
+// No box: a 4:5 photo on mist, then name, brand and price on the page itself
 export default function ProductCard({
   href,
   name,
@@ -37,6 +40,7 @@ export default function ProductCard({
   sizes,
   priority = false,
   titleAs: Title = 'h3',
+  size = 'md',
   className,
   ...rest
 }: ProductCardProps) {
@@ -45,20 +49,21 @@ export default function ProductCard({
       {...rest}
       href={href}
       className={[
-        // In a grid parent the card spans 4 shared rows, so brand, name and price
+        // In a grid parent the card spans 4 shared rows, so name, brand and price
         // line up across a row even when a name wraps. A parent row-gap would leak
         // into those rows, so grids space card rows with --card-row-gap instead.
-        // Outside a grid (a flex rail) wrap each card in a grid-rows-[auto_auto_auto_1fr]
-        // element: with no parent grid, Chrome collapses the subgrid rows.
-        'group relative row-span-4 mb-(--card-row-gap) grid grid-rows-subgrid content-start gap-y-0 rounded-card bg-white p-1.5 focus-visible:z-10 sm:p-2',
+        // Outside a grid (a flex rail) wrap each card in a grid-rows-[auto_auto_1fr_auto]
+        // element: with no parent grid, Chrome collapses the subgrid rows. The brand row
+        // takes the slack there, so prices line up across the rail.
+        'group relative row-span-4 mb-(--card-row-gap) grid grid-rows-subgrid content-start gap-y-0 outline-offset-4 focus-visible:z-10',
         className,
       ]
         .filter(Boolean)
         .join(' ')}
     >
-      <div className="relative aspect-[4/5] overflow-hidden rounded-image bg-oat">
+      <div className="relative aspect-[4/5] overflow-hidden bg-mist">
         <div
-          className={`absolute inset-0 ${hoverImage ? '' : 'transition-transform duration-500 ease-out group-hover:scale-[1.03]'}`}
+          className={`absolute inset-0 ${hoverImage ? '' : 'transition-transform duration-700 ease-out group-hover:scale-[1.03]'}`}
         >
           {image && (
             <DatoImage
@@ -73,7 +78,7 @@ export default function ProductCard({
         {hoverImage && (
           <div
             aria-hidden="true"
-            className="absolute inset-0 hidden opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 [@media(hover:hover)]:block"
+            className="absolute inset-0 hidden opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100 [@media(hover:hover)]:block"
           >
             <DatoImage
               fragment={hoverImage}
@@ -84,27 +89,30 @@ export default function ProductCard({
           </div>
         )}
         {onSale && saleLabel && (
-          <span className="badge absolute top-2.5 left-2.5 z-10 bg-sale text-white sm:top-3 sm:left-3">
+          <span className="tag-dark absolute top-3 left-3 z-10">
             {saleLabel}
           </span>
         )}
       </div>
-      {brand ? (
-        <p className="px-2 pt-3.5 text-xs font-semibold text-muted sm:px-2.5 sm:pt-4">
-          {brand}
-        </p>
-      ) : (
-        <span aria-hidden="true" className="pt-3.5 sm:pt-4" />
-      )}
-      <Title className="line-clamp-2 px-2 pt-1 text-md font-semibold text-ink sm:px-2.5">
+      {/* Greedy wrap: the base h1-h3 balance (and pretty) move the break to the hyphen of a
+          compound such as Funnel-Neck. Three lines leave room for long localized names. */}
+      <Title
+        className={`line-clamp-3 pt-4 leading-snug font-semibold text-wrap text-ink ${size === 'lg' ? 'text-lg tracking-[-0.02em] lg:text-xl' : 'text-base'}`}
+      >
         {name}
       </Title>
+      {brand ? (
+        <p className="pt-1 text-sm text-mute">{brand}</p>
+      ) : (
+        <span aria-hidden="true" />
+      )}
       <Price
         price={price}
         salePrice={salePrice}
         onSale={onSale}
         currencySymbol={currencySymbol}
-        className="px-2 pt-2.5 pb-2.5 text-ink sm:px-2.5"
+        size={size === 'lg' ? 'md' : 'sm'}
+        className="pt-2.5 text-ink"
       />
     </Link>
   );

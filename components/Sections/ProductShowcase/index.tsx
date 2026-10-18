@@ -1,209 +1,213 @@
 import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import SectionTitle from '@/components/Common/SectionTitle';
 import DatoImage from '@/components/DatoImage';
-import {
-  type FragmentOf,
-  type ResultOf,
-  readFragment,
-} from '@/lib/datocms/graphql';
+import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import { seasonTint } from '../season';
+import RailControls from '../RailControls';
+import RailFocus from '../RailFocus';
+import { IMG_ZOOM, MEDIA } from '../ui';
 import { CollectionCardShowcaseFragment } from './fragments';
 
 type Props = {
-  fragment: FragmentOf<typeof CollectionCardShowcaseFragment>;
+  /** Consecutive collection showcases (the seasons), shown side by side */
+  sections: FragmentOf<typeof CollectionCardShowcaseFragment>[];
   globalPageProps: ResolvedGlobalPageProps;
-  /** Season bands alternate between a white card and the bare page */
-  filled?: boolean;
+  /** Base of the heading id; the group is a labelled section only when it has a title */
+  id: string;
+  /** Navigation column label that groups these collections ("Seasons") */
+  title?: string | null;
+  /** Navigation link to the whole catalog ("All products") */
+  action?: { label: string; href: string };
 };
 
-type Collection = ResultOf<
-  typeof CollectionCardShowcaseFragment
->['collection'][number];
+// Up to four columns side by side from lg; more wrap onto another row
+const COLUMNS = [
+  '',
+  'lg:grid-cols-1',
+  'lg:grid-cols-2',
+  'lg:grid-cols-3',
+  'lg:grid-cols-4',
+];
 
-// Grid slots in the sm+ mosaic (3 columns, 2 rows): the lead photo takes two columns on the
-// outer edge of the band, the other two stack beside it, next to the copy.
-const SLOTS = {
-  left: {
-    lead: 'sm:col-span-2 sm:col-start-2 sm:row-span-2 sm:row-start-1',
-    side: ['sm:col-start-1 sm:row-start-1', 'sm:col-start-1 sm:row-start-2'],
-  },
-  right: {
-    lead: 'sm:col-span-2 sm:col-start-1 sm:row-span-2 sm:row-start-1',
-    side: ['sm:col-start-3 sm:row-start-1', 'sm:col-start-3 sm:row-start-2'],
-  },
-};
+// Below lg a snap rail that runs gutter to gutter, from lg a grid. Either way every column spans
+// the same four rows (photo, title and copy, link, other collections), so the copy, links and
+// small photos line up across the seasons whatever the text lengths. py-2 (taken back by -my-2)
+// leaves room for the links' focus rings, 4px out, inside the rail. Snapping pauses while
+// keyboard focus is inside, so tabbing moves the rail only as far as RailControls (or RailFocus)
+// scrolls to show the focused season whole.
+const GRID =
+  'no-scrollbar -mx-(--gutter) -my-2 grid auto-cols-[80%] grid-flow-col grid-rows-[repeat(4,auto)] gap-x-4 overflow-x-auto scroll-px-(--gutter) px-(--gutter) py-2 snap-x snap-mandatory has-focus-visible:snap-none sm:auto-cols-[44%] lg:mx-0 lg:my-0 lg:auto-cols-auto lg:grid-flow-row lg:gap-x-8 lg:overflow-visible lg:px-0 lg:py-0 xl:gap-x-10';
 
-function MosaicTile({
-  item,
+function Season({
+  fragment,
   lng,
-  lead,
   className,
-  sizes,
 }: {
-  item: Collection;
+  fragment: FragmentOf<typeof CollectionCardShowcaseFragment>;
   lng: string;
-  lead?: boolean;
   className: string;
-  sizes: string;
 }) {
-  return (
-    <Link
-      href={`/${lng}/products?collections=${item.id}`}
-      className={`group @container relative block overflow-hidden rounded-nav bg-oat ${className}`}
-      data-datocms-content-link-group
-    >
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-      >
-        {item.details.image.responsiveImage && (
-          <DatoImage
-            fragment={item.details.image.responsiveImage}
-            layout="fill"
-            objectFit="cover"
-            objectPosition="50% 30%"
-            sizes={sizes}
-          />
-        )}
-      </div>
-      {lead ? (
-        <span className="absolute bottom-4 left-4 inline-flex max-w-[calc(100%-2rem)] items-center gap-3 rounded-full bg-white py-2 pr-2 pl-5 text-md font-bold shadow-card">
-          <span className="truncate">{item.name}</span>
-          <span
-            aria-hidden="true"
-            className="grid size-9 shrink-0 place-items-center rounded-full bg-ink text-cream"
-          >
-            <ArrowRightIcon className="size-4 stroke-[2.4]" />
-          </span>
-        </span>
-      ) : (
-        // Narrow tiles get a compact tag without the disc, so one long word still fits (on the
-        // smallest phones it hyphenates); a name that wraps keeps soft corners
-        <span className="absolute bottom-3 left-3 inline-flex max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-md bg-white px-3 py-1.5 text-xs leading-tight font-semibold shadow-card @min-[12rem]:rounded-card @min-[12rem]:pr-1.5 @min-[12rem]:pl-3.5 @min-[12rem]:text-sm">
-          <span className="min-w-0 wrap-break-word hyphens-auto">
-            {item.name}
-          </span>
-          <span
-            aria-hidden="true"
-            className="hidden size-8 shrink-0 place-items-center rounded-full bg-ink text-cream @min-[12rem]:grid"
-          >
-            <ArrowRightIcon className="size-[0.9375rem] stroke-[2.4]" />
-          </span>
-        </span>
-      )}
-    </Link>
+  const { id, pretitle, title, description, button, collection } = readFragment(
+    CollectionCardShowcaseFragment,
+    fragment,
   );
-}
-
-const ProductShowcase = ({ fragment, globalPageProps, filled }: Props) => {
-  const { id, direction, pretitle, title, description, button, collection } =
-    readFragment(CollectionCardShowcaseFragment, fragment);
-  const { lng } = globalPageProps.params;
-
-  /**
-   * DatoCMS Content Link can add invisible editing markers to draft text.
-   * Keep those markers when rendering content, but strip them before exact
-   * string logic, URL building, metadata, IDs, or third-party payloads.
-   */
-  const textLeft = stripStega(direction || '') === 'left';
-  const slots = SLOTS[textLeft ? 'left' : 'right'];
   const [lead, ...rest] = collection;
-  const side = rest.slice(0, 2);
-  // Collections past the third continue under the mosaic as a row of small tiles
-  const extra = rest.slice(2);
-  const tint = seasonTint(lead?.slug);
   const cta = button[0];
   const titleId = `${id}-title`;
 
   return (
-    <section
+    <article
       aria-labelledby={titleId}
-      className={`@container grid grid-cols-1 gap-8 rounded-card p-(--card-pad) sm:gap-10 xl:items-center xl:gap-12 ${lead ? (textLeft ? 'xl:grid-cols-[minmax(min-content,4fr)_minmax(0,8fr)]' : 'xl:grid-cols-[minmax(0,8fr)_minmax(min-content,4fr)]') : ''}${filled ? ' bg-white' : ''}`}
+      className={`row-span-4 grid snap-start grid-rows-subgrid ${className}`}
     >
-      {/* From md to xl the title and the copy sit side by side above the mosaic. The title column
-          is never narrower than the longest word, so a long season name never breaks mid-word. On
-          small phones the title scales with the card so a nine-letter word (Printemps) still fits. */}
-      <div
-        className={`md:grid md:grid-cols-[minmax(min-content,1fr)_minmax(0,1fr)] md:items-end md:gap-10 xl:block ${textLeft ? '' : 'xl:order-2'}`}
-      >
-        <div>
-          {pretitle && (
-            <p
-              className={`pretitle ${tint ?? (filled ? 'bg-cream' : 'bg-white')}`}
-            >
-              {!tint && (
-                <span
-                  aria-hidden="true"
-                  className="size-2.5 shrink-0 rounded-full bg-butter"
-                />
-              )}
-              {pretitle}
-            </p>
+      {lead ? (
+        <Link
+          href={`/${lng}/products?collections=${lead.id}`}
+          className={`group block ${MEDIA} aspect-[4/5] outline-offset-4`}
+          data-datocms-content-link-group
+        >
+          {lead.details.image.responsiveImage && (
+            <DatoImage
+              fragment={lead.details.image.responsiveImage}
+              className={IMG_ZOOM}
+              layout="fill"
+              objectFit="cover"
+              objectPosition="50% 30%"
+              sizes="(min-width: 1440px) 310px, (min-width: 1024px) 22vw, (min-width: 640px) 44vw, 80vw"
+            />
           )}
-          <h2
-            id={titleId}
-            className={`season-title wrap-break-word max-sm:text-[min(3.75rem,21cqw)] ${pretitle ? 'mt-5' : ''}`}
-          >
-            {title}
-          </h2>
-        </div>
-        {(description || cta) && (
-          <div className="mt-5 md:mt-0 xl:mt-6">
-            {description && (
-              <p className="max-w-[24em] text-lg text-pretty text-ink/80 xl:text-[1.1875rem] xl:leading-[1.5]">
-                {description}
-              </p>
-            )}
-            {cta && (
-              <Link
-                href={`/${lng}/${stripStega(cta.slug ?? '')}`}
-                className={`btn-primary ${description ? 'mt-6' : ''}`}
+          {/* The pretitle belongs to this showcase block, not to the lead collection the link
+              group edits, so it stays its own click-to-edit target. A long one wraps into
+              balanced lines whose white boxes hug the text and join into one label: 28px boxes
+              24px apart, the wrapper 2px lower so a single line sits 12px in like every tag. */}
+          {pretitle && (
+            <span className="absolute top-3.5 left-3 max-w-[calc(100%-1.5rem)] text-xs leading-6 text-balance">
+              <span
+                className="tag inline box-decoration-clone py-1.25 leading-6 whitespace-normal"
+                data-datocms-content-link-boundary
               >
-                {cta.label}
-                <ArrowRightIcon aria-hidden="true" />
-              </Link>
-            )}
-          </div>
+                {pretitle}
+              </span>
+            </span>
+          )}
+          {/* Dark and tall enough to keep the white caption at AA on the lightest photos */}
+          <span className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-linear-to-t from-ink/75 to-transparent px-4 pt-20 pb-4 text-sm font-semibold text-white">
+            {lead.name}
+            <ArrowRightIcon
+              aria-hidden="true"
+              className="size-4 shrink-0 stroke-2 transition-transform duration-200 group-hover:translate-x-0.5"
+            />
+          </span>
+        </Link>
+      ) : (
+        <span aria-hidden="true" />
+      )}
+      <div className="mt-5">
+        <h3 id={titleId} className="title-card">
+          {title}
+        </h3>
+        {description && (
+          <p className="mt-3 text-sm leading-[1.5] text-pretty text-ink-2">
+            {description}
+          </p>
         )}
       </div>
-
-      {lead && (
-        <div className={`grid gap-3 lg:gap-4 ${textLeft ? '' : 'xl:order-1'}`}>
-          <div className="grid grid-cols-2 gap-3 sm:h-[clamp(26.25rem,56vw,35rem)] sm:grid-cols-3 sm:grid-rows-2 lg:gap-4 xl:h-[clamp(31.25rem,40vw,36.25rem)]">
-            <MosaicTile
-              item={lead}
-              lng={lng}
-              lead
-              className={`col-span-2 aspect-[5/6] sm:aspect-auto ${side.length > 0 ? slots.lead : 'sm:col-span-3 sm:row-span-2'}`}
-              sizes="(min-width: 1280px) 38vw, (min-width: 640px) 60vw, 92vw"
-            />
-            {side.map((item, index) => (
-              <MosaicTile
-                key={item.id}
-                item={item}
-                lng={lng}
-                className={`sm:aspect-auto ${slots.side[index]} ${side.length === 1 ? 'col-span-2 aspect-[2/1] sm:col-span-1 sm:row-span-2' : 'aspect-square'}`}
-                sizes="(min-width: 1280px) 19vw, (min-width: 640px) 30vw, 46vw"
-              />
-            ))}
-          </div>
-          {extra.length > 0 && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:gap-4">
-              {extra.map((item, index) => (
-                <MosaicTile
-                  key={item.id}
-                  item={item}
-                  lng={lng}
-                  className={`sm:col-span-1 sm:aspect-[4/3] ${index === extra.length - 1 && extra.length % 2 === 1 ? 'col-span-2 aspect-[2/1]' : 'aspect-square'}`}
-                  sizes="(min-width: 1280px) 19vw, (min-width: 640px) 30vw, 46vw"
-                />
-              ))}
-            </div>
-          )}
+      {cta ? (
+        <div className="mt-4">
+          <Link
+            href={`/${lng}/${stripStega(cta.slug ?? '')}`}
+            className="tlink"
+          >
+            {cta.label}
+            <ArrowRightIcon aria-hidden="true" className="stroke-2" />
+          </Link>
         </div>
+      ) : (
+        <span aria-hidden="true" />
       )}
+      {rest.length > 0 ? (
+        <ul className="mt-6 grid grid-cols-2 gap-x-3 gap-y-5">
+          {rest.map((item) => (
+            <li key={item.id}>
+              <Link
+                href={`/${lng}/products?collections=${item.id}`}
+                className="group block outline-offset-4"
+                data-datocms-content-link-group
+              >
+                <div className={`${MEDIA} aspect-[4/5]`}>
+                  {item.details.image.responsiveImage && (
+                    <DatoImage
+                      fragment={item.details.image.responsiveImage}
+                      className={IMG_ZOOM}
+                      layout="fill"
+                      objectFit="cover"
+                      objectPosition="50% 30%"
+                      sizes="(min-width: 1440px) 150px, (min-width: 1024px) 11vw, (min-width: 640px) 22vw, 40vw"
+                    />
+                  )}
+                </div>
+                <p className="mt-2.5 text-sm leading-tight font-medium underline-offset-4 group-hover:underline">
+                  {item.name}
+                </p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <span aria-hidden="true" />
+      )}
+    </article>
+  );
+}
+
+const ProductShowcase = ({
+  sections,
+  globalPageProps,
+  id,
+  title,
+  action,
+}: Props) => {
+  const { lng } = globalPageProps.params;
+  const columns = Math.min(sections.length, 4);
+  const titleId = `${id}-seasons-title`;
+  const railId = `${id}-seasons`;
+
+  const grid = (
+    <div id={railId} className={`${GRID} ${COLUMNS[columns]}`}>
+      {sections.map((section, index) => (
+        <Season
+          key={readFragment(CollectionCardShowcaseFragment, section).id}
+          fragment={section}
+          lng={lng}
+          // A wrapped row of seasons keeps its distance from the one above
+          className={index >= columns ? 'lg:mt-16' : ''}
+        />
+      ))}
+    </div>
+  );
+
+  if (!title) {
+    return (
+      <div className="shell pt-(--section-gap)">
+        {grid}
+        <RailFocus railId={railId} />
+      </div>
+    );
+  }
+
+  return (
+    <section aria-labelledby={titleId} className="shell pt-(--section-gap)">
+      {/* The arrows show only while the seasons scroll (from sm to lg) */}
+      <SectionTitle
+        id={titleId}
+        title={title}
+        action={action}
+        aside={<RailControls railId={railId} />}
+        className="mb-8 lg:mb-12"
+      />
+      {grid}
     </section>
   );
 };

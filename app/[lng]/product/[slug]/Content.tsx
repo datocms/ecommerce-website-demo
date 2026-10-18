@@ -11,6 +11,7 @@ import DatoStructuredText from '@/components/DatoStructuredText';
 import FeaturedProducts from '@/components/Grids/FeaturedProducts';
 import ProductInfoSection from '@/components/Products/Product/Blocks/ProductInfoSection';
 import QuestionsSection from '@/components/Products/Product/Blocks/QuestionsSection';
+import { PDP_RAIL } from '@/components/Products/Product/ui';
 import ProductView from '@/components/Products/ProductView';
 import Reviews from '@/components/Products/Reviews';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
@@ -37,7 +38,7 @@ const Content: ContentPage<PageProps, Query> = ({
         <div className="shell pt-(--section-gap)">
           <DatoStructuredText
             data={data.product.description}
-            className="grid gap-3 sm:gap-4 lg:gap-5"
+            className="grid gap-16 lg:gap-20"
             renderBlock={({ record }) => {
               switch (record.__typename) {
                 case 'ProductFeatureSectionRecord':
@@ -56,8 +57,9 @@ const Content: ContentPage<PageProps, Query> = ({
               }
             }}
             customNodeRules={[
-              // Text between blocks becomes one white card: copy on the left, care chips on the right.
-              // Copy that follows a list starts a new row, so the source order is kept.
+              // Text between blocks becomes one group: the copy as a lead on the left, care labels
+              // on the buy box's line. Copy that follows a list starts a new row, so the source
+              // order is kept.
               renderNodeRule(isRoot, ({ node, children, key }) => {
                 const parts: Array<{ block: ReactNode } | TextGroup> = [];
                 for (const child of children ?? []) {
@@ -90,7 +92,7 @@ const Content: ContentPage<PageProps, Query> = ({
                       return (
                         <div
                           key={part.key}
-                          className="grid gap-8 rounded-card bg-white p-(--card-pad) lg:grid-cols-12 lg:gap-10 lg:p-(--panel-pad)"
+                          className="grid gap-6 lg:grid-cols-12 lg:gap-x-4 lg:gap-y-10"
                         >
                           {part.rows.map((row) => {
                             const both =
@@ -98,15 +100,17 @@ const Content: ContentPage<PageProps, Query> = ({
                             return (
                               <Fragment key={row.key}>
                                 {row.text.length > 0 && (
+                                  // The first paragraph is the lead; copy without care labels keeps a
+                                  // readable measure instead of running the full width
                                   <div
-                                    className={`prose-dato [&>p]:text-[1.1875rem] [&>p]:leading-[1.6] xl:[&>p]:text-[1.3125rem] ${both ? 'lg:col-span-7' : 'lg:col-span-full'}`}
+                                    className={`prose-dato [&>p:first-of-type]:text-xl [&>p:first-of-type]:leading-[1.5] xl:[&>p:first-of-type]:text-2xl xl:[&>p:first-of-type]:leading-[1.45] ${both ? 'lg:col-span-6' : 'lg:col-span-8 xl:col-span-7'}`}
                                   >
                                     {row.text}
                                   </div>
                                 )}
                                 {row.lists.length > 0 && (
                                   <div
-                                    className={`grid content-start gap-2 ${both ? 'lg:col-span-4 lg:col-start-9' : 'lg:col-span-full'}`}
+                                    className={`grid content-start gap-2 ${both ? PDP_RAIL : 'lg:col-span-full'}`}
                                   >
                                     {row.lists}
                                   </div>
@@ -128,7 +132,11 @@ const Content: ContentPage<PageProps, Query> = ({
               }),
               renderNodeRule(isListItem, ({ children, key }) => {
                 return (
-                  <li key={key} className="chip bg-cream shadow-none [&>p]:m-0">
+                  // A label, not a control: the decorative hairline instead of a control's boundary
+                  <li
+                    key={key}
+                    className="chip min-h-10 border-line px-3.5 [&>p]:m-0"
+                  >
                     {children}
                   </li>
                 );

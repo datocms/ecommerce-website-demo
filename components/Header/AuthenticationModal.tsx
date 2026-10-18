@@ -45,15 +45,18 @@ const AuthenticationModal = ({ onClose, onSuccess }: Props) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
       transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-      className="absolute right-0 bottom-full mb-3 w-[min(100vw-2*var(--gutter),25rem)] rounded-sheet bg-white p-5 shadow-pop sm:p-6"
+      className="absolute right-0 bottom-full mb-3 w-[min(100vw-2*var(--gutter),25rem)] border border-ink bg-white p-5 sm:p-6"
     >
-      <h2 id={`${id}-title`} className="title-sm">
+      <h2 id={`${id}-title`} className="title-item">
         Authenticate first
       </h2>
-      <p className="mt-1.5 text-sm text-pretty text-muted">
+      <p className="mt-2 text-sm text-pretty text-ink-2">
         You will need a secret token to access the drafts. Please add it below.
       </p>
-      <label htmlFor={`${id}-token`} className="mt-5 block text-sm font-bold">
+      <label
+        htmlFor={`${id}-token`}
+        className="mt-5 block text-sm font-semibold"
+      >
         Secret token
       </label>
       <input
@@ -83,18 +86,10 @@ const AuthenticationModal = ({ onClose, onSuccess }: Props) => {
         )}
       </div>
       <div className="mt-5 grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={onClose}
-          className="btn-secondary btn-sm h-12"
-        >
+        <button type="button" onClick={onClose} className="btn-line btn-sm">
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={isFetching}
-          className="btn-primary btn-sm h-12"
-        >
+        <button type="submit" disabled={isFetching} className="btn btn-sm">
           {isFetching ? 'Checking…' : 'Authenticate'}
         </button>
       </div>

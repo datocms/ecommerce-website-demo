@@ -20,6 +20,29 @@ export const query = graphql(
         currencySymbol
         sale
         shopNow
+        newArrivals
+      }
+      layout(locale: $locale, fallbackLocales: $fallbackLocale) {
+        menu {
+          __typename
+          ... on DropdownMenuRecord {
+            id
+            column {
+              id
+              label
+              item {
+                ... on RecordInterface {
+                  id
+                }
+              }
+            }
+          }
+          ... on LinkItemRecord {
+            id
+            label
+            slug
+          }
+        }
       }
       allProducts(
         first: 8

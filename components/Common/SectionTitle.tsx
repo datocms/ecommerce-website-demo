@@ -11,12 +11,15 @@ type SectionTitleProps = {
   as?: 'h1' | 'h2';
   /** Heading id, for the section's aria-labelledby */
   id?: string;
+  /** Right-aligned text link with an arrow, such as "All products" */
   action?: { label: ReactNode; href: string };
   /** Extra controls after the action, such as rail arrows */
   aside?: ReactNode;
   className?: string;
 };
 
+// Title block of a section: small label, h2 and an optional line
+// on the left; a text link and controls bottom-aligned on the right
 export default function SectionTitle({
   eyebrow,
   title,
@@ -30,37 +33,29 @@ export default function SectionTitle({
   return (
     <div
       className={[
-        'flex flex-col justify-between gap-8 lg:flex-row lg:items-end',
+        'flex flex-wrap items-end justify-between gap-x-10 gap-y-6',
         className,
       ]
         .filter(Boolean)
         .join(' ')}
     >
-      <div className="max-w-[51.25rem]">
-        {eyebrow && (
-          <p className="pretitle">
-            <span
-              aria-hidden="true"
-              className="size-2.5 shrink-0 rounded-full bg-butter"
-            />
-            {eyebrow}
-          </p>
-        )}
-        <Heading id={id} className={`h-xl ${eyebrow ? 'mt-5' : ''}`}>
+      <div className="max-w-[51.25rem] min-w-0">
+        {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
+        <Heading id={id} className="title-section">
           {title}
         </Heading>
         {description && (
-          <p className="mt-5 max-w-[36em] text-lg text-pretty text-ink/80 lg:text-[1.3125rem] lg:leading-[1.5]">
+          <p className="mt-5 max-w-[36em] text-lg text-pretty text-ink-2 lg:text-xl lg:leading-[1.45] lg:tracking-[-0.015em]">
             {description}
           </p>
         )}
       </div>
       {(action || aside) && (
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-6">
           {action && (
-            <Link href={action.href} className="btn-primary">
+            <Link href={action.href} className="group tlink">
               {action.label}
-              <ArrowRightIcon aria-hidden="true" />
+              <ArrowRightIcon aria-hidden="true" className="stroke-2" />
             </Link>
           )}
           {aside}

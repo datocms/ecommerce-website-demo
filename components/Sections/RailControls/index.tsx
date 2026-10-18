@@ -2,6 +2,7 @@
 
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
+import { useRevealFocus } from '../RailFocus';
 
 type Props = {
   /** id of the horizontal scroller the buttons drive */
@@ -13,7 +14,7 @@ type Props = {
 
 const pad = (value: number) => String(value).padStart(2, '0');
 
-// One item plus the gap: how far a press scrolls
+// One item plus the gap
 function stepOf(rail: HTMLElement) {
   const item = rail.firstElementChild;
   if (!item) return rail.clientWidth;
@@ -21,10 +22,25 @@ function stepOf(rail: HTMLElement) {
   return item.getBoundingClientRect().width + gap;
 }
 
-// Previous/next discs for a rail rendered elsewhere on the page. They hide themselves when
-// everything fits, and flag the rail with data-at-end so it can drop its edge fade. Keyboard
-// focus on a card that is only partly in view scrolls the rail just enough to show it whole.
+// How far a press scrolls: every item that is fully in view, so the next press starts on the
+// first one that was cut off (one at a time where only one fits)
+function pageOf(rail: HTMLElement) {
+  const step = stepOf(rail);
+  const style = getComputedStyle(rail);
+  const gap = Number.parseFloat(style.columnGap) || 0;
+  const view =
+    rail.clientWidth -
+    Number.parseFloat(style.paddingLeft) -
+    Number.parseFloat(style.paddingRight);
+  return step * Math.max(1, Math.floor((view + gap) / step));
+}
+
+// Previous/next squares for a rail rendered elsewhere on the page, with an optional "01 / 03"
+// counter. They hide themselves when everything fits (phones swipe instead), and flag the rail
+// with data-at-end. Keyboard focus on a card that is only partly in view scrolls the rail just
+// enough to show it whole.
 export default function RailControls({ railId, count, className }: Props) {
+  useRevealFocus(railId);
   const [position, setPosition] = useState({
     atStart: true,
     atEnd: false,
@@ -34,11 +50,8 @@ export default function RailControls({ railId, count, className }: Props) {
   useEffect(() => {
     const rail = document.getElementById(railId);
     if (!rail) return;
-    // Where the rail sat before the latest scroll event, for the focus handling below
-    let resting = rail.scrollLeft;
     const update = () => {
       const x = rail.scrollLeft;
-      resting = x;
       const atStart = x <= 1;
       const atEnd = x >= rail.scrollWidth - rail.clientWidth - 1;
       // The first card in view; with two cards in view the end reads 02 / 03, not a skip to 03
@@ -55,41 +68,12 @@ export default function RailControls({ railId, count, className }: Props) {
           : { atStart, atEnd, index },
       );
     };
-    const reveal = (event: FocusEvent) => {
-      const target = event.target;
-      if (
-        !(target instanceof HTMLElement) ||
-        target === rail ||
-        !target.matches(':focus-visible')
-      )
-        return;
-      // The browser has already scrolled (centring a hidden card, leaving a partly visible one
-      // alone) but not yet reported it; replace that with the smallest scroll from where it was
-      const from = resting;
-      requestAnimationFrame(() => {
-        const style = getComputedStyle(rail);
-        const left =
-          target.getBoundingClientRect().left -
-          rail.getBoundingClientRect().left +
-          rail.scrollLeft;
-        const toStart = left - Number.parseFloat(style.paddingLeft);
-        const toEnd =
-          left +
-          target.offsetWidth -
-          rail.clientWidth +
-          Number.parseFloat(style.paddingRight);
-        const next = from > toStart ? toStart : from < toEnd ? toEnd : from;
-        if (Math.abs(next - rail.scrollLeft) > 1) rail.scrollLeft = next;
-      });
-    };
     update();
     rail.addEventListener('scroll', update, { passive: true });
-    rail.addEventListener('focusin', reveal);
     const observer = new ResizeObserver(update);
     observer.observe(rail);
     return () => {
       rail.removeEventListener('scroll', update);
-      rail.removeEventListener('focusin', reveal);
       observer.disconnect();
     };
   }, [railId, count]);
@@ -101,7 +85,7 @@ export default function RailControls({ railId, count, className }: Props) {
       '(prefers-reduced-motion: reduce)',
     ).matches;
     rail.scrollBy({
-      left: direction * stepOf(rail),
+      left: direction * pageOf(rail),
       behavior: instant ? 'auto' : 'smooth',
     });
   };
@@ -115,9 +99,12 @@ export default function RailControls({ railId, count, className }: Props) {
         .join(' ')}
     >
       {count ? (
-        <p aria-hidden="true" className="mr-2 font-bold tabular-nums">
+        <p
+          aria-hidden="true"
+          className="mr-3 text-sm font-semibold tabular-nums"
+        >
           {pad(position.index + 1)}{' '}
-          <span className="text-ink/70">/ {pad(count)}</span>
+          <span className="text-mute">/ {pad(count)}</span>
         </p>
       ) : null}
       <button
@@ -128,7 +115,7 @@ export default function RailControls({ railId, count, className }: Props) {
         onClick={() => !position.atStart && scroll(-1)}
         className="rail-btn"
       >
-        <ArrowLeftIcon aria-hidden="true" />
+        <ArrowLeftIcon aria-hidden="true" className="stroke-2" />
       </button>
       <button
         type="button"
@@ -138,7 +125,7 @@ export default function RailControls({ railId, count, className }: Props) {
         onClick={() => !position.atEnd && scroll(1)}
         className="rail-btn"
       >
-        <ArrowRightIcon aria-hidden="true" />
+        <ArrowRightIcon aria-hidden="true" className="stroke-2" />
       </button>
     </div>
   );

@@ -5,59 +5,37 @@
 /* No @tailwindcss/forms: inputs and checkboxes are styled by the utilities below. */
 
 @theme static {
-  /* Tailwind's default steps, so prototype markup ports 1:1, plus the desktop-navigation switch */
   --breakpoint-*: initial;
   --breakpoint-sm: 40rem;
   --breakpoint-md: 48rem;
   --breakpoint-lg: 64rem;
+  /* The split desktop navigation: the longest locale (es) fits from here */
   --breakpoint-nav: 68.75rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 90rem;
 
-  /* Figtree for UI and body, Bricolage Grotesque for display. The variables are set on <html>
-     by next/font in app/layout.tsx. */
+  /* One typeface. --font-geist is set on <html> by next/font in app/layout.tsx */
   --font-*: initial;
-  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
-  --font-display:
-    var(--font-bricolage), var(--font-figtree), ui-sans-serif, sans-serif;
+  --font-sans:
+    var(--font-geist), ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
 
-  /* Colors: this is the entire palette. Cream page, white cards, forest panels, one accent (butter). */
+  /* The whole palette: white page, ink type and actions, one sale red */
   --color-*: initial;
-  --color-cream: #f6f1e7;
   --color-white: #ffffff;
-  --color-oat: #ece4d4;
-  --color-line: #e6decd;
-  --color-border: #d6ccb8;
-  --color-border-strong: #8f8676;
-  --color-ink: #1b2a21;
-  --color-ink-hover: #000000;
-  --color-muted: #4f5a52;
-  --color-disabled: #a39b8b;
-  --color-forest: #1f3d2e;
-  --color-forest-2: #2e6046;
-  --color-forest-deep: #183225;
-  --color-butter: #f3d983;
-  --color-butter-soft: #f7e7b3;
-  --color-sale: #b23f24;
-  /* Only on the footer wordmark */
-  --color-sage: #c9d7b4;
-  /* Only on the hero season tiles and the season pretitle chips */
-  --color-spring: #eed8cf;
-  --color-summer: var(--color-butter);
-  --color-fall: #e9c6a8;
-  --color-winter: #d4dfe4;
-  /* Earlier names, kept as aliases so unmigrated markup stays on the palette */
-  --color-canvas: var(--color-white);
-  --color-subtle: var(--color-cream);
-  --color-sunken: var(--color-oat);
-  --color-hairline: var(--color-line);
-  /* CMS accent: only <mark> and ::selection. --color-primary(-graphic) are written by
-     components/Common/CustomColor.tsx */
-  --color-accent-wash: color-mix(in oklab, var(--color-primary) 22%, #ffffff);
-  --color-accent-graphic: var(--color-primary-graphic);
+  --color-ink: #0a0a0a;
+  --color-ink-2: #3a3a3a;
+  --color-mute: #6b6b6b;
+  --color-line: #e5e5e5;
+  /* 3:1 on white: boundaries of fields, chips and checkboxes */
+  --color-line-strong: #8f8f8f;
+  --color-mist: #f4f4f3;
+  --color-sale: #c4271c;
+  --color-disabled: #a3a3a3;
+  /* The CMS accent tints <mark> only. --color-primary is written by CustomColor.tsx */
+  --color-accent-wash: color-mix(in oklab, var(--color-primary) 30%, #ffffff);
 
-  /* Type scale (Figtree). 14px is the floor, for tags, brand lines and fine print only;
-     body copy starts at 15px. Display sizes are the hero-title / h-xl / title-* utilities. */
+  /* 14px is the floor (tags, brand lines, fine print); body copy is 15-17px */
   --text-*: initial;
   --text-xs: 0.875rem;
   --text-xs--line-height: 1.25rem;
@@ -73,44 +51,21 @@
   --text-lg--line-height: 1.75rem;
   --text-xl: 1.25rem;
   --text-xl--line-height: 1.75rem;
-  --text-xl--letter-spacing: -0.005em;
+  --text-xl--letter-spacing: -0.01em;
   --text-2xl: 1.5rem;
   --text-2xl--line-height: 1.875rem;
-  --text-2xl--letter-spacing: -0.01em;
-  --text-3xl: 1.75rem;
-  --text-3xl--line-height: 2rem;
-  --text-3xl--letter-spacing: -0.015em;
+  --text-2xl--letter-spacing: -0.02em;
 
-  /* Rounded, soft: one radius per role */
+  /* Square and flat: no radius, shadow or blur tokens */
   --radius-*: initial;
-  --radius-xs: 0.5rem;
-  --radius-sm: 0.625rem;
-  --radius-md: 0.75rem;
-  --radius-image: 0.875rem;
-  --radius-nav: 1rem;
-  --radius-card: 1.25rem;
-  /* Drawers, dialogs, the search sheet, the popup */
-  --radius-sheet: 1.5rem;
-
-  /* Soft, ink-tinted shadows: resting cards and floating layers */
   --shadow-*: initial;
-  --shadow-card:
-    0 1px 2px rgb(27 42 33 / 0.05), 0 10px 28px -16px rgb(27 42 33 / 0.26);
-  --shadow-pop:
-    0 2px 6px rgb(27 42 33 / 0.06), 0 40px 90px -30px rgb(27 42 33 / 0.5);
   --inset-shadow-*: initial;
   --drop-shadow-*: initial;
   --text-shadow-*: initial;
-
-  /* Scrims and the sticky header backing */
   --blur-*: initial;
-  --blur-xs: 4px;
-  --blur-md: 12px;
 
-  /* Motion */
   --ease-*: initial;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --default-transition-duration: 150ms;
   --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
@@ -118,57 +73,55 @@
 
 @layer base {
   :root {
-    /* Accent defaults: a stone wash and ink dots. CustomColor overrides them (unlayered). */
-    --color-primary: #c9bfa9;
-    --color-primary-graphic: #1b2a21;
-    /* The sticky floating nav: 12px above and below a 64px (72px from nav) bar */
-    --header-h: 5.5rem;
-    --gutter: 1rem;
-    /* Inner padding of drawers and small floating layers: the gutter, capped at 24px */
-    --inset: min(var(--gutter), 1.5rem);
-    /* White content cards and season bands */
-    --card-pad: 1.25rem;
-    /* Feature panels: forest heroes, testimonial cards, large white panels */
-    --panel-pad: 1.75rem;
-    /* Space between page sections; --section-y is half of it, for bands padded on both sides */
-    --section-gap: 5rem;
-    --section-y: 2.5rem;
+    /* Neutral until CustomColor writes the CMS accent (unlayered, so it wins) */
+    --color-primary: #d4d4d4;
+    /* What sits on the current surface: ink on white, white on surface-ink. btn, btn-line,
+       chip and rail-btn read these, so they invert inside black bands on their own. */
+    --surface-fg: var(--color-ink);
+    --surface-bg: var(--color-white);
+    /* The sticky header: a 64px bar (72px from nav) plus its hairline */
+    --header-h: calc(4rem + 1px);
+    --gutter: 1.25rem;
+    /* Drawer and dialog padding */
+    --inset: 1.25rem;
+    /* Between page sections; --page-top is the first title block's distance from the header */
+    --section-gap: 6rem;
+    --page-top: 3rem;
+    /* Vertical padding inside black bands (testimonials, newsletter) */
+    --band-y: 5rem;
   }
   @media (min-width: 40rem) {
     :root {
-      --gutter: 1.5rem;
-      --card-pad: 2rem;
-      --panel-pad: 2.5rem;
+      --inset: 2rem;
+    }
+  }
+  @media (min-width: 48rem) {
+    :root {
+      --gutter: 2.5rem;
     }
   }
   @media (min-width: 64rem) {
     :root {
-      --gutter: 2.5rem;
-      --section-gap: 7rem;
-      --section-y: 3.5rem;
+      --section-gap: 8rem;
+      --page-top: 5rem;
+      --band-y: 7rem;
     }
   }
   @media (min-width: 68.75rem) {
     :root {
-      --header-h: 6rem;
-    }
-  }
-  @media (min-width: 80rem) {
-    :root {
-      --card-pad: 2.5rem;
-      --panel-pad: 3rem;
+      --header-h: calc(4.5rem + 1px);
     }
   }
   @media (prefers-contrast: more) {
     :root {
-      --color-line: #8f8676;
-      --color-border: #8f8676;
-      --color-muted: #333b35;
+      --color-line: #8f8f8f;
+      --color-line-strong: #3a3a3a;
+      --color-mute: #3a3a3a;
     }
   }
 
   html {
-    background-color: var(--color-cream);
+    background-color: var(--color-white);
     scroll-padding-top: calc(var(--header-h) + 1rem);
     scroll-padding-bottom: 5rem; /* keeps focused elements clear of the draft toggle */
   }
@@ -177,12 +130,12 @@
   }
   @media (min-width: 48rem) {
     html:has(#cookie-notice) {
-      scroll-padding-bottom: calc(2 * var(--gutter) + 6rem);
+      scroll-padding-bottom: 9rem;
     }
   }
   body {
     overflow-x: clip;
-    background-color: var(--color-cream);
+    background-color: var(--color-white);
     color: var(--color-ink);
     font-size: var(--text-base);
     line-height: var(--text-base--line-height);
@@ -201,6 +154,10 @@
   h3 {
     text-wrap: balance;
   }
+  /* French sets guillemets off with a narrow no-break space, which Chrome's own quotes omit */
+  :lang(fr) {
+    quotes: '\00AB\202F' '\202F\00BB' '\2039\202F' '\202F\203A';
+  }
 
   *,
   ::after,
@@ -213,16 +170,20 @@
   [role='button']:not(:disabled) {
     cursor: pointer;
   }
-  /* Heroicons outline glyphs at the weight of Figtree's semibold UI text */
+  /* Heroicons outline glyphs at the weight of Geist's medium UI text */
   svg[data-slot='icon'][stroke='currentColor'] {
-    stroke-width: 2;
+    stroke-width: 1.75;
   }
-  /* Dark surfaces (surface-forest) switch the ring to cream through --focus-ring */
+  /* Black bands (surface-ink) switch the ring to white through --focus-ring */
   :focus-visible {
     outline: 2px solid var(--focus-ring, var(--color-ink));
     outline-offset: 2px;
   }
   ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+  }
+  mark {
     background-color: var(--color-accent-wash);
     color: var(--color-ink);
   }
@@ -240,21 +201,16 @@
 }
 
 /* ---------- Layout ---------- */
-/* Page container: 1440px including the 16/24/40px gutter */
+/* Page container: 1440px including the 20/40px gutter */
 @utility shell {
   width: 100%;
   max-width: 90rem;
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
-/* The shell without its gutter, for compositions that run to the shell's outer edge */
-@utility bleed {
-  width: 100%;
-  max-width: 90rem;
-  margin-inline: auto;
-}
-@utility section-y {
-  padding-block: var(--section-y);
+/* From inside the shell, run an element out to the right edge of the viewport */
+@utility bleed-r {
+  margin-right: calc(-1 * (var(--gutter) + (100vw - min(100vw, 90rem)) / 2));
 }
 /* Full-width horizontal scroller whose first item starts on the shell's content edge and whose
    items bleed off the viewport edge. Compose with flex, gap-*, overflow-x-auto and snap-*. */
@@ -271,170 +227,144 @@
     display: none;
   }
 }
-/* Forest panel (hero cards, footer): cream text, cream focus ring */
-@utility surface-forest {
-  background-color: var(--color-forest);
-  color: var(--color-cream);
-  --focus-ring: var(--color-cream);
-  --prose-body: color-mix(in oklab, var(--color-cream) 86%, transparent);
-  --prose-strong: var(--color-cream);
+/* Black band (notification strip, testimonials, newsletter + footer). Hairlines, secondary text,
+   focus rings, prose and the btn/chip family switch to their on-black values inside. */
+@utility surface-ink {
+  background-color: var(--color-ink);
+  color: var(--color-white);
+  --surface-fg: var(--color-white);
+  --surface-bg: var(--color-ink);
+  --focus-ring: var(--color-white);
+  --color-line: rgb(255 255 255 / 0.15);
+  --color-line-strong: rgb(255 255 255 / 0.4);
+  --color-mute: rgb(255 255 255 / 0.7);
+  --color-ink-2: rgb(255 255 255 / 0.8);
+  --prose-body: rgb(255 255 255 / 0.8);
+  --prose-strong: var(--color-white);
 }
 
-/* ---------- Display type (Bricolage Grotesque) ---------- */
-@utility hero-title {
-  font-family: var(--font-display);
+/* The CMS logo is a pale mark on white: threshold it to crisp ink (light surfaces) or white
+   (black bands). Multiply/screen drop its white box. */
+@utility logo-ink {
+  filter: grayscale(1) brightness(0.56) contrast(14);
+  mix-blend-mode: multiply;
+}
+@utility logo-white {
+  filter: grayscale(1) brightness(0.56) contrast(14) invert(1);
+  mix-blend-mode: screen;
+}
+
+/* ---------- Display type (Geist semibold, tight) ---------- */
+/* Home hero h1: 52px, 64px on tablets, then 80px at 1024 growing to 112px at 1440 */
+@utility title-hero {
   font-weight: 600;
-  font-size: 3.75rem;
-  line-height: 0.95;
-  letter-spacing: -0.025em;
+  font-size: 3.25rem;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
   text-wrap: balance;
-  @media (min-width: 40rem) {
-    font-size: 5.25rem;
+  @media (min-width: 48rem) {
+    font-size: 4rem;
   }
   @media (min-width: 64rem) {
-    font-size: 6.25rem;
-  }
-  @media (min-width: 80rem) {
-    font-size: clamp(4rem, 6.6vw, 6.5rem);
+    font-size: clamp(5rem, 7.8vw, 7rem);
   }
 }
-@utility season-title {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 3.75rem;
-  line-height: 0.95;
-  letter-spacing: -0.022em;
-  text-wrap: balance;
-  @media (min-width: 40rem) {
-    font-size: 4.75rem;
-  }
-  @media (min-width: 80rem) {
-    font-size: clamp(3.75rem, 6.4vw, 6.25rem);
-  }
-}
-/* Section titles */
-@utility h-xl {
-  font-family: var(--font-display);
+/* Page titles: showcase h1, store name, 404 (44 / 64 at 1024 / 80 at 1280) */
+@utility title-display {
   font-weight: 600;
   font-size: 2.75rem;
   line-height: 0.98;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.05em;
   text-wrap: balance;
-  @media (min-width: 40rem) {
-    font-size: 3.75rem;
-  }
   @media (min-width: 64rem) {
-    font-size: clamp(3.75rem, 5.2vw, 4.75rem);
+    font-size: clamp(4rem, 6.25vw, 5rem);
   }
 }
-/* Showcase hero title */
-@utility sc-title {
-  font-family: var(--font-display);
+/* Statements: divider title, newsletter heading, product name (44 / 56 / 64 at 1280) */
+@utility title-statement {
   font-weight: 600;
-  font-size: 2.625rem;
-  line-height: 1;
-  letter-spacing: -0.024em;
+  font-size: 2.75rem;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
   text-wrap: balance;
-  @media (min-width: 40rem) {
-    font-size: 3.5rem;
-  }
   @media (min-width: 64rem) {
-    font-size: 4rem;
-  }
-  @media (min-width: 80rem) {
-    font-size: clamp(3rem, 4.2vw, 3.875rem);
+    font-size: clamp(3.5rem, 5vw, 4rem);
   }
 }
-/* Panel titles: newsletter, showcase materials, product name, 404 */
-@utility title-lg {
-  font-family: var(--font-display);
+/* Section titles: 36 / 48 */
+@utility title-section {
   font-weight: 600;
-  font-size: 2.5rem;
-  line-height: 1;
-  letter-spacing: -0.025em;
+  font-size: 2.25rem;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
   text-wrap: balance;
-  @media (min-width: 40rem) {
-    font-size: 3.25rem;
-  }
-  @media (min-width: 80rem) {
-    font-size: 3.75rem;
+  @media (min-width: 64rem) {
+    font-size: 3rem;
   }
 }
-/* Card titles: materials, collections, drawer titles, spotlight names */
-@utility title-md {
-  font-family: var(--font-display);
+/* Column and card titles: season columns, collection names, drawer titles */
+@utility title-card {
   font-weight: 600;
   font-size: 1.75rem;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  @media (min-width: 64rem) {
-    font-size: 2rem;
-  }
-}
-/* Small display: wordmark lockup, mobile menu rows, mega-menu tiles, season tiles */
-@utility title-sm {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.3125rem;
   line-height: 1.05;
-  letter-spacing: -0.015em;
-  @media (min-width: 40rem) {
-    font-size: 1.5rem;
-  }
+  letter-spacing: -0.035em;
+}
+/* Item names: material tiles, mobile menu rows, spotlight names, the header wordmark */
+@utility title-item {
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 /* Footer wordmark: a fallback size; the footer fits it to the content width */
 @utility giant {
-  font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 18vw;
-  line-height: 0.8;
-  letter-spacing: -0.035em;
+  line-height: 0.82;
+  letter-spacing: -0.065em;
   white-space: nowrap;
 }
 
-/* ---------- Actions: pills. Every text button is at least 42px tall (52px by default). ---------- */
+/* ---------- Actions: square, flat. Text buttons are 52px (44px with btn-sm). ---------- */
 /* btn-sm only sets the variables below, so it works whatever the class order */
 @utility btn-sm {
-  --btn-h: 2.625rem;
-  --btn-px: 1.125rem;
-  --btn-gap: 0.375rem;
-  --btn-fs: 0.9375rem;
+  --btn-h: 2.75rem;
+  --btn-px: 1.25rem;
+  --btn-gap: 0.5rem;
   --btn-icon: 1rem;
 }
-@utility btn-primary {
+/* Solid button: ink on light surfaces, white inside surface-ink */
+@utility btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--btn-gap, 0.625rem);
   min-height: var(--btn-h, 3.25rem);
-  padding: 0.5rem var(--btn-px, 1.625rem);
-  border-radius: calc(infinity * 1px);
+  padding: 0.5rem var(--btn-px, 1.75rem);
   text-align: center;
   text-wrap: balance;
-  background-color: var(--color-ink);
-  color: var(--color-cream);
-  font-size: var(--btn-fs, 1rem);
+  background-color: var(--surface-fg);
+  color: var(--surface-bg);
+  font-size: var(--text-sm);
   line-height: 1.25;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.005em;
   transition:
-    background-color 200ms var(--ease-out),
-    color 200ms var(--ease-out),
-    translate 200ms var(--ease-out);
+    background-color 150ms var(--ease-out),
+    color 150ms var(--ease-out);
   @media (hover: hover) {
-    &:hover {
-      background-color: var(--color-ink-hover);
-    }
-  }
-  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     &:not(:disabled, [aria-disabled='true']):hover {
-      translate: 0 -1px;
+      background-color: color-mix(
+        in oklab,
+        var(--surface-fg) 82%,
+        var(--surface-bg)
+      );
     }
   }
   &:disabled,
   &[aria-disabled='true'] {
-    background-color: var(--color-oat);
-    color: var(--color-muted);
+    background-color: var(--color-mist);
+    color: var(--color-mute);
     cursor: not-allowed;
   }
   & > svg {
@@ -443,42 +373,35 @@
     flex-shrink: 0;
   }
 }
-/* Outline pill: secondary actions and in-card "Shop now" */
-@utility btn-secondary {
+/* Outline button: 1px ink rectangle that fills on hover */
+@utility btn-line {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--btn-gap, 0.625rem);
   min-height: var(--btn-h, 3.25rem);
-  padding: 0.5rem var(--btn-px, 1.625rem);
-  border-radius: calc(infinity * 1px);
+  padding: 0.5rem var(--btn-px, 1.75rem);
   text-align: center;
   text-wrap: balance;
+  border: 1px solid var(--surface-fg);
   background-color: transparent;
-  box-shadow: inset 0 0 0 1.5px currentColor;
-  color: var(--color-ink);
-  font-size: var(--btn-fs, 1rem);
+  color: var(--surface-fg);
+  font-size: var(--text-sm);
   line-height: 1.25;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.005em;
   transition:
-    background-color 200ms var(--ease-out),
-    color 200ms var(--ease-out),
-    box-shadow 200ms var(--ease-out),
-    translate 200ms var(--ease-out);
-  /* A card that is one link highlights its pill when hovered anywhere */
+    background-color 150ms var(--ease-out),
+    color 150ms var(--ease-out);
   @media (hover: hover) {
-    &:hover,
-    :where(.group):hover & {
-      background-color: var(--color-ink);
-      box-shadow: inset 0 0 0 1.5px var(--color-ink);
-      color: var(--color-cream);
+    &:not(:disabled, [aria-disabled='true']):hover {
+      background-color: var(--surface-fg);
+      color: var(--surface-bg);
     }
   }
   &:disabled,
   &[aria-disabled='true'] {
-    background-color: transparent;
-    box-shadow: inset 0 0 0 1.5px var(--color-border);
+    border-color: var(--color-line);
     color: var(--color-disabled);
     cursor: not-allowed;
   }
@@ -488,121 +411,51 @@
     flex-shrink: 0;
   }
 }
-/* Butter pill: the primary action on forest panels */
-@utility btn-butter {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--btn-gap, 0.625rem);
-  min-height: var(--btn-h, 3.25rem);
-  padding: 0.5rem var(--btn-px, 1.625rem);
-  border-radius: calc(infinity * 1px);
-  text-align: center;
-  text-wrap: balance;
-  background-color: var(--color-butter);
-  color: var(--color-ink);
-  font-size: var(--btn-fs, 1rem);
-  line-height: 1.25;
-  font-weight: 700;
-  letter-spacing: -0.005em;
-  --focus-ring: var(--color-butter);
-  transition:
-    background-color 200ms var(--ease-out),
-    translate 200ms var(--ease-out);
-  @media (hover: hover) {
-    &:hover {
-      background-color: var(--color-butter-soft);
-    }
-  }
-  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-    &:hover {
-      translate: 0 -1px;
-    }
-  }
-  & > svg {
-    width: var(--btn-icon, 1.125rem);
-    height: var(--btn-icon, 1.125rem);
-    flex-shrink: 0;
-  }
-}
-/* White pill: actions on photos, butter or cream surfaces */
-@utility btn-white {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--btn-gap, 0.625rem);
-  min-height: var(--btn-h, 3.25rem);
-  padding: 0.5rem var(--btn-px, 1.625rem);
-  border-radius: calc(infinity * 1px);
-  text-align: center;
-  text-wrap: balance;
-  background-color: var(--color-white);
-  color: var(--color-ink);
-  font-size: var(--btn-fs, 1rem);
-  line-height: 1.25;
-  font-weight: 700;
-  letter-spacing: -0.005em;
-  transition:
-    background-color 200ms var(--ease-out),
-    color 200ms var(--ease-out),
-    translate 200ms var(--ease-out);
-  @media (hover: hover) {
-    &:hover {
-      background-color: var(--color-ink);
-      color: var(--color-cream);
-    }
-  }
-  & > svg {
-    width: var(--btn-icon, 1.125rem);
-    height: var(--btn-icon, 1.125rem);
-    flex-shrink: 0;
-  }
-}
-/* Inline text link inside sentences and small utility links ("Not now", "Remove", "Clear all") */
-@utility link-underline {
-  text-decoration-line: underline;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 4px;
-  text-decoration-color: currentColor;
-  transition: text-decoration-color 150ms var(--ease-out);
-  @media (hover: hover) {
-    &:hover {
-      text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
-    }
-  }
-}
-/* Tertiary text action: bold, underlined. The ::after widens the hit area to ~48px. */
-@utility link-cta {
+/* Text link with an arrow: "All products ->", "Shop now ->". The arrow nudges
+   on hover, also when its group card is hovered; ::after widens the hit area to ~48px. */
+@utility tlink {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.5rem;
   font-size: var(--text-base);
   line-height: var(--text-base--line-height);
-  font-weight: 700;
-  text-decoration-line: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 5px;
-  text-decoration-color: currentColor;
-  transition: text-decoration-color 150ms var(--ease-out);
+  font-weight: 600;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
   &::after {
     content: '';
     position: absolute;
     inset: -0.75rem -0.25rem;
   }
-  @media (hover: hover) {
-    &:hover {
-      text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
-    }
-  }
   & > svg {
     width: 1.125rem;
     height: 1.125rem;
     flex-shrink: 0;
+    transition: translate 200ms var(--ease-out);
+  }
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-line: underline;
+    }
+    &:hover > svg,
+    :where(.group):hover & > svg {
+      translate: 0.1875rem 0;
+    }
   }
 }
-/* Round icon button (44px). Takes any fill (bg-white, bg-cream, bg-ink); hover tints that fill.
-   A button that swaps to a flat hover fill drops the tint with hover:bg-none. */
+/* Inline link in sentences and small utility links ("Not now", "Remove", "Clear all") */
+@utility link-underline {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-thickness: 2px;
+    }
+  }
+}
+/* Square 44px icon button without a fill; hover tints whatever surface it is on */
 @utility icon-btn {
   display: inline-flex;
   align-items: center;
@@ -610,11 +463,8 @@
   width: 2.75rem;
   height: 2.75rem;
   flex-shrink: 0;
-  border-radius: calc(infinity * 1px);
   color: inherit;
-  transition:
-    background-color 150ms var(--ease-out),
-    color 150ms var(--ease-out);
+  transition: background-color 150ms var(--ease-out);
   & > svg {
     width: 1.25rem;
     height: 1.25rem;
@@ -622,8 +472,8 @@
   @media (hover: hover) {
     &:hover:where(:not(:disabled, [aria-disabled='true'])) {
       background-image: linear-gradient(
-        color-mix(in oklab, currentColor 10%, transparent),
-        color-mix(in oklab, currentColor 10%, transparent)
+        color-mix(in oklab, currentColor 8%, transparent),
+        color-mix(in oklab, currentColor 8%, transparent)
       );
     }
   }
@@ -633,105 +483,101 @@
     cursor: not-allowed;
   }
 }
-/* Previous/next for rails and carousels (52px white disc, ink on hover) */
+/* Previous/next for rails: 44px hairline square that fills ink on hover */
 @utility rail-btn {
   display: inline-grid;
   place-items: center;
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   flex-shrink: 0;
-  border-radius: calc(infinity * 1px);
-  background-color: var(--color-white);
-  box-shadow: inset 0 0 0 1px var(--color-line);
-  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+  color: var(--surface-fg);
   transition:
     background-color 150ms var(--ease-out),
-    color 150ms var(--ease-out),
-    opacity 150ms var(--ease-out);
+    border-color 150ms var(--ease-out),
+    color 150ms var(--ease-out);
   & > svg {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.125rem;
+    height: 1.125rem;
   }
   @media (hover: hover) {
     &:not(:disabled, [aria-disabled='true']):hover {
-      background-color: var(--color-ink);
-      color: var(--color-cream);
+      border-color: var(--surface-fg);
+      background-color: var(--surface-fg);
+      color: var(--surface-bg);
     }
   }
   &:disabled,
   &[aria-disabled='true'] {
-    opacity: 0.5;
+    color: var(--color-disabled);
     cursor: not-allowed;
   }
 }
 
 /* ---------- Labels ---------- */
-/* Readable label: nav and footer column headings, filter group names, small CMS labels.
-   On forest use eyebrow text-butter. */
+/* Small semibold label: CMS pre-titles, menu and footer column labels, filter group names.
+   Takes its surface's text colour. */
 @utility eyebrow {
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
-  font-weight: 700;
-  letter-spacing: -0.005em;
-  color: var(--color-forest-2);
-}
-/* CMS pre-title chip above section titles. Generic: a butter dot span inside
-   (<span aria-hidden="true" class="size-2.5 rounded-full bg-butter" />); seasons: bg-{season}, no dot. */
-@utility pretitle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 2.125rem;
-  padding: 0.25rem 0.9375rem 0.25rem 0.75rem;
-  border-radius: calc(infinity * 1px);
-  background-color: var(--color-white);
-  color: var(--color-ink);
-  font-size: var(--text-sm);
-  line-height: 1.25;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.005em;
 }
-/* Pill tag, usually on images: Sale (badge bg-sale text-white), Trending (bg-butter), New, counters */
-@utility badge {
+/* White square tag on photos: season pre-titles, Trending, New */
+@utility tag {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  min-height: 1.875rem;
-  padding-inline: 0.75rem;
-  border-radius: calc(infinity * 1px);
+  min-height: 1.75rem;
+  padding-inline: 0.625rem;
   white-space: nowrap;
   background-color: var(--color-white);
   color: var(--color-ink);
   font-size: var(--text-xs);
-  line-height: var(--text-xs--line-height);
-  font-weight: 700;
-  letter-spacing: -0.005em;
+  line-height: 1.25rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-/* Selectable pill (sort, filters, care labels, locales, sizes). White with a line ring on cream;
-   on a white card compose with bg-cream shadow-none. Selected (aria-pressed / aria-current /
-   data-selected / a checked input inside) is ink; disabled is struck through. */
+/* Black uppercase tag: Sale, counters on light surfaces */
+@utility tag-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 1.75rem;
+  padding-inline: 0.625rem;
+  white-space: nowrap;
+  background-color: var(--color-ink);
+  color: var(--color-white);
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+/* Square selectable option (sort, filters, sizes, care labels, locales). Selected
+   (aria-pressed / aria-current / data-selected / a checked input inside) fills ink;
+   disabled is struck through. */
 @utility chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  min-height: 2.625rem;
+  min-height: 2.75rem;
   padding: 0.375rem 1rem;
-  border-radius: calc(infinity * 1px);
-  background-color: var(--color-white);
-  box-shadow: inset 0 0 0 1px var(--color-line);
-  color: var(--color-ink);
+  border: 1px solid var(--color-line-strong);
+  background-color: transparent;
+  color: var(--surface-fg);
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
-  font-weight: 600;
+  font-weight: 500;
   transition:
-    box-shadow 150ms var(--ease-out),
+    border-color 150ms var(--ease-out),
     background-color 150ms var(--ease-out),
     color 150ms var(--ease-out);
   @media (hover: hover) {
     &:is(a, button, label):hover {
-      box-shadow: inset 0 0 0 1.5px var(--color-ink);
+      border-color: var(--surface-fg);
     }
   }
   &[aria-pressed='true'],
@@ -739,14 +585,14 @@
   &[aria-current='page'],
   &[data-selected],
   &:has(input:checked) {
-    background-color: var(--color-ink);
-    box-shadow: inset 0 0 0 1.5px var(--color-ink);
-    color: var(--color-cream);
+    border-color: var(--surface-fg);
+    background-color: var(--surface-fg);
+    color: var(--surface-bg);
   }
   &:disabled,
   &[aria-disabled='true'] {
+    border-color: var(--color-line);
     background-color: transparent;
-    box-shadow: inset 0 0 0 1px var(--color-line);
     color: var(--color-disabled);
     text-decoration-line: line-through;
     cursor: not-allowed;
@@ -763,71 +609,78 @@
 }
 
 /* ---------- Forms ---------- */
-/* Pill field on light surfaces */
+/* Square field on light surfaces */
 @utility input-field {
   display: block;
   width: 100%;
   min-height: 3.25rem;
-  padding-inline: 1.25rem;
+  padding-inline: 1rem;
   appearance: none;
-  border: 1px solid var(--color-border-strong);
-  border-radius: calc(infinity * 1px);
+  border: 1px solid var(--color-line-strong);
+  border-radius: 0;
   background-color: var(--color-white);
   color: var(--color-ink);
   font-size: var(--text-input);
   line-height: var(--text-input--line-height);
-  font-weight: 500;
   transition:
     border-color 150ms var(--ease-out),
     box-shadow 150ms var(--ease-out);
   &::placeholder {
-    color: var(--color-muted);
+    color: var(--color-mute);
     opacity: 1;
+  }
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-ink-2);
+    }
   }
   &:focus-visible {
     border-color: var(--color-ink);
     outline: 2px solid transparent;
-    box-shadow: 0 0 0 1px var(--color-ink);
+    box-shadow: inset 0 0 0 1px var(--color-ink);
   }
   &[aria-invalid='true'] {
     border-color: var(--color-sale);
   }
+  /* One clean 2px error edge, not a red line around the ink focus line */
+  &[aria-invalid='true']:focus-visible {
+    box-shadow: inset 0 0 0 1px var(--color-sale);
+  }
 }
-/* Ghost pill that takes its surface's text color: the newsletter field on forest, search on cream */
+/* Field that takes its surface's text colour: the newsletter field on black */
 @utility input-line {
   display: block;
   width: 100%;
   min-height: 3.25rem;
   padding-inline: 1.25rem;
   appearance: none;
-  border: 1px solid color-mix(in oklab, currentColor 30%, transparent);
-  border-radius: calc(infinity * 1px);
-  background-color: color-mix(in oklab, currentColor 8%, transparent);
+  border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
+  border-radius: 0;
+  background-color: transparent;
   color: inherit;
   font-size: var(--text-input);
   line-height: var(--text-input--line-height);
-  font-weight: 500;
   transition:
     border-color 150ms var(--ease-out),
     box-shadow 150ms var(--ease-out);
   &::placeholder {
-    color: color-mix(in oklab, currentColor 72%, transparent);
+    color: color-mix(in oklab, currentColor 60%, transparent);
     opacity: 1;
   }
   &:focus-visible {
     border-color: currentColor;
     outline: 2px solid transparent;
-    box-shadow: 0 0 0 1px currentColor;
+    box-shadow: inset 0 0 0 1px currentColor;
   }
 }
 @utility checkbox {
   appearance: none;
   flex-shrink: 0;
-  width: 1.375rem;
-  height: 1.375rem;
+  width: 1.25rem;
+  height: 1.25rem;
   margin: 0;
-  border: 1.5px solid var(--color-border-strong);
-  border-radius: 0.4375rem;
+  border: 1.5px solid var(--color-line-strong);
+  border-radius: 0;
   background-color: var(--color-white);
   background-position: center;
   background-repeat: no-repeat;
@@ -835,10 +688,15 @@
   transition:
     background-color 100ms var(--ease-out),
     border-color 100ms var(--ease-out);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-ink);
+    }
+  }
   &:checked {
     border-color: var(--color-ink);
     background-color: var(--color-ink);
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M3.5 8.5l3 3 6-7' stroke='%23f6f1e7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M3.5 8.5l3 3 6-7' stroke='%23ffffff' stroke-width='2' stroke-linecap='square'/%3e%3c/svg%3e");
   }
   &:focus-visible {
     outline: 2px solid var(--focus-ring, var(--color-ink));
@@ -852,14 +710,11 @@
 
 /* ---------- Long-form text (legal, PDP description, FilterDetail description) ----------
    Styles ONLY elements without a class attribute: give an element any className to opt out.
-   Inside surface-forest the text turns cream through --prose-body / --prose-strong. */
+   Inside surface-ink the text turns white through --prose-body / --prose-strong. */
 @utility prose-dato {
-  font-size: var(--text-md);
-  line-height: 1.65;
-  color: var(
-    --prose-body,
-    color-mix(in oklab, var(--color-ink) 86%, transparent)
-  );
+  font-size: var(--text-base);
+  line-height: 1.7;
+  color: var(--prose-body, var(--color-ink-2));
   & :where(:is(p, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, hr):not([class])) {
     max-width: 68ch;
   }
@@ -872,52 +727,48 @@
   }
   & :where(:is(h1, h2, h3, h4, h5, h6):not([class])) {
     color: var(--prose-strong, var(--color-ink));
+    font-weight: 600;
     text-wrap: balance;
   }
-  & :where(:is(h1, h2):not([class])) {
-    font-family: var(--font-display);
-    font-weight: 600;
-  }
   & :where(h1:not([class])) {
-    font-size: 2.75rem;
-    line-height: 0.98;
-    letter-spacing: -0.025em;
+    font-size: 2.25rem;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
     margin-block: 0 0.6em;
   }
   & :where(h2:not([class])) {
-    font-size: 1.875rem;
-    line-height: 1.08;
-    letter-spacing: -0.018em;
+    font-size: 1.625rem;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
     margin-block: 2em 0.5em;
   }
   & :where(h1:not([class]) + h2:not([class])) {
     margin-top: 1.4em;
   }
   & :where(:is(h3, h4, h5, h6):not([class])) {
-    font-size: var(--text-xl);
-    line-height: 1.3;
-    font-weight: 700;
+    font-size: var(--text-lg);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
     margin-block: 1.6em 0.5em;
   }
   & :where(ul:not([class])) {
     display: grid;
-    gap: 0.55em;
+    gap: 0.5em;
     padding-left: 0;
     margin-block: 0 1em;
   }
   & :where(ul:not([class]) > li:not([class])) {
     position: relative;
-    padding-left: 1.625rem;
+    padding-left: 1.375rem;
   }
   & :where(ul:not([class]) > li:not([class]))::before {
     content: '';
     position: absolute;
-    top: 0.62em;
+    top: 0.72em;
     left: 0.25rem;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: calc(infinity * 1px);
-    background-color: var(--color-forest-2);
+    width: 0.375rem;
+    height: 0.375rem;
+    background-color: var(--prose-strong, var(--color-ink));
   }
   & :where(ol:not([class])) {
     list-style: decimal;
@@ -929,35 +780,37 @@
     padding-left: 0.25rem;
   }
   & :where(ol:not([class]) > li:not([class]))::marker {
-    color: var(--color-forest-2);
-    font-weight: 700;
+    color: var(--prose-strong, var(--color-ink));
+    font-weight: 600;
   }
   & :where(a:not([class])) {
     color: var(--prose-strong, var(--color-ink));
-    font-weight: 600;
+    font-weight: 500;
     text-decoration-line: underline;
-    text-decoration-thickness: 1.5px;
+    text-decoration-thickness: 1px;
     text-underline-offset: 3px;
+  }
+  & :where(a:not([class])):hover {
+    text-decoration-thickness: 2px;
   }
   & :where(strong:not([class])) {
     color: var(--prose-strong, var(--color-ink));
-    font-weight: 700;
+    font-weight: 600;
   }
   & :where(hr:not([class])) {
     border: 0;
-    border-top: 1px solid
-      color-mix(in oklab, currentColor 18%, transparent);
+    border-top: 1px solid var(--color-line);
     margin-block: 2em;
   }
   & :where(blockquote:not([class])) {
-    border-left: 3px solid currentColor;
+    border-left: 2px solid var(--prose-strong, var(--color-ink));
     padding-left: 1.25rem;
     margin-block: 1.5rem;
     color: var(--prose-strong, var(--color-ink));
-    font-family: var(--font-display);
     font-size: 1.25em;
-    line-height: 1.35;
-    letter-spacing: -0.01em;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
   }
   & :where(h2:not([class]) + :is(h3, h4, h5, h6):not([class])) {
     margin-top: 0;
@@ -969,13 +822,15 @@
     margin-bottom: 0;
   }
   @media (min-width: 40rem) {
-    font-size: var(--text-lg);
-    line-height: 1.7;
+    font-size: var(--text-md);
     & :where(h1:not([class])) {
-      font-size: 3.75rem;
+      font-size: 3rem;
     }
     & :where(h2:not([class])) {
-      font-size: 2.125rem;
+      font-size: 1.875rem;
+    }
+    & :where(:is(h3, h4, h5, h6):not([class])) {
+      font-size: var(--text-xl);
     }
   }
 }

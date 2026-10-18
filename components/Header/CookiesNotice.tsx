@@ -1,13 +1,14 @@
 import { useSyncExternalStore } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import DatoImage from '@/components/DatoImage';
+import { MEDIA } from '@/components/Sections/ui';
 
 export type CookieNotice = NonNullable<
   NonNullable<LayoutQuery['layout']>['cookieNotice']
 >;
 
 // Shared by the header (the popup waits for the dismissal) and the footer (which
-// renders the card). The [lng] layout remounts on a locale switch, so a dismissal
+// renders the bar). The [lng] layout remounts on a locale switch, so a dismissal
 // lasts for the page load.
 let dismissed = false;
 const listeners = new Set<() => void>();
@@ -35,48 +36,55 @@ type PropTypes = {
   cookieNotice: CookieNotice;
 };
 
-// A floating card, rendered right after the footer: it is sticky, so it follows the
-// viewport while scrolling and comes to rest under the footer, never hiding the page's end.
-// No scrim: the page stays usable.
+// A white bar along the viewport's bottom edge, rendered right after the footer: it is
+// sticky, so it follows the viewport while scrolling and comes to rest under the footer,
+// never hiding the page's end. No scrim: the page stays usable.
 const CookiesNotice = ({ cookieNotice }: PropTypes) => {
   return (
     <section
       id="cookie-notice"
       aria-label={cookieNotice.header ?? undefined}
-      className="pointer-events-none sticky bottom-0 z-40 px-2 pb-2 sm:px-3 sm:pb-3 lg:px-10 lg:pb-6"
+      className="sticky bottom-0 z-40 border-t border-ink bg-white"
     >
-      <div className="pointer-events-auto mx-auto flex max-w-340 flex-col gap-5 rounded-card bg-white p-4 shadow-pop sm:p-5 md:flex-row md:items-center">
-        <div className="flex min-w-0 flex-1 gap-4 md:items-center">
-          <div className="relative size-16 shrink-0 overflow-hidden rounded-image bg-oat sm:size-18">
+      {/* One row from lg; below it the buttons go under the text (right-aligned from sm), so
+          the text keeps its width instead of wrapping to four lines beside them */}
+      <div className="shell flex flex-col gap-4 py-4 md:py-5 lg:flex-row lg:items-center lg:gap-8">
+        <div className="flex min-w-0 flex-1 items-start gap-4 md:items-center">
+          <div className={`${MEDIA} size-14 shrink-0 sm:size-16`}>
             {cookieNotice.cookieNoticeImage?.responsiveImage && (
               <DatoImage
                 fragment={cookieNotice.cookieNoticeImage.responsiveImage}
                 layout="fill"
                 objectFit="cover"
-                sizes="72px"
+                sizes="64px"
               />
             )}
           </div>
           <div className="min-w-0">
-            <h2 className="title-sm">{cookieNotice.header}</h2>
-            <p className="mt-1.5 max-w-[80ch] text-sm text-pretty text-muted">
+            <h2 className="text-md font-semibold tracking-[-0.01em] sm:text-lg">
+              {cookieNotice.header}
+            </h2>
+            <p className="mt-1 max-w-[86ch] text-sm text-pretty text-ink-2">
               {cookieNotice.subheader}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 md:shrink-0">
+        {/* Phones: equal halves while both labels fit on one line (a longer label takes what it
+            needs), stacked when they don't, so a label never wraps inside its button. The
+            primary's clear border matches the outline's, so the halves come out equal. */}
+        <div className="flex flex-wrap gap-2 sm:grid sm:grid-cols-2 sm:self-end lg:shrink-0 lg:self-auto">
           <button
             type="button"
             onClick={dismiss}
-            className="btn-secondary btn-sm h-12"
+            className="btn-line btn-sm min-w-fit flex-1"
           >
             {cookieNotice.secondaryButtonLabel}
           </button>
           <button
             type="button"
             onClick={dismiss}
-            className="btn-primary btn-sm h-12"
+            className="btn btn-sm min-w-fit flex-1 border border-transparent"
           >
             {cookieNotice.primaryButtonLabel}
           </button>

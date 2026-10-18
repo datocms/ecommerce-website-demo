@@ -12,14 +12,14 @@ import {
 } from '@headlessui/react';
 import {
   ArrowRightIcon,
-  Bars3BottomLeftIcon,
+  Bars2Icon,
   ChevronDownIcon,
   MagnifyingGlassIcon,
   ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { type FormEvent, Suspense, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { type FormEvent, Suspense, useRef, useState } from 'react';
 import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import type { SiteLocale } from '@/app/i18n/settings';
@@ -27,6 +27,7 @@ import Drawer from '@/components/Common/Drawer';
 import SvgRenderer from '@/components/Common/SvgRenderer';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
+import { IMG_ZOOM, MEDIA } from '@/components/Sections/ui';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import Cart from './Cart';
@@ -42,199 +43,134 @@ type PropTypes = {
   languages: SiteLocale[];
   data: LayoutQuery;
   globalPageProps: ResolvedGlobalPageProps;
-  /** Show the language switch in the bar below xl (the strip carries it while it is shown) */
-  showLocale?: boolean;
 };
 
-// Pills in the bar: cream when hovered, open or current
-const NAV_LINK =
-  'inline-flex h-11 items-center gap-1 rounded-full px-2.5 text-sm font-semibold whitespace-nowrap transition-colors duration-150 hover:bg-cream aria-[current=page]:bg-cream data-open:bg-cream xl:px-3 2xl:px-4';
+// Bar items: full bar height, with a 2px ink bar on the header's bottom edge when hovered,
+// open or current. Their sides (--nav-x, set per cluster) grow with the viewport up to 14px
+// at xl, so the spacing never jumps.
+const NAV_ITEM =
+  'relative inline-flex h-18 items-center gap-1 px-(--nav-x) text-xs font-medium whitespace-nowrap after:absolute after:inset-x-(--nav-x) after:-bottom-px after:h-0.5 after:bg-ink after:opacity-0 after:transition-opacity after:duration-150 hover:after:opacity-100 focus-visible:outline-offset-[-2px] aria-[current=page]:after:opacity-100 data-open:after:opacity-100 xl:text-sm';
 
-// Display rows of the mobile menu
+// Header icon buttons: 40px, so the glyphs sit on the content edges with -mx-2.5
+const BAR_ICON = 'icon-btn size-10 [&>svg]:size-5.5';
+
+// Rows of the mobile menu
 const MENU_ROW =
-  'title-sm flex h-17 w-full items-center justify-between gap-4 px-5 text-left text-[1.5rem] focus-visible:outline-offset-[-2px]';
+  'title-item flex h-16 w-full items-center justify-between gap-4 text-left text-[1.375rem] tracking-[-0.03em] focus-visible:outline-offset-[-2px]';
 
 type FeatureTileProps = {
   item: FeaturedItem;
   href: string;
   tag: string | null | undefined;
-  tagClassName: string;
   shopNow: string | null | undefined;
   sizes: string;
-  className: string;
   onNavigate: () => void;
+  /** The other tile's name, so both captions lay out the same */
+  partnerName?: string;
+  /** The mega menu shows "Shop now" beside the name; the mobile menu only the name */
+  compact?: boolean;
 };
 
-// Trending / New tile: a photo with its labels on it, or a brand logo on a cream mat
+// Trending / New: a 4:3 photo (or a brand logo on mist) with its tag, the name under it.
+// In the mega menu the pair shares two subgrid rows: when the link columns run longer, both
+// photos grow together to end with them, and a caption that wraps keeps both photos equal.
 const FeatureTile = ({
   item,
   href,
   tag,
-  tagClassName,
   shopNow,
   sizes,
-  className,
   onNavigate,
+  partnerName,
+  compact = false,
 }: FeatureTileProps) => {
   const image = item.details.image.responsiveImage;
-
-  if (item._modelApiKey === 'brand') {
-    return (
-      <Link
-        href={href}
-        onClick={onNavigate}
-        className={`group flex min-w-0 flex-col rounded-image bg-cream p-2 ${className}`}
-      >
-        <span className="relative min-h-0 flex-1 overflow-hidden rounded-sm bg-white">
-          {image && (
-            <span className="absolute inset-[18%] transition-transform duration-500 ease-out group-hover:scale-[1.04]">
-              <DatoImage
-                fragment={image}
-                layout="fill"
-                objectFit="contain"
-                placeholderStyle={{
-                  left: 0,
-                  top: 0,
-                  width: '100%',
-                  height: '100%',
-                }}
-                sizes={sizes}
-              />
-            </span>
-          )}
-          {tag && (
-            <span className={`badge absolute top-2.5 left-2.5 ${tagClassName}`}>
-              {tag}
-            </span>
-          )}
-        </span>
-        <span className="flex items-center justify-between gap-2 px-2 pt-3 pb-1.5">
-          <span className="title-sm min-w-0 text-[1.25rem] wrap-break-word">
-            {item.name}
-          </span>
-          <span
-            aria-hidden="true"
-            className="hidden size-8 shrink-0 place-items-center rounded-full bg-ink text-cream xl:grid"
-          >
-            <ArrowRightIcon className="size-3.75 stroke-[2.4]" />
-          </span>
-        </span>
-      </Link>
-    );
-  }
+  const brand = item._modelApiKey === 'brand';
 
   return (
     <Link
       href={href}
       onClick={onNavigate}
-      className={`group relative block min-w-0 overflow-hidden rounded-image bg-oat ${className}`}
+      className={`group min-w-0 outline-offset-4 ${compact ? 'flex flex-col' : 'row-span-2 grid grid-rows-subgrid'}`}
     >
-      {image && (
-        <DatoImage
-          fragment={image}
-          layout="fill"
-          objectFit="cover"
-          // Portraits keep their faces in the tile
-          objectPosition="50% 25%"
-          sizes={sizes}
-          className="transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-        />
-      )}
       <span
-        aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-ink/60 to-transparent"
-      />
-      {tag && (
-        <span className={`badge absolute top-3 left-3 ${tagClassName}`}>
-          {tag}
-        </span>
-      )}
-      <span className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-2 text-white">
-        <span className="min-w-0">
-          <span className="title-sm block text-[1.25rem] xl:text-[1.5rem]">
-            {item.name}
+        // Stretched in the mega menu: w-full, or the ratio would size the width from the height
+        className={`${MEDIA} block aspect-[4/3] ${compact ? '' : 'w-full self-stretch'}`}
+      >
+        {image &&
+          (brand ? (
+            // The logo stays under the tag (12px in, 28px tall) with the 8px gap it has at 1440:
+            // on smaller tiles 19% is less than that band
+            <span className="absolute inset-x-[19%] top-[max(19%,3rem)] bottom-[max(19%,0.75rem)]">
+              <DatoImage
+                fragment={image}
+                layout="fill"
+                objectFit="contain"
+                sizes={sizes}
+                usePlaceholder={false}
+                // Logos come on white: multiply drops the box onto the mist well
+                imgClassName="mix-blend-multiply"
+              />
+            </span>
+          ) : (
+            <DatoImage
+              fragment={image}
+              layout="fill"
+              objectFit="cover"
+              // Portraits keep their faces in the landscape crop
+              objectPosition="50% 20%"
+              sizes={sizes}
+              className={IMG_ZOOM}
+            />
+          ))}
+        {tag && <span className="tag absolute top-3 left-3">{tag}</span>}
+      </span>
+      {compact ? (
+        <span className="mt-2.5 text-sm font-semibold">{item.name}</span>
+      ) : (
+        // CMS names are never truncated: when a name and a long shopNow label don't share
+        // the row, the label moves under the name
+        <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          {/* The partner's name shares this cell, invisible, so the pair's longer name sizes
+              both: the two labels stay beside their names, or both move under them */}
+          <span className="grid min-w-0 text-base font-semibold text-pretty">
+            <span className="col-start-1 row-start-1">{item.name}</span>
+            {partnerName && (
+              <span
+                aria-hidden="true"
+                className="invisible col-start-1 row-start-1"
+              >
+                {partnerName}
+              </span>
+            )}
           </span>
           {shopNow && (
-            <span className="mt-2 block text-xs font-semibold text-white/90">
+            <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium">
               {shopNow}
+              <ArrowRightIcon
+                aria-hidden="true"
+                className="size-4 stroke-2 transition-transform duration-200 group-hover:translate-x-0.75"
+              />
             </span>
           )}
         </span>
-        <span
-          aria-hidden="true"
-          className="hidden size-9 shrink-0 place-items-center rounded-full bg-white text-ink xl:grid"
-        >
-          <ArrowRightIcon className="size-4 stroke-[2.4]" />
-        </span>
-      </span>
+      )}
     </Link>
   );
-};
-
-type SearchFieldProps = {
-  lng: string;
-  placeholder: string;
-  defaultValue?: string;
-};
-
-// The bar's own search field (from xl); below xl a button opens the search sheet
-const SearchField = ({ lng, placeholder, defaultValue }: SearchFieldProps) => {
-  const router = useRouter();
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const value = new FormData(event.currentTarget).get('productName');
-    router.push(
-      `/${lng}/products?productName=${encodeURIComponent(String(value ?? ''))}`,
-    );
-  };
-
-  return (
-    <search className="hidden w-58 min-w-0 xl:block 2xl:w-68">
-      <form
-        onSubmit={handleSubmit}
-        className="flex h-11 w-full items-center gap-2.5 rounded-full bg-cream px-4 text-muted transition-shadow duration-150 has-[input:focus-visible]:ring-2 has-[input:focus-visible]:ring-ink"
-      >
-        <MagnifyingGlassIcon
-          aria-hidden="true"
-          className="size-4.5 shrink-0 stroke-[2.2]"
-        />
-        <label htmlFor="header-search" className="sr-only">
-          {placeholder}
-        </label>
-        <input
-          id="header-search"
-          name="productName"
-          type="search"
-          enterKeyHint="search"
-          autoComplete="off"
-          defaultValue={defaultValue}
-          placeholder={placeholder}
-          className="h-full min-w-0 flex-1 bg-transparent text-sm font-medium text-ink outline-none placeholder:text-muted [&::-webkit-search-cancel-button]:appearance-none"
-        />
-      </form>
-    </search>
-  );
-};
-
-// Prefills the field with the current query. Its own Suspense boundary keeps
-// useSearchParams from opting the header out of server rendering.
-const SearchFieldWithQuery = (props: SearchFieldProps) => {
-  const query = useSearchParams().get('productName') ?? '';
-  return <SearchField key={query} {...props} defaultValue={query} />;
 };
 
 export default function CategoryHeader({
   globalPageProps,
   languages,
   data,
-  showLocale = false,
 }: PropTypes) {
   const lng = globalPageProps.params.lng;
   const pathname = usePathname();
   const router = useRouter();
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [searchIsOpen, setSearchIsOpen] = useState(false);
+  const [searchCover, setSearchCover] = useState(0);
+  const headerRef = useRef<HTMLElement>(null);
   const [cartIsOpen, setCartIsOpen] = useState(false);
 
   const menu = data.layout?.menu ?? [];
@@ -244,6 +180,12 @@ export default function CategoryHeader({
   const categories = menu.filter(
     (item) => item._modelApiKey === 'dropdown_menu',
   ) as DropdownMenu[];
+  // The bar splits around the centred lockup: the dropdowns and the first link on the left,
+  // the other links on the right
+  const leftItems = menu.filter(
+    (item) => item._modelApiKey === 'dropdown_menu' || item === links[0],
+  );
+  const rightLinks = links.slice(1);
 
   const generalInterface = data.generalInterface;
   const searchPlaceholder = generalInterface?.searchPlaceholder || 'Search';
@@ -258,58 +200,56 @@ export default function CategoryHeader({
   const logo = data.layout?.logo.responsiveImage;
   const logoData = logo && readFragment(ResponsiveImageFragment, logo);
   const wordmark = data.layout?.footerTitle;
-  const lockup = (
+  const lockup = (wordmarkClassName = '') => (
     <>
       {logoData && (
         <RSCImage
           data={wordmark ? { ...logoData, alt: '' } : logoData}
           usePlaceholder={false}
-          sizes="36px"
-          imgClassName="rounded-xs mix-blend-multiply"
-          imgStyle={{ height: '2.25rem', width: 'auto' }}
+          sizes="30px"
+          imgClassName="logo-ink"
+          imgStyle={{ height: '1.875rem', width: 'auto' }}
         />
       )}
       {wordmark && (
-        // Steps down on narrow phones so it clears the search and bag buttons
-        <span className="min-w-0 truncate py-1 font-display text-[clamp(1.125rem,5.4vw,1.3125rem)] leading-none font-bold tracking-[-0.02em] xl:text-[1.375rem]">
+        <span
+          className={`title-item tracking-[-0.03em] whitespace-nowrap ${wordmarkClassName}`}
+        >
           {wordmark}
         </span>
       )}
     </>
   );
 
-  // Trending first (butter tag), then New
+  // Trending first, then New. Keyed by slot: one record can fill both.
   const featured = (
     category: DropdownMenu,
-    className: string,
     sizes: string,
     close: () => void,
+    compact?: boolean,
   ) => {
-    const brand = category.newArrival._modelApiKey === 'brand';
-    return (
-      <>
-        <FeatureTile
-          item={category.trending}
-          href={productsHref(category.trending)}
-          tag={generalInterface?.trending}
-          tagClassName="bg-butter"
-          shopNow={generalInterface?.shopNow}
-          sizes={sizes}
-          className={className}
-          onNavigate={close}
-        />
-        <FeatureTile
-          item={category.newArrival}
-          href={productsHref(category.newArrival)}
-          tag={generalInterface?.new}
-          tagClassName={brand ? 'bg-cream' : ''}
-          shopNow={generalInterface?.shopNow}
-          sizes={sizes}
-          className={className}
-          onNavigate={close}
-        />
-      </>
-    );
+    const slots = [
+      {
+        slot: 'trending',
+        item: category.trending,
+        tag: generalInterface?.trending,
+      },
+      { slot: 'new', item: category.newArrival, tag: generalInterface?.new },
+    ];
+    return slots.map(({ slot, item, tag }, index) => (
+      <FeatureTile
+        key={slot}
+        item={item}
+        href={productsHref(item)}
+        tag={tag}
+        shopNow={generalInterface?.shopNow}
+        sizes={sizes}
+        onNavigate={close}
+        // Stripped: the invisible copy must not become a second visual-editing target
+        partnerName={stripStega(slots[1 - index].item.name)}
+        compact={compact}
+      />
+    ));
   };
 
   const handleMenuSearch = (event: FormEvent<HTMLFormElement>) => {
@@ -321,7 +261,12 @@ export default function CategoryHeader({
     closeMenu();
   };
 
-  const searchFieldProps = { lng, placeholder: searchPlaceholder };
+  // The search sheet covers the strip and the header whatever their height (the strip wraps
+  // to 2-3 lines on phones), so no slice of the bar shows under it
+  const openSearch = () => {
+    setSearchCover(headerRef.current?.getBoundingClientRect().bottom ?? 0);
+    setSearchIsOpen(true);
+  };
 
   return (
     <>
@@ -338,329 +283,341 @@ export default function CategoryHeader({
           open={searchIsOpen}
           onClose={() => setSearchIsOpen(false)}
           placeholder={searchPlaceholder}
+          minHeight={searchCover}
         />
       </Suspense>
 
-      {/* Mobile menu: a cream sheet of white cards */}
       <Drawer
         open={menuIsOpen}
         onClose={closeMenu}
         side="left"
-        tone="cream"
         closeLabel="Close menu"
-        title={lockup}
+        title={lockup()}
       >
-        {/* Cards run 8px from the sheet's edges: on the viewport's 16px gutter, like the bar */}
-        <div className="-mx-4 flex flex-col">
-          <search>
-            <form onSubmit={handleMenuSearch} className="relative">
-              <label htmlFor="menu-search" className="sr-only">
-                {searchPlaceholder}
-              </label>
-              <MagnifyingGlassIcon
-                aria-hidden="true"
-                className="pointer-events-none absolute top-1/2 left-5 size-5 -translate-y-1/2 stroke-[2.2] text-muted"
-              />
-              <input
-                id="menu-search"
-                name="productName"
-                type="search"
-                enterKeyHint="search"
-                autoComplete="off"
-                placeholder={searchPlaceholder}
-                className="input-field pl-12 [&::-webkit-search-cancel-button]:appearance-none"
-              />
-            </form>
-          </search>
+        <search>
+          <form onSubmit={handleMenuSearch} className="relative">
+            <label htmlFor="menu-search" className="sr-only">
+              {searchPlaceholder}
+            </label>
+            <MagnifyingGlassIcon
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 left-4 size-4.5 -translate-y-1/2 text-mute"
+            />
+            <input
+              id="menu-search"
+              name="productName"
+              type="search"
+              enterKeyHint="search"
+              autoComplete="off"
+              placeholder={searchPlaceholder}
+              className="input-field h-12 min-h-12 pl-11 [&::-webkit-search-cancel-button]:appearance-none"
+            />
+          </form>
+        </search>
 
-          {categories.length > 0 && (
-            <ul className="mt-4 divide-y divide-line overflow-hidden rounded-card bg-white">
-              {categories.map((category, index) => (
-                <li key={category.id}>
-                  <Disclosure defaultOpen={index === 0}>
-                    <DisclosureButton className={`group ${MENU_ROW}`}>
-                      {category.label}
-                      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-cream transition-transform duration-200 group-data-open:rotate-180">
-                        <ChevronDownIcon
-                          aria-hidden="true"
-                          className="size-4.5 stroke-[2.4]"
-                        />
-                      </span>
-                    </DisclosureButton>
-                    <DisclosurePanel className="grid gap-6 px-5 pb-6">
-                      {category.column.map((column) => (
-                        <div key={column.id}>
-                          <p
-                            id={`${category.id}-${column.id}-heading-mobile`}
-                            className="eyebrow"
+        <nav aria-label="Main" className="mt-2">
+          {categories.map((category, index) => (
+            <Disclosure
+              key={category.id}
+              as="div"
+              defaultOpen={index === 0}
+              className="border-b border-line"
+            >
+              <DisclosureButton className={`group ${MENU_ROW}`}>
+                {category.label}
+                <ChevronDownIcon
+                  aria-hidden="true"
+                  className="size-5 shrink-0 stroke-2 transition-transform duration-200 group-data-open:rotate-180"
+                />
+              </DisclosureButton>
+              <DisclosurePanel className="space-y-5 pb-6">
+                {category.column.map((column) => (
+                  <div key={column.id}>
+                    <p
+                      id={`${category.id}-${column.id}-heading-mobile`}
+                      className="eyebrow"
+                    >
+                      {column.label}
+                    </p>
+                    <ul
+                      aria-labelledby={`${category.id}-${column.id}-heading-mobile`}
+                      className="mt-1.5 grid grid-cols-2 gap-x-4"
+                    >
+                      {column.item.map((item) => (
+                        <li key={item.id} className="min-w-0">
+                          <Link
+                            href={productsHref(item)}
+                            onClick={closeMenu}
+                            className="block py-1.5 text-base text-ink-2 transition-colors duration-150 hover:text-ink"
                           >
-                            {column.label}
-                          </p>
-                          <ul
-                            aria-labelledby={`${category.id}-${column.id}-heading-mobile`}
-                            className="mt-3 flex flex-wrap gap-2"
-                          >
-                            {column.item.map((item) => (
-                              <li key={item.id}>
-                                <Link
-                                  href={productsHref(item)}
-                                  onClick={closeMenu}
-                                  className="chip bg-cream shadow-none"
-                                >
-                                  {item.name}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                            {item.name}
+                          </Link>
+                        </li>
                       ))}
-                      <div className="grid grid-cols-2 gap-2">
-                        {featured(
-                          category,
-                          'h-52.5',
-                          '(min-width: 640px) 13rem, 45vw',
-                          closeMenu,
-                        )}
-                      </div>
-                    </DisclosurePanel>
-                  </Disclosure>
-                </li>
-              ))}
-            </ul>
-          )}
+                    </ul>
+                  </div>
+                ))}
+                <div className="grid grid-cols-2 gap-x-4 pt-1">
+                  {featured(
+                    category,
+                    '(min-width: 640px) 12.5rem, 45vw',
+                    closeMenu,
+                    true,
+                  )}
+                </div>
+              </DisclosurePanel>
+            </Disclosure>
+          ))}
 
           {links.length > 0 && (
-            <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card bg-white">
+            <ul>
               {links.map((link) => (
                 <li key={link.id}>
                   <Link
                     href={linkHref(link)}
                     onClick={closeMenu}
                     aria-current={isCurrent(link) ? 'page' : undefined}
-                    className={`group ${MENU_ROW}`}
+                    // The current page underlines its label with the desktop bar's 2px ink
+                    className={`group ${MENU_ROW} border-b border-line`}
                   >
-                    {link.label}
-                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-cream group-aria-[current=page]:bg-butter">
-                      <ArrowRightIcon
-                        aria-hidden="true"
-                        className="size-4.25 stroke-[2.4]"
-                      />
+                    <span className="decoration-2 underline-offset-[0.3em] group-aria-[current=page]:underline">
+                      {link.label}
                     </span>
+                    <ArrowRightIcon
+                      aria-hidden="true"
+                      className="size-5 shrink-0 stroke-2"
+                    />
                   </Link>
                 </li>
               ))}
             </ul>
           )}
+        </nav>
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-            <Suspense>
-              <LanguageSelector
-                languages={languages}
-                currencySymbol={generalInterface?.currencySymbol}
-                placement="above-start"
-                className="h-11 rounded-full bg-white px-4 text-sm font-bold hover:shadow-[inset_0_0_0_1.5px_var(--color-ink)]"
-                onNavigate={closeMenu}
-              />
-            </Suspense>
-            {socials.length > 0 && (
-              <div className="flex gap-2">
-                {socials.map((social) => (
-                  <a
-                    key={social.id}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={
-                      stripStega(social.name ?? '') || stripStega(social.url)
-                    }
-                    className="icon-btn bg-white"
-                  >
-                    <SvgRenderer url={social.icon.url} />
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+          <Suspense>
+            <LanguageSelector
+              languages={languages}
+              currencySymbol={generalInterface?.currencySymbol}
+              placement="above-start"
+              className="h-11 border border-line px-4 text-sm hover:border-ink aria-expanded:border-ink"
+              onNavigate={closeMenu}
+            />
+          </Suspense>
+          {socials.length > 0 && (
+            <div className="-mr-3 flex">
+              {socials.map((social) => (
+                <a
+                  key={social.id}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={
+                    stripStega(social.name ?? '') || stripStega(social.url)
+                  }
+                  className="icon-btn"
+                >
+                  <SvgRenderer url={social.icon.url} />
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       </Drawer>
 
       {/* Above the floating controls (z-40), so the mega menu's scrim dims them like the
-          dialogs' scrims do. While a menu is open the backing drops its colour and blur, so
-          the scrim below dims the strip behind the bar too. */}
-      <header className="peer sticky top-0 z-45 bg-cream/85 backdrop-blur-md has-[[data-open],[data-leave]]:bg-transparent has-[[data-open],[data-leave]]:backdrop-blur-none">
-        <div className="shell py-3">
-          {/* Positions the mega menu under the whole bar */}
-          <div className="relative">
-            <nav
-              aria-label="Main"
-              className="grid h-16 grid-cols-[1fr_auto] items-center rounded-nav bg-white pr-2 pl-2 shadow-card nav:h-18 nav:grid-cols-[auto_1fr_auto] nav:pl-5 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] xl:gap-x-3"
+          dialogs' scrims do. Sticky makes it the mega menu's containing block. */}
+      <header
+        ref={headerRef}
+        className="peer sticky top-0 z-45 border-b border-line bg-white"
+      >
+        {/* Left items' sides: 6px at 1100 (the longest cluster, es, stays 40px+ clear of the
+            lockup) to 14px at 1280. The right links have room to start at 10px. While a
+            panel is open only its button carries the bar, not the current page's link. */}
+        <nav
+          aria-label="Main"
+          className="shell grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-x-4 [--nav-x:clamp(0.375rem,calc((100vw_-_68.75rem)/22.5_+_0.375rem),0.875rem)] nav:h-18 [&:has([data-open])_[aria-current=page]:not(:hover)]:after:opacity-0"
+        >
+          <div className="-ml-2.5 flex min-w-0 items-center justify-self-start nav:-ml-(--nav-x)">
+            <button
+              type="button"
+              aria-label="Menu"
+              aria-haspopup="dialog"
+              aria-expanded={menuIsOpen}
+              onClick={() => setMenuIsOpen(true)}
+              className={`${BAR_ICON} nav:hidden`}
             >
-              <div className="flex min-w-0 items-center gap-1 justify-self-start">
-                <button
-                  type="button"
-                  aria-label="Menu"
-                  aria-haspopup="dialog"
-                  aria-expanded={menuIsOpen}
-                  onClick={() => setMenuIsOpen(true)}
-                  className="icon-btn nav:hidden [&>svg]:size-5.5"
-                >
-                  <Bars3BottomLeftIcon aria-hidden="true" />
-                </button>
+              <Bars2Icon aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-label={searchPlaceholder}
+              aria-haspopup="dialog"
+              onClick={openSearch}
+              className={`${BAR_ICON} nav:hidden`}
+            >
+              <MagnifyingGlassIcon aria-hidden="true" />
+            </button>
 
-                <Link
-                  href={`/${lng}/home`}
-                  className="flex min-w-0 items-center gap-2.5 rounded-xs"
-                >
-                  {lockup}
-                  {!wordmark && <span className="sr-only">Home</span>}
-                </Link>
-              </div>
-
-              <PopoverGroup
-                as="ul"
-                className="hidden items-center justify-self-center nav:flex"
-              >
-                {menu.map((item) => {
-                  if (item.__typename === 'LinkItemRecord') {
-                    return (
-                      <li key={item.id}>
-                        <Link
-                          href={linkHref(item)}
-                          aria-current={isCurrent(item) ? 'page' : undefined}
-                          className={NAV_LINK}
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    );
-                  }
-
-                  const category = item;
+            <PopoverGroup as="ul" className="hidden items-center nav:flex">
+              {leftItems.map((item) => {
+                if (item.__typename === 'LinkItemRecord') {
                   return (
-                    <li key={category.id}>
-                      <Popover>
-                        {/* Headless focuses the button on click: keep the ring for keyboard focus only */}
-                        <PopoverButton
-                          className={`group ${NAV_LINK} not-data-focus:outline-0`}
-                        >
-                          {category.label}
-                          <ChevronDownIcon
-                            aria-hidden="true"
-                            className="size-4 stroke-[2.4] opacity-60 transition duration-200 group-data-open:rotate-180 group-data-open:opacity-100"
-                          />
-                        </PopoverButton>
-
-                        <PopoverPanel
-                          transition
-                          className="absolute inset-x-0 top-full pt-2 transition duration-200 ease-out data-closed:-translate-y-1 data-closed:opacity-0"
-                        >
-                          {({ close }) => (
-                            <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2 rounded-card bg-white p-3 shadow-pop">
-                              {/* Lists of up to 210px each; the tiles take the rest */}
-                              <div className="grid auto-cols-[minmax(9.375rem,13.125rem)] grid-flow-col content-start gap-2">
-                                {category.column.map((column) => (
-                                  <div
-                                    key={column.id}
-                                    className="min-w-0 px-2 py-5"
-                                  >
-                                    <p
-                                      id={`${category.id}-${column.id}-heading`}
-                                      className="eyebrow px-3"
-                                    >
-                                      {column.label}
-                                    </p>
-                                    <ul
-                                      aria-labelledby={`${category.id}-${column.id}-heading`}
-                                      className="mt-3 grid gap-0.5"
-                                    >
-                                      {column.item.map((menuItem) => (
-                                        <li key={menuItem.id}>
-                                          <Link
-                                            href={productsHref(menuItem)}
-                                            onClick={() => close()}
-                                            className="group/link relative block rounded-md py-2 pr-6 pl-3 text-md font-medium transition-colors duration-150 hover:bg-cream focus-visible:bg-cream"
-                                          >
-                                            {menuItem.name}
-                                            <ArrowRightIcon
-                                              aria-hidden="true"
-                                              className="absolute top-1/2 right-2 size-4 -translate-x-1 -translate-y-1/2 stroke-[2.2] opacity-0 transition duration-150 group-hover/link:translate-x-0 group-hover/link:opacity-100 group-focus-visible/link:translate-x-0 group-focus-visible/link:opacity-100"
-                                            />
-                                          </Link>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                ))}
-                              </div>
-                              <div className="grid h-75 grid-cols-2 gap-3 xl:h-85">
-                                {featured(
-                                  category,
-                                  'h-full',
-                                  '(min-width: 1440px) 21rem, 24vw',
-                                  () => close(),
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </PopoverPanel>
-                      </Popover>
+                    <li key={item.id}>
+                      <Link
+                        href={linkHref(item)}
+                        aria-current={isCurrent(item) ? 'page' : undefined}
+                        className={NAV_ITEM}
+                      >
+                        {item.label}
+                      </Link>
                     </li>
                   );
-                })}
-              </PopoverGroup>
+                }
 
-              {/* From xl the cluster fills its column, so the field gives way to long nav labels */}
-              <div className="flex min-w-0 items-center justify-end gap-2 justify-self-end xl:w-full">
-                {/* The field takes this room from xl; the footer carries the switch there */}
-                {showLocale && (
-                  <div className="hidden text-sm nav:block xl:hidden">
-                    <Suspense>
-                      <LanguageSelector
-                        languages={languages}
-                        currencySymbol={generalInterface?.currencySymbol}
-                        className="h-11 rounded-full px-3 hover:bg-cream aria-expanded:bg-cream"
-                      />
-                    </Suspense>
-                  </div>
-                )}
+                const category = item;
+                return (
+                  <li key={category.id}>
+                    <Popover>
+                      {/* Headless focuses the button on click: keep the ring for keyboard focus only */}
+                      <PopoverButton
+                        className={`group ${NAV_ITEM} not-data-focus:outline-0`}
+                      >
+                        {category.label}
+                        <ChevronDownIcon
+                          aria-hidden="true"
+                          className="size-3.75 stroke-2 transition-transform duration-200 group-data-open:rotate-180"
+                        />
+                      </PopoverButton>
 
-                <Suspense fallback={<SearchField {...searchFieldProps} />}>
-                  <SearchFieldWithQuery {...searchFieldProps} />
-                </Suspense>
-
-                <button
-                  type="button"
-                  aria-label={searchPlaceholder}
-                  aria-haspopup="dialog"
-                  onClick={() => setSearchIsOpen(true)}
-                  className="icon-btn bg-cream xl:hidden [&>svg]:size-4.75 [&>svg]:stroke-[2.2]"
-                >
-                  <MagnifyingGlassIcon aria-hidden="true" />
-                </button>
-
-                <button
-                  type="button"
-                  aria-haspopup="dialog"
-                  onClick={() => setCartIsOpen(true)}
-                  className="icon-btn relative bg-ink text-cream [&>svg]:size-4.75"
-                >
-                  <ShoppingBagIcon aria-hidden="true" />
-                  <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-butter px-1 text-xs font-bold text-ink tabular-nums ring-2 ring-white">
-                    0
-                  </span>
-                  <span className="sr-only"> items in bag</span>
-                </button>
-              </div>
-            </nav>
+                      {/* Under the header's hairline, full width */}
+                      <PopoverPanel
+                        transition
+                        className="absolute inset-x-0 top-[calc(100%+1px)] border-b border-line bg-white transition-opacity duration-150 ease-out data-closed:opacity-0"
+                      >
+                        {({ close }) => (
+                          <div className="shell grid grid-cols-12 gap-4 pt-10 pb-12">
+                            <div className="col-span-6 grid grid-cols-3 content-start gap-6 pr-6 xl:gap-8 xl:pr-8">
+                              {category.column.map((column) => (
+                                <div key={column.id} className="min-w-0">
+                                  <p
+                                    id={`${category.id}-${column.id}-heading`}
+                                    className="eyebrow border-b border-line pb-3"
+                                  >
+                                    {column.label}
+                                  </p>
+                                  {/* Full-width 36px rows (-mx-2 px-2
+                                      gives the focus ring room); the 20px leading keeps a
+                                      wrapped name visibly one item */}
+                                  <ul
+                                    aria-labelledby={`${category.id}-${column.id}-heading`}
+                                    className="mt-2.5 -mb-1.5"
+                                  >
+                                    {column.item.map((menuItem) => (
+                                      <li key={menuItem.id}>
+                                        <Link
+                                          href={productsHref(menuItem)}
+                                          onClick={() => close()}
+                                          className="-mx-2 block px-2 py-2 text-base leading-5 text-ink-2 transition-colors duration-150 hover:text-ink"
+                                        >
+                                          {menuItem.name}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="col-span-6 grid grid-cols-2 grid-rows-[1fr_auto] gap-x-4 gap-y-3">
+                              {featured(
+                                category,
+                                '(min-width: 1440px) 20.5rem, 23vw',
+                                () => close(),
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </PopoverPanel>
+                    </Popover>
+                  </li>
+                );
+              })}
+            </PopoverGroup>
           </div>
-        </div>
+
+          <Link
+            href={`/${lng}/home`}
+            className="flex items-center gap-2.5 justify-self-center"
+          >
+            {/* Under 360px the mark alone clears the menu and search buttons */}
+            {lockup('max-[22.5rem]:sr-only')}
+            {!wordmark && <span className="sr-only">Home</span>}
+          </Link>
+
+          <div className="-mr-2.5 flex min-w-0 items-center justify-self-end">
+            {rightLinks.length > 0 && (
+              <ul className="hidden items-center [--nav-x:clamp(0.625rem,calc((100vw_-_68.75rem)/45_+_0.625rem),0.875rem)] nav:flex">
+                {rightLinks.map((link) => (
+                  <li key={link.id}>
+                    <Link
+                      href={linkHref(link)}
+                      aria-current={isCurrent(link) ? 'page' : undefined}
+                      className={NAV_ITEM}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <span
+              aria-hidden="true"
+              className="mx-2 hidden h-5 w-px bg-line nav:block xl:mx-3"
+            />
+            <div className="hidden nav:block">
+              <Suspense>
+                <LanguageSelector
+                  languages={languages}
+                  currencySymbol={generalInterface?.currencySymbol}
+                  // Globe only until xl; screen readers always get the label
+                  labelClassName="max-xl:sr-only"
+                  className="h-10 px-2.5 text-sm hover:bg-mist aria-expanded:bg-mist max-xl:w-10 max-xl:justify-center max-xl:px-0 [&>svg]:size-5"
+                />
+              </Suspense>
+            </div>
+            <button
+              type="button"
+              aria-label={searchPlaceholder}
+              aria-haspopup="dialog"
+              onClick={openSearch}
+              className={`${BAR_ICON} hidden nav:inline-flex`}
+            >
+              <MagnifyingGlassIcon aria-hidden="true" />
+            </button>
+            {/* The glyph ends about on the content edge, mirroring the menu button. The
+                counter overlaps the body's top-right corner, clear of the handle, and
+                overhangs 12px into the gutter (mr-0.75 keeps it 8px off a phone's edge). */}
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              onClick={() => setCartIsOpen(true)}
+              className={`${BAR_ICON} relative mr-0.75`}
+            >
+              <ShoppingBagIcon aria-hidden="true" />
+              <span className="tag-dark absolute top-0 -right-1.25 min-h-4.5 min-w-4.5 justify-center px-1 leading-4.5 tracking-normal">
+                0
+              </span>
+              <span className="sr-only"> items in bag</span>
+            </button>
+          </div>
+        </nav>
       </header>
 
-      {/* The mega menu's scrim. It lives outside the sticky header, where its blur can reach
-          the page; a click on it is a click outside the menu, which closes it. */}
+      {/* The mega menu's scrim: outside the sticky header, so it can cover the page; a click
+          on it is a click outside the menu, which closes it */}
       <div
         aria-hidden="true"
-        className="invisible fixed inset-0 z-44 bg-ink/30 opacity-0 backdrop-blur-xs transition-[opacity,visibility] duration-300 ease-out peer-has-[[data-open]]:visible peer-has-[[data-open]]:opacity-100"
+        className="invisible fixed inset-0 z-44 bg-ink/30 opacity-0 transition-[opacity,visibility] duration-200 ease-out peer-has-[[data-open]]:visible peer-has-[[data-open]]:opacity-100"
       />
     </>
   );

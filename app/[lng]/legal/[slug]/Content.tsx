@@ -52,31 +52,30 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
     sections.push({ id, title });
   }
 
+  // The document's h1 is the page title, so it takes the page-title step rather than prose's
   return (
-    <div className="shell grid gap-4 pt-1 xl:grid-cols-12 xl:gap-5">
+    <div className="shell grid pt-(--page-top) lg:grid-cols-12 lg:gap-x-4">
       {sections.length > 0 && (
         <SectionIndex label={label} sections={sections} />
       )}
       <article
         lang={params.lng}
-        className={`rounded-card bg-white px-(--panel-pad) py-10 sm:py-14 lg:py-20 ${sections.length > 0 ? 'xl:col-span-9' : 'xl:col-span-12'}`}
+        className={`prose-dato [&_h1]:title-statement ${sections.length > 0 ? 'lg:col-span-8 lg:col-start-5' : 'lg:col-span-full'}`}
       >
-        <div className="prose-dato mx-auto max-w-[68ch] [&_:is(h1,h2)]:hyphens-auto [&_:is(h1,h2)]:[hyphenate-limit-chars:13_5_5]">
-          <DatoStructuredText
-            data={value}
-            customNodeRules={[
-              renderNodeRule(
-                isHeading,
-                ({ adapter: { renderNode }, node, children, key }) =>
-                  renderNode(
-                    `h${node.level}`,
-                    { key, id: anchors.get(node) },
-                    children,
-                  ),
-              ),
-            ]}
-          />
-        </div>
+        <DatoStructuredText
+          data={value}
+          customNodeRules={[
+            renderNodeRule(
+              isHeading,
+              ({ adapter: { renderNode }, node, children, key }) =>
+                renderNode(
+                  `h${node.level}`,
+                  { key, id: anchors.get(node) },
+                  children,
+                ),
+            ),
+          ]}
+        />
       </article>
     </div>
   );

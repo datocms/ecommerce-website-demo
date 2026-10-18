@@ -2,16 +2,17 @@
 
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { type ReactNode, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { type ReactNode, useLayoutEffect, useRef, useState } from 'react';
 import Drawer from '@/components/Common/Drawer';
 import { PendingQueryProvider } from '@/components/Common/SideFilter';
 
 type PropTypes = {
   count: number;
   lng: string;
-  /** Filter groups that narrow the listing, shown as a badge on the trigger */
+  /** Filter groups that narrow the listing, shown as a count on the trigger */
   narrowed?: number;
-  /** Sort chips, shown in the toolbar */
+  /** Sort tabs, shown in the toolbar */
   sort?: ReactNode;
   searchChip?: ReactNode;
   /** The toolbar follows a filter header instead of the page header */
@@ -31,21 +32,48 @@ const ProductFilters = ({
   const [open, setOpen] = useState(false);
   const results = `${count} ${count === 1 ? 'result' : 'results'}`;
 
+  const landed = useSearchParams().toString();
+  const toolbar = useRef<HTMLDivElement>(null);
+  const resultsTop = useRef<HTMLDivElement>(null);
+  const rewindTo = useRef<string | null>(null);
+  const awaitQuery = (query: string) => {
+    if (query !== landed) rewindTo.current = query;
+  };
+
+  // From lg the toolbar sticks, so sort and filters can change far down the list.
+  // The new results then start from the top, right under the toolbar; at the top
+  // of the page nothing moves. It waits for the drawer to close, whose scroll lock
+  // would otherwise put the old position back on iOS
+  useLayoutEffect(() => {
+    if (open || rewindTo.current !== landed) return;
+    rewindTo.current = null;
+    const overlap =
+      (toolbar.current?.getBoundingClientRect().bottom ?? 0) -
+      (resultsTop.current?.getBoundingClientRect().top ?? 0);
+    if (overlap > 1) window.scrollBy({ top: -overlap, behavior: 'instant' });
+  }, [landed, open]);
+
   return (
-    <PendingQueryProvider>
-      <div className={`shell ${framed ? 'pt-8' : 'pt-6'} lg:pt-10`}>
-        <div className="flex flex-wrap items-center gap-3">
+    <PendingQueryProvider onPush={awaitQuery}>
+      {/* A hairline bar that sticks under the header from lg. Right under the header it
+          shares the header's hairline; after a filter header it draws its own, which
+          tucks under the header's while stuck */}
+      <div
+        ref={toolbar}
+        className={`border-b border-line bg-white lg:sticky lg:z-20 ${framed ? 'mt-16 border-t lg:top-[calc(var(--header-h)-1px)] lg:mt-24' : 'lg:top-(--header-h)'}`}
+      >
+        <div className="shell flex flex-wrap items-center gap-x-6 lg:flex-nowrap">
           <button
             type="button"
             onClick={() => setOpen(true)}
             aria-haspopup="dialog"
             aria-expanded={open}
-            className={`chip shrink-0 gap-2 pl-4 font-bold ${narrowed ? 'pr-2' : 'pr-5'}`}
+            className="-ml-2 inline-flex h-14 shrink-0 items-center gap-2.5 px-2 text-sm font-semibold underline-offset-4 outline-offset-[-2px] hover:underline [&>svg]:size-5"
           >
             <AdjustmentsHorizontalIcon aria-hidden="true" />
             Filters
             {narrowed > 0 && (
-              <span className="grid h-6 min-w-6 place-items-center rounded-full bg-ink px-1.5 text-xs font-bold text-cream tabular-nums">
+              <span className="tag-dark min-h-6 px-1.5">
                 <span className="sr-only"> (</span>
                 {narrowed}
                 <span className="sr-only"> applied)</span>
@@ -53,19 +81,24 @@ const ProductFilters = ({
             )}
           </button>
           {sort && (
-            // Phones and tablets: a row of its own that scrolls edge to edge.
-            // From lg it sizes to its chips, so a long search chip wraps to the
-            // next line instead of squeezing the sort options
-            <div className="order-last -mx-(--gutter) w-[calc(100%+2*var(--gutter))] lg:order-none lg:-my-1 lg:mx-0 lg:w-auto lg:min-w-0 lg:flex-auto">
-              {sort}
-            </div>
+            <>
+              <span
+                aria-hidden="true"
+                className="hidden h-6 w-px bg-line lg:block"
+              />
+              {/* Phones and tablets: a row of its own under a hairline, edge to edge.
+                  From lg it sits between Filters and the count at its full width */}
+              <div className="order-last -mx-(--gutter) w-[calc(100%+2*var(--gutter))] border-t border-line lg:order-none lg:mx-0 lg:w-auto lg:min-w-0 lg:border-t-0">
+                {sort}
+              </div>
+            </>
           )}
-          {/* Below lg it shares the Filters row, so a long search chip
-              truncates there instead of wrapping to a row of its own */}
-          <div className="ml-auto flex min-w-0 items-center justify-end gap-3 max-lg:flex-1 max-lg:basis-0">
+          {/* A long search chip truncates before the sort tabs give way: below lg on
+              the Filters row, from lg beside the tabs */}
+          <div className="ml-auto flex min-w-0 items-center justify-end gap-4 max-lg:flex-1 max-lg:basis-0 lg:shrink-[999]">
             {searchChip}
             <p
-              className="shrink-0 text-sm font-semibold text-muted tabular-nums"
+              className="shrink-0 text-sm text-mute tabular-nums"
               aria-live="polite"
             >
               {results}
@@ -73,6 +106,8 @@ const ProductFilters = ({
           </div>
         </div>
       </div>
+      {/* Where the results start: the toolbar's bottom edge while it isn't stuck */}
+      <div ref={resultsTop} />
       <Drawer
         open={open}
         onClose={() => setOpen(false)}
@@ -80,22 +115,25 @@ const ProductFilters = ({
         title="Filters"
         closeLabel="Close filters"
         footer={
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-6">
             <p role="status" className="sr-only">
               {results}
             </p>
             <Link
               href={`/${lng}/products`}
               scroll={false}
-              onClick={() => setOpen(false)}
-              className="link-cta shrink-0 text-sm"
+              onClick={() => {
+                awaitQuery('');
+                setOpen(false);
+              }}
+              className="link-underline inline-flex min-h-11 shrink-0 items-center text-sm font-semibold"
             >
               Clear all
             </Link>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="btn-primary flex-1 tabular-nums"
+              className="btn flex-1 tabular-nums"
             >
               Show {results}
             </button>

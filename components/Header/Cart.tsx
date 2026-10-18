@@ -20,23 +20,23 @@ export default function Cart({ open, onClose, currencySymbol }: PropTypes) {
       closeLabel="Close bag"
       title={
         <>
-          Bag <span className="text-muted tabular-nums">(0)</span>
+          Bag <span className="font-normal text-mute tabular-nums">(0)</span>
         </>
       }
       footer={
         <>
-          <div className="flex justify-between text-md font-bold">
+          <div className="flex justify-between text-md font-semibold">
             <p>Subtotal</p>
             <p className="tabular-nums">
               {formatPrice(currencySymbol ?? '', 0)}
             </p>
           </div>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-mute">
             Shipping and taxes calculated at checkout.
           </p>
           <button
             type="button"
-            className="btn-primary mt-5 w-full"
+            className="btn mt-5 w-full"
             aria-disabled="true"
           >
             Checkout
@@ -44,16 +44,14 @@ export default function Cart({ open, onClose, currencySymbol }: PropTypes) {
         </>
       }
     >
-      <div className="flex gap-3 rounded-nav bg-cream p-4">
-        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white text-forest-2">
-          <InformationCircleIcon
-            aria-hidden="true"
-            className="size-4.5 stroke-[2.2]"
-          />
-        </span>
+      <div className="flex gap-3 bg-mist p-4">
+        <InformationCircleIcon
+          aria-hidden="true"
+          className="mt-0.5 size-5 shrink-0"
+        />
         <div>
-          <p className="text-base font-bold">This is a DatoCMS Demo</p>
-          <p className="mt-1 text-sm text-pretty text-muted">
+          <p className="text-base font-semibold">This is a DatoCMS Demo</p>
+          <p className="mt-1 text-sm text-pretty text-ink-2">
             To use the cart and enable purchases, an integration with Shopify or
             Commerce Layer is necessary.
           </p>
@@ -61,21 +59,18 @@ export default function Cart({ open, onClose, currencySymbol }: PropTypes) {
       </div>
 
       {/* Centred in the free space, so the sheet doesn't end on a void */}
-      <div className="my-auto flex flex-col items-center py-10 text-center">
-        <span className="grid size-20 place-items-center rounded-full bg-oat">
-          <ShoppingBagIcon
-            aria-hidden="true"
-            className="size-7.5 stroke-[1.9]"
-          />
+      <div className="my-auto flex flex-col items-center py-12 text-center">
+        <span className="grid size-20 place-items-center bg-mist">
+          <ShoppingBagIcon aria-hidden="true" className="size-7" />
         </span>
-        <p className="title-md mt-6">Your bag is empty</p>
-        <p className="mt-2 max-w-[28ch] text-base text-pretty text-muted">
+        <p className="title-card mt-6">Your bag is empty</p>
+        <p className="mt-2 max-w-[28ch] text-sm text-pretty text-mute">
           Pieces you add to your bag will appear here.
         </p>
         <button
           type="button"
           onClick={onClose}
-          className="btn-secondary btn-sm mt-6 h-12 px-6"
+          className="btn-line btn-sm mt-7"
         >
           Continue shopping
         </button>

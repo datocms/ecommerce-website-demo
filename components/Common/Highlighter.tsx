@@ -5,7 +5,7 @@ const Highlighter = (rawTagName: any, props: any, ...children: any) => {
     return (
       <mark
         key={props?.key}
-        className="-mx-1 rounded-xs bg-accent-wash box-decoration-clone px-1 text-ink"
+        className="-mx-0.5 bg-accent-wash box-decoration-clone px-0.5 text-ink"
       >
         {children}
       </mark>

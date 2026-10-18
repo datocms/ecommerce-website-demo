@@ -9,7 +9,7 @@ import {
 import { type MouseEvent, useRef, useState } from 'react';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
-import { FOREST_CARD, PAGE_VARS } from '@/components/Sections/ui';
+import { IMG_ZOOM, MEDIA, PAGE_VARS } from '@/components/Sections/ui';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { PageProps, Query } from './meta';
@@ -17,12 +17,13 @@ import type { PageProps, Query } from './meta';
 const pad = (value: number) => String(value).padStart(2, '0');
 
 const DESCRIPTION =
-  'mt-6 max-w-[36em] text-md leading-[1.6] text-pretty text-cream/85 xl:mt-8 2xl:text-lg 2xl:leading-[1.6]';
+  'mt-6 max-w-[36em] text-md text-pretty text-ink-2 lg:text-base 2xl:[@media(min-height:56.25rem)]:text-md';
+const MAPS = 'btn mt-6 w-full sm:w-auto 2xl:[@media(min-height:56.25rem)]:mt-8';
 
 const Content: ContentPage<PageProps, Query> = ({ data }) => {
   const [currentStore, setCurrentStore] = useState(0);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   const allStores = data.allStores;
@@ -34,23 +35,30 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
   const findOnMaps = data.generalInterface?.findOnMaps;
 
   // The photo covers its box, so it renders at the box's width or at its height × the photo's
-  // ratio, whichever is wider. The box is 4:3 below lg; from lg the forest card sets its height
-  // (about 660-810px, by locale) while its column is 50vw, then 58vw, then 790px wide
+  // ratio, whichever is wider. Below lg the box is full width and 4:3; from lg it is 6 of 12
+  // columns plus the right gutter (50vw - 8px), 7 from 2xl (50vw + 107px), and at most 780px
+  // tall (--hero-h), unless a long description makes the text column taller
   const { width, height } = image
     ? readFragment(ResponsiveImageFragment, image)
     : { width: 1, height: 1 };
   const ratio = width / height;
-  const cover = (from: number, to: number, vw: number, boxHeight: number) => {
+  const cover = (
+    from: number,
+    to: number,
+    vw: number,
+    offset: number,
+    boxHeight: number,
+  ) => {
     const px = Math.round(boxHeight * ratio);
-    const vwFrom = Math.round((px * 100) / vw);
-    if (vwFrom <= from) return `(min-width: ${from}px) ${vw}vw`;
-    if (vwFrom >= to) return `(min-width: ${from}px) ${px}px`;
-    return `(min-width: ${vwFrom}px) ${vw}vw, (min-width: ${from}px) ${px}px`;
+    const box = `calc(${vw}vw ${offset < 0 ? '-' : '+'} ${Math.abs(offset)}px)`;
+    const crossing = Math.ceil(((px - offset) * 100) / vw);
+    if (crossing <= from) return `(min-width: ${from}px) ${box}`;
+    if (crossing >= to) return `(min-width: ${from}px) ${px}px`;
+    return `(min-width: ${crossing}px) ${box}, (min-width: ${from}px) ${px}px`;
   };
   const sizes = [
-    `(min-width: 1440px) ${Math.max(790, Math.round(750 * ratio))}px`,
-    cover(1280, 1440, 58, 750),
-    cover(1024, 1280, 50, 780),
+    cover(1440, Number.POSITIVE_INFINITY, 50, 107, 780),
+    cover(1024, 1440, 50, -8, 780),
     `${Math.round(Math.max(100, 75 * ratio))}vw`,
   ].join(', ');
 
@@ -61,29 +69,58 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
     );
   };
 
+  // Phones show the pager above the store, wider screens under it: each layout gets its own copy
+  // (the other one is display: none), so the tab and reading order always follow what is seen
+  const pager = (className: string) => (
+    <div className={`flex items-center justify-between gap-6 ${className}`}>
+      <p className="text-sm font-semibold tabular-nums">
+        {pad(currentStore + 1)}{' '}
+        <span className="font-normal text-mute">/ {pad(allStores.length)}</span>
+      </p>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          aria-label="Previous store"
+          className="rail-btn"
+          onClick={() => step(-1)}
+        >
+          <ArrowLeftIcon aria-hidden="true" className="stroke-2" />
+        </button>
+        <button
+          type="button"
+          aria-label="Next store"
+          className="rail-btn"
+          onClick={() => step(1)}
+        >
+          <ArrowRightIcon aria-hidden="true" className="stroke-2" />
+        </button>
+      </div>
+    </div>
+  );
+
   // Below lg the index sits under the store, so picking one there takes focus (and the view, when
   // the name is out of it) up to its name. From lg a click leaves the page where it is while a
-  // good part of the card shows, so the index stays under the pointer; a key press only moves on
-  // when the name is out of view
+  // good part of the text column shows, so the index stays under the pointer; a key press only
+  // moves on when the name is out of view
   const showStore = (index: number, event: MouseEvent) => {
     setCurrentStore(index);
     const heading = headingRef.current;
-    const card = cardRef.current;
-    if (!heading || !card) return;
+    const text = textRef.current;
+    if (!heading || !text) return;
     const headerOffset =
       Number.parseFloat(
         getComputedStyle(document.documentElement).scrollPaddingTop,
       ) || 0;
     const { top, bottom } = heading.getBoundingClientRect();
     const inView = top >= headerOffset && bottom <= window.innerHeight;
-    const cardBox = card.getBoundingClientRect();
-    const cardShown =
-      Math.min(cardBox.bottom, window.innerHeight) -
-        Math.max(cardBox.top, headerOffset) >=
+    const textBox = text.getBoundingClientRect();
+    const textShown =
+      Math.min(textBox.bottom, window.innerHeight) -
+        Math.max(textBox.top, headerOffset) >=
       (window.innerHeight - headerOffset) / 4;
     if (
       window.matchMedia('(min-width: 64rem)').matches &&
-      (inView || (event.detail > 0 && cardShown))
+      (inView || (event.detail > 0 && textShown))
     ) {
       return;
     }
@@ -92,12 +129,14 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
   };
 
   return (
-    <div className={`${PAGE_VARS} pt-1`}>
-      <div
+    <div className={PAGE_VARS}>
+      <section
         ref={heroRef}
-        className="shell grid gap-3 sm:gap-4 lg:grid-cols-12 xl:min-h-(--hero-h)"
+        className="shell grid lg:min-h-(--hero-h) lg:grid-cols-12 lg:gap-4"
       >
-        <div className="relative aspect-[4/3] overflow-hidden rounded-card bg-oat lg:order-last lg:col-span-6 lg:aspect-auto xl:col-span-7">
+        <div
+          className={`${MEDIA} -mx-(--gutter) aspect-[4/3] lg:order-last lg:col-span-6 lg:mx-0 lg:aspect-auto lg:bleed-r 2xl:col-span-7`}
+        >
           {image && (
             <DatoImage
               key={store.id}
@@ -111,52 +150,42 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
         </div>
 
         <div
-          ref={cardRef}
+          ref={textRef}
           aria-live="polite"
-          className={`${FOREST_CARD} relative mx-2 -mt-16 flex flex-col shadow-pop sm:mx-0 sm:mt-0 sm:shadow-none lg:col-span-6 xl:col-span-5`}
+          className="flex flex-col pt-4 md:pt-8 lg:col-span-6 lg:py-8 lg:pr-10 xl:py-10 xl:pr-14 2xl:col-span-5 2xl:[@media(min-height:56.25rem)]:py-12"
         >
-          {/* The pager keeps the top right corner: a country too long to sit beside it wraps
-              onto the row below, so the arrows never move under the thumb */}
-          <div className="flex flex-wrap-reverse items-center gap-4">
-            <p className="pretitle bg-butter">{store.country}</p>
-            <div className="-mr-1 ml-auto flex items-center gap-1">
-              <button
-                type="button"
-                aria-label="Previous store"
-                className="icon-btn ring-1 ring-white/25 hover:bg-butter hover:bg-none hover:text-ink hover:ring-butter"
-                onClick={() => step(-1)}
-              >
-                <ArrowLeftIcon aria-hidden="true" className="stroke-[2.4]" />
-              </button>
-              <span className="min-w-14 text-center text-sm font-bold tabular-nums">
-                {pad(currentStore + 1)}{' '}
-                <span className="text-cream/70">/ {pad(allStores.length)}</span>
-              </span>
-              <button
-                type="button"
-                aria-label="Next store"
-                className="icon-btn ring-1 ring-white/25 hover:bg-butter hover:bg-none hover:text-ink hover:ring-butter"
-                onClick={() => step(1)}
-              >
-                <ArrowRightIcon aria-hidden="true" className="stroke-[2.4]" />
-              </button>
-            </div>
-          </div>
-
-          {/* From md every store's name and text share one cell, so the card keeps the longest
-              store's height and the index stays put under the pointer; the spare room goes above
-              the link. Below md only the current store renders. The current store always comes
-              first, so the h1 keeps its node (and focus) from one store to the next */}
-          <div className="mt-8 grid grow sm:mt-10">
+          {/* From md every store's text shares one cell, so the column keeps the longest store's
+              height: the pager under it and the index below stay put, and the spare room goes
+              under the shorter stores' link. Below md only the current store renders and the
+              pager sits above it, so the arrows never move under the thumb. Until 2xl the text
+              takes half the row; from 2xl it takes 5 columns, and only the name may run 32px into
+              the right padding, so the longest store name keeps one line while the copy, link
+              and pager keep their distance from the photo. The copy is 16px from lg, with a
+              tight rhythm, so even the longest store keeps the pager above the fold of a
+              730px-tall screen; once the hero reaches its full 780px (2xl, 900px tall) the copy
+              grows to 17px and the rhythm opens up. The current store always comes first, so
+              the h1 keeps its node (and focus) from one store to the next */}
+          {pager('border-b pb-4 md:hidden')}
+          <div className="grid grow max-md:mt-8">
             <div className="col-start-1 row-start-1">
+              <p className="eyebrow">{store.country}</p>
               <h1
                 ref={headingRef}
                 tabIndex={-1}
-                className="sc-title focus:outline-hidden"
+                className="title-display mt-4 focus:outline-hidden 2xl:-mr-8"
               >
                 {store.storeName}
               </h1>
               <p className={DESCRIPTION}>{store.storeDescription}</p>
+              <a
+                href={`https://www.google.com/maps/?q=${store.storeLocation?.latitude},${store.storeLocation?.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={MAPS}
+              >
+                {findOnMaps}
+                <ArrowUpRightIcon aria-hidden="true" className="stroke-2" />
+              </a>
             </div>
             {allStores.map((item, index) =>
               index === currentStore ? null : (
@@ -165,65 +194,72 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
                   aria-hidden="true"
                   className="col-start-1 row-start-1 max-md:hidden md:invisible"
                 >
-                  <p className="sc-title">{stripStega(item.storeName)}</p>
+                  <p className="eyebrow">{stripStega(item.country)}</p>
+                  <p className="title-display mt-4 2xl:-mr-8">
+                    {stripStega(item.storeName)}
+                  </p>
                   <p className={DESCRIPTION}>
                     {stripStega(item.storeDescription)}
                   </p>
+                  <span className={MAPS}>
+                    {stripStega(findOnMaps)}
+                    <ArrowUpRightIcon className="stroke-2" />
+                  </span>
                 </div>
               ),
             )}
           </div>
 
-          <a
-            href={`https://www.google.com/maps/?q=${store.storeLocation?.latitude},${store.storeLocation?.longitude}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-butter mt-8 self-start"
-          >
-            {findOnMaps}
-            <ArrowUpRightIcon aria-hidden="true" />
-          </a>
+          {pager(
+            'mt-8 border-t pt-5 max-md:hidden 2xl:[@media(min-height:56.25rem)]:mt-10',
+          )}
         </div>
-      </div>
+      </section>
 
-      <ol className="shell relative mt-3 grid gap-3 sm:mt-4 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+      <ol className="shell grid pt-16 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-3 lg:pt-24">
         {allStores.map((item, index) => {
-          const current = index === currentStore;
           const thumbnail = item.thumbnail?.responsiveImage;
+          // Each row draws its own rules, so the index ends with its last row; between sm and lg
+          // an odd last store takes the whole row, so its rules run the full width
           return (
-            <li key={item.id} className="grid sm:max-lg:odd:last:col-span-2">
+            <li
+              key={item.id}
+              className="-mt-px border-y sm:max-lg:odd:last:col-span-2"
+            >
               <button
                 type="button"
-                aria-current={current ? 'true' : undefined}
+                aria-current={index === currentStore ? 'true' : undefined}
                 onClick={(event) => showStore(index, event)}
-                className="group flex w-full items-center gap-4 rounded-card bg-white p-2 pr-4 text-left transition-shadow duration-200 hover:shadow-card focus-visible:outline-offset-4 aria-[current=true]:inset-ring-2 aria-[current=true]:inset-ring-ink"
+                className="group flex w-full items-center gap-4 py-4 text-left"
               >
                 <span
                   aria-hidden="true"
-                  className="relative size-17 shrink-0 overflow-hidden rounded-image bg-oat"
+                  className={`${MEDIA} size-18 shrink-0`}
                 >
                   {thumbnail && (
-                    <DatoImage
-                      fragment={thumbnail}
-                      layout="fill"
-                      objectFit="cover"
-                      sizes="68px"
-                    />
+                    <span className={`absolute inset-0 ${IMG_ZOOM}`}>
+                      <DatoImage
+                        fragment={thumbnail}
+                        layout="fill"
+                        objectFit="cover"
+                        sizes="72px"
+                      />
+                    </span>
                   )}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="title-sm block text-pretty">
+                  <span className="title-item block text-pretty decoration-1 underline-offset-4 group-hover:underline">
                     {item.storeName}
                   </span>
-                  <span className="mt-1 block text-sm font-semibold text-muted">
+                  <span className="mt-1 block text-sm text-mute">
                     {item.country}
                   </span>
                 </span>
                 <span
                   aria-hidden="true"
-                  className="grid size-9 shrink-0 place-items-center rounded-full bg-cream sm:max-md:hidden lg:max-xl:hidden transition-colors duration-150 group-hover:bg-ink group-hover:text-cream group-aria-[current=true]:bg-ink group-aria-[current=true]:text-cream"
+                  className="grid size-10 shrink-0 place-items-center text-ink-2 transition-colors duration-150 group-hover:bg-ink group-hover:text-white group-aria-[current=true]:bg-ink group-aria-[current=true]:text-white"
                 >
-                  <ArrowRightIcon className="size-4 stroke-[2.4]" />
+                  <ArrowRightIcon className="size-4.5 stroke-2" />
                 </span>
               </button>
             </li>

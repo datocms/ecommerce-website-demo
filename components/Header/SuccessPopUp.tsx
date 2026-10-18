@@ -28,13 +28,13 @@ const SuccessPopUp = ({ open, onDismiss, returnFocusRef }: Props) => {
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
       }}
-      // Above the draft toggle (48px), on the same gutter line
-      className="fixed right-(--gutter) bottom-[calc(var(--inset)+3.75rem)] z-60 w-[min(100vw-2*var(--gutter),22.5rem)]"
+      // Above the draft toggle (48px, 16px off the bottom edge), on the same gutter line
+      className="fixed right-(--gutter) bottom-19 z-60 w-[min(100vw-2*var(--gutter),22.5rem)]"
     >
       {open && (
-        <div className="flex items-center gap-3 rounded-full bg-ink py-2 pr-2 pl-2 text-sm font-semibold text-cream shadow-pop transition duration-200 ease-out [--focus-ring:var(--color-cream)] starting:translate-y-2 starting:opacity-0">
-          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-butter text-ink">
-            <CheckIcon aria-hidden="true" className="size-4.25 stroke-[2.8]" />
+        <div className="surface-ink flex items-center gap-3 py-2 pr-1 pl-2 text-sm font-semibold transition duration-200 ease-out starting:translate-y-2 starting:opacity-0">
+          <span className="grid size-8 shrink-0 place-items-center bg-white text-ink">
+            <CheckIcon aria-hidden="true" className="size-4 stroke-[2.5]" />
           </span>
           <p>Authentication successful</p>
           <button
@@ -46,7 +46,7 @@ const SuccessPopUp = ({ open, onDismiss, returnFocusRef }: Props) => {
               onDismiss();
               returnFocusRef?.current?.focus();
             }}
-            className="icon-btn relative ml-auto size-9 after:absolute after:-inset-1 [&>svg]:size-4.25 [&>svg]:stroke-[2.4]"
+            className="icon-btn ml-auto size-10 [&>svg]:size-4.5 [&>svg]:stroke-2"
           >
             <XMarkIcon aria-hidden="true" />
           </button>

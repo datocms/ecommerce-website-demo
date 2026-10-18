@@ -1,11 +1,11 @@
 import { executeQuery } from '@datocms/cda-client';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { TadaDocumentNode } from 'gql.tada';
 
 export default async function queryDatoCMS<
   TResult = unknown,
   TVariables = Record<string, unknown>,
 >(
-  document: TypedDocumentNode<TResult, TVariables>,
+  document: TadaDocumentNode<TResult, TVariables>,
   variables?: TVariables,
   isDraft?: boolean,
 ): Promise<TResult> {

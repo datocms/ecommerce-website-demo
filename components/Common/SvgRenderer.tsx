@@ -1,21 +1,21 @@
 'use client';
 
-import type { URL } from 'node:url';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Props = {
-  url: string | URL;
+  url: string;
+  className?: string;
 };
 
-const SvgRenderer = ({ url }: Props) => {
+// CMS social icons are filled currentColor glyphs. The parent link carries the aria-label.
+const SvgRenderer = ({ url, className }: Props) => {
   const [svgContent, setSvgContent] = useState('');
 
   useEffect(() => {
     const fetchSvg = async () => {
       try {
         const response = await fetch(url);
-        const svgText = await response.text();
-        setSvgContent(svgText);
+        setSvgContent(await response.text());
       } catch (error) {
         console.error('Error fetching SVG:', error);
       }
@@ -25,8 +25,11 @@ const SvgRenderer = ({ url }: Props) => {
   }, [url]);
 
   return (
-    <div
-      className="fill-current [&>*]:text-gray-400"
+    <span
+      aria-hidden="true"
+      className={['inline-flex [&_svg]:size-5 [&_svg]:fill-current', className]
+        .filter(Boolean)
+        .join(' ')}
       dangerouslySetInnerHTML={{ __html: svgContent }}
     />
   );

@@ -1,7 +1,7 @@
 'use client';
 
+import { usePathname, useRouter } from 'next/navigation';
 import { ContentLink as DatoContentLink } from 'react-datocms/content-link';
-import { useRouter, usePathname } from 'next/navigation';
 
 export default function ContentLink() {
   const router = useRouter();

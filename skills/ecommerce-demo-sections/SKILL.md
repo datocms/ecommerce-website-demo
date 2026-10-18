@@ -5,7 +5,7 @@ description: >-
   especially requests like "add a new homepage section", "add a featured brands
   section", "show three featured brands on the homepage", or "add a homepage
   block". Handles sections rendered through app/[lng]/home/Content.tsx,
-  app/[lng]/home/query.graphql, components/Sections/**/fragment.graphql, and
+  app/[lng]/home/meta.ts, components/Sections/**/fragments.ts, and
   components/Sections/** React components. Also use when the section displays
   existing catalog data such as brands, materials, collections, or products.
   Do not use for product listing filters, product detail blocks, new page
@@ -29,11 +29,11 @@ Before schema or content operations:
 Homepage sections follow this chain:
 
 1. A DatoCMS block record appears inside `home.sections`.
-2. The block has a fragment in `components/Sections/<SectionName>/fragment.graphql`.
+2. The block has a `graphql()` fragment in `components/Sections/<SectionName>/fragments.ts`.
 3. The block has a React renderer in `components/Sections/<SectionName>/index.tsx`.
-4. `app/[lng]/home/query.graphql` includes an inline fragment for the block.
+4. The `query` in `app/[lng]/home/meta.ts` spreads the fragment inside `sections` and lists it in the `graphql()` dependencies array.
 5. `app/[lng]/home/Content.tsx` switches on `section.__typename` and renders the component.
-6. GraphQL types are refreshed after query or fragment changes.
+6. gql.tada infers the types from the query and fragments, so there is no generation step.
 
 Existing section examples: Hero, Divider, ProductShowcase, MaterialShowcase, Testimonials.
 
@@ -53,11 +53,11 @@ Existing section examples: Hero, Divider, ProductShowcase, MaterialShowcase, Tes
    - Use existing records for referenced content when possible. For example, a featured brands section should link existing Brand records.
    - If no content selection is specified, choose a small deterministic set of existing valid records, preferably 3 items, and mention that choice in the final summary.
    - If the Home record is currently published, publish the updated Home record after adding the section so published mode and draft preview both render it.
-6. Add the section fragment beside the section component.
+6. Add the section fragment to `fragments.ts` beside the section component, listing the fragments it spreads (such as `ResponsiveImageFragment`) in its dependencies array.
 7. Add or update the React component under `components/Sections/` using this starter's existing component props pattern.
-8. Add the inline fragment to `app/[lng]/home/query.graphql`.
-9. Add a `case` to the switch in `app/[lng]/home/Content.tsx` using the generated `__typename`.
-10. Refresh GraphQL types.
+8. Spread the fragment inside `sections` in `app/[lng]/home/meta.ts` and add it to the dependencies array.
+9. Add a `case` to the switch in `app/[lng]/home/Content.tsx` using the block's `__typename`.
+10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 11. Verify published rendering and draft/live preview rendering.
 
 ## Guardrails
@@ -69,7 +69,7 @@ Existing section examples: Hero, Divider, ProductShowcase, MaterialShowcase, Tes
 
 ## Acceptance criteria
 
-- The section appears in generated homepage query types.
+- The section appears in the homepage `Query` type inferred from `app/[lng]/home/meta.ts`.
 - The existing Home singleton contains the new section block in `sections`.
 - If `sections` is localized, the section is present in each active locale unless scoped otherwise.
 - The section renders on the homepage in published mode.

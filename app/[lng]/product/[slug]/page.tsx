@@ -1,12 +1,12 @@
 import { draftMode } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { toNextMetadata } from 'react-datocms/seo';
-import getAvailableLocales, { getFallbackLocale } from '@/app/i18n/settings';
-import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
-import {
-  ProductStaticParamsDocument,
+import getAvailableLocales, {
+  getFallbackLocale,
   type SiteLocale,
-} from '@/graphql/types/graphql';
+} from '@/app/i18n/settings';
+import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
+import { graphql } from '@/lib/datocms/graphql';
 import {
   buildProductSlugMap,
   resolveProductSlug,
@@ -17,11 +17,22 @@ import Content from './Content';
 import { type PageProps, type Query, query, type Variables } from './meta';
 import RealTime from './RealTime';
 
+const staticParamsQuery = graphql(/* GraphQL */ `
+  query ProductStaticParams($locale: SiteLocale) {
+    allProducts(
+      first: 100
+      locale: $locale
+    ) {
+      slug
+    }
+  }
+`);
+
 export async function generateStaticParams() {
   const locales = await getAvailableLocales();
   const params = await Promise.all(
     locales.map(async (lng) => {
-      const { allProducts } = await queryDatoCMS(ProductStaticParamsDocument, {
+      const { allProducts } = await queryDatoCMS(staticParamsQuery, {
         locale: lng as SiteLocale,
       });
 

@@ -1,4 +1,4 @@
-import type { SiteLocale } from '@/graphql/types/graphql';
+import type { SiteLocale } from '@/app/i18n/settings';
 
 // Type for incoming page props (params as Promise - Next.js 16)
 export type GlobalPageProps = {

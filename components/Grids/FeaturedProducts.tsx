@@ -1,12 +1,9 @@
 import { stripStega } from '@datocms/content-link';
-import Link from 'next/link';
-import { getFragmentData } from '@/graphql/types';
-import {
-  ProductGeneralInterfaceFragmentDoc,
-  type ProductQuery,
-} from '@/graphql/types/graphql';
+import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
+import ProductCard from '@/components/Common/ProductCard';
+import { ProductGeneralInterfaceFragment } from '@/components/Products/Product/GeneralInferface/fragments';
+import { readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import DatoImage from '../DatoImage';
 
 type PropTypes = {
   data: ProductQuery;
@@ -14,76 +11,47 @@ type PropTypes = {
 };
 
 const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
-  const { sale, currencySymbol } = getFragmentData(
-    ProductGeneralInterfaceFragmentDoc,
-    data.generalInterface!,
-  );
+  const { sale, currencySymbol } =
+    readFragment(ProductGeneralInterfaceFragment, data.generalInterface) ?? {};
+
+  const relatedProducts = data.product?.relatedProducts ?? [];
+  if (relatedProducts.length === 0) return null;
+
+  // Below md a flex snap rail that bleeds off the right edge; each card sits in its own 4-row grid,
+  // so a short name leaves no gap. From md the wrappers drop out and the cards share the grid's rows
+  const fourUp = relatedProducts.length >= 4;
 
   return (
-    <>
-      <div className="bg-white px-16 py-6 sm:py-8 lg:mx-56 lg:px-8 lg:py-12">
-        <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
-          <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 md:gap-x-6 lg:grid-cols-3 xl:grid-cols-3">
-            {data.product?.relatedProducts.map((product) => {
-              const isOnSale = stripStega(product?.sale || '') === 'on_sale';
-              return (
-                <div key={product.id}>
-                  <Link
-                    href={`/${globalPageProps.params.lng}/product/${product.slug}`}
-                    className="group relative mb-2 block h-96 overflow-hidden rounded-lg bg-gray-100 shadow-lg lg:mb-3"
-                  >
-                    <div className="h-full w-full object-cover object-center transition duration-200 group-hover:scale-105">
-                      <DatoImage
-                        fragment={product.productImages[0].responsiveImage!}
-                        className="h-full w-full object-contain"
-                        layout="fill"
-                        objectFit="cover"
-                        objectPosition="50% 50%"
-                      />
-                    </div>
-
-                    {isOnSale && (
-                      <div className="absolute bottom-2 left-0 flex gap-2">
-                        <span className="rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
-                          {sale}
-                        </span>
-                      </div>
-                    )}
-                  </Link>
-
-                  <div className="flex items-start justify-between gap-2 px-2">
-                    <div className="flex flex-col">
-                      <a
-                        href="#"
-                        className="text-lg font-bold text-gray-800 transition duration-100 hover:text-gray-500 lg:text-xl"
-                      >
-                        {product.name}
-                      </a>
-                      <span className="text-gray-500">
-                        {product.brand?.name}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col items-end">
-                      <span className="font-bold text-gray-600 lg:text-lg">
-                        {currencySymbol}
-                        {isOnSale ? product.salePrice : product.price}
-                      </span>
-                      {isOnSale && (
-                        <span className="text-sm text-red-500 line-through">
-                          {currencySymbol}
-                          {product.price}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+    <section className="pt-(--section-gap)">
+      <div
+        className={`rail no-scrollbar flex snap-x snap-mandatory gap-x-3 overflow-x-auto py-1 sm:gap-x-4 md:-mb-4 md:grid md:snap-none md:grid-cols-3 md:overflow-visible md:py-0 md:[--card-row-gap:1rem] ${fourUp ? 'xl:grid-cols-4' : ''}`}
+      >
+        {relatedProducts.map((product) => {
+          return (
+            <div
+              key={product.id}
+              className="grid w-[72vw] max-w-[18.75rem] shrink-0 snap-start grid-rows-[auto_auto_auto_1fr] sm:w-[18.75rem] md:contents"
+            >
+              <ProductCard
+                href={`/${globalPageProps.params.lng}/product/${stripStega(product.slug)}`}
+                name={product.name}
+                brand={product.brand?.name}
+                image={product.productImages[0]?.responsiveImage}
+                hoverImage={product.productImages[1]?.responsiveImage}
+                price={product.price}
+                salePrice={product.salePrice}
+                onSale={stripStega(product.sale || '') === 'on_sale'}
+                currencySymbol={currencySymbol ?? ''}
+                saleLabel={sale}
+                sizes={`(min-width: 1440px) ${fourUp ? '340px' : '450px'}, (min-width: 1280px) ${fourUp ? '24vw' : '32vw'}, (min-width: 768px) 32vw, min(72vw, 300px)`}
+                titleAs="p"
+                data-datocms-content-link-group
+              />
+            </div>
+          );
+        })}
       </div>
-    </>
+    </section>
   );
 };
 

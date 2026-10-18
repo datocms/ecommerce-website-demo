@@ -1,5 +1,11 @@
-import { isHeading, isList, isListItem } from 'datocms-structured-text-utils';
+import {
+  isHeading,
+  isList,
+  isListItem,
+  isRoot,
+} from 'datocms-structured-text-utils';
 import { notFound } from 'next/navigation';
+import { Fragment, isValidElement, type ReactNode } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import FeaturedProducts from '@/components/Grids/FeaturedProducts';
@@ -10,6 +16,13 @@ import Reviews from '@/components/Products/Reviews';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
 
+type TextRow = { key: string; text: ReactNode[]; lists: ReactNode[] };
+type TextGroup = { key: string; rows: TextRow[] };
+
+// The renderer keys top-level nodes "t-<index>", which leads back to the node's type
+const nodeIndex = (child: ReactNode) =>
+  isValidElement(child) ? Number(String(child.key).split('-').pop()) : -1;
+
 const Content: ContentPage<PageProps, Query> = ({
   data,
   ...globalPageProps
@@ -18,69 +31,122 @@ const Content: ContentPage<PageProps, Query> = ({
     notFound();
   }
   return (
-    <div className="mx-auto max-w-[1480px]">
+    <>
       <ProductView data={data} globalPageProps={globalPageProps} />
-      <div className="mx-12 mt-8 sm:mx-24 lg:mx-64">
-        <div className="text-gray-500">
-          {data.product.description && (
-            <DatoStructuredText
-              data={data.product.description}
-              renderBlock={({ record }) => {
-                switch (record.__typename) {
-                  case 'ProductFeatureSectionRecord':
-                    return (
-                      <ProductInfoSection
-                        ProductInfoFragment={record}
-                        MaterialFragment={data.product?.material}
-                        generalInterfaceFragment={data.generalInterface}
-                        globalPageProps={globalPageProps}
-                      />
-                    );
-                  case 'FeaturedQuestionsSectionRecord':
-                    return <QuestionsSection fragment={record} />;
-                  default:
-                    return null;
+      {data.product.description && (
+        <div className="shell pt-(--section-gap)">
+          <DatoStructuredText
+            data={data.product.description}
+            className="grid gap-3 sm:gap-4 lg:gap-5"
+            renderBlock={({ record }) => {
+              switch (record.__typename) {
+                case 'ProductFeatureSectionRecord':
+                  return (
+                    <ProductInfoSection
+                      ProductInfoFragment={record}
+                      MaterialFragment={data.product?.material}
+                      generalInterfaceFragment={data.generalInterface}
+                      globalPageProps={globalPageProps}
+                    />
+                  );
+                case 'FeaturedQuestionsSectionRecord':
+                  return <QuestionsSection fragment={record} />;
+                default:
+                  return null;
+              }
+            }}
+            customNodeRules={[
+              // Text between blocks becomes one white card: copy on the left, care chips on the right.
+              // Copy that follows a list starts a new row, so the source order is kept.
+              renderNodeRule(isRoot, ({ node, children, key }) => {
+                const parts: Array<{ block: ReactNode } | TextGroup> = [];
+                for (const child of children ?? []) {
+                  const type = node.children[nodeIndex(child)]?.type;
+                  if (type === 'block') {
+                    parts.push({ block: child });
+                    continue;
+                  }
+                  const last = parts.at(-1);
+                  const group =
+                    last && 'rows' in last
+                      ? last
+                      : { key: `text-${parts.length}`, rows: [] };
+                  if (group !== last) parts.push(group);
+                  let row = group.rows.at(-1);
+                  if (!row || (type !== 'list' && row.lists.length > 0)) {
+                    row = {
+                      key: `row-${group.rows.length}`,
+                      text: [],
+                      lists: [],
+                    };
+                    group.rows.push(row);
+                  }
+                  (type === 'list' ? row.lists : row.text).push(child);
                 }
-              }}
-              customNodeRules={[
-                renderNodeRule(isHeading, ({ children, key }) => {
-                  return (
-                    <h3
-                      className="mb-4 mt-9 text-xl font-bold text-black dark:text-white sm:text-2xl lg:text-xl xl:text-2xl"
-                      key={key}
-                    >
-                      {children}
-                    </h3>
-                  );
-                }),
-                renderNodeRule(isListItem, ({ children, key }) => {
-                  return (
-                    <div
-                      key={key}
-                      className="whitespace-nowrap rounded-full bg-primary/80 px-4 py-2 text-center text-sm font-medium text-white"
-                    >
-                      <div>{children}</div>
-                    </div>
-                  );
-                }),
-                renderNodeRule(isList, ({ children, key }) => {
-                  return (
-                    <div
-                      key={key}
-                      className="-mb-4 flex flex-col items-center justify-center gap-4 py-8 md:mb-0 md:flex-row "
-                    >
-                      {children}
-                    </div>
-                  );
-                }),
-              ]}
-            />
-          )}
+                return (
+                  <Fragment key={key}>
+                    {parts.map((part) => {
+                      if ('block' in part) return part.block;
+                      return (
+                        <div
+                          key={part.key}
+                          className="grid gap-8 rounded-card bg-white p-(--card-pad) lg:grid-cols-12 lg:gap-10 lg:p-(--panel-pad)"
+                        >
+                          {part.rows.map((row) => {
+                            const both =
+                              row.text.length > 0 && row.lists.length > 0;
+                            return (
+                              <Fragment key={row.key}>
+                                {row.text.length > 0 && (
+                                  <div
+                                    className={`prose-dato [&>p]:text-[1.1875rem] [&>p]:leading-[1.6] xl:[&>p]:text-[1.3125rem] ${both ? 'lg:col-span-7' : 'lg:col-span-full'}`}
+                                  >
+                                    {row.text}
+                                  </div>
+                                )}
+                                {row.lists.length > 0 && (
+                                  <div
+                                    className={`grid content-start gap-2 ${both ? 'lg:col-span-4 lg:col-start-9' : 'lg:col-span-full'}`}
+                                  >
+                                    {row.lists}
+                                  </div>
+                                )}
+                              </Fragment>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </Fragment>
+                );
+              }),
+              renderNodeRule(isHeading, ({ node, children, key }) => {
+                // The page already has its h1
+                const Heading =
+                  node.level === 1 ? 'h2' : (`h${node.level}` as const);
+                return <Heading key={key}>{children}</Heading>;
+              }),
+              renderNodeRule(isListItem, ({ children, key }) => {
+                return (
+                  <li key={key} className="chip bg-cream shadow-none [&>p]:m-0">
+                    {children}
+                  </li>
+                );
+              }),
+              renderNodeRule(isList, ({ children, key }) => {
+                return (
+                  <ul key={key} className="flex flex-wrap gap-2">
+                    {children}
+                  </ul>
+                );
+              }),
+            ]}
+          />
         </div>
-      </div>
+      )}
       <FeaturedProducts data={data} globalPageProps={globalPageProps} />
       <Reviews data={data} globalPageProps={globalPageProps} />
-    </div>
+    </>
   );
 };
 

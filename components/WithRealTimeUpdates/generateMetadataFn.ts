@@ -1,4 +1,4 @@
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { TadaDocumentNode } from 'gql.tada';
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import {
@@ -16,7 +16,7 @@ export function generateMetadataFn<
   TResult = unknown,
   TVariables = Record<string, unknown>,
 >(options: {
-  query: TypedDocumentNode<TResult, TVariables>;
+  query: TadaDocumentNode<TResult, TVariables>;
   buildVariables?: BuildVariablesFn<PageProps, TVariables>;
   generate: (
     data: TResult,

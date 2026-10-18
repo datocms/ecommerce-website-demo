@@ -1,10 +1,10 @@
-import Highlighter from '@/components/Common/Highlighter';
 import { cloneElement, type ReactElement } from 'react';
 import {
+  type CdaStructuredTextRecord,
   StructuredText,
   type StructuredTextPropTypes,
-  type CdaStructuredTextRecord,
 } from 'react-datocms/structured-text';
+import Highlighter from '@/components/Common/Highlighter';
 
 function addBoundaryAttribute(
   result: ReactElement | null,
@@ -19,17 +19,23 @@ export default function DatoStructuredText<
   BlockRecord extends CdaStructuredTextRecord = CdaStructuredTextRecord,
   LinkRecord extends CdaStructuredTextRecord = CdaStructuredTextRecord,
   InlineBlockRecord extends CdaStructuredTextRecord = CdaStructuredTextRecord,
->(props: StructuredTextPropTypes<BlockRecord, LinkRecord, InlineBlockRecord>) {
+>(
+  props: StructuredTextPropTypes<BlockRecord, LinkRecord, InlineBlockRecord> & {
+    /** Classes for the wrapper div */
+    className?: string;
+  },
+) {
   const {
     renderBlock,
     renderInlineRecord,
     renderLinkToRecord,
     renderNode,
+    className,
     ...rest
   } = props;
 
   return (
-    <div data-datocms-content-link-group>
+    <div data-datocms-content-link-group className={className}>
       <StructuredText
         {...rest}
         renderNode={renderNode ?? Highlighter}

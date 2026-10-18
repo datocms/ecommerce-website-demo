@@ -1,69 +1,57 @@
-import type { Dispatch, SetStateAction } from 'react';
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { type RefObject, useEffect, useState } from 'react';
 
 type Props = {
-  setSuccessToast: Dispatch<SetStateAction<boolean>>;
+  open: boolean;
+  onDismiss: () => void;
+  returnFocusRef?: RefObject<HTMLElement | null>;
 };
 
-const SuccessPopUp = ({ setSuccessToast }: Props) => {
+const SuccessPopUp = ({ open, onDismiss, returnFocusRef }: Props) => {
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  // Auto-hide after 5s; the timer pauses while the toast is hovered or focused
+  useEffect(() => {
+    if (!open || hovered || focused) return;
+    const timeout = setTimeout(onDismiss, 5000);
+    return () => clearTimeout(timeout);
+  }, [open, hovered, focused, onDismiss]);
+
   return (
+    // The live region stays mounted so the message is announced when it appears
     <div
-      role="alert"
-      className="rounded-xl border border-gray-100 bg-white p-6 shadow-xl"
+      role="status"
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
+      }}
+      // Above the draft toggle (48px), on the same gutter line
+      className="fixed right-(--gutter) bottom-[calc(var(--inset)+3.75rem)] z-60 w-[min(100vw-2*var(--gutter),22.5rem)]"
     >
-      <div className="flex items-center justify-center gap-4 text-center">
-        <span className="text-green-600">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="h-12 w-12"
+      {open && (
+        <div className="flex items-center gap-3 rounded-full bg-ink py-2 pr-2 pl-2 text-sm font-semibold text-cream shadow-pop transition duration-200 ease-out [--focus-ring:var(--color-cream)] starting:translate-y-2 starting:opacity-0">
+          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-butter text-ink">
+            <CheckIcon aria-hidden="true" className="size-4.25 stroke-[2.8]" />
+          </span>
+          <p>Authentication successful</p>
+          <button
+            type="button"
+            aria-label="Dismiss"
+            onClick={() => {
+              setHovered(false);
+              setFocused(false);
+              onDismiss();
+              returnFocusRef?.current?.focus();
+            }}
+            className="icon-btn relative ml-auto size-9 after:absolute after:-inset-1 [&>svg]:size-4.25 [&>svg]:stroke-[2.4]"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </span>
-
-        <div className="flex-1">
-          <strong className="block font-medium text-gray-900">
-            Authentication Successfull!
-          </strong>
-
-          <p className="mt-1 text-center text-sm text-gray-700">
-            You are now fetching DatoCMS from the Draft endpoint, with Real-Time
-            updates!
-          </p>
+            <XMarkIcon aria-hidden="true" />
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            setSuccessToast(false);
-          }}
-          className="text-gray-500 transition hover:text-gray-600"
-        >
-          <span className="sr-only">Dismiss popup</span>
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="h-6 w-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      </div>
+      )}
     </div>
   );
 };

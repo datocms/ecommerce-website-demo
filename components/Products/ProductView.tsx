@@ -1,14 +1,22 @@
 'use client';
 
 import { stripStega } from '@datocms/content-link';
+import { CheckIcon, HeartIcon, TruckIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { useState } from 'react';
-import { getFragmentData } from '@/graphql/types';
 import {
-  ProductGeneralInterfaceFragmentDoc,
-  type ProductQuery,
-} from '@/graphql/types/graphql';
+  type CSSProperties,
+  type UIEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
+import Price from '@/components/Common/Price';
+import StarRating from '@/components/Common/StarRating';
+import { ProductGeneralInterfaceFragment } from '@/components/Products/Product/GeneralInferface/fragments';
+import { readFragment } from '@/lib/datocms/graphql';
+import { contrast, hexToRgb, WHITE } from '@/utils/color';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 import DatoImage from '../DatoImage';
 
@@ -17,24 +25,66 @@ type Props = {
   globalPageProps: ResolvedGlobalPageProps;
 };
 
+type Variation = NonNullable<
+  ProductQuery['product']
+>['productVariations'][number];
+
 const allSizes = ['xs', 's', 'm', 'l', 'xl'];
+
+//narrow down of json field with checkbox field editor
+const sizesOf = (variation?: Variation) =>
+  (variation?.availableSizes as Array<string> | null | undefined) ?? [];
+
+const firstAvailableSize = (variation?: Variation) => {
+  const available = sizesOf(variation);
+  return allSizes.find((size) => available.includes(size)) ?? available[0];
+};
 
 const ProductView = ({ data, globalPageProps }: Props) => {
   if (!data.product) notFound();
 
-  const [selectedColor, setSelectedColor] = useState(
-    data.product.productVariations[0].color.hex,
+  const { product } = data;
+  const variations = product.productVariations;
+  const images = product.productImages;
+
+  const [selectedVariationId, setSelectedVariationId] = useState(
+    variations[0]?.id,
   );
 
   const [selectedSize, setSelectedSize] = useState(
-    (data.product.productVariations[0].availableSizes as Array<string>)[0], //narrow down of json field with checkbox field editor
+    firstAvailableSize(variations[0]),
   );
 
-  const [selectedImage, setSelectedImage] = useState(
-    data.product.productImages[0],
-  );
+  // First photo in view: phones show one at a time, tablets two
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  const isOnSale = stripStega(data.product?.sale || '') === 'on_sale';
+  // The gallery is a tab stop only while it scrolls (not once the photos stack from lg)
+  const galleryRef = useRef<HTMLElement>(null);
+  const [galleryScrolls, setGalleryScrolls] = useState(true);
+  useEffect(() => {
+    const gallery = galleryRef.current;
+    if (!gallery) return;
+    const observer = new ResizeObserver(() =>
+      setGalleryScrolls(gallery.scrollWidth > gallery.clientWidth + 1),
+    );
+    observer.observe(gallery);
+    return () => observer.disconnect();
+  }, []);
+
+  // A buy box taller than the viewport sticks by its bottom edge, so its actions stay in view
+  const buyBoxRef = useRef<HTMLDivElement>(null);
+  const [buyBoxHeight, setBuyBoxHeight] = useState<number>();
+  useEffect(() => {
+    const box = buyBoxRef.current;
+    if (!box) return;
+    const observer = new ResizeObserver(() =>
+      setBuyBoxHeight(box.offsetHeight),
+    );
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, []);
+
+  const isOnSale = stripStega(product.sale || '') === 'on_sale';
 
   const {
     sale,
@@ -47,273 +97,237 @@ const ProductView = ({ data, globalPageProps }: Props) => {
     primaryButton,
     secondaryButton,
   } =
-    getFragmentData(
-      ProductGeneralInterfaceFragmentDoc,
-      data.generalInterface,
-    ) ?? {};
+    readFragment(ProductGeneralInterfaceFragment, data.generalInterface) ?? {};
+
+  const selectedVariation =
+    variations.find((variation) => variation.id === selectedVariationId) ??
+    variations[0];
+  const availableSizes = sizesOf(selectedVariation);
+
+  const selectVariation = (variation: Variation) => {
+    setSelectedVariationId(variation.id);
+    setSelectedSize(firstAvailableSize(variation));
+  };
+
+  const handleGalleryScroll = (event: UIEvent<HTMLElement>) => {
+    const { scrollLeft, children } = event.currentTarget;
+    const first = children[0] as HTMLElement | undefined;
+    const second = children[1] as HTMLElement | undefined;
+    if (!first) return;
+    const pitch = second
+      ? second.offsetLeft - first.offsetLeft
+      : first.clientWidth;
+    if (!pitch) return;
+    const slide = Math.round(scrollLeft / pitch);
+    setCurrentSlide(Math.min(Math.max(slide, 0), images.length - 1));
+  };
+
+  // Phones swipe one photo at a time, tablets two. From lg the photos stack beside the buy box,
+  // and from xl three or more pair up (an odd first one spans the row)
+  const paired = images.length >= 3;
+  const oddImageCount = images.length % 2 === 1;
 
   return (
-    <div className="flex w-full items-center justify-center">
-      <div className="flex w-full justify-center bg-white py-6 sm:py-8 lg:py-12">
-        <div className="mx-8 w-full max-w-[1080px] md:ml-20 lg:ml-56">
-          <div className="grid w-full items-center gap-8 md:ml-4 md:grid-cols-2">
-            <div className="grid flex-shrink-0 gap-4 lg:h-full lg:grid-cols-5">
-              <div className="order-last flex gap-4 lg:order-none lg:flex-col">
-                {data.product.productImages.map((image) => {
-                  if (image === selectedImage)
-                    return (
-                      <div
-                        key={image.id}
-                        className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100"
-                      >
-                        {image.responsiveImage && (
-                          <DatoImage
-                            fragment={image.responsiveImage}
-                            className="h-full w-full object-contain"
-                            layout="fill"
-                            objectFit="cover"
-                            objectPosition="50% 50%"
-                          />
-                        )}
-                      </div>
-                    );
-
-                  return (
-                    <div
-                      key={image.id}
-                      className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100 transition duration-200 hover:scale-105 hover:cursor-pointer"
-                      onClick={() => {
-                        setSelectedImage(image);
-                      }}
-                    >
-                      {image.responsiveImage && (
-                        <DatoImage
-                          fragment={image.responsiveImage}
-                          className="h-full w-full object-contain"
-                          layout="fill"
-                          objectFit="cover"
-                          objectPosition="50% 50%"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="relative w-full overflow-hidden rounded-lg bg-gray-100 md:h-80 lg:col-span-4 lg:h-full">
-                <div className="h-[500px] sm:h-[650px] md:h-full">
-                  {selectedImage?.responsiveImage && (
-                    <DatoImage
-                      fragment={selectedImage?.responsiveImage}
-                      className="h-full w-full object-contain"
-                      layout="fill"
-                      objectFit="cover"
-                      objectPosition="50% 50%"
-                    />
-                  )}
-                </div>
-
-                {isOnSale && (
-                  <span className="absolute left-0 top-0 rounded-br-lg bg-red-500 px-3 py-1.5 text-sm uppercase tracking-wider text-white">
+    <div className="shell grid gap-3 pt-1 sm:gap-4 lg:grid-cols-12 lg:gap-5">
+      <div className="relative min-w-0 lg:col-span-7">
+        <section
+          ref={galleryRef}
+          aria-label={product.name}
+          tabIndex={galleryScrolls ? 0 : undefined}
+          onScroll={handleGalleryScroll}
+          className={`no-scrollbar peer flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-nav focus-visible:outline-hidden lg:grid lg:snap-none lg:gap-4 lg:overflow-visible ${paired ? 'xl:grid-cols-2' : ''}`}
+        >
+          {images.map((image, index) => {
+            const spansRow = paired && oddImageCount && index === 0;
+            return (
+              <div
+                key={image.id}
+                className={`relative aspect-[4/5] w-full shrink-0 snap-start overflow-hidden rounded-nav bg-oat sm:w-[calc((100%-0.75rem)/2)] lg:w-auto ${spansRow ? 'xl:col-span-2' : ''}`}
+              >
+                {image.responsiveImage && (
+                  <DatoImage
+                    fragment={image.responsiveImage}
+                    layout="fill"
+                    objectFit="cover"
+                    sizes={
+                      paired && !spansRow
+                        ? '(min-width: 1440px) 390px, (min-width: 1280px) 28vw, (min-width: 1024px) 55vw, (min-width: 640px) 50vw, 100vw'
+                        : '(min-width: 1440px) 790px, (min-width: 1024px) 55vw, (min-width: 640px) 50vw, 100vw'
+                    }
+                    priority={index === 0}
+                  />
+                )}
+                {index === 0 && isOnSale && sale && (
+                  <span className="badge absolute top-4 left-4 z-10 bg-sale text-white">
                     {sale}
                   </span>
                 )}
-
-                <a
-                  href="#"
-                  className="absolute right-4 top-4 inline-block rounded-lg border bg-white px-3.5 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-primary/30 transition duration-100 hover:bg-gray-100 focus-visible:ring active:text-gray-700 md:text-base"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </svg>
-                </a>
               </div>
+            );
+          })}
+        </section>
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-10 hidden rounded-nav outline-2 outline-offset-2 outline-ink peer-focus-visible:block"
+        />
+        {images.length > 1 && (
+          <span
+            aria-hidden="true"
+            className="badge absolute right-4 bottom-4 z-10 sm:hidden"
+          >
+            {currentSlide + 1} / {images.length}
+          </span>
+        )}
+        {images.length > 2 && (
+          <span
+            aria-hidden="true"
+            className="badge absolute right-4 bottom-4 z-10 hidden sm:inline-flex lg:hidden"
+          >
+            {currentSlide + 1}–{Math.min(currentSlide + 2, images.length)} /{' '}
+            {images.length}
+          </span>
+        )}
+      </div>
+
+      {/* Tablets: product and shipping on the left, options on the right */}
+      <div
+        ref={buyBoxRef}
+        style={
+          buyBoxHeight
+            ? ({ '--buy-box-h': `${buyBoxHeight}px` } as CSSProperties)
+            : undefined
+        }
+        className="rounded-card bg-white p-(--card-pad) md:grid md:grid-cols-2 md:grid-rows-[auto_1fr] md:gap-x-10 lg:sticky lg:top-[min(calc(var(--header-h)_+_1rem),calc(100vh_-_var(--buy-box-h,0px)_-_1rem))] lg:col-span-5 lg:block lg:self-start"
+      >
+        <div>
+          <Link
+            href={`/${globalPageProps.params.lng}/products?brands=${product.brand.id}`}
+            className="eyebrow inline-flex min-h-6 items-center underline-offset-4 hover:underline"
+          >
+            {product.brand?.name}
+          </Link>
+          <h1 className="title-lg mt-3">{product.name}</h1>
+
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+            <div>
+              <Price
+                price={product.price}
+                salePrice={product.salePrice}
+                onSale={isOnSale}
+                currencySymbol={currencySymbol ?? ''}
+                size="lg"
+              />
+              {priceUndertext && (
+                <p className="mt-0.5 text-sm text-muted">{priceUndertext}</p>
+              )}
             </div>
-
-            <div className="mx-auto flex w-80 flex-col items-center justify-center text-center md:mx-0 md:block md:text-left">
-              <div className="mb-2 md:mb-3">
-                <Link
-                  href={`/${globalPageProps.params.lng}/products?brands=${data.product.brand.id}`}
-                  className="mb-0.5 inline-block cursor-pointer text-gray-500 hover:underline"
-                >
-                  {data.product.brand?.name}
-                </Link>
-                <h2 className="text-2xl font-bold text-gray-800 lg:text-3xl">
-                  {data.product.name}
-                </h2>
-              </div>
-
-              <div className="mb-6 flex items-center gap-3 md:mb-10">
-                <div className="flex h-7 items-center gap-1 rounded-full bg-primary/90 px-2 text-white">
-                  <span className="text-sm">{data.product.reviewAverage}</span>
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                </div>
-
-                <span className="text-sm text-gray-500 transition duration-100">
-                  {data.product.numberOfReviews} {reviews}
-                </span>
-              </div>
-
-              <div className="mb-4 md:mb-6">
-                <span className="mb-3 inline-block text-sm font-semibold text-gray-500 md:text-base">
-                  {color}
-                </span>
-
-                <div className="flex flex-wrap gap-2">
-                  {data.product.productVariations.map((variation) => {
-                    if (variation.color.hex === selectedColor)
-                      return (
-                        <span
-                          key={variation.id}
-                          style={{ backgroundColor: variation.color.hex }}
-                          className="h-8 w-8 rounded-full border ring-2 ring-gray-800 ring-offset-1 transition duration-100"
-                        />
-                      );
-                    return (
-                      <button
-                        key={variation.id}
-                        type="button"
-                        style={{ backgroundColor: variation.color.hex }}
-                        className={
-                          'h-8 w-8 rounded-full border ring-2 ring-transparent ring-offset-1 transition duration-100 hover:ring-gray-200'
-                        }
-                        onClick={() => {
-                          setSelectedColor(variation.color.hex);
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="mb-8 md:mb-10">
-                <span className="mb-3 inline-block text-sm font-semibold text-gray-500 md:text-base">
-                  {size}
-                </span>
-
-                <div className="flex flex-wrap gap-3">
-                  {allSizes.map((size) => {
-                    if (
-                      (
-                        data.product?.productVariations.find(
-                          (item) => item.color.hex === selectedColor,
-                        )?.availableSizes as Array<string>
-                      ).find((item) => item === size)
-                    ) {
-                      if (selectedSize === size)
-                        return (
-                          <span
-                            key={size}
-                            className="border-primary/90-500 flex h-8 w-12 cursor-default items-center justify-center rounded-md border bg-primary/90 text-center text-sm font-semibold text-white"
-                          >
-                            {size.toUpperCase()}
-                          </span>
-                        );
-                      return (
-                        <button
-                          key={size}
-                          type="button"
-                          className="flex h-8 w-12 items-center justify-center rounded-md border bg-white text-center text-sm font-semibold text-gray-800 transition duration-100 hover:bg-gray-100 active:bg-gray-200"
-                          onClick={() => {
-                            setSelectedSize(size);
-                          }}
-                        >
-                          {size.toUpperCase()}
-                        </button>
-                      );
-                    }
-                    return (
-                      <span
-                        key={size}
-                        className="flex h-8 w-12 cursor-not-allowed items-center justify-center rounded-md border bg-white text-center text-sm font-semibold text-gray-400"
-                      >
-                        {size.toUpperCase()}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="mb-4">
-                {isOnSale && (
-                  <div className="flex items-end gap-2">
-                    <span className="text-xl font-bold text-gray-800 md:text-2xl">
-                      {currencySymbol} {data.product.salePrice}
-                    </span>
-                    <span className="mb-0.5 text-red-500 line-through">
-                      {currencySymbol} {data.product.price}
-                    </span>
-                  </div>
-                )}
-
-                {!isOnSale && (
-                  <div className="">
-                    <span className="text-xl font-bold text-gray-800 md:text-2xl">
-                      {currencySymbol} {data.product.price}
-                    </span>
-                  </div>
-                )}
-
-                <span className="text-sm text-gray-500">{priceUndertext}</span>
-              </div>
-
-              <div className="mb-6 flex items-center gap-2 text-gray-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"
-                  />
-                </svg>
-
-                <span className="text-sm">{shippingText}</span>
-              </div>
-
-              <div className="flex w-[90%] flex-col gap-2.5">
-                <a
-                  href="#"
-                  className="inline-block flex-1 rounded-lg bg-primary/90 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-primary/40 transition duration-100 hover:bg-primary focus-visible:ring active:bg-primary/50 sm:flex-none md:text-base"
-                >
-                  {primaryButton}
-                </a>
-
-                <a
-                  href="#"
-                  className="inline-block rounded-lg bg-gray-200 px-8 py-3 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-300 focus-visible:ring active:text-gray-700 md:text-base"
-                >
-                  {secondaryButton}
-                </a>
-              </div>
-            </div>
+            <a
+              href="#reviews"
+              className="inline-flex min-h-11 items-center gap-2.5 rounded-full bg-cream pr-4 pl-3.5 text-sm font-semibold transition-colors hover:bg-oat"
+            >
+              <StarRating value={product.reviewAverage} size={16} />
+              <span className="tabular-nums">
+                {product.numberOfReviews} {reviews}
+              </span>
+            </a>
           </div>
         </div>
+
+        <div className="mt-6 border-t border-line pt-6 md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:border-t-0 md:pt-1 lg:mt-6 lg:border-t lg:pt-6">
+          <p id="pdp-color-label" className="text-sm font-bold">
+            {color}
+          </p>
+          <fieldset
+            aria-labelledby="pdp-color-label"
+            className="mt-2 -ml-1.5 flex min-w-0 flex-wrap gap-1"
+          >
+            {variations.map((variation) => {
+              const hex = stripStega(variation.color.hex);
+              const rgb = hexToRgb(hex);
+              const light = rgb ? contrast(rgb, WHITE) < 3 : false;
+              const selected = variation.id === selectedVariation?.id;
+              return (
+                // Selected: an inner ink ring and a tick, so it reads apart from the outer focus ring
+                <button
+                  key={variation.id}
+                  type="button"
+                  aria-label={`${color ?? 'Color'}: ${hex}`}
+                  aria-pressed={selected}
+                  onClick={() => selectVariation(variation)}
+                  className="grid size-12 place-items-center rounded-full ring-ink/30 transition-shadow ring-inset hover:ring-2 aria-pressed:ring-2 aria-pressed:ring-ink"
+                >
+                  <span
+                    style={{ backgroundColor: hex }}
+                    className={`grid size-9 place-items-center rounded-full ring-1 ring-inset ${light ? 'text-ink ring-border-strong' : 'text-white ring-ink/15'} forced-color-adjust-none`}
+                  >
+                    {selected && (
+                      <CheckIcon
+                        aria-hidden="true"
+                        className="size-[1.125rem] stroke-[2.4]"
+                      />
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </fieldset>
+
+          <p id="pdp-size-label" className="mt-5 text-sm font-bold">
+            {size}{' '}
+            <span className="ml-1 font-semibold text-muted tabular-nums">
+              {selectedSize?.toUpperCase()}
+            </span>
+          </p>
+          <fieldset
+            aria-labelledby="pdp-size-label"
+            className="mt-3 grid min-w-0 grid-cols-5 gap-2"
+          >
+            {allSizes.map((sizeOption) => {
+              const available = availableSizes.includes(sizeOption);
+              return (
+                <button
+                  key={sizeOption}
+                  type="button"
+                  disabled={!available}
+                  aria-pressed={
+                    available ? selectedSize === sizeOption : undefined
+                  }
+                  onClick={() => setSelectedSize(sizeOption)}
+                  className="chip h-12 px-0 text-base font-bold tabular-nums"
+                >
+                  {sizeOption.toUpperCase()}
+                </button>
+              );
+            })}
+          </fieldset>
+
+          <div className="mt-6 grid gap-2">
+            <div className="flex gap-2">
+              <button type="button" className="btn-primary flex-1">
+                {primaryButton}
+              </button>
+              <button
+                type="button"
+                aria-label="Add to wishlist"
+                className="icon-btn size-13 bg-white ring-1 ring-line ring-inset"
+              >
+                <HeartIcon aria-hidden="true" />
+              </button>
+            </div>
+            <button type="button" className="btn-secondary w-full">
+              {secondaryButton}
+            </button>
+          </div>
+        </div>
+
+        {shippingText && (
+          <p className="mt-5 flex items-center gap-3 rounded-nav bg-cream p-3 text-sm font-semibold md:col-start-1 md:row-start-2 md:self-end">
+            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white">
+              <TruckIcon aria-hidden="true" className="size-[1.125rem]" />
+            </span>
+            {shippingText}
+          </p>
+        )}
       </div>
     </div>
   );

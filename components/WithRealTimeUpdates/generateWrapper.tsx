@@ -1,4 +1,4 @@
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { TadaDocumentNode } from 'gql.tada';
 import { draftMode } from 'next/headers';
 import { getFallbackLocale } from '@/app/i18n/settings';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
@@ -15,7 +15,7 @@ export function generateWrapper<
   TResult = unknown,
   TVariables = Record<string, unknown>,
 >(options: {
-  query: TypedDocumentNode<TResult, TVariables>;
+  query: TadaDocumentNode<TResult, TVariables>;
   buildVariables?: BuildVariablesFn<PageProps, TVariables>;
   contentComponent: ContentPage<PageProps, TResult>;
   realtimeComponent: RealtimeUpdatesPage<PageProps, TResult, TVariables>;

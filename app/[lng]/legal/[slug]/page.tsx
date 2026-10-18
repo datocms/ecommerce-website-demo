@@ -1,19 +1,24 @@
-import getAvailableLocales from '@/app/i18n/settings';
+import getAvailableLocales, { type SiteLocale } from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
-import {
-  LegalStaticParamsDocument,
-  type SiteLocale,
-} from '@/graphql/types/graphql';
+import { graphql } from '@/lib/datocms/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import Content from './Content';
 import { type PageProps, type Query, query, type Variables } from './meta';
 import RealTime from './RealTime';
 
+const staticParamsQuery = graphql(/* GraphQL */ `
+  query LegalStaticParams {
+    allLegalPages(first: 100) {
+      slug
+    }
+  }
+`);
+
 export async function generateStaticParams() {
   const locales = await getAvailableLocales();
-  const { allLegalPages } = await queryDatoCMS(LegalStaticParamsDocument);
+  const { allLegalPages } = await queryDatoCMS(staticParamsQuery);
 
   return allLegalPages.flatMap((legal) =>
     locales.map((lng) => ({

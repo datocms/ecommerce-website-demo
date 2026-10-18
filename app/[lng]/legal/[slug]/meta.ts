@@ -1,8 +1,8 @@
 import {
-  LegalPageDocument,
-  type LegalPageQuery,
-  type LegalPageQueryVariables,
-} from '@/graphql/types/graphql';
+  graphql,
+  type ResultOf,
+  type VariablesOf,
+} from '@/lib/datocms/graphql';
 
 export type PageProps = {
   params: Promise<{
@@ -11,7 +11,28 @@ export type PageProps = {
   }>;
 };
 
-export type Query = LegalPageQuery;
-export type Variables = LegalPageQueryVariables;
+export const query = graphql(/* GraphQL */ `
+  query LegalPage(
+    $slug: String
+    $locale: SiteLocale
+    $fallbackLocale: [SiteLocale!]
+  ) {
+    legalPage(
+      filter: { slug: { eq: $slug } }
+      locale: $locale
+      fallbackLocales: $fallbackLocale
+    ) {
+      seo: _seoMetaTags {
+        attributes
+        content
+        tag
+      }
+      content {
+        value
+      }
+    }
+  }
+`);
 
-export const query = LegalPageDocument;
+export type Query = ResultOf<typeof query>;
+export type Variables = VariablesOf<typeof query>;

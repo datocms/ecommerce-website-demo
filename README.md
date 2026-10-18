@@ -14,7 +14,7 @@ This example showcases a TypeScript Next.js 16 website with App Router (app) —
 
 It uses the official [@datocms/cda-client](https://github.com/datocms/cda-client) for content fetching, which provides TypeScript support, auto-retry on rate limits, and better error handling.
 
-It also uses GraphQL CodeGen to type all of the requests coming from Dato automatically: [See how it works here](https://www.datocms.com/blog/how-to-generate-typescript-types-from-graphql)
+It also uses [gql.tada](https://gql-tada.0no.co/), so every GraphQL query is fully typed and your IDE will help you complete the GraphQL queries.
 
 ## Demo
 
@@ -72,9 +72,19 @@ npm run dev
 
 Your blog should be up and running on [http://localhost:3000](http://localhost:3000)!
 
+## Updating the GraphQL schema
+
+The types of every query come from the DatoCMS schema saved in `schema.graphql`. When you change models or fields in your DatoCMS project, make sure `DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN` is set in your `.env` file and run:
+
+```bash
+npm run generate-schema
+```
+
+Executing this task will automatically update the `schema.graphql` and `lib/datocms/graphql-env.d.ts` files for you.
+
 ## VS Code
 
-It's strongly suggested to install the [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql) extension, to get autocomplete suggestions, validation against schema, and many more niceties when working with your GraphQL queries.
+It is highly recommended to follow [these instructions](https://gql-tada.0no.co/get-started/installation#vscode-setup) for an optimal experience with Visual Studio Code, including features like diagnostics, auto-completions, and type hovers for GraphQL.
 
 <!--datocms-autoinclude-footer start-->
 

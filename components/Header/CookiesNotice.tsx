@@ -1,89 +1,88 @@
-import type { Dispatch, SetStateAction } from 'react';
-import {
-  Image as DatoImage,
-  type ResponsiveImageType,
-} from 'react-datocms/image';
-import type { CookieNoticeRecord } from '@/graphql/types/graphql';
+import { useSyncExternalStore } from 'react';
+import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import DatoImage from '@/components/DatoImage';
 
-type PropTypes = {
-  setCookies: Dispatch<SetStateAction<boolean>>;
-  cookieNotice: CookieNoticeRecord;
+export type CookieNotice = NonNullable<
+  NonNullable<LayoutQuery['layout']>['cookieNotice']
+>;
+
+// Shared by the header (the popup waits for the dismissal) and the footer (which
+// renders the card). The [lng] layout remounts on a locale switch, so a dismissal
+// lasts for the page load.
+let dismissed = false;
+const listeners = new Set<() => void>();
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 };
 
-const CookiesNotice = ({ setCookies, cookieNotice }: PropTypes) => {
+const dismiss = () => {
+  dismissed = true;
+  for (const listener of listeners) listener();
+};
+
+export const useCookieNoticeOpen = () =>
+  !useSyncExternalStore(
+    subscribe,
+    () => dismissed,
+    () => false,
+  );
+
+type PropTypes = {
+  cookieNotice: CookieNotice;
+};
+
+// A floating card, rendered right after the footer: it is sticky, so it follows the
+// viewport while scrolling and comes to rest under the footer, never hiding the page's end.
+// No scrim: the page stays usable.
+const CookiesNotice = ({ cookieNotice }: PropTypes) => {
   return (
-    <div className="fixed bottom-0 left-0 z-20 p-4">
-      <div className="relative max-w-xl rounded-lg bg-gray-100 p-6 shadow-sm">
-        <button
-          type="button"
-          className="absolute -end-1 -top-1 rounded-full border border-gray-200 bg-white p-1 text-gray-400"
-          onClick={() => {
-            setCookies(false);
-          }}
-        >
-          <span className="sr-only">Close</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-3 w-3"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="relative h-full w-full overflow-hidden rounded-xl object-cover">
-            <DatoImage
-              data={
-                cookieNotice.cookieNoticeImage
-                  ?.responsiveImage as ResponsiveImageType
-              }
-              className="h-full w-full object-contain"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
-            />
+    <section
+      id="cookie-notice"
+      aria-label={cookieNotice.header ?? undefined}
+      className="pointer-events-none sticky bottom-0 z-40 px-2 pb-2 sm:px-3 sm:pb-3 lg:px-10 lg:pb-6"
+    >
+      <div className="pointer-events-auto mx-auto flex max-w-340 flex-col gap-5 rounded-card bg-white p-4 shadow-pop sm:p-5 md:flex-row md:items-center">
+        <div className="flex min-w-0 flex-1 gap-4 md:items-center">
+          <div className="relative size-16 shrink-0 overflow-hidden rounded-image bg-oat sm:size-18">
+            {cookieNotice.cookieNoticeImage?.responsiveImage && (
+              <DatoImage
+                fragment={cookieNotice.cookieNoticeImage.responsiveImage}
+                layout="fill"
+                objectFit="cover"
+                sizes="72px"
+              />
+            )}
           </div>
-          {/* <img
-            alt="Laptop"
-            src="https://images.unsplash.com/photo-1587614382346-4ec70e388b28?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-            className="h-full w-full rounded-xl object-cover"
-          /> */}
-
-          <div>
-            <h2 className="text-lg font-medium">{cookieNotice.header}</h2>
-
-            <p className="mt-4 text-sm text-gray-500">
+          <div className="min-w-0">
+            <h2 className="title-sm">{cookieNotice.header}</h2>
+            <p className="mt-1.5 max-w-[80ch] text-sm text-pretty text-muted">
               {cookieNotice.subheader}
             </p>
-
-            <div className="tex mt-6 sm:text-right">
-              <div
-                onClick={() => {
-                  setCookies(false);
-                }}
-                className="inline-block cursor-pointer rounded-lg px-5 py-3 text-sm  font-medium text-slate-400"
-              >
-                {cookieNotice.secondaryButtonLabel}
-              </div>
-              <div
-                onClick={() => {
-                  setCookies(false);
-                }}
-                className="inline-block cursor-pointer rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white"
-              >
-                {cookieNotice.primaryButtonLabel}
-              </div>
-            </div>
           </div>
         </div>
+
+        <div className="grid grid-cols-2 gap-2 md:shrink-0">
+          <button
+            type="button"
+            onClick={dismiss}
+            className="btn-secondary btn-sm h-12"
+          >
+            {cookieNotice.secondaryButtonLabel}
+          </button>
+          <button
+            type="button"
+            onClick={dismiss}
+            className="btn-primary btn-sm h-12"
+          >
+            {cookieNotice.primaryButtonLabel}
+          </button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

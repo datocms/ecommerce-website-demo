@@ -1,7 +1,6 @@
 import { draftMode } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
-import getAvailableLocales from '@/app/i18n/settings';
-import type { SiteLocale } from '@/graphql/types/graphql';
+import getAvailableLocales, { type SiteLocale } from '@/app/i18n/settings';
 import { resolveProductSlug } from '@/utils/productSlugs';
 
 export async function GET(request: NextRequest) {

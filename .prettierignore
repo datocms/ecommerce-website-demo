@@ -1,2 +1,3 @@
 README.md
-graphql/types
+lib/datocms/graphql-env.d.ts
+schema.graphql

@@ -4,7 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
-.vscode
+.vscode/*
+!.vscode/settings.json
 # testing
 /coverage
 
@@ -25,6 +26,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 tsconfig.tsbuildinfo
+next-env.d.ts
 
 # local env files
 .env*.local

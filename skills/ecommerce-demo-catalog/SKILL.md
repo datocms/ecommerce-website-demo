@@ -26,9 +26,9 @@ Before schema or content operations:
 ## Existing catalog structure
 
 - Listing route: `app/[lng]/products/page.tsx`.
-- Listing query: `app/[lng]/products/query.graphql`.
+- Listing queries: `productsQuery` and `initialParamsQuery` in `app/[lng]/products/page.tsx`.
 - Product detail route: `app/[lng]/product/[slug]/`.
-- Product detail query: `app/[lng]/product/[slug]/query.graphql`.
+- Product detail query: `query` in `app/[lng]/product/[slug]/meta.ts`.
 - Listing filters use collections, brands, and materials.
 - URL query params include `page`, `orderBy`, `productName`, `collections`, `brands`, and `materials`.
 - Pagination is listing behavior: preserve active query params and reset or clamp stale `page` values after filter/sort changes.
@@ -40,17 +40,17 @@ Before schema or content operations:
 ### Add or change a product field on listing cards
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
-2. Add the field to `app/[lng]/products/query.graphql`.
+2. Add the field to `productsQuery` in `app/[lng]/products/page.tsx`.
 3. Render it in the listing card while preserving existing sale-price logic and links.
-4. Refresh GraphQL types.
+4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 5. Verify pagination, filters, and search still work.
 
 ### Add or change a product field on product detail pages
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
-2. Add the field to `app/[lng]/product/[slug]/query.graphql` or the relevant component fragment.
+2. Add the field to the `query` in `app/[lng]/product/[slug]/meta.ts` or the relevant component fragment in its `fragments.ts`.
 3. Render it in the product detail component or related block component.
-4. Refresh GraphQL types.
+4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 5. Verify static params and draft preview still work.
 
 ### Add or change filter behavior
@@ -60,14 +60,14 @@ Before schema or content operations:
 3. Update listing query variables and filter arguments.
 4. Update URL query param handling without breaking existing params.
 5. Update `SideFilter` or the listing page UI.
-6. Refresh GraphQL types and verify pagination counts.
+6. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`. Verify pagination counts.
 
 ### Add or change sort behavior
 
 1. Confirm the field is sortable in the GraphQL schema.
 2. Add the order value to the listing UI.
 3. Keep `orderBy` query param behavior stable.
-4. Verify generated enum values and default ordering.
+4. Verify the `ProductModelOrderBy` enum values (typed from `schema.graphql`) and default ordering.
 
 ### Adjust header category dropdowns
 
@@ -89,4 +89,4 @@ Before schema or content operations:
 - Filter counts, pagination links, and pagination range text still work.
 - Check page 1, page 2 or last page, zero-result, and out-of-range `page` states when changing listing filters, sorting, or counts.
 - Product detail pages still generate static params.
-- GraphQL type generation passes after query changes.
+- `npx gql.tada check` and `npx tsc --noEmit` pass after query changes.

@@ -31,7 +31,7 @@ Before schema or content operations:
 
 ## Existing layout structure
 
-- Shared shell route query: `app/[lng]/query.graphql`.
+- Shared shell route query: `query` in `app/[lng]/meta.ts`.
 - Shared shell renderer: `app/[lng]/Content.tsx`.
 - Header components: `components/Header/**`.
 - Footer component: `components/Footer/index.tsx`.
@@ -56,9 +56,9 @@ Before schema or content operations:
 
 1. Confirm the request affects the shared shell, not a homepage section, catalog surface, or page route.
 2. Inspect the live field shape through MCP before changing queries or components.
-3. Update `app/[lng]/query.graphql` only when the shared query needs more data.
+3. Update the `query` in `app/[lng]/meta.ts` only when the shared query needs more data.
 4. Update the relevant shared component under `components/Header/**`, `components/Footer/index.tsx`, or the shared shell renderer.
-5. Refresh GraphQL types after query changes.
+5. After query changes, run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 6. Verify the shared surface on at least one homepage route and one non-homepage route when practical.
 
 ### Adjust navigation
@@ -98,5 +98,5 @@ Before schema or content operations:
 - Header, footer, popup, cookie notice, notification strip, newsletter footer, search, language selector, and accent color still render safely when their DatoCMS fields are absent or empty.
 - Desktop and mobile navigation still work after menu changes.
 - Footer links remain locale-aware.
-- GraphQL type generation passes after query changes.
+- `npx gql.tada check` and `npx tsc --noEmit` pass after query changes.
 - Build passes after code changes.

@@ -1,8 +1,0 @@
-query ProductStaticParams($locale: SiteLocale) {
-  allProducts(
-    first: 100
-    locale: $locale
-  ) {
-    slug
-  }
-}

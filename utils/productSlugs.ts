@@ -1,8 +1,19 @@
-import {
-  ProductSlugLookupDocument,
-  type SiteLocale,
-} from '@/graphql/types/graphql';
+import type { SiteLocale } from '@/app/i18n/settings';
+import { graphql } from '@/lib/datocms/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
+
+const productSlugLookupQuery = graphql(/* GraphQL */ `
+  query ProductSlugLookup {
+    allProducts(first: 100) {
+      id
+      slug
+      _allSlugLocales {
+        locale
+        value
+      }
+    }
+  }
+`);
 
 type SlugLocaleEntry = {
   locale?: SiteLocale | null;
@@ -54,11 +65,7 @@ export async function resolveProductSlug({
   fallbackLocale: SiteLocale;
   isDraft: boolean;
 }) {
-  const data = await queryDatoCMS(
-    ProductSlugLookupDocument,
-    undefined,
-    isDraft,
-  );
+  const data = await queryDatoCMS(productSlugLookupQuery, undefined, isDraft);
   const slugIndex = new Map<
     string,
     {

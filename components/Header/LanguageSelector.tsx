@@ -1,25 +1,49 @@
 'use client';
 
-import type { Maybe } from 'graphql/jsutils/Maybe';
+import { CheckIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { getLangNameFromCode } from 'language-name-map';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import type { SiteLocale } from '@/graphql/types/graphql';
+import { useEffect, useId, useRef, useState } from 'react';
+import type { SiteLocale } from '@/app/i18n/settings';
 
 type Props = {
   languages: SiteLocale[];
-  currencySymbol: Maybe<string>;
+  currencySymbol?: string | null;
+  /** Where the list opens: below the strip/nav trigger, above the mobile menu and footer ones */
+  placement?: 'below-end' | 'above-start' | 'above-end' | 'above-start-sm-end';
+  /** light: ink text (butter, white, cream); dark: cream text (forest) */
+  tone?: 'light' | 'dark';
+  /** Extra classes for the trigger (pill fills, heights) */
+  className?: string;
+  onNavigate?: () => void;
 };
 
-const LanguageSelector = ({ languages, currencySymbol }: Props) => {
+const PLACEMENT = {
+  'below-end': 'top-full right-0 mt-2',
+  'above-start': 'bottom-full left-0 mb-2',
+  'above-end': 'bottom-full right-0 mb-2',
+  // A trigger on the left edge on phones, on the right edge from sm
+  'above-start-sm-end': 'bottom-full left-0 mb-2 sm:right-0 sm:left-auto',
+};
+
+const LanguageSelector = ({
+  languages,
+  currencySymbol,
+  placement = 'below-end',
+  tone = 'light',
+  className,
+  onNavigate,
+}: Props) => {
+  const listId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [productSlugs, setProductSlugs] = useState<Record<string, string>>({});
   const selectorRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const pathSegments = pathname.split('/').filter(Boolean);
   const currentLocale = pathSegments[0] as SiteLocale; //will be a SiteLocale because of the middleware redirect rules
-  const searchParams = useSearchParams()!;
+  const searchParams = useSearchParams();
   const currentProductSlug =
     pathSegments[1] === 'product' ? pathSegments[2] : null;
 
@@ -65,23 +89,29 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
       return;
     }
 
-    const handlePointerDown = (event: PointerEvent) => {
+    // Close on clicks and on keyboard focus moving outside the selector
+    const handleOutside = (event: Event) => {
       if (!selectorRef.current?.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
 
+    // preventDefault: a dialog around the selector (the mobile menu) stays open
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
         setIsOpen(false);
+        triggerRef.current?.focus();
       }
     };
 
-    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('pointerdown', handleOutside);
+    document.addEventListener('focusin', handleOutside);
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('pointerdown', handleOutside);
+      document.removeEventListener('focusin', handleOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
@@ -97,45 +127,78 @@ const LanguageSelector = ({ languages, currencySymbol }: Props) => {
   };
 
   return (
-    <div className="relative" ref={selectorRef}>
+    <div ref={selectorRef} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen((currentIsOpen) => !currentIsOpen)}
         aria-expanded={isOpen}
-        aria-haspopup="menu"
-        className="ml-4 inline-flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-md bg-white px-4 py-2 text-center text-sm font-medium text-gray-800 transition duration-100 hover:bg-gray-200 active:scale-95 active:bg-gray-300"
+        aria-controls={listId}
+        className={[
+          'group inline-flex items-center gap-1 font-semibold whitespace-nowrap transition-colors',
+          className,
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
-        {getLangNameFromCode(currentLocale)?.name || currentLocale} (
-        {currencySymbol})
+        <span className="sr-only">Language and currency: </span>
+        {currentLocale?.replaceAll('_', '-').toUpperCase()}
+        {currencySymbol && (
+          <>
+            <span
+              aria-hidden="true"
+              className={tone === 'dark' ? 'text-cream/70' : 'text-muted'}
+            >
+              /
+            </span>
+            {currencySymbol}
+          </>
+        )}
+        <ChevronDownIcon
+          aria-hidden="true"
+          className="size-3.75 shrink-0 stroke-[2.4] transition-transform duration-200 group-aria-expanded:rotate-180"
+        />
       </button>
 
-      <div
-        className={`absolute end-0 left-5 z-10 mt-1 w-28 rounded-md border border-gray-100 bg-white shadow-lg${
-          isOpen ? '' : ' hidden'
-        }`}
-        role="menu"
+      <ul
+        id={listId}
+        hidden={!isOpen}
+        className={`absolute z-50 w-56 rounded-card bg-white p-2 text-ink shadow-pop [--focus-ring:var(--color-ink)] ${PLACEMENT[placement]}`}
       >
         {languages.map((locale) => {
+          const bcp47 = locale.replaceAll('_', '-');
+          const current = locale === currentLocale;
           return (
-            <div
-              key={locale}
-              className="inline-flex w-full cursor-pointer items-end justify-start rounded-lg text-center text-sm font-medium text-gray-900 hover:bg-gray-100"
-            >
+            <li key={locale}>
               <Link
                 href={hrefForLocale(locale)}
+                hrefLang={bcp47}
                 prefetch={false}
-                onClick={() => setIsOpen(false)}
-                className="block w-full px-4 py-2 text-center text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white"
-                role="menuitem"
+                aria-current={current ? 'true' : undefined}
+                onClick={() => {
+                  setIsOpen(false);
+                  onNavigate?.();
+                }}
+                className="flex min-h-11 items-center justify-between gap-4 rounded-md px-3 py-2 text-base font-medium transition-colors duration-150 hover:bg-cream aria-[current=true]:bg-cream"
               >
-                <div className="w-full text-center">
-                  {getLangNameFromCode(locale)?.name || locale}
-                </div>
+                <span lang={bcp47}>
+                  {getLangNameFromCode(locale)?.native || locale}
+                </span>
+                {current ? (
+                  <CheckIcon
+                    aria-hidden="true"
+                    className="size-4 shrink-0 stroke-[2.4]"
+                  />
+                ) : (
+                  <span className="text-xs font-semibold text-muted">
+                    {bcp47.toUpperCase()}
+                  </span>
+                )}
               </Link>
-            </div>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 };

@@ -1,128 +1,170 @@
+import { stripStega } from '@datocms/content-link';
 import {
   isList,
-  isListItem,
   isThematicBreak,
   type Record,
   type StructuredText,
 } from 'datocms-structured-text-utils';
-import type { Maybe } from 'graphql/jsutils/Maybe';
 import { renderNodeRule } from 'react-datocms/structured-text';
 import ReactMarkdown from 'react-markdown';
+import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import DatoStructuredText from '@/components/DatoStructuredText';
-import type { FragmentType } from '@/graphql/types';
-import type { DatoImage_ResponsiveImageFragmentDoc } from '@/graphql/types/graphql';
+import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import DatoImage from '../DatoImage';
 
 type PropTypes = {
+  lng: string;
   name: string;
   subtitle: string;
-  type: Maybe<string>;
-  image: Maybe<FragmentType<typeof DatoImage_ResponsiveImageFragmentDoc>>;
-  description: Maybe<StructuredText<Record, Record>>;
+  type: string | null | undefined;
+  image: FragmentOf<typeof ResponsiveImageFragment> | null | undefined;
+  description: StructuredText<Record, Record> | null | undefined;
+  /** The image is a logo: shown whole on a white card, never cropped */
+  logo?: boolean;
 };
 
+const SIZES =
+  '(min-width: 1440px) 560px, (min-width: 1280px) 38vw, (min-width: 768px) 50vw, 100vw';
+
+// Advance widths of the display face at title sizes, in em, rounded up
+const advance = (char: string) =>
+  /[.,'’iíìïjlI]/.test(char)
+    ? 0.25
+    : /[frtJ1-]/.test(char)
+      ? 0.39
+      : /[mwMW]/.test(char)
+        ? 0.9
+        : /\p{Lu}/u.test(char)
+          ? 0.66
+          : 0.57;
+
+/** The widest unbreakable part of a title, in em */
+const widestWord = (title: string) =>
+  Math.max(
+    0,
+    ...title
+      .split(/\s+|(?<=-)/)
+      .map((word) => [...word].reduce((sum, char) => sum + advance(char), 0)),
+  );
+
 const FilterDetail = ({
+  lng,
   name,
   type,
   image,
   description,
   subtitle,
+  logo = false,
 }: PropTypes) => {
+  // From xl the photo spans the forest card and the description, at most a
+  // screen tall: beside a long description it stays in view instead of being
+  // cropped to a sliver. Without a description the forest card stretches to it
+  const media = image
+    ? [
+        'relative overflow-hidden rounded-card md:aspect-auto md:min-h-[22rem] lg:min-h-[24rem] xl:col-span-5 xl:min-h-[36rem]',
+        description
+          ? 'xl:sticky xl:top-[calc(var(--header-h)+1rem)] xl:row-span-2 xl:h-[min(100%,calc(100dvh-var(--header-h)-2rem))] xl:self-start'
+          : '',
+        logo
+          ? 'aspect-square bg-white sm:aspect-[4/3]'
+          : 'aspect-[4/5] bg-oat sm:aspect-[4/3]',
+      ].join(' ')
+    : '';
+  const logoData =
+    image && logo ? readFragment(ResponsiveImageFragment, image) : null;
+  const titleWidth = widestWord(stripStega(name));
+
   return (
-    <div className="relative isolate mx-auto max-w-7xl overflow-hidden bg-white px-6 py-12 lg:overflow-visible lg:px-0">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <svg
-          className="absolute left-[max(50%,25rem)] top-0 h-[64rem] w-[128rem] -translate-x-1/2 stroke-gray-200 [mask-image:radial-gradient(64rem_64rem_at_top,white,transparent)]"
-          aria-hidden="true"
+    <section lang={lng} className="shell pt-1">
+      <div
+        className={`grid gap-3 sm:gap-4 xl:grid-cols-12 ${image ? 'md:grid-cols-2' : ''} ${image && description ? 'xl:grid-rows-[auto_1fr]' : ''}`}
+      >
+        {image && (
+          <div className={media}>
+            {logoData ? (
+              // Sized against both sides of the card, so a logo of any shape
+              // fits whole and keeps its rounded corners; on phones it centres
+              // above the overlapping forest card
+              <div className="absolute inset-0 grid place-items-center pb-20 [container-type:size] sm:pb-0">
+                <div
+                  className="relative overflow-hidden rounded-nav"
+                  style={{
+                    aspectRatio: `${logoData.width} / ${logoData.height}`,
+                    width: `min(76cqw, ${(76 * logoData.width) / logoData.height}cqh, 30rem)`,
+                  }}
+                >
+                  <DatoImage
+                    fragment={image}
+                    layout="fill"
+                    objectFit="cover"
+                    sizes="(min-width: 1280px) 30rem, (min-width: 768px) 38vw, 76vw"
+                    priority
+                  />
+                </div>
+              </div>
+            ) : (
+              // Portraits keep the head in frame when the card turns landscape
+              <DatoImage
+                fragment={image}
+                layout="fill"
+                objectFit="cover"
+                objectPosition="50% 20%"
+                sizes={SIZES}
+                priority
+              />
+            )}
+          </div>
+        )}
+        <div
+          className={`relative z-10 flex flex-col rounded-card surface-forest p-(--panel-pad) [container-type:inline-size] ${image ? 'mx-2 -mt-20 shadow-pop sm:mx-0 sm:mt-0 sm:shadow-none xl:col-span-7' : 'xl:col-span-12'}`}
         >
-          <defs>
-            <pattern
-              id="e813992c-7d03-4cc4-a2bd-151760b470a0"
-              width={200}
-              height={200}
-              x="50%"
-              y={-1}
-              patternUnits="userSpaceOnUse"
-            >
-              <path d="M100 200V.5M.5 .5H200" fill="none" />
-            </pattern>
-          </defs>
-          <svg x="50%" y={-1} className="overflow-visible fill-gray-50">
-            <path
-              d="M-100.5 0h201v201h-201Z M699.5 0h201v201h-201Z M499.5 400h201v201h-201Z M-300.5 600h201v201h-201Z"
-              strokeWidth={0}
-            />
-          </svg>
-          <rect
-            width="100%"
-            height="100%"
-            strokeWidth={0}
-            fill="url(#e813992c-7d03-4cc4-a2bd-151760b470a0)"
-          />
-        </svg>
-      </div>
-      <div className="gap-t-16 lg:gap-t-10 mx-auto -mt-4 grid w-full max-w-2xl gap-x-8 lg:mx-0 lg:mt-0 lg:max-w-none lg:grid-cols-3 lg:items-start">
-        <div className="mb-8 w-full lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-16">
-          <div className="lg:pr-4">
-            <p className="text-center text-base font-semibold leading-7 text-primary lg:text-left">
-              {type}
-            </p>
-            <h1 className="mt-2 text-center text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-left">
-              {name}
+          {type && <p className="pretitle self-start bg-butter">{type}</p>}
+          {/* Bottom-aligned when the card stretches beside the photo */}
+          <div className={`mt-auto ${type ? 'pt-6' : ''}`}>
+            <h1 className="h-xl hyphens-auto">
+              {/* A long single word (German compounds) shrinks to fit the
+                  card instead of breaking mid-word */}
+              <span
+                className="block tracking-[-0.025em]"
+                style={
+                  titleWidth
+                    ? {
+                        fontSize: `min(1em, ${(100 / titleWidth).toFixed(2)}cqi)`,
+                      }
+                    : undefined
+                }
+              >
+                {name}
+              </span>
             </h1>
-            <div className="mt-6 text-center text-xl leading-8 text-gray-700 lg:text-left">
-              <ReactMarkdown>{subtitle || ''}</ReactMarkdown>
-            </div>
+            {subtitle && (
+              <div className="mt-5 max-w-[34em] text-lg font-medium text-pretty text-cream/85 [&>p+p]:mt-3">
+                <ReactMarkdown>{subtitle}</ReactMarkdown>
+              </div>
+            )}
           </div>
         </div>
-        <div className="relative mx-8 mb-8 h-96 p-12 lg:sticky lg:top-32 lg:row-span-5 lg:row-start-1 lg:mx-0 lg:-ml-12 lg:mb-0 lg:mr-12 lg:h-full lg:overflow-hidden">
-          {image && (
-            <DatoImage
-              fragment={image}
-              className="relative h-full w-[48rem] max-w-none rounded-xl bg-gray-900 object-contain shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
-              layout="fill"
-              objectFit="cover"
-              objectPosition="50% 50%"
-            />
-          )}
-        </div>
-        <div className="lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:mx-auto lg:w-full lg:max-w-7xl lg:gap-x-8 lg:px-8">
-          <div className="px-8 text-base leading-7 text-gray-700">
+        {description && (
+          <div
+            className={`rounded-card bg-white p-(--panel-pad) ${image ? 'md:col-span-2 xl:col-span-7' : 'xl:col-span-12'}`}
+          >
             <DatoStructuredText
               data={description}
+              className="prose-dato"
               customNodeRules={[
-                renderNodeRule(isListItem, ({ children, key }) => {
-                  return (
-                    <div key={key} className="flex gap-x-3">
-                      <div>{children}</div>
-                    </div>
-                  );
-                }),
-                renderNodeRule(isThematicBreak, ({ children, key }) => {
-                  return (
-                    <hr
-                      key={key}
-                      className="mx-auto my-4 h-[3px] w-1/2 rounded-3xl bg-primary opacity-50"
-                    />
-                  );
-                }),
-                renderNodeRule(isList, ({ children, key }) => {
-                  return (
-                    <ul
-                      key={key}
-                      role="list"
-                      className="my-8 space-y-8 text-gray-600"
-                    >
-                      {children}
-                    </ul>
-                  );
-                }),
+                renderNodeRule(isList, ({ children, key }) => (
+                  <ul key={key}>{children}</ul>
+                )),
+                // Rules span the card, not the text measure
+                renderNodeRule(isThematicBreak, ({ key }) => (
+                  <hr key={key} className="my-8 border-line" />
+                )),
               ]}
             />
           </div>
-        </div>
+        )}
       </div>
-    </div>
+    </section>
   );
 };
 

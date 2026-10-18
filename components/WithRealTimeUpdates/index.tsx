@@ -1,4 +1,4 @@
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { TadaDocumentNode } from 'gql.tada';
 import { useQuerySubscription } from 'react-datocms/use-query-subscription';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 
@@ -17,7 +17,7 @@ export default function WithRealTimeUpdates<
 }: {
   initialData: TResult;
   variables: TVariables;
-  query: TypedDocumentNode<TResult, TVariables>;
+  query: TadaDocumentNode<TResult, TVariables>;
   children: (
     props: PageProps & {
       data: TResult;

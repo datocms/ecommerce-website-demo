@@ -1,63 +1,106 @@
+import { stripStega } from '@datocms/content-link';
+import type { CSSProperties } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { type FragmentType, getFragmentData } from '@/graphql/types';
-import { TestimonialSectionFragmentDoc } from '@/graphql/types/graphql';
+import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
+import RailControls from '../RailControls';
+import { TestimonialSectionFragment } from './fragments';
 
 type Props = {
-  fragment: FragmentType<typeof TestimonialSectionFragmentDoc>;
+  fragment: FragmentOf<typeof TestimonialSectionFragment>;
 };
 
+// "Jane P." -> "JP"
+const initialsOf = (author?: string | null) =>
+  stripStega(author ?? '')
+    .replaceAll('.', '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => Array.from(word)[0])
+    .join('')
+    .toUpperCase();
+
+// The rail's padding matches the title row (24/40/56px). Cards are sized off the butter panel
+// (a size container) so one card (two from xl) plus a peek fit, and the peek fades out until
+// the rail reaches its end. Its 8px block padding holds the rounded focus ring around the cards;
+// the fade drops while the rail has focus so it doesn't wipe out the ring's right edge.
+const RAIL =
+  'no-scrollbar mt-6 flex snap-x snap-mandatory scroll-px-6 gap-4 overflow-x-auto rounded-card px-6 py-2 [--fade:2.75rem] [mask-image:linear-gradient(to_right,black_calc(100%-var(--fade)),transparent)] focus-visible:-outline-offset-2 focus-visible:[mask-image:none] data-at-end:[mask-image:none] sm:scroll-px-10 sm:px-10 sm:[--fade:6rem] lg:mt-10 lg:scroll-px-14 lg:px-14 xl:[--fade:7rem]';
+const CARD_WIDTH =
+  'w-[calc(100cqw-5.25rem)] sm:w-[min(38.75rem,calc(100cqw-9.5rem))] lg:w-[min(38.75rem,calc(100cqw-11.5rem))] xl:w-[calc((100cqw-12.5rem)/2)]';
+
 const TestimonialsSection = ({ fragment }: Props) => {
-  const { title, testimonial } = getFragmentData(
-    TestimonialSectionFragmentDoc,
+  const { id, title, testimonial } = readFragment(
+    TestimonialSectionFragment,
     fragment,
   );
+  const titleId = `${id}-title`;
+  const railId = `${id}-rail`;
+  // On phones the title shrinks until its longest word fits the panel (Kundenstimmen), at
+  // about 0.6em per letter
+  const longestWord = Math.max(
+    1,
+    ...stripStega(title ?? '')
+      .split(/\s+/)
+      .map((word) => Array.from(word).length),
+  );
+
   return (
-    <div className="container mx-auto max-w-7xl px-16 py-12">
-      <h2 className="font-display text-3xl font-semibold">{title}</h2>
-      <div className="mt-12 grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-24">
-        {testimonial.map((testimonial) => {
-          return (
-            <div key={testimonial.id} className="relative">
-              <div className="relative z-10 h-32 text-justify">
-                <ReactMarkdown>{testimonial.testimonial || ''}</ReactMarkdown>
-              </div>
-              <div className="relative z-10 flex items-center justify-end text-sm">
-                <svg
-                  className="-mb-8 inline-block h-32 w-32"
-                  x="0px"
-                  y="0px"
-                  viewBox="0 0 100 125"
-                >
-                  <title>Author</title>
-                  <path d="M91.8 45c-3.9 0-5.9 2.3-7.7 4.3-1.7 2-3.2 3.7-6.2 3.7s-4.5-1.7-6.2-3.7C70 47.3 68 45 64 45c-3.9 0-5.9 2.3-7.7 4.3-1.7 2-3.2 3.7-6.2 3.7s-4.5-1.7-6.2-3.7c-1.8-2-3.8-4.3-7.7-4.3-3.9 0-5.9 2.3-7.7 4.3-1.7 2-3.2 3.7-6.2 3.7s-4.5-1.7-6.2-3.7c-1.8-2-3.8-4.3-7.7-4.3-.6 0-1 .4-1 1s.4 1 1 1c3 0 4.5 1.7 6.2 3.7 1.8 2 3.8 4.3 7.7 4.3 3.9 0 5.9-2.3 7.7-4.3 1.7-2 3.2-3.7 6.2-3.7s4.5 1.7 6.2 3.7c1.8 2 3.8 4.3 7.7 4.3 3.9 0 5.9-2.3 7.7-4.3 1.7-2 3.2-3.7 6.2-3.7s4.5 1.7 6.2 3.7c1.8 2 3.8 4.3 7.7 4.3 3.9 0 5.9-2.3 7.7-4.3 1.7-2 3.2-3.7 6.2-3.7.6 0 1-.4 1-1s-.4-1-1-1z" />
-                </svg>
-                <span>{testimonial.author}</span>
-              </div>
-              <svg
-                className="absolute left-0 top-0 -ml-8 -mt-10 h-28 w-28 opacity-5"
-                viewBox="0 0 95.333 95.332"
+    <section aria-labelledby={titleId} className="shell pt-(--section-gap)">
+      <div className="@container rounded-card bg-butter pt-10 pb-8 sm:pt-14 sm:pb-12 lg:pt-16 lg:pb-14">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-5 px-6 sm:px-10 lg:px-14">
+          <h2
+            id={titleId}
+            className="h-xl min-w-0 wrap-break-word hyphens-auto max-sm:text-[min(2.75rem,calc((100cqw-3rem)/var(--title-em)))]"
+            style={{ '--title-em': longestWord * 0.6 } as CSSProperties}
+          >
+            {title}
+          </h2>
+          <RailControls railId={railId} count={testimonial.length} />
+        </div>
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: the quotes are not focusable, so the scroller takes focus for keyboard scrolling */}
+        <ul id={railId} tabIndex={0} aria-labelledby={titleId} className={RAIL}>
+          {testimonial.map((item) => {
+            const initials = initialsOf(item.author);
+            return (
+              <li
+                key={item.id}
+                className={`flex shrink-0 snap-start ${CARD_WIDTH}`}
               >
-                <title>Testimonial</title>
-                <path
-                  d="M30.512,43.939c-2.348-0.676-4.696-1.019-6.98-1.019c-3.527,0-6.47,0.806-8.752,1.793
-                                            c2.2-8.054,7.485-21.951,18.013-23.516c0.975-0.145,1.774-0.85,2.04-1.799l2.301-8.23c0.194-0.696,0.079-1.441-0.318-2.045
-                                            s-1.035-1.007-1.75-1.105c-0.777-0.106-1.569-0.16-2.354-0.16c-12.637,0-25.152,13.19-30.433,32.076
-                                            c-3.1,11.08-4.009,27.738,3.627,38.223c4.273,5.867,10.507,9,18.529,9.313c0.033,0.001,0.065,0.002,0.098,0.002
-                                            c9.898,0,18.675-6.666,21.345-16.209c1.595-5.705,0.874-11.688-2.032-16.851C40.971,49.307,36.236,45.586,30.512,43.939z"
-                />
-                <path
-                  d="M92.471,54.413c-2.875-5.106-7.61-8.827-13.334-10.474c-2.348-0.676-4.696-1.019-6.979-1.019
-                                            c-3.527,0-6.471,0.806-8.753,1.793c2.2-8.054,7.485-21.951,18.014-23.516c0.975-0.145,1.773-0.85,2.04-1.799l2.301-8.23
-                                            c0.194-0.696,0.079-1.441-0.318-2.045c-0.396-0.604-1.034-1.007-1.75-1.105c-0.776-0.106-1.568-0.16-2.354-0.16
-                                            c-12.637,0-25.152,13.19-30.434,32.076c-3.099,11.08-4.008,27.738,3.629,38.225c4.272,5.866,10.507,9,18.528,9.312
-                                            c0.033,0.001,0.065,0.002,0.099,0.002c9.897,0,18.675-6.666,21.345-16.209C96.098,65.559,95.376,59.575,92.471,54.413z"
-                />
-              </svg>
-            </div>
-          );
-        })}
+                <figure
+                  data-datocms-content-link-group
+                  className="flex w-full flex-col rounded-card bg-white p-7 sm:p-10"
+                >
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 48 36"
+                    fill="currentColor"
+                    className="h-[2.125rem] w-11 shrink-0 text-forest"
+                  >
+                    <path d="M0 36V22.5C0 10.8 6.2 3.3 18.6 0l2.2 5.1C14.4 7.4 11.3 11.4 11 17h9v19H0Zm27 0V22.5C27 10.8 33.2 3.3 45.6 0l2.2 5.1C41.4 7.4 38.3 11.4 38 17h9v19H27Z" />
+                  </svg>
+                  <blockquote className="mt-6 font-display text-[1.375rem] leading-[1.3] font-medium tracking-[-0.012em] text-pretty sm:text-[1.625rem] xl:text-[1.75rem] [&>p+p]:mt-[0.75em]">
+                    <ReactMarkdown>{item.testimonial || ''}</ReactMarkdown>
+                  </blockquote>
+                  <figcaption className="mt-auto flex items-center gap-3 pt-9">
+                    {initials && (
+                      <span
+                        aria-hidden="true"
+                        className="grid size-12 shrink-0 place-items-center rounded-full bg-cream font-display text-base font-bold"
+                      >
+                        {initials}
+                      </span>
+                    )}
+                    <span className="text-md font-bold">{item.author}</span>
+                  </figcaption>
+                </figure>
+              </li>
+            );
+          })}
+        </ul>
       </div>
-    </div>
+    </section>
   );
 };
+
 export default TestimonialsSection;

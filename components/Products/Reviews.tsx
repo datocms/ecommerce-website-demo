@@ -1,8 +1,9 @@
-import { getFragmentData } from '@/graphql/types';
-import {
-  ProductGeneralInterfaceFragmentDoc,
-  type ProductQuery,
-} from '@/graphql/types/graphql';
+import { stripStega } from '@datocms/content-link';
+import ReactMarkdown from 'react-markdown';
+import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
+import StarRating from '@/components/Common/StarRating';
+import { ProductGeneralInterfaceFragment } from '@/components/Products/Product/GeneralInferface/fragments';
+import { readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 
 type PropTypes = {
@@ -10,87 +11,62 @@ type PropTypes = {
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-import React, { type FC } from 'react';
-import ReactMarkdown from 'react-markdown';
-
-interface StarRatingProps {
-  rating: number;
-}
-
-const StarRating: FC<StarRatingProps> = ({ rating }) => {
-  const filledStars = Array.from({ length: Math.round(rating) });
-  const emptyStars = Array.from({ length: 5 - Math.round(rating) });
-
-  return (
-    <div className="flex">
-      {filledStars.map((_, index) => (
-        <svg
-          key={`filled-star-${index}`}
-          xmlns="http://www.w3.org/2000/svg"
-          className="text-yellow-400 h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-      {emptyStars.map((_, index) => (
-        <svg
-          key={`empty-star-${index}`}
-          xmlns="http://www.w3.org/2000/svg"
-          className="text-yellow-400 h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-    </div>
-  );
-};
+const initialsOf = (name: string) =>
+  stripStega(name)
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase();
 
 const Reviews = ({ data, globalPageProps }: PropTypes) => {
-  const { reviewButton, reviews } = getFragmentData(
-    ProductGeneralInterfaceFragmentDoc,
-    data.generalInterface!,
-  );
+  const { reviewButton, reviews } =
+    readFragment(ProductGeneralInterfaceFragment, data.generalInterface) ?? {};
+
+  const average = data.product?.reviewAverage ?? 0;
+  const formattedAverage = new Intl.NumberFormat(globalPageProps.params.lng, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(average);
+  const featuredReviews = data.product?.featuredReviews ?? [];
 
   return (
-    <div className="bg-white py-6 text-center sm:py-8 md:text-start lg:py-12">
-      <div className="mx-auto max-w-screen-md px-4 md:px-8">
-        <div className="mb-4 flex items-center justify-around border-b border-t py-4 md:justify-between">
-          <div className="flex items-center gap-2">
-            <div className="-ml-1 flex gap-0.5 text-primary">
-              <div className="flex h-7 items-center gap-1 rounded-full bg-primary/90 px-2 text-white">
-                <span className="text-sm">{data.product?.reviewAverage}</span>
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              </div>
-            </div>
-
-            <span className="block text-sm text-gray-500">
+    <section
+      id="reviews"
+      className="shell grid gap-3 pt-(--section-gap) sm:gap-4 lg:grid-cols-12 lg:gap-5"
+    >
+      <div className="flex flex-col gap-7 rounded-card bg-white p-(--card-pad) sm:flex-row sm:items-end sm:justify-between lg:sticky lg:top-[calc(var(--header-h)+1rem)] lg:col-span-4 lg:block lg:self-start lg:p-(--panel-pad)">
+        <div className="flex items-end gap-5 lg:block">
+          <p className="font-display text-[5.5rem] leading-[0.8] font-semibold tracking-[-0.03em] tabular-nums lg:text-[7rem]">
+            {formattedAverage}
+            <span className="sr-only"> out of 5</span>
+          </p>
+          <div className="pb-1 lg:pb-0">
+            <StarRating
+              value={average}
+              size={20}
+              decorative
+              className="lg:mt-6"
+            />
+            <h2 className="mt-2 text-md font-semibold text-muted lg:mt-3">
               {data.product?.numberOfReviews} {reviews}
-            </span>
+            </h2>
           </div>
-
-          <a
-            href="#"
-            className="inline-block rounded-lg border bg-white px-4 py-2 text-center text-sm font-semibold text-gray-500 outline-none ring-indigo-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:px-8 md:py-3 md:text-base"
+        </div>
+        {reviewButton && (
+          <button
+            type="button"
+            className="btn-secondary w-full sm:w-auto lg:mt-8"
           >
             {reviewButton}
-          </a>
-        </div>
+          </button>
+        )}
+      </div>
 
-        <div className="divide-y">
-          {data.product?.featuredReviews.map((review) => {
+      {featuredReviews.length > 0 && (
+        <ul className="grid gap-3 sm:gap-4 lg:col-span-8 lg:gap-5">
+          {featuredReviews.map((review) => {
             const date = new Date(review.reviewDate);
             const formattedDate = new Intl.DateTimeFormat(
               globalPageProps.params.lng,
@@ -102,32 +78,37 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
             ).format(date);
 
             return (
-              <div
+              <li
                 key={review.id}
-                className="flex flex-col items-center justify-center gap-3 py-4 md:items-start md:justify-start md:py-8"
+                className="flex flex-col rounded-card bg-white p-(--card-pad)"
               >
-                <div>
-                  <span className="block text-sm font-bold">
-                    {review.reviewerName}
-                  </span>
-                  <span className="block text-sm text-gray-500">
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                  <StarRating value={review.reviewScore} size={16} />
+                  <time
+                    dateTime={review.reviewDate}
+                    className="text-sm font-semibold text-muted"
+                  >
                     {formattedDate}
-                  </span>
+                  </time>
                 </div>
-
-                <div className="-ml-1 flex gap-0.5 text-primary">
-                  <StarRating rating={review.reviewScore} />
-                </div>
-
-                <div className="text-gray-600">
+                <div className="mt-5 font-display text-[1.3125rem] leading-[1.3] font-medium tracking-[-0.012em] text-pretty sm:text-2xl sm:leading-[1.3] [&_p+p]:mt-3">
                   <ReactMarkdown>{review.review || ''}</ReactMarkdown>
                 </div>
-              </div>
+                <p className="mt-7 flex items-center gap-3 text-md font-bold">
+                  <span
+                    aria-hidden="true"
+                    className="grid size-11 shrink-0 place-items-center rounded-full bg-cream font-display text-sm font-bold"
+                  >
+                    {initialsOf(review.reviewerName)}
+                  </span>
+                  {review.reviewerName}
+                </p>
+              </li>
             );
           })}
-        </div>
-      </div>
-    </div>
+        </ul>
+      )}
+    </section>
   );
 };
 

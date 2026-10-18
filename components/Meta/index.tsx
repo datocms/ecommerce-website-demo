@@ -1,4 +1,4 @@
-import type { LayoutQuery } from '@/graphql/types/graphql';
+import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 
 type PropTypes = {
   data: LayoutQuery;

@@ -7,7 +7,7 @@ description: >-
   Previews URLs, or SEO analysis route mapping. Trigger on prompts like "add a
   new lookbook page", "create /[lng]/campaign/[slug]", "map this model in
   preview-links", or "SEO analysis does not know this page route". Covers the
-  starter's meta.ts, query.graphql, page.tsx, Content.tsx, RealTime.tsx,
+  starter's meta.ts, page.tsx, Content.tsx, RealTime.tsx,
   app/api/draft/preview-links/route.tsx, and app/api/seoAnalysis/route.tsx
   when the request is about a page route. Do not use for homepage sections,
   product listing filters, product detail rendering, product sale price or card
@@ -31,12 +31,11 @@ Before schema or content operations:
 
 Record-backed pages use this route folder shape under `app/[lng]/...`:
 
-- `query.graphql` for the route data query.
-- `meta.ts` for generated document/type exports and page prop types.
+- `meta.ts` for the route data query (`graphql()` from `@/lib/datocms/graphql`), its inferred `Query`/`Variables` types, and page prop types.
 - `page.tsx` for variables, metadata, static params when needed, and `generateWrapper`.
 - `Content.tsx` for published rendering.
 - `RealTime.tsx` for draft/live preview rendering.
-- Optional `staticParams.graphql` for slug-backed collection routes.
+- Optional `staticParamsQuery` in `page.tsx` for slug-backed collection routes.
 
 Existing examples:
 
@@ -50,12 +49,12 @@ Existing examples:
 2. Inspect the target DatoCMS model through MCP.
 3. Reuse an existing model when appropriate. If a new model or fields are needed, route modeling to `datocms-content-modeling` and implementation to `datocms-cli`, `datocms-cma`, or MCP.
 4. Add a route folder under `app/[lng]/...` following the closest existing route pattern.
-5. Add `query.graphql` with SEO fields when the model supports SEO metadata.
-6. Add `meta.ts` exporting the generated document, query type, variables type, and page props.
+5. Add `meta.ts` with the route `query` written with `graphql()`, including SEO fields when the model supports SEO metadata.
+6. Export `Query = ResultOf<typeof query>`, `Variables = VariablesOf<typeof query>`, and the page props from `meta.ts`.
 7. Add `page.tsx` using `generateWrapper`; add `generateMetadataFn` when SEO tags are available.
-8. Add `staticParams.graphql` and `generateStaticParams` for slug-backed collection routes.
+8. Add a `staticParamsQuery` and `generateStaticParams` to `page.tsx` for slug-backed collection routes.
 9. Add `Content.tsx` and `RealTime.tsx` using the existing wrapper/realtime pattern.
-10. Refresh GraphQL types.
+10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 11. Update `app/api/draft/preview-links/route.tsx` so the model API key maps to the route URL.
 12. Update `app/api/seoAnalysis/route.tsx` when the model should support SEO/readability analysis.
 13. Verify published route, draft preview link, metadata, and localized static params.

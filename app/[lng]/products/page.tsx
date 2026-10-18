@@ -1,25 +1,109 @@
 export const dynamic = 'force-dynamic';
 
-import { getFallbackLocale } from '@/app/i18n/settings';
-import SideFilter from '@/components/Common/SideFilter';
-import DatoImage from '@/components/DatoImage';
-import FilterDetail from '@/components/Products/FilterDetail';
-import Pagination from '@/components/Products/Pagination';
-import { getFragmentData } from '@/graphql/types';
-import {
-  InitialParamsDocument,
-  InitialParamsFragmentDoc,
-  ProductModelOrderBy,
-  ProductsDocument,
-  ProductsGeneralInterfaceFragmentDoc,
-  type SiteLocale,
-} from '@/graphql/types/graphql';
-import '@/styles/global.css';
 import { stripStega } from '@datocms/content-link';
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import type { Record, StructuredText } from 'datocms-structured-text-utils';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
+import { getFallbackLocale, type SiteLocale } from '@/app/i18n/settings';
+import ProductCard from '@/components/Common/ProductCard';
+import SideFilter, { SortChips } from '@/components/Common/SideFilter';
+import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
+import FilterDetail from '@/components/Products/FilterDetail';
+import { ProductsGeneralInterfaceFragment } from '@/components/Products/GeneralInterface/fragments';
+import { InitialParamsFragment } from '@/components/Products/InitialParams/fragments';
+import Pagination from '@/components/Products/Pagination';
+import ProductFilters from '@/components/Products/ProductFilters';
+import { graphql, readFragment } from '@/lib/datocms/graphql';
 import queryDatoCMS from '@/utils/queryDatoCMS';
+
+type ProductModelOrderBy = ReturnType<
+  typeof graphql.scalar<'ProductModelOrderBy'>
+>;
+
+// Must match `first` in the products query below
+const PAGE_SIZE = 12;
+
+const productsQuery = graphql(
+  /* GraphQL */ `
+    query Products(
+      $locale: SiteLocale
+      $fallbackLocale: [SiteLocale!]
+      $skip: IntType
+      $orderBy: [ProductModelOrderBy]
+      $collections: [ItemId]
+      $brands: [ItemId]
+      $materials: [ItemId]
+      $nameSearch: String!
+    ) {
+      allProducts(
+        first: 12
+        locale: $locale
+        fallbackLocales: $fallbackLocale
+        skip: $skip
+        orderBy: $orderBy
+        filter: {
+          collections: { anyIn: $collections }
+          AND: {
+            brand: { in: $brands }
+            AND: {
+              material: { in: $materials }
+              AND: { name: { matches: { pattern: $nameSearch } } }
+            }
+          }
+        }
+      ) {
+        id
+        slug
+        sale
+        salePrice
+        productImages {
+          responsiveImage {
+            ...ResponsiveImageFragment
+          }
+        }
+        price
+        name
+        brand {
+          name
+        }
+      }
+      _allProductsMeta(
+        locale: $locale
+        filter: {
+          collections: { anyIn: $collections }
+          AND: {
+            brand: { in: $brands }
+            AND: {
+              material: { in: $materials }
+              AND: { name: { matches: { pattern: $nameSearch } } }
+            }
+          }
+        }
+      ) {
+        count
+      }
+      generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+        ...ProductsGeneralInterfaceFragment
+      }
+    }
+  `,
+  [ResponsiveImageFragment, ProductsGeneralInterfaceFragment],
+);
+
+const initialParamsQuery = graphql(
+  /* GraphQL */ `
+    query InitialParams($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+      ...InitialParamsFragment
+    }
+  `,
+  [InitialParamsFragment],
+);
 
 type PageProps = {
   params: Promise<{
@@ -41,13 +125,17 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const resolvedSearchParams = await searchParams;
   const { isEnabled } = await draftMode();
   const fallbackLng = await getFallbackLocale();
-  const pageNumber = Number.parseInt(resolvedSearchParams?.page ?? '1');
+  // Out-of-range values like ?page=0 would make `skip` negative and fail the query
+  const pageNumber = Math.max(
+    1,
+    Number.parseInt(resolvedSearchParams?.page ?? '1', 10) || 1,
+  );
   const orderBy: ProductModelOrderBy =
-    resolvedSearchParams?.orderBy ?? ProductModelOrderBy.CreatedAtAsc;
+    resolvedSearchParams?.orderBy ?? '_createdAt_ASC';
   const nameSearch = resolvedSearchParams?.productName ?? '';
 
   const initialParams = await queryDatoCMS(
-    InitialParamsDocument,
+    initialParamsQuery,
     {
       locale: lng as SiteLocale,
       fallbackLocale: [fallbackLng],
@@ -56,7 +144,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
   );
 
   const { allBrands, allCollections, allMaterials } =
-    getFragmentData(InitialParamsFragmentDoc, initialParams) ?? {};
+    readFragment(InitialParamsFragment, initialParams) ?? {};
 
   const collectionParams = resolvedSearchParams?.collections
     ?.split('|')
@@ -85,12 +173,12 @@ const Page = async ({ params, searchParams }: PageProps) => {
       : materialParams;
 
   const data = await queryDatoCMS(
-    ProductsDocument,
+    productsQuery,
     {
       locale: lng as SiteLocale,
       fallbackLocale: [fallbackLng],
-      skip: (pageNumber - 1) * 12,
-      orderBy: orderBy,
+      skip: (pageNumber - 1) * PAGE_SIZE,
+      orderBy: [orderBy],
       collections,
       brands,
       materials,
@@ -120,10 +208,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
     CollectionRecord,
     MaterialRecord,
   } =
-    getFragmentData(
-      ProductsGeneralInterfaceFragmentDoc,
-      data.generalInterface,
-    ) ?? {};
+    readFragment(ProductsGeneralInterfaceFragment, data.generalInterface) ?? {};
 
   const type =
     singleFilter?.__typename === 'BrandRecord'
@@ -134,10 +219,47 @@ const Page = async ({ params, searchParams }: PageProps) => {
           ? MaterialRecord
           : null;
 
+  // Mirrors SideFilter: a group narrows the listing unless every option is on
+  const isNarrowed = (selected: string[], options: { id: string }[]) =>
+    options.some((option) => !selected.includes(option.id));
+  const narrowed = [
+    isNarrowed(collections, allCollections),
+    isNarrowed(materials, allMaterials),
+    isNarrowed(brands, allBrands),
+  ].filter(Boolean).length;
+
+  const count = data._allProductsMeta.count;
+  const totalPages = Math.ceil(count / PAGE_SIZE);
+
+  const hrefWithout = (...keys: string[]) => {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(resolvedSearchParams ?? {})) {
+      if (!keys.includes(key) && value !== undefined) params.set(key, value);
+    }
+    const query = params.toString();
+    return `/${lng}/products${query ? `?${query}` : ''}`;
+  };
+
+  const emptyState =
+    count === 0
+      ? {
+          title: 'No products match these filters',
+          body: 'Try removing a filter or searching for something else.',
+          href: `/${lng}/products`,
+          cta: 'View all products',
+        }
+      : {
+          title: 'This page is empty',
+          body: `These results end on page ${totalPages}.`,
+          href: hrefWithout('page'),
+          cta: 'Back to the first page',
+        };
+
   return (
     <>
-      {singleFilter && (
+      {singleFilter ? (
         <FilterDetail
+          lng={lng}
           type={type}
           name={singleFilter.name}
           subtitle={singleFilter.details.subtitle ?? ''}
@@ -145,98 +267,97 @@ const Page = async ({ params, searchParams }: PageProps) => {
             singleFilter.details.description as StructuredText<Record, Record>
           }
           image={singleFilter.details.image.responsiveImage}
+          logo={singleFilter.__typename === 'BrandRecord'}
         />
+      ) : (
+        <h1 className="sr-only">Products</h1>
       )}
-      <div
-        className={`mx-auto max-w-7xl grid-cols-5 bg-white pt-8 lg:grid${
-          singleFilter ? ' border-t-2' : ''
-        }`}
+      <ProductFilters
+        count={count}
+        lng={lng}
+        narrowed={narrowed}
+        framed={Boolean(singleFilter)}
+        sort={<SortChips generalInterface={data.generalInterface} />}
+        searchChip={
+          nameSearch ? (
+            <Link
+              href={hrefWithout('productName', 'page')}
+              aria-label={`Clear search “${nameSearch}”`}
+              className="chip min-w-0 gap-2 pr-1.5 pl-4"
+            >
+              <MagnifyingGlassIcon
+                aria-hidden="true"
+                className="stroke-[2.4] text-muted"
+              />
+              <span className="min-w-0 truncate">“{nameSearch}”</span>
+              <span
+                aria-hidden="true"
+                className="grid size-8 shrink-0 place-items-center rounded-full bg-cream [&>svg]:size-[0.9375rem] [&>svg]:stroke-[2.6]"
+              >
+                <XMarkIcon />
+              </span>
+            </Link>
+          ) : undefined
+        }
       >
-        <div className="col-span-1 ml-4  p-4">
-          <SideFilter
-            initialParams={initialParams}
-            generalInterface={data.generalInterface}
-            paramaterCollections={collections}
-            parameterBrands={brands}
-            parameterMaterials={materials}
-          />
-        </div>
-        <div className="col-span-4 ml-4 bg-white px-16 md:px-0 lg:ml-0">
-          <div className="mx-auto max-w-screen-2xl px-4 md:px-8">
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-              {data.allProducts.map((product) => {
-                const isOnSale = stripStega(product.sale) === 'on_sale';
-                return (
-                  <div
-                    key={product.id}
-                    className="group rounded-lg opacity-95 shadow-lg transition duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-100"
-                  >
-                    <Link
-                      href={`/${lng}/product/${product.slug}`}
-                      className="relative block h-96 overflow-hidden rounded-t-lg bg-gray-100"
-                    >
-                      {product.productImages[0].responsiveImage && (
-                        <DatoImage
-                          fragment={product.productImages[0].responsiveImage}
-                          className="h-full w-full object-contain"
-                          layout="fill"
-                          objectFit="cover"
-                          objectPosition="50% 50%"
-                        />
-                      )}
-
-                      {isOnSale && (
-                        <span className="absolute left-0 top-3 rounded-r-lg bg-red-500 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-white">
-                          {sale}
-                        </span>
-                      )}
-                    </Link>
-
-                    <div className="flex h-24 w-full items-center justify-between gap-2 overflow-hidden rounded-b-lg bg-primary/5 p-4">
-                      <div className="flex flex-col justify-center">
-                        <a
-                          href="#"
-                          className="lg:text-md overflow-hidden font-bold text-gray-800 transition duration-100 hover:text-gray-500"
-                        >
-                          {product.name}
-                        </a>
-                        <span className="text-sm text-gray-500">
-                          {product.brand.name}
-                        </span>
-                      </div>
-
-                      {isOnSale && (
-                        <div className="flex flex-col items-end gap-2">
-                          <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            {currencySymbol}
-                            {product.salePrice}
-                          </span>
-                          <span className="mb-0.5 text-red-500 line-through">
-                            {currencySymbol}
-                            {product.price}
-                          </span>
-                        </div>
-                      )}
-
-                      {!isOnSale && (
-                        <div className="flex items-end gap-2">
-                          <span className="text-xl font-bold text-gray-800 md:text-xl">
-                            {currencySymbol}
-                            {product.price}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+        <SideFilter
+          initialParams={initialParams}
+          generalInterface={data.generalInterface}
+          paramaterCollections={collections}
+          parameterBrands={brands}
+          parameterMaterials={materials}
+        />
+      </ProductFilters>
+      <section className="shell mt-5 lg:mt-6">
+        {data.allProducts.length > 0 ? (
+          // Cards space their rows with --card-row-gap; the negative margin
+          // takes the last row's back
+          <div className="-mb-(--card-row-gap) grid grid-cols-2 gap-x-3 [--card-row-gap:0.75rem] sm:gap-x-4 sm:[--card-row-gap:1rem] md:grid-cols-3 xl:grid-cols-4">
+            {data.allProducts.map((product, index) => {
+              return (
+                <ProductCard
+                  key={product.id}
+                  href={`/${lng}/product/${product.slug}`}
+                  name={product.name}
+                  brand={product.brand?.name}
+                  image={product.productImages[0]?.responsiveImage}
+                  hoverImage={product.productImages[1]?.responsiveImage}
+                  price={product.price}
+                  salePrice={product.salePrice}
+                  onSale={stripStega(product.sale) === 'on_sale'}
+                  currencySymbol={currencySymbol ?? ''}
+                  saleLabel={sale}
+                  sizes="(min-width: 1440px) 320px, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 46vw"
+                  priority={!singleFilter && index < 4}
+                  titleAs="h2"
+                />
+              );
+            })}
           </div>
-        </div>
-      </div>
+        ) : (
+          <div className="flex flex-col items-center rounded-card bg-white px-6 py-16 text-center sm:py-24">
+            <span
+              aria-hidden="true"
+              className="grid size-18 place-items-center rounded-full bg-oat [&>svg]:size-7"
+            >
+              <MagnifyingGlassIcon />
+            </span>
+            <h2 className="title-md mt-7 max-w-[16em]">{emptyState.title}</h2>
+            <p className="mt-4 max-w-[40ch] text-md text-pretty text-muted tabular-nums sm:text-lg">
+              {emptyState.body}
+            </p>
+            <Link href={emptyState.href} className="btn-primary mt-8">
+              {count > 0 && <ArrowLeftIcon aria-hidden="true" />}
+              {emptyState.cta}
+              {count === 0 && <ArrowRightIcon aria-hidden="true" />}
+            </Link>
+          </div>
+        )}
+      </section>
       <Pagination
-        numberOfProducts={data._allProductsMeta.count}
+        numberOfProducts={count}
         currentPage={pageNumber}
+        pageSize={PAGE_SIZE}
       />
     </>
   );

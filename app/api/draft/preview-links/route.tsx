@@ -1,6 +1,6 @@
 import { headers as getHeaders } from 'next/headers';
 import type { NextRequest } from 'next/server';
-import type { SiteLocale } from '@/graphql/types/graphql';
+import type { SiteLocale } from '@/app/i18n/settings';
 import { localizedString } from '@/utils/localizedField';
 
 type generatePreviewUrlParams = {

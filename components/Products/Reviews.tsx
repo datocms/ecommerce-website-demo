@@ -2,7 +2,6 @@ import ReactMarkdown from 'react-markdown';
 import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
 import StarRating from '@/components/Common/StarRating';
 import { ProductGeneralInterfaceFragment } from '@/components/Products/Product/GeneralInferface/fragments';
-import { PDP_RAIL } from '@/components/Products/Product/ui';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
 
@@ -22,20 +21,18 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
   }).format(average);
   const featuredReviews = data.product?.featuredReviews ?? [];
 
-  // The summary sticks on the left while the reviews scroll on the buy box's line
+  // A compact summary bar (score, stars, count and the button on one ruled line), then the
+  // reviews in columns like the testimonials
   return (
-    <section
-      id="reviews"
-      className="shell grid gap-10 pt-(--section-gap) lg:grid-cols-12 lg:gap-4"
-    >
-      <div className="lg:sticky lg:top-[calc(var(--header-h)+2rem)] lg:col-span-6 lg:self-start">
-        <div className="flex items-end gap-6 lg:block">
-          <p className="text-[5.5rem] leading-[0.8] font-semibold tracking-[-0.05em] tabular-nums lg:text-[7rem]">
+    <section id="reviews" className="shell pt-(--section-gap)">
+      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-6 border-b border-line pb-8">
+        <div className="flex items-end gap-5">
+          <p className="text-[4rem] leading-[0.8] font-semibold tracking-[-0.05em] tabular-nums lg:text-[5rem]">
             {formattedAverage}
             <span className="sr-only"> out of 5</span>
           </p>
-          <div className="pb-1 lg:mt-6 lg:pb-0">
-            <StarRating value={average} size={20} decorative />
+          <div className="pb-0.5">
+            <StarRating value={average} size={16} decorative />
             <h2 className="mt-2 text-md font-semibold">
               <span className="tabular-nums">
                 {data.product?.numberOfReviews}
@@ -45,14 +42,14 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
           </div>
         </div>
         {reviewButton && (
-          <button type="button" className="btn-line mt-8 w-full sm:w-auto">
+          <button type="button" className="btn-line w-full sm:w-auto">
             {reviewButton}
           </button>
         )}
       </div>
 
       {featuredReviews.length > 0 && (
-        <ul className={PDP_RAIL}>
+        <ul className="mt-8 grid gap-x-4 gap-y-10 md:grid-cols-2 lg:mt-10 lg:grid-cols-3">
           {featuredReviews.map((review) => {
             const date = new Date(review.reviewDate);
             const formattedDate = new Intl.DateTimeFormat(
@@ -65,10 +62,7 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
             ).format(date);
 
             return (
-              <li
-                key={review.id}
-                className="border-t border-line py-8 first:border-t-0 first:pt-0 last:pb-0 lg:py-10"
-              >
+              <li key={review.id} className="flex flex-col lg:pr-10">
                 <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                   <StarRating value={review.reviewScore} size={16} />
                   <time
@@ -78,7 +72,7 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
                     {formattedDate}
                   </time>
                 </div>
-                <div className="mt-5 text-xl leading-[1.4] font-medium tracking-[-0.015em] text-pretty lg:text-2xl lg:leading-[1.4] [&_p+p]:mt-3">
+                <div className="mt-4 text-lg leading-[1.45] font-medium tracking-[-0.01em] text-pretty [&_p+p]:mt-3">
                   <ReactMarkdown>{review.review || ''}</ReactMarkdown>
                 </div>
                 <p className="mt-5 text-sm font-semibold">

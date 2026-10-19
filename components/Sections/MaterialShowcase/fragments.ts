@@ -14,6 +14,7 @@ export const MaterialShowcaseFragment = graphql(
         name
         slug
         details {
+          subtitle
           image {
             responsiveImage {
               ...ResponsiveImageFragment

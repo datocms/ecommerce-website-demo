@@ -6,8 +6,8 @@ type Props = {
   b: number;
 };
 
-// Writes the CMS accent. global.css mixes it into --color-accent-wash, which only <mark> uses:
-// the rest of the site is ink and white. A plain <style> is server-rendered (styled-jsx would
+// Writes the CMS accent. global.css mixes it into --color-accent-wash, which only text selection
+// uses: the rest of the site, highlights included, is ink and white. A plain <style> is server-rendered (styled-jsx would
 // only inject it after hydration).
 const CustomColor = ({ r, g, b }: Props) => (
   <style>{`:root{--color-primary:rgb(${Math.round(r)} ${Math.round(g)} ${Math.round(b)})}`}</style>

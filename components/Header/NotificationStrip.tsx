@@ -34,7 +34,7 @@ const NotificationStrip = ({
           // No balancing: the nowrap link drops to the second line as a whole
           className="min-w-0 px-10 text-xs"
           data={notification.value as StructuredText<Record, Record>}
-          // The accent wash would be lost on black: marks render as semibold instead
+          // The grey marker would be lost on black: marks render as semibold instead
           renderNode={(
             tag: string,
             props: { key?: string } | null,

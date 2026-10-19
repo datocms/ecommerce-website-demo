@@ -98,20 +98,22 @@ const Footer = ({ data, globalPageProps }: Props) => {
       <footer className="surface-ink mt-(--section-gap)">
         {showNewsletter && (
           <>
-            <div className="shell grid gap-10 pt-(--band-y) pb-16 lg:grid-cols-12 lg:gap-4 lg:pb-20">
-              <div className="lg:col-span-6">
+            {/* One slim row: the invitation on the left, the field on the right, both on the
+                footer's own grid so the form lines up with the link columns below */}
+            <div className="shell grid gap-6 py-12 md:py-14 lg:grid-cols-12 lg:items-end lg:gap-4">
+              <div className="lg:col-span-4 xl:col-span-5">
                 {generalInterface?.newsletter && (
                   <p className="eyebrow text-mute">
                     {generalInterface.newsletter}
                   </p>
                 )}
-                <h2 className="title-statement mt-4 max-w-[37.5rem] first:mt-0">
+                <h2 className="title-card mt-2 text-balance first:mt-0">
                   {generalInterface?.subscribeToOurNewsletter}
                 </h2>
               </div>
               <form
                 onSubmit={(e) => e.preventDefault()}
-                className="flex self-end lg:col-span-5 lg:col-start-8"
+                className="flex lg:col-span-8 lg:col-start-5 xl:col-span-7 xl:col-start-6"
               >
                 <label htmlFor="footer-newsletter-email" className="sr-only">
                   {generalInterface?.emailPlaceholder ?? 'Email'}
@@ -121,9 +123,9 @@ const Footer = ({ data, globalPageProps }: Props) => {
                   type="email"
                   autoComplete="email"
                   placeholder={generalInterface?.emailPlaceholder ?? 'Email'}
-                  className="input-line h-14 min-w-0 flex-1"
+                  className="input-line min-w-0 flex-1"
                 />
-                <button type="submit" className="btn h-14 shrink-0 px-8">
+                <button type="submit" className="btn shrink-0 px-8">
                   {generalInterface?.newsletterButton}
                 </button>
               </form>
@@ -135,7 +137,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
         )}
 
         <div
-          className={`shell grid gap-12 pb-16 lg:grid-cols-12 lg:gap-4 ${showNewsletter ? 'pt-16' : 'pt-(--band-y)'}`}
+          className={`shell grid gap-12 pb-16 lg:grid-cols-12 lg:gap-4 ${showNewsletter ? 'pt-12 md:pt-14' : 'pt-(--band-y)'}`}
         >
           <div className="lg:col-span-4">
             {(footerLogo || footerTitle) && (

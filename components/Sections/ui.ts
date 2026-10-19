@@ -15,7 +15,7 @@ export const MEDIA = 'relative overflow-hidden bg-mist';
 export const IMG_ZOOM =
   'transition-transform duration-700 ease-out group-hover:scale-[1.03]';
 
-// A photo with its caption under it, as one link (collections, materials, seasons)
+// A photo with its caption under it, as one link (collections, seasons)
 export const TILE = 'group flex flex-col';
 // The caption block under a tile's photo: a title and a tlink, or a name with an arrow
 export const CAPTION = 'flex flex-col items-start gap-2 pt-4';

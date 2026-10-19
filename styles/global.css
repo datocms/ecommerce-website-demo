@@ -32,8 +32,8 @@
   --color-mist: #f4f4f3;
   --color-sale: #c4271c;
   --color-disabled: #a3a3a3;
-  /* The CMS accent tints <mark> only. --color-primary is written by CustomColor.tsx */
-  --color-accent-wash: color-mix(in oklab, var(--color-primary) 30%, #ffffff);
+  /* The CMS accent tints text selection only. --color-primary is written by CustomColor.tsx */
+  --color-accent-wash: color-mix(in oklab, var(--color-primary) 50%, #ffffff);
 
   /* 14px is the floor (tags, brand lines, fine print); body copy is 15-17px */
   --text-*: initial;
@@ -73,8 +73,9 @@
 
 @layer base {
   :root {
-    /* Neutral until CustomColor writes the CMS accent (unlayered, so it wins) */
-    --color-primary: #d4d4d4;
+    /* Neutral until CustomColor writes the CMS accent (unlayered, so it wins); pages without
+       it (404) still get a visible selection */
+    --color-primary: #a3a3a3;
     /* What sits on the current surface: ink on white, white on surface-ink. btn, btn-line,
        chip and rail-btn read these, so they invert inside black bands on their own. */
     --surface-fg: var(--color-ink);
@@ -87,7 +88,7 @@
     /* Between page sections; --page-top is the first title block's distance from the header */
     --section-gap: 6rem;
     --page-top: 3rem;
-    /* Vertical padding inside black bands (testimonials, newsletter) */
+    /* Vertical padding inside black bands (testimonials, the footer top without a newsletter) */
     --band-y: 5rem;
   }
   @media (min-width: 40rem) {
@@ -179,13 +180,21 @@
     outline: 2px solid var(--focus-ring, var(--color-ink));
     outline-offset: 2px;
   }
+  /* Ink text keeps the selection readable on black bands too */
   ::selection {
-    background-color: var(--color-ink);
-    color: var(--color-white);
-  }
-  mark {
     background-color: var(--color-accent-wash);
     color: var(--color-ink);
+  }
+  /* Highlighted copy: a marker stroke over the lower x-height, 12% of the text colour, so it
+     also reads on a black band */
+  mark {
+    background: linear-gradient(
+      to top,
+      transparent 0.23em,
+      color-mix(in srgb, currentColor 12%, transparent) 0.23em 0.62em,
+      transparent 0.62em
+    );
+    color: inherit;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -280,7 +289,7 @@
     font-size: clamp(4rem, 6.25vw, 5rem);
   }
 }
-/* Statements: divider title, newsletter heading, product name (44 / 56 / 64 at 1280) */
+/* Statements: popup title, legal page title, 404 (44 / 56 / 64 at 1280) */
 @utility title-statement {
   font-weight: 600;
   font-size: 2.75rem;
@@ -309,7 +318,8 @@
   line-height: 1.05;
   letter-spacing: -0.035em;
 }
-/* Item names: material tiles, mobile menu rows, spotlight names, the header wordmark */
+/* Item names: store and material index rows, mobile menu rows, spotlight names, the header
+   wordmark */
 @utility title-item {
   font-weight: 600;
   font-size: 1.25rem;

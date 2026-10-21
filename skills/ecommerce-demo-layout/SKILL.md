@@ -26,21 +26,23 @@ Use this for shared site layout behavior in the ecommerce starter: header, navig
 Before schema or content operations:
 
 - Expect the DatoCMS skills plugin to be installed. If it is missing, pause and request installation before continuing.
-- Strongly recommend the DatoCMS remote MCP from `/Users/marcelofinamorvieira/datoCMS/dev/remote-mcp`. If layout schema or content facts are needed and the MCP is not running, pause and request startup.
+- Recommend a DatoCMS MCP server connected to this project. If layout schema or content facts are needed and none is available, pause and ask for one.
 - Inspect live schema/content through MCP before assuming singleton field shapes, localized fields, linked records, or block validators.
 
 ## Existing layout structure
 
 - Shared shell route query: `query` in `app/[lng]/meta.ts`.
 - Shared shell renderer: `app/[lng]/Content.tsx`.
-- Header components: `components/Header/**`.
-- Footer component: `components/Footer/index.tsx`.
-- Accent color component: `components/Common/CustomColor.tsx`.
+- Header components: `components/Layout/Header/**` (NavBar, MobileMenu, MegaMenuPanel, FeatureTiles, SearchDialog, Cart, NotificationStrip, PopupDialog; menu hrefs in `menu.ts`).
+- Footer component: `components/Layout/Footer/index.tsx` (wordmark in `Wordmark.tsx`).
+- Shared by header and footer: `components/Layout/LanguageSelector.tsx`, `components/Layout/CookieNotice.tsx`.
+- Accent color component: `components/Layout/CustomColor.tsx`.
 - Shared DatoCMS records: `Layout` and shell-related `General Interface` fields.
 - `Layout.menu` drives header navigation, link items, dropdown menus, dropdown columns, and category-style menu links.
 - `Layout.footerColumns`, `Layout.socialMediaLinks`, footer logo/title/subtitle, and copyright fields drive the footer.
 - `Layout.popup`, `Layout.cookieNotice`, and `Layout.notification` drive site-wide overlays and top messaging.
 - `General Interface` drives shared labels such as search placeholder, newsletter footer labels, currency symbol, and header dropdown labels.
+- Shell elements that stay on screen across pages (the strip, header, mega-menu scrim, sheets and draft dock) carry `data-chrome`, and the View transitions section of `styles/global.css` names each one, so pages pass under them during navigation. The cookie bar is matched by its `id="cookie-notice"` instead, so keep that id. A new fixed or sticky shell element needs both the attribute and a name in global.css.
 
 ## Common workflows
 
@@ -57,7 +59,7 @@ Before schema or content operations:
 1. Confirm the request affects the shared shell, not a homepage section, catalog surface, or page route.
 2. Inspect the live field shape through MCP before changing queries or components.
 3. Update the `query` in `app/[lng]/meta.ts` only when the shared query needs more data.
-4. Update the relevant shared component under `components/Header/**`, `components/Footer/index.tsx`, or the shared shell renderer.
+4. Update the relevant shared component under `components/Layout/Header/**`, `components/Layout/Footer/index.tsx`, or the shared shell renderer.
 5. After query changes, run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 6. Verify the shared surface on at least one homepage route and one non-homepage route when practical.
 

@@ -24,7 +24,7 @@ Use this for record-backed page routes in the ecommerce starter, including previ
 Before schema or content operations:
 
 - Expect the DatoCMS skills plugin to be installed. If it is missing, pause and request installation before continuing.
-- Strongly recommend the DatoCMS remote MCP from `/Users/marcelofinamorvieira/datoCMS/dev/remote-mcp`. If page model or record facts are needed and the MCP is not running, pause and request startup.
+- Recommend a DatoCMS MCP server connected to this project. If page model or record facts are needed and none is available, pause and ask for one.
 - Inspect live schema/content through MCP before assuming model API keys, slug fields, singleton status, or localized fields.
 
 ## Existing page pattern
@@ -37,11 +37,14 @@ Record-backed pages use this route folder shape under `app/[lng]/...`:
 - `RealTime.tsx` for draft/live preview rendering.
 - Optional `staticParamsQuery` in `page.tsx` for slug-backed collection routes.
 
+A `page.tsx` that does not use `generateWrapper` wraps what it renders in `<PageTransition>` (`components/Common/PageTransition.tsx`), as `products/` and `product/[slug]/` do. Without it, navigating to the page skips the page fade.
+
 Existing examples:
 
 - singleton route: `app/[lng]/showcase/`.
 - collection route: `app/[lng]/legal/[slug]/`.
-- product route: `app/[lng]/product/[slug]/`.
+- product route: `app/[lng]/product/[slug]/` (its page.tsx resolves localized slugs and redirects before rendering, so it does not use generateWrapper).
+- catalog route: `app/[lng]/products/` keeps its queries in `meta.ts` but has no `RealTime.tsx`: its page.tsx runs them per request because they depend on search params.
 
 ## Workflow for a new record-backed page route
 

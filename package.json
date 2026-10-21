@@ -1,5 +1,5 @@
 {
-  "name": "startup-nextjs-template",
+  "name": "ecommerce-website-demo",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome lint .",
-    "format": "biome check . --write --diagnostic-level=error && biome format --diagnostic-level=error --write .",
+    "format": "biome check --write --diagnostic-level=error .",
     "generate-schema": "dotenv -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN\" && gql.tada generate-output'"
   },
   "dependencies": {
@@ -20,7 +20,6 @@
     "@formatjs/intl-localematcher": "^0.9.0",
     "@headlessui/react": "^2.2.10",
     "@heroicons/react": "^2.2.0",
-    "@tailwindcss/forms": "^0.5.11",
     "datocms-structured-text-utils": "^6.0.1",
     "gql.tada": "^1.11.4",
     "language-name-map": "^0.3.0",

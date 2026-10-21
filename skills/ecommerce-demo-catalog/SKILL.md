@@ -20,13 +20,13 @@ Use this for storefront catalog behavior in the ecommerce starter: products, fil
 Before schema or content operations:
 
 - Expect the DatoCMS skills plugin to be installed. If it is missing, pause and request installation before continuing.
-- Strongly recommend the DatoCMS remote MCP from `/Users/marcelofinamorvieira/datoCMS/dev/remote-mcp`. If catalog schema or content facts are needed and the MCP is not running, pause and request startup.
+- Recommend a DatoCMS MCP server connected to this project. If catalog schema or content facts are needed and none is available, pause and ask for one.
 - Inspect live schema/content through MCP before assuming product, taxonomy, variant, or menu field shapes.
 
 ## Existing catalog structure
 
 - Listing route: `app/[lng]/products/page.tsx`.
-- Listing queries: `productsQuery` and `initialParamsQuery` in `app/[lng]/products/page.tsx`.
+- Listing queries: `productsQuery` and `filterOptionsQuery` in `app/[lng]/products/meta.ts` (page.tsx runs them per request).
 - Product detail route: `app/[lng]/product/[slug]/`.
 - Product detail query: `query` in `app/[lng]/product/[slug]/meta.ts`.
 - Listing filters use collections, brands, and materials.
@@ -34,13 +34,16 @@ Before schema or content operations:
 - Pagination is listing behavior: preserve active query params and reset or clamp stale `page` values after filter/sort changes.
 - Header category links are built from layout menu records and use `_modelApiKey` plus record ids.
 - Product variants provide colors and available sizes for the product detail UI.
+- Listing UI: `components/ProductListing/`
+- Product card and price: `components/ProductCard/`
+- Product page UI: `components/ProductDetail/` (labels fragment in `fragments.ts`, description blocks in `Blocks/<Block>/`)
 
 ## Common workflows
 
 ### Add or change a product field on listing cards
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
-2. Add the field to `productsQuery` in `app/[lng]/products/page.tsx`.
+2. Add the field to `productsQuery` in `app/[lng]/products/meta.ts`.
 3. Render it in the listing card while preserving existing sale-price logic and links.
 4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 5. Verify pagination, filters, and search still work.
@@ -59,7 +62,7 @@ Before schema or content operations:
 2. Route modeling decisions to `datocms-content-modeling` before changing schema.
 3. Update listing query variables and filter arguments.
 4. Update URL query param handling without breaking existing params.
-5. Update `SideFilter` or the listing page UI.
+5. Update `FilterPanel` (`components/ProductListing/FilterPanel.tsx`; sort options in `SortTabs.tsx`) or the listing page UI. A control inside the filters drawer pushes its query with the "filter" transition type (`pushQueryParam` in `PendingQuery.tsx`), so the results update behind the scrim instead of swapping.
 6. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`. Verify pagination counts.
 
 ### Add or change sort behavior

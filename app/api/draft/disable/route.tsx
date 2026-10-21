@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   if (!url) return new Response('Draft mode is disabled');
 
   if (!isSafeRedirectUrl(url, requestUrl))
-    return new Response('URL must be relative!', { status: 422 });
+    return new Response('Redirect must point to this site', { status: 422 });
 
   // Reissued as SameSite=None; Secure so the cleared cookie survives the redirect inside the
   // DatoCMS iframe

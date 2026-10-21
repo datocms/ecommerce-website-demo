@@ -188,7 +188,7 @@ const Content: ContentPage<PageProps, Query> = ({
                   {/* The links line up even when a localized name wraps. Names wrap between
                       words only: balanced lines would otherwise split "Geschäftlich" in three
                       columns at md */}
-                  <div className="flex flex-col items-start gap-2 pt-4 flex-1 pt-5">
+                  <div className="flex flex-col items-start gap-2 pt-5 flex-1">
                     <h2 className="title-card hyphens-manual">
                       {collection.name}
                     </h2>

@@ -47,7 +47,7 @@ export const productsQuery = graphql(
           collections: { anyIn: $collections }
           brand: { in: $brands }
           material: { in: $materials }
-          name: { matches: { pattern: $nameSearch } }
+          name: { matches: { pattern: $nameSearch, regexp: false } }
         }
       ) {
         id
@@ -71,7 +71,7 @@ export const productsQuery = graphql(
           collections: { anyIn: $collections }
           brand: { in: $brands }
           material: { in: $materials }
-          name: { matches: { pattern: $nameSearch } }
+          name: { matches: { pattern: $nameSearch, regexp: false } }
         }
       ) {
         count

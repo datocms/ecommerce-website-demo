@@ -41,7 +41,9 @@ export default function TokenForm({
     if (isFetching) return;
     setIsFetching(true);
     try {
-      const response = await fetch(`/api/draft/enable?token=${inputValue}`);
+      const response = await fetch(
+        `/api/draft/enable?token=${encodeURIComponent(inputValue)}`,
+      );
       if (response.status === 200) {
         onSuccess();
         return;

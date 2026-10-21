@@ -19,7 +19,7 @@ export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
     query,
     buildVariables,
     // The stores page has no record of its own, so it uses the first store's SEO tags
-    generate: (data) => data.allStores[0].seo,
+    generate: (data) => data.allStores[0]?.seo,
   },
 );
 

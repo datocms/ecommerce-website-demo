@@ -18,7 +18,7 @@ const findSlugAndPermalink = (
   // Paths must match the routes /api/draft/preview-links uses.
   switch (itemTypeApiKey) {
     case 'home':
-      return { slug, permalink: `/${locale}/` };
+      return { slug, permalink: `/${locale}/home` };
     case 'showcase':
       return { slug, permalink: `/${locale}/showcase` };
     case 'store':
@@ -105,8 +105,6 @@ export async function GET(request: NextRequest) {
         headers: corsHeaders,
       });
     const pageContent = contentEl.innerHTML;
-    const pageLocale =
-      document.querySelector('html')?.getAttribute('lang') || 'en';
     const pageTitle = document.querySelector('title')?.textContent;
     const pageDescription = document
       .querySelector('meta[name="description"]')
@@ -114,7 +112,8 @@ export async function GET(request: NextRequest) {
 
     return new Response(
       JSON.stringify({
-        locale: pageLocale,
+        // The requested locale: the server HTML has no <html lang>, since the root layout sits above [lng]
+        locale,
         slug,
         permalink,
         title: pageTitle,

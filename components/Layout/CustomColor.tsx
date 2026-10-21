@@ -6,11 +6,8 @@ type Props = {
   b: number;
 };
 
-// Writes the CMS accent. global.css mixes it into --color-accent-wash, which only text selection
-// uses: the rest of the site, highlights included, is ink and white. A plain <style> is server-rendered (styled-jsx would
-// only inject it after hydration).
-const CustomColor = ({ r, g, b }: Props) => (
-  <style>{`:root{--color-primary:rgb(${Math.round(r)} ${Math.round(g)} ${Math.round(b)})}`}</style>
-);
-
-export default CustomColor;
+// Sets --color-primary from Layout.mainColor. global.css uses it only through
+// --color-accent-wash, to tint text selection. A plain <style>, so it ships in the server HTML.
+export default function CustomColor({ r, g, b }: Props) {
+  return <style>{`:root{--color-primary:rgb(${r} ${g} ${b})}`}</style>;
+}

@@ -13,11 +13,11 @@ const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
   fallbackLocale: [fallbackLocale],
 });
 
-const layout = generateWrapper<PageProps, Query, Variables>({
+const Layout = generateWrapper<PageProps, Query, Variables>({
   query,
   buildVariables,
   contentComponent: Content,
   realtimeComponent: RealTime,
 });
 
-export default layout;
+export default Layout;

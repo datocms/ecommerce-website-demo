@@ -14,16 +14,16 @@ import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 
-export type Popup = NonNullable<NonNullable<LayoutQuery['layout']>['popup']>;
+type Popup = NonNullable<NonNullable<LayoutQuery['layout']>['popup']>;
 
-type PropTypes = {
+type Props = {
   open: boolean;
   onClose: () => void;
   popup: Popup;
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-const PopupDialog = ({ open, onClose, popup, globalPageProps }: PropTypes) => {
+const PopupDialog = ({ open, onClose, popup, globalPageProps }: Props) => {
   const button = popup.button[0];
 
   return (

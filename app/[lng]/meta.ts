@@ -6,6 +6,8 @@ import {
 } from '@/lib/datocms/graphql';
 import type { GlobalPageProps } from '@/lib/globalPageProps';
 
+// The layout's children (the current page) reach Content through pageProps, also in draft mode
+// where RealTime renders it.
 export type PageProps = GlobalPageProps & {
   children: React.ReactNode;
 };
@@ -28,6 +30,7 @@ export const query = graphql(
         favicon {
           url
         }
+        locales
       }
       layout(locale: $locale, fallbackLocales: $fallbackLocale) {
         copyrightText
@@ -88,7 +91,6 @@ export const query = graphql(
           }
         }
         logo {
-          url
           responsiveImage {
             ...ResponsiveImageFragment
           }
@@ -101,31 +103,26 @@ export const query = graphql(
           ... on DropdownMenuRecord {
             id
             label
-            _modelApiKey
             column {
               label
               id
               item {
                 ... on ProductRecord {
-                  slug
                   _modelApiKey
                   id
                   name
                 }
                 ... on MaterialRecord {
-                  slug
                   id
                   _modelApiKey
                   name
                 }
                 ... on CollectionRecord {
-                  slug
                   id
                   _modelApiKey
                   name
                 }
                 ... on BrandRecord {
-                  slug
                   id
                   _modelApiKey
                   name
@@ -136,7 +133,6 @@ export const query = graphql(
               ... on MaterialRecord {
                 id
                 name
-                slug
                 _modelApiKey
                 details {
                   image {
@@ -149,7 +145,6 @@ export const query = graphql(
               ... on CollectionRecord {
                 id
                 name
-                slug
                 _modelApiKey
                 details {
                   image {
@@ -162,7 +157,6 @@ export const query = graphql(
               ... on BrandRecord {
                 id
                 name
-                slug
                 _modelApiKey
                 details {
                   image {
@@ -177,7 +171,6 @@ export const query = graphql(
               ... on MaterialRecord {
                 id
                 name
-                slug
                 _modelApiKey
                 details {
                   image {
@@ -190,7 +183,6 @@ export const query = graphql(
               ... on CollectionRecord {
                 id
                 name
-                slug
                 _modelApiKey
                 details {
                   image {
@@ -203,7 +195,6 @@ export const query = graphql(
               ... on BrandRecord {
                 id
                 name
-                slug
                 _modelApiKey
                 details {
                   image {
@@ -220,12 +211,8 @@ export const query = graphql(
             id
             label
             slug
-            _modelApiKey
           }
         }
-      }
-      _site {
-        locales
       }
       generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
         currencySymbol

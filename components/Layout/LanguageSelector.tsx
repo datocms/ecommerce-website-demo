@@ -15,7 +15,7 @@ type Props = {
   languages: SiteLocale[];
   currencySymbol?: string | null;
   /** Where the list opens: below the header trigger, above the mobile menu and footer ones */
-  placement?: 'below-end' | 'above-start' | 'above-end' | 'above-start-md-end';
+  placement?: 'below-end' | 'above-start' | 'above-start-md-end';
   /** A chevron after the label (the footer's switch) */
   chevron?: boolean;
   /** Classes for the "EN / $" label, e.g. to keep it for screen readers only on narrow bars */
@@ -26,11 +26,11 @@ type Props = {
 };
 
 const PLACEMENT = {
-  // The header's: its 40px trigger is centred in the 72px bar, so 16px down the list's ink
-  // top edge lies on the header's hairline, where the mega menu hangs too; it drops from there
+  // Header: the 40px trigger is centred in the 72px bar, so mt-4 puts the list's top edge on
+  // the header's bottom border, where the mega menu opens too, and --pop-y drops it from there.
+  // Each placement scales from the corner nearest its trigger (origin-*).
   'below-end': 'top-full right-0 mt-4 origin-top-right [--pop-y:-0.5rem]',
   'above-start': 'bottom-full left-0 mb-2 origin-bottom-left',
-  'above-end': 'bottom-full right-0 mb-2 origin-bottom-right',
   // A trigger on the left edge on phones, on the right edge from md
   'above-start-md-end':
     'bottom-full left-0 mb-2 origin-bottom-left md:right-0 md:left-auto md:origin-bottom-right',
@@ -52,7 +52,9 @@ const LanguageSelector = ({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const pathSegments = pathname.split('/').filter(Boolean);
-  const currentLocale = pathSegments[0] as SiteLocale; //will be a SiteLocale because of the middleware redirect rules
+  // proxy.ts redirects every request to a locale-prefixed path, so the first segment is a
+  // SiteLocale
+  const currentLocale = pathSegments[0] as SiteLocale;
   const searchParams = useSearchParams();
   const currentProductSlug =
     pathSegments[1] === 'product' ? pathSegments[2] : null;
@@ -67,6 +69,8 @@ const LanguageSelector = ({
       return;
     }
 
+    // abort() cancels a request still in flight; ignore drops a response that was already read
+    // when the product changed
     const controller = new AbortController();
     let ignore = false;
 
@@ -82,11 +86,9 @@ const LanguageSelector = ({
           setProductSlugs(data?.slugs || {});
         }
       })
-      .catch((error) => {
-        if (error.name !== 'AbortError' && !ignore) {
-          setProductSlugs({});
-        }
-      });
+      // Aborted, or no map: the links keep each locale's plain path (productSlugs was reset
+      // above)
+      .catch(() => {});
 
     return () => {
       ignore = true;

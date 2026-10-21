@@ -3,13 +3,13 @@ import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 
-export type CookieNotice = NonNullable<
+type CookieNoticeContent = NonNullable<
   NonNullable<LayoutQuery['layout']>['cookieNotice']
 >;
 
-// Shared by the header (the popup waits for the dismissal) and the footer (which
-// renders the bar). The [lng] layout remounts on a locale switch, so a dismissal
-// lasts for the page load.
+// Shared by the header (the popup waits for the dismissal) and the footer (which renders the
+// bar). Kept outside React so a dismissal survives the [lng] layout remounting on a locale
+// switch; a full reload shows it again.
 let dismissed = false;
 const listeners = new Set<() => void>();
 
@@ -32,28 +32,29 @@ export const useCookieNoticeOpen = () =>
     () => false,
   );
 
-type PropTypes = {
-  cookieNotice: CookieNotice;
+type Props = {
+  cookieNotice: CookieNoticeContent;
 };
 
-// It arrives once per page load, after the hero: a locale switch remounts it, and it should
-// hold still then instead of leaving for 600ms and rising again
-let arrived = false;
+// The bar arrives once per page load (enter, 600ms in, after the hero). Kept outside React
+// like `dismissed`: a locale switch remounts the bar, and it should hold still then rather
+// than vanish for 600ms and rise again.
+let hasArrived = false;
 
 // A white bar along the viewport's bottom edge, rendered right after the footer: it is
 // sticky, so it follows the viewport while scrolling and comes to rest under the footer,
 // never hiding the page's end. No scrim: the page stays usable.
-const CookieNotice = ({ cookieNotice }: PropTypes) => {
-  const [enter] = useState(!arrived);
+const CookieNotice = ({ cookieNotice }: Props) => {
+  const [playArrival] = useState(!hasArrived);
   useEffect(() => {
-    arrived = true;
+    hasArrived = true;
   }, []);
 
   return (
     <section
       id="cookie-notice"
       aria-label={cookieNotice.header ?? undefined}
-      className={`${enter ? 'enter [--delay:600ms] ' : ''}sticky bottom-0 z-40 border-t border-ink bg-white`}
+      className={`${playArrival ? 'enter [--delay:600ms] ' : ''}sticky bottom-0 z-40 border-t border-ink bg-white`}
     >
       {/* One row from lg; below it the buttons go under the text (right-aligned from sm), so
           the text keeps its width instead of wrapping to four lines beside them */}

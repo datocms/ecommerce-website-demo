@@ -1,8 +1,7 @@
-import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import Rise from '@/components/Common/Rise';
-import SvgRenderer from '@/components/Common/SvgRenderer';
+import SocialLink from '@/components/Common/SocialLink';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
@@ -40,8 +39,10 @@ const Hero = ({
   } = readFragment(HeroSectionFragment, fragment);
   const { lng } = globalPageProps.params;
   const titleId = `${id}-title`;
-  const hasMeta = featuredCollections.length > 0 || socials.length > 0;
-  const second = withAdditionalImage ? additionalImage.responsiveImage : null;
+  const hasLinksRow = featuredCollections.length > 0 || socials.length > 0;
+  const additionalPhoto = withAdditionalImage
+    ? additionalImage.responsiveImage
+    : null;
   const mainPhoto = heroImage.responsiveImage && (
     <DatoImage
       fragment={heroImage.responsiveImage}
@@ -49,7 +50,7 @@ const Hero = ({
       objectFit="cover"
       objectPosition="50% 8%"
       sizes={
-        second
+        additionalPhoto
           ? '(min-width: 1024px) 41vw, 67vw'
           : '(min-width: 1024px) 62vw, 100vw'
       }
@@ -59,20 +60,22 @@ const Hero = ({
 
   return (
     <section aria-labelledby={titleId}>
-      {/* From lg the photo sets the height; min-h lets a long localized title grow the row
-          instead of spilling out of it on short viewports */}
+      {/* From lg the row is --hero-h tall (set on the page wrapper) and the photo fills it;
+          min-h rather than h lets a long localized title grow the row */}
       <div className="shell grid lg:min-h-(--hero-h) lg:grid-cols-12 lg:gap-4">
         {/* justify-self-stretch: a grid item with an aspect ratio otherwise shrinks to it, so a
             capped height (tablets) would narrow the photo instead of cropping it */}
         <div
-          className={`${second ? 'grid grid-cols-[2fr_1fr] gap-3 lg:gap-4' : `${MEDIA} settle`} -mx-(--gutter) aspect-[4/5] max-h-[62svh] justify-self-stretch lg:order-2 lg:col-span-7 lg:mx-0 lg:aspect-auto lg:max-h-none lg:bleed-r`}
+          // settle goes on the photo's own well: this element for one photo, each of the pair's
+          // wells for two
+          className={`${additionalPhoto ? 'grid grid-cols-[2fr_1fr] gap-3 lg:gap-4' : `${MEDIA} settle`} -mx-(--gutter) aspect-[4/5] max-h-[62svh] justify-self-stretch lg:order-2 lg:col-span-7 lg:mx-0 lg:aspect-auto lg:max-h-none lg:bleed-r`}
         >
-          {second ? (
+          {additionalPhoto ? (
             <>
               <div className={`${MEDIA} settle h-full`}>{mainPhoto}</div>
               <div className={`${MEDIA} settle h-full`}>
                 <DatoImage
-                  fragment={second}
+                  fragment={additionalPhoto}
                   layout="fill"
                   objectFit="cover"
                   sizes="(min-width: 1024px) 21vw, 33vw"
@@ -107,7 +110,7 @@ const Hero = ({
                 </Link>
               </div>
             )}
-            {hasMeta && (
+            {hasLinksRow && (
               <div className="mt-10 flex flex-wrap items-center justify-between gap-x-8 border-t border-line pt-3 lg:mt-14">
                 {featuredCollections.length > 0 && (
                   <ul className="flex flex-wrap items-center gap-x-2.5">
@@ -140,18 +143,7 @@ const Hero = ({
                     <ul className="-mr-3 flex">
                       {socials.map((social) => (
                         <li key={social.id}>
-                          <a
-                            href={social.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label={
-                              stripStega(social.name ?? '') ||
-                              stripStega(social.url)
-                            }
-                            className="icon-btn"
-                          >
-                            <SvgRenderer url={social.icon.url} />
-                          </a>
+                          <SocialLink social={social} />
                         </li>
                       ))}
                     </ul>

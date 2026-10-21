@@ -1,10 +1,12 @@
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 
-type PropTypes = {
+type Props = {
   data: LayoutQuery;
 };
 
-export default function SiteMeta({ data }: PropTypes) {
+// Site-wide fallbacks: the title and description from the DatoCMS global SEO settings, the
+// site favicon, and the viewport
+export default function SiteMeta({ data }: Props) {
   return (
     <>
       <title>{data._site.globalSeo?.fallbackSeo?.title}</title>

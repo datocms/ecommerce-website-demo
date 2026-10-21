@@ -2,10 +2,10 @@
 
 import { stripStega } from '@datocms/content-link';
 import Link from 'next/link';
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense } from 'react';
 import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
-import SvgRenderer from '@/components/Common/SvgRenderer';
+import SocialLink from '@/components/Common/SocialLink';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import CookieNotice, {
   useCookieNoticeOpen,
@@ -13,70 +13,16 @@ import CookieNotice, {
 import LanguageSelector from '@/components/Layout/LanguageSelector';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
+import Wordmark from './Wordmark';
 
 type Props = {
   data: LayoutQuery;
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-// The giant wordmark, fitted to the content width: measure the ink at a reference size and
-// rescale (Geist's widths are linear in size, so one step converges; the loop also covers
-// fallback fonts), then shift the ink onto the content's left edge.
-const Wordmark = ({ text }: { text: string }) => {
-  const ref = useRef<HTMLParagraphElement>(null);
-  const plain = stripStega(text).trim();
-
-  useEffect(() => {
-    const element = ref.current;
-    const context = document.createElement('canvas').getContext('2d');
-    if (!element || !context || !plain) return;
-
-    let width = 0;
-    const fit = () => {
-      width = element.clientWidth;
-      if (!width) return;
-      let size = 100;
-      let metrics = context.measureText(plain);
-      element.style.transform = '';
-      for (let step = 0; step < 5; step++) {
-        element.style.fontSize = `${size}px`;
-        const style = getComputedStyle(element);
-        context.font = `${style.fontWeight} ${size}px ${style.fontFamily}`;
-        context.letterSpacing = style.letterSpacing;
-        metrics = context.measureText(plain);
-        const ink =
-          metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
-        if (!ink) return;
-        size = (size * width) / ink;
-      }
-      element.style.fontSize = `${size.toFixed(2)}px`;
-      element.style.transform = `translateX(${metrics.actualBoundingBoxLeft.toFixed(2)}px)`;
-    };
-
-    fit();
-    document.fonts.ready.then(fit);
-    const observer = new ResizeObserver(() => {
-      if (element.clientWidth !== width) fit();
-    });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [plain]);
-
-  return (
-    <p
-      ref={ref}
-      aria-hidden="true"
-      className="giant reveal mask pb-6 select-none md:pb-10"
-      // Close to the fitted size before the script runs: the content width at about
-      // 0.46em per glyph
-      style={{
-        fontSize: `calc((min(100vw, 90rem) - 2 * var(--gutter)) / ${Math.max(plain.length, 1) * 0.46})`,
-      }}
-    >
-      {text}
-    </p>
-  );
-};
+// --draft-toggle-w is published by DraftModeToggle
+const CLEAR_OF_DRAFT_TOGGLE =
+  'max(var(--gutter), calc(var(--draft-toggle-w, 0px) + min(var(--draft-toggle-w, 0px), 1.5rem) + var(--gutter) - max(0px, (100vw - 90rem) / 2)))';
 
 const Footer = ({ data, globalPageProps }: Props) => {
   const { lng } = globalPageProps.params;
@@ -93,7 +39,13 @@ const Footer = ({ data, globalPageProps }: Props) => {
   const socials = data.layout?.socialMediaLinks ?? [];
   const cookieNoticeOpen = useCookieNoticeOpen();
   const cookieNotice = data.layout?.cookieNotice;
-  const cookieBar = cookieNoticeOpen && !!cookieNotice;
+  const cookieNoticeVisible = cookieNoticeOpen && !!cookieNotice;
+  // Named by the title, else by the logo's alt text, else "Home"
+  const homeLabel = footerTitle
+    ? stripStega(footerTitle)
+    : footerLogo?.alt
+      ? undefined
+      : 'Home';
 
   return (
     <>
@@ -115,6 +67,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
                   {generalInterface?.subscribeToOurNewsletter}
                 </h2>
               </div>
+              {/* Demo only: no newsletter provider is wired up */}
               <form
                 onSubmit={(e) => e.preventDefault()}
                 className="flex lg:col-span-8 lg:col-start-5 xl:col-span-7 xl:col-start-6"
@@ -147,13 +100,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
             {(footerLogo || footerTitle) && (
               <Link
                 href={`/${lng}/home`}
-                aria-label={
-                  footerTitle
-                    ? stripStega(footerTitle)
-                    : footerLogo?.alt
-                      ? undefined
-                      : 'Home'
-                }
+                aria-label={homeLabel}
                 className="inline-flex outline-offset-4"
               >
                 {footerLogo && (
@@ -181,18 +128,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
               // -ml-3: the first glyph sits on the content edge
               <div className="mt-8 -ml-3 flex first:mt-0">
                 {socials.map((social) => (
-                  <a
-                    key={social.id}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={
-                      stripStega(social.name ?? '') || stripStega(social.url)
-                    }
-                    className="icon-btn"
-                  >
-                    <SvgRenderer url={social.icon.url} />
-                  </a>
+                  <SocialLink key={social.id} social={social} />
                 ))}
               </div>
             )}
@@ -238,10 +174,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
         <div className="border-t border-line">
           <div
             className="shell flex flex-col items-start gap-1 pt-5 pb-4.5 text-xs text-mute md:min-h-20 md:flex-row md:items-center md:justify-between md:gap-6 md:py-3"
-            style={{
-              paddingRight:
-                'max(var(--gutter), calc(var(--draft-toggle-w, 0px) + min(var(--draft-toggle-w, 0px), 1.5rem) + var(--gutter) - max(0px, (100vw - 90rem) / 2)))',
-            }}
+            style={{ paddingRight: CLEAR_OF_DRAFT_TOGGLE }}
           >
             <p className="text-balance tabular-nums">
               {data.layout?.copyrightText}
@@ -260,7 +193,7 @@ const Footer = ({ data, globalPageProps }: Props) => {
       </footer>
 
       {/* After the footer, so the sticky bar comes to rest under it */}
-      {cookieBar && <CookieNotice cookieNotice={cookieNotice} />}
+      {cookieNoticeVisible && <CookieNotice cookieNotice={cookieNotice} />}
     </>
   );
 };

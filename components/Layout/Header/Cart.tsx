@@ -5,13 +5,13 @@ import {
 import Drawer from '@/components/Common/Drawer';
 import { formatPrice } from '@/components/ProductCard/Price';
 
-type PropTypes = {
+type Props = {
   open: boolean;
   onClose: () => void;
   currencySymbol: string | null | undefined;
 };
 
-export default function Cart({ open, onClose, currencySymbol }: PropTypes) {
+export default function Cart({ open, onClose, currencySymbol }: Props) {
   return (
     <Drawer
       open={open}

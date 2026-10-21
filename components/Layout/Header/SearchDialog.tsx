@@ -8,8 +8,9 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { FormEvent } from 'react';
+import { productSearchHref } from './menu';
 
-type PropTypes = {
+type Props = {
   lng: string;
   open: boolean;
   onClose: () => void;
@@ -24,15 +25,17 @@ const SearchDialog = ({
   onClose,
   placeholder,
   minHeight,
-}: PropTypes) => {
+}: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const value = new FormData(event.currentTarget).get('productName');
     router.push(
-      `/${lng}/products?productName=${encodeURIComponent(String(value ?? ''))}`,
+      productSearchHref(
+        lng,
+        new FormData(event.currentTarget).get('productName'),
+      ),
     );
     onClose();
   };

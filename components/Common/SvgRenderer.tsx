@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react';
 
 type Props = {
   url: string;
-  className?: string;
 };
 
-// CMS social icons are filled currentColor glyphs. The parent link carries the aria-label.
-const SvgRenderer = ({ url, className }: Props) => {
+/** Inlines a CMS-hosted SVG icon so it inherits currentColor; the parent link carries the
+ * accessible name. */
+export default function SvgRenderer({ url }: Props) {
   const [svgContent, setSvgContent] = useState('');
 
   useEffect(() => {
@@ -27,12 +27,8 @@ const SvgRenderer = ({ url, className }: Props) => {
   return (
     <span
       aria-hidden="true"
-      className={['inline-flex [&_svg]:size-5 [&_svg]:fill-current', className]
-        .filter(Boolean)
-        .join(' ')}
+      className="inline-flex [&_svg]:size-5 [&_svg]:fill-current"
       dangerouslySetInnerHTML={{ __html: svgContent }}
     />
   );
-};
-
-export default SvgRenderer;
+}

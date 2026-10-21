@@ -1,174 +1,53 @@
 'use client';
 
-import { stripStega } from '@datocms/content-link';
 import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
   Popover,
   PopoverButton,
   PopoverGroup,
   PopoverPanel,
 } from '@headlessui/react';
 import {
-  ArrowRightIcon,
   Bars2Icon,
   ChevronDownIcon,
   MagnifyingGlassIcon,
   ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { type FormEvent, Suspense, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { Suspense, useRef, useState } from 'react';
 import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
-import Drawer from '@/components/Common/Drawer';
 import LinkPending from '@/components/Common/LinkPending';
-import SvgRenderer from '@/components/Common/SvgRenderer';
-import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
-import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import LanguageSelector from '@/components/Layout/LanguageSelector';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
-import type { SiteLocale } from '@/lib/i18n';
 import Cart from './Cart';
+import MegaMenuPanel from './MegaMenuPanel';
+import MobileMenu from './MobileMenu';
+import { type DropdownMenu, type LinkItem, linkHref } from './menu';
 import SearchDialog from './SearchDialog';
 
-type MenuItem = NonNullable<LayoutQuery['layout']>['menu'][number];
-type LinkItem = Extract<MenuItem, { __typename: 'LinkItemRecord' }>;
-type DropdownMenu = Extract<MenuItem, { __typename: 'DropdownMenuRecord' }>;
-type FeaturedItem = DropdownMenu['newArrival'] | DropdownMenu['trending'];
-
-type PropTypes = {
-  languages: SiteLocale[];
+type Props = {
   data: LayoutQuery;
   globalPageProps: ResolvedGlobalPageProps;
 };
 
 // Bar items: full bar height, with a 2px ink bar on the header's bottom edge when hovered,
 // open or current (it draws from the left, retracts the same way, and stays drawn while its
-// page is on its way). Their sides (--nav-x, set per cluster) grow with the viewport up to
-// 14px at xl, so the spacing never jumps.
+// page is on its way: the LinkPending inside the link sets data-pending, which
+// has-data-pending: reads). Their sides (--nav-x, set per cluster) grow with the viewport up
+// to 14px at xl, so the spacing never jumps.
 const NAV_ITEM =
   'bar-draw relative inline-flex h-18 items-center gap-1 px-(--nav-x) text-xs font-medium whitespace-nowrap after:absolute after:inset-x-(--nav-x) after:-bottom-px after:h-0.5 after:bg-ink hover:after:scale-x-100 focus-visible:outline-offset-[-2px] has-data-pending:after:scale-x-100 aria-[current=page]:after:scale-x-100 data-open:after:scale-x-100 xl:text-sm';
 
-// Header icon buttons: 40px, so the glyphs sit on the content edges with -mx-2.5
+// 40px icon buttons; the clusters' -ml-2.5/-mr-2.5 pull the outermost glyphs
+// onto the content edges
 const BAR_ICON = 'icon-btn size-10 [&>svg]:size-5.5';
 
-// Rows of the mobile menu
-const MENU_ROW =
-  'title-item flex h-16 w-full items-center justify-between gap-4 text-left text-[1.375rem] tracking-[-0.03em] focus-visible:outline-offset-[-2px]';
-
-type FeatureTileProps = {
-  item: FeaturedItem;
-  href: string;
-  tag: string | null | undefined;
-  shopNow: string | null | undefined;
-  sizes: string;
-  onNavigate: () => void;
-  /** The other tile's name, so both captions lay out the same */
-  partnerName?: string;
-  /** The mega menu shows "Shop now" beside the name; the mobile menu only the name */
-  compact?: boolean;
-};
-
-// Trending / New: a 4:3 photo (or a brand logo on mist) with its tag, the name under it.
-// In the mega menu the pair shares two subgrid rows: when the link columns run longer, both
-// photos grow together to end with them, and a caption that wraps keeps both photos equal.
-const FeatureTile = ({
-  item,
-  href,
-  tag,
-  shopNow,
-  sizes,
-  onNavigate,
-  partnerName,
-  compact = false,
-}: FeatureTileProps) => {
-  const image = item.details.image.responsiveImage;
-  const brand = item._modelApiKey === 'brand';
-
-  return (
-    <Link
-      href={href}
-      onClick={onNavigate}
-      className={`group min-w-0 outline-offset-4 ${compact ? 'flex flex-col' : 'row-span-2 grid grid-rows-subgrid'}`}
-    >
-      <span
-        // Stretched in the mega menu: w-full, or the ratio would size the width from the height
-        className={`${MEDIA} block aspect-[4/3] ${compact ? '' : 'w-full self-stretch'}`}
-      >
-        {image &&
-          (brand ? (
-            // The logo stays under the tag (12px in, 28px tall) with the 8px gap it has at 1440:
-            // on smaller tiles 19% is less than that band
-            <span className="absolute inset-x-[19%] top-[max(19%,3rem)] bottom-[max(19%,0.75rem)]">
-              <DatoImage
-                fragment={image}
-                layout="fill"
-                objectFit="contain"
-                sizes={sizes}
-                usePlaceholder={false}
-                // Logos come on white: multiply drops the box onto the mist well
-                imgClassName="mix-blend-multiply"
-              />
-            </span>
-          ) : (
-            <DatoImage
-              fragment={image}
-              layout="fill"
-              objectFit="cover"
-              // Portraits keep their faces in the landscape crop
-              objectPosition="50% 20%"
-              sizes={sizes}
-              className={IMG_ZOOM}
-            />
-          ))}
-        {tag && <span className="tag absolute top-3 left-3">{tag}</span>}
-      </span>
-      {compact ? (
-        <span className="mt-2.5 text-sm font-semibold">{item.name}</span>
-      ) : (
-        // CMS names are never truncated: when a name and a long shopNow label don't share
-        // the row, the label moves under the name
-        <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-          {/* The partner's name shares this cell, invisible, so the pair's longer name sizes
-              both: the two labels stay beside their names, or both move under them */}
-          <span className="grid min-w-0 text-base font-semibold text-pretty">
-            <span className="col-start-1 row-start-1">{item.name}</span>
-            {partnerName && (
-              <span
-                aria-hidden="true"
-                className="invisible col-start-1 row-start-1"
-              >
-                {partnerName}
-              </span>
-            )}
-          </span>
-          {shopNow && (
-            <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium">
-              {shopNow}
-              <ArrowRightIcon
-                aria-hidden="true"
-                className="size-4 stroke-2 transition-transform duration-200 group-hover:translate-x-0.75"
-              />
-            </span>
-          )}
-        </span>
-      )}
-    </Link>
-  );
-};
-
-export default function NavBar({
-  globalPageProps,
-  languages,
-  data,
-}: PropTypes) {
+export default function NavBar({ globalPageProps, data }: Props) {
   const lng = globalPageProps.params.lng;
   const pathname = usePathname();
-  const router = useRouter();
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [searchIsOpen, setSearchIsOpen] = useState(false);
   const [searchCover, setSearchCover] = useState(0);
@@ -177,15 +56,15 @@ export default function NavBar({
 
   const menu = data.layout?.menu ?? [];
   const links = menu.filter(
-    (item) => item._modelApiKey === 'link_item',
-  ) as LinkItem[];
+    (item): item is LinkItem => item.__typename === 'LinkItemRecord',
+  );
   const categories = menu.filter(
-    (item) => item._modelApiKey === 'dropdown_menu',
-  ) as DropdownMenu[];
+    (item): item is DropdownMenu => item.__typename === 'DropdownMenuRecord',
+  );
   // The bar splits around the centred lockup: the dropdowns and the first link on the left,
   // the other links on the right
   const leftItems = menu.filter(
-    (item) => item._modelApiKey === 'dropdown_menu' || item === links[0],
+    (item) => item.__typename === 'DropdownMenuRecord' || item === links[0],
   );
   const rightLinks = links.slice(1);
 
@@ -194,13 +73,11 @@ export default function NavBar({
   const socials = data.layout?.socialMediaLinks ?? [];
   const closeMenu = () => setMenuIsOpen(false);
 
-  const productsHref = (item: { _modelApiKey: string; id: string }) =>
-    `/${lng}/products?${item._modelApiKey}s=${item.id}`;
-  const linkHref = (link: LinkItem) => `/${lng}/${stripStega(link.slug)}`;
-  const isCurrent = (link: LinkItem) => pathname === linkHref(link);
+  const isCurrent = (link: LinkItem) => pathname === linkHref(lng, link);
 
   const logo = data.layout?.logo.responsiveImage;
   const logoData = logo && readFragment(ResponsiveImageFragment, logo);
+  // The Layout model has no site-name field: footerTitle doubles as the header wordmark
   const wordmark = data.layout?.footerTitle;
   const lockup = (wordmarkClassName = '') => (
     <>
@@ -222,46 +99,6 @@ export default function NavBar({
       )}
     </>
   );
-
-  // Trending first, then New. Keyed by slot: one record can fill both.
-  const featured = (
-    category: DropdownMenu,
-    sizes: string,
-    close: () => void,
-    compact?: boolean,
-  ) => {
-    const slots = [
-      {
-        slot: 'trending',
-        item: category.trending,
-        tag: generalInterface?.trending,
-      },
-      { slot: 'new', item: category.newArrival, tag: generalInterface?.new },
-    ];
-    return slots.map(({ slot, item, tag }, index) => (
-      <FeatureTile
-        key={slot}
-        item={item}
-        href={productsHref(item)}
-        tag={tag}
-        shopNow={generalInterface?.shopNow}
-        sizes={sizes}
-        onNavigate={close}
-        // Stripped: the invisible copy must not become a second visual-editing target
-        partnerName={stripStega(slots[1 - index].item.name)}
-        compact={compact}
-      />
-    ));
-  };
-
-  const handleMenuSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const value = new FormData(event.currentTarget).get('productName');
-    router.push(
-      `/${lng}/products?productName=${encodeURIComponent(String(value ?? ''))}`,
-    );
-    closeMenu();
-  };
 
   // The search sheet covers the strip and the header whatever their height (the strip wraps
   // to 2-3 lines on phones), so no slice of the bar shows under it
@@ -289,143 +126,19 @@ export default function NavBar({
         />
       </Suspense>
 
-      <Drawer
+      <MobileMenu
         open={menuIsOpen}
         onClose={closeMenu}
-        side="left"
-        closeLabel="Close menu"
         title={lockup()}
-      >
-        <search>
-          <form onSubmit={handleMenuSearch} className="relative">
-            <label htmlFor="menu-search" className="sr-only">
-              {searchPlaceholder}
-            </label>
-            <MagnifyingGlassIcon
-              aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-4 size-4.5 -translate-y-1/2 text-mute"
-            />
-            <input
-              id="menu-search"
-              name="productName"
-              type="search"
-              enterKeyHint="search"
-              autoComplete="off"
-              placeholder={searchPlaceholder}
-              className="input-field h-12 min-h-12 pl-11 [&::-webkit-search-cancel-button]:appearance-none"
-            />
-          </form>
-        </search>
-
-        <nav aria-label="Main" className="mt-2">
-          {categories.map((category, index) => (
-            <Disclosure
-              key={category.id}
-              as="div"
-              defaultOpen={index === 0}
-              className="border-b border-line"
-            >
-              <DisclosureButton className={`group ${MENU_ROW}`}>
-                {category.label}
-                <ChevronDownIcon
-                  aria-hidden="true"
-                  className="size-5 shrink-0 stroke-2 transition-transform duration-200 group-data-open:rotate-180"
-                />
-              </DisclosureButton>
-              <DisclosurePanel className="quick enter space-y-5 pb-6">
-                {category.column.map((column) => (
-                  <div key={column.id}>
-                    <p
-                      id={`${category.id}-${column.id}-heading-mobile`}
-                      className="eyebrow"
-                    >
-                      {column.label}
-                    </p>
-                    <ul
-                      aria-labelledby={`${category.id}-${column.id}-heading-mobile`}
-                      className="mt-1.5 grid grid-cols-2 gap-x-4"
-                    >
-                      {column.item.map((item) => (
-                        <li key={item.id} className="min-w-0">
-                          <Link
-                            href={productsHref(item)}
-                            onClick={closeMenu}
-                            className="block py-1.5 text-base text-ink-2 transition-colors duration-150 hover:text-ink"
-                          >
-                            {item.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-                <div className="grid grid-cols-2 gap-x-4 pt-1">
-                  {featured(
-                    category,
-                    '(min-width: 640px) 12.5rem, 45vw',
-                    closeMenu,
-                    true,
-                  )}
-                </div>
-              </DisclosurePanel>
-            </Disclosure>
-          ))}
-
-          {links.length > 0 && (
-            <ul>
-              {links.map((link) => (
-                <li key={link.id}>
-                  <Link
-                    href={linkHref(link)}
-                    onClick={closeMenu}
-                    aria-current={isCurrent(link) ? 'page' : undefined}
-                    // The current page underlines its label with the desktop bar's 2px ink
-                    className={`group ${MENU_ROW} border-b border-line`}
-                  >
-                    <span className="decoration-2 underline-offset-[0.3em] group-aria-[current=page]:underline">
-                      {link.label}
-                    </span>
-                    <ArrowRightIcon
-                      aria-hidden="true"
-                      className="size-5 shrink-0 stroke-2"
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </nav>
-
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-          <Suspense>
-            <LanguageSelector
-              languages={languages}
-              currencySymbol={generalInterface?.currencySymbol}
-              placement="above-start"
-              className="h-11 border border-line px-4 text-sm hover:border-ink aria-expanded:border-ink"
-              onNavigate={closeMenu}
-            />
-          </Suspense>
-          {socials.length > 0 && (
-            <div className="-mr-3 flex">
-              {socials.map((social) => (
-                <a
-                  key={social.id}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={
-                    stripStega(social.name ?? '') || stripStega(social.url)
-                  }
-                  className="icon-btn"
-                >
-                  <SvgRenderer url={social.icon.url} />
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
-      </Drawer>
+        lng={lng}
+        categories={categories}
+        links={links}
+        isCurrent={isCurrent}
+        generalInterface={generalInterface}
+        searchPlaceholder={searchPlaceholder}
+        socials={socials}
+        locales={data._site.locales}
+      />
 
       {/* Above the floating controls (z-40), so the mega menu's scrim dims them like the
           dialogs' scrims do. Sticky makes it the mega menu's containing block. */}
@@ -434,9 +147,8 @@ export default function NavBar({
         data-chrome="header"
         className="peer sticky top-0 z-45 border-b border-line bg-white"
       >
-        {/* Left items' sides: 6px at 1100 (the longest cluster, es, stays 40px+ clear of the
-            lockup) to 14px at 1280. The right links have room to start at 10px. While a
-            panel is open only its button carries the bar, not the current page's link. */}
+        {/* --nav-x grows 6px→14px between 1100px and 1280px so the longest locale's items
+            clear the logo. While a panel is open, only its button shows the bar. */}
         <nav
           aria-label="Main"
           className="shell grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-x-4 [--nav-x:clamp(0.375rem,calc((100vw_-_68.75rem)/22.5_+_0.375rem),0.875rem)] nav:h-18 [&:has([data-open])_[aria-current=page]:not(:hover)]:after:scale-x-0"
@@ -468,7 +180,7 @@ export default function NavBar({
                   return (
                     <li key={item.id}>
                       <Link
-                        href={linkHref(item)}
+                        href={linkHref(lng, item)}
                         aria-current={isCurrent(item) ? 'page' : undefined}
                         className={NAV_ITEM}
                       >
@@ -500,46 +212,14 @@ export default function NavBar({
                         className="wipe absolute inset-x-0 top-[calc(100%+1px)] border-b border-line bg-white"
                       >
                         {({ close }) => (
-                          <div className="quick shell grid grid-cols-12 gap-4 pt-10 pb-12">
-                            <div className="enter-stagger col-span-6 grid grid-cols-3 content-start gap-6 pr-6 xl:gap-8 xl:pr-8 [--delay:60ms]">
-                              {category.column.map((column) => (
-                                <div key={column.id} className="min-w-0">
-                                  <p
-                                    id={`${category.id}-${column.id}-heading`}
-                                    className="eyebrow border-b border-line pb-3"
-                                  >
-                                    {column.label}
-                                  </p>
-                                  {/* Full-width 36px rows (-mx-2 px-2
-                                      gives the focus ring room); the 20px leading keeps a
-                                      wrapped name visibly one item */}
-                                  <ul
-                                    aria-labelledby={`${category.id}-${column.id}-heading`}
-                                    className="mt-2.5 -mb-1.5"
-                                  >
-                                    {column.item.map((menuItem) => (
-                                      <li key={menuItem.id}>
-                                        <Link
-                                          href={productsHref(menuItem)}
-                                          onClick={() => close()}
-                                          className="-mx-2 block px-2 py-2 text-base leading-5 text-ink-2 transition-colors duration-150 hover:text-ink"
-                                        >
-                                          {menuItem.name}
-                                        </Link>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="enter-stagger col-span-6 grid grid-cols-2 grid-rows-[1fr_auto] gap-x-4 gap-y-3 [--delay:120ms]">
-                              {featured(
-                                category,
-                                '(min-width: 1440px) 20.5rem, 23vw',
-                                () => close(),
-                              )}
-                            </div>
-                          </div>
+                          <MegaMenuPanel
+                            category={category}
+                            generalInterface={generalInterface}
+                            lng={lng}
+                            // Wrapped: close() takes an element to refocus, so it must not be
+                            // handed the click event
+                            onNavigate={() => close()}
+                          />
                         )}
                       </PopoverPanel>
                     </Popover>
@@ -564,7 +244,7 @@ export default function NavBar({
                 {rightLinks.map((link) => (
                   <li key={link.id}>
                     <Link
-                      href={linkHref(link)}
+                      href={linkHref(lng, link)}
                       aria-current={isCurrent(link) ? 'page' : undefined}
                       className={NAV_ITEM}
                     >
@@ -582,7 +262,7 @@ export default function NavBar({
             <div className="hidden nav:block">
               <Suspense>
                 <LanguageSelector
-                  languages={languages}
+                  languages={data._site.locales}
                   currencySymbol={generalInterface?.currencySymbol}
                   // Globe only until xl; screen readers always get the label
                   labelClassName="max-xl:sr-only"
@@ -609,6 +289,7 @@ export default function NavBar({
               className={`${BAR_ICON} relative mr-0.75`}
             >
               <ShoppingBagIcon aria-hidden="true" />
+              {/* Static: the demo bag is always empty (see Cart) */}
               <span className="tag-dark absolute top-0 -right-1.25 min-h-4.5 min-w-4.5 justify-center px-1 leading-4.5 tracking-normal">
                 0
               </span>

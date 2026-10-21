@@ -6,69 +6,67 @@ import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import { useCookieNoticeOpen } from '@/components/Layout/CookieNotice';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import NavBar from './NavBar';
-import NotificationStrip, {
-  type LayoutNotification,
-} from './NotificationStrip';
-import PopupDialog, { type Popup } from './PopupDialog';
+import NotificationStrip from './NotificationStrip';
+import PopupDialog from './PopupDialog';
 
 type Props = {
   data: LayoutQuery;
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-// The [lng] layout remounts on a locale switch: dismissals last for the page load
-const dismissed = { strip: false, popUp: false };
+// Kept outside React so a dismissal survives the [lng] layout remounting on a locale switch;
+// a full reload shows it again
+const dismissed = { strip: false, popup: false };
 
 const Header = ({ data, globalPageProps }: Props) => {
-  const [notificationStrip, setNotificationStrip] = useState(
-    !dismissed.strip && !isEmptyDocument(data.layout?.notification),
+  const notification = data.layout?.notification;
+  const popup = data.layout?.popup;
+
+  const [showStrip, setShowStrip] = useState(
+    !dismissed.strip && !isEmptyDocument(notification),
   );
 
   // The cookie bar itself is rendered by the footer, right after it
   const cookieNoticeOpen = useCookieNoticeOpen();
-  const cookies = cookieNoticeOpen && !!data.layout?.cookieNotice;
+  const cookieNoticeVisible = cookieNoticeOpen && !!data.layout?.cookieNotice;
 
-  // The popup waits for the cookie notice: it opens 600ms after that is dismissed
-  const [popUp, setPopUp] = useState<'waiting' | 'open' | 'closed'>(
-    dismissed.popUp ? 'closed' : 'waiting',
+  // The popup opens 600ms after the cookie notice is gone (or after load when there is none)
+  const [popupState, setPopupState] = useState<'waiting' | 'open' | 'closed'>(
+    dismissed.popup ? 'closed' : 'waiting',
   );
-  const hasPopup = !!data.layout?.popup;
+  const hasPopup = !!popup;
 
   useEffect(() => {
-    if (!hasPopup || cookies || popUp !== 'waiting') return;
-    const timer = window.setTimeout(() => setPopUp('open'), 600);
+    if (!hasPopup || cookieNoticeVisible || popupState !== 'waiting') return;
+    const timer = window.setTimeout(() => setPopupState('open'), 600);
     return () => window.clearTimeout(timer);
-  }, [hasPopup, cookies, popUp]);
+  }, [hasPopup, cookieNoticeVisible, popupState]);
 
   return (
     <>
-      {notificationStrip && (
+      {showStrip && notification && (
         <NotificationStrip
-          notification={data.layout?.notification as LayoutNotification}
+          notification={notification}
           globalPageProps={globalPageProps}
           onDismiss={() => {
             dismissed.strip = true;
-            setNotificationStrip(false);
+            setShowStrip(false);
           }}
         />
       )}
       <Suspense>
-        <NavBar
-          globalPageProps={globalPageProps}
-          languages={data._site.locales}
-          data={data}
-        />
+        <NavBar globalPageProps={globalPageProps} data={data} />
       </Suspense>
 
-      {hasPopup && (
+      {popup && (
         <PopupDialog
           globalPageProps={globalPageProps}
-          open={popUp === 'open'}
+          open={popupState === 'open'}
           onClose={() => {
-            dismissed.popUp = true;
-            setPopUp('closed');
+            dismissed.popup = true;
+            setPopupState('closed');
           }}
-          popup={data.layout?.popup as Popup}
+          popup={popup}
         />
       )}
     </>

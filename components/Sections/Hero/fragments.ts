@@ -4,7 +4,6 @@ import { graphql } from '@/lib/datocms/graphql';
 export const HeroSectionFragment = graphql(
   /* GraphQL */ `
     fragment HeroSectionFragment on HeroSectionRecord {
-      _modelApiKey
       id
       heroSubtitle
       heroTitle
@@ -30,7 +29,6 @@ export const HeroSectionFragment = graphql(
       featuredCollections {
         id
         name
-        slug
       }
     }
   `,

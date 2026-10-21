@@ -1,7 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import RailControls from '@/components/Common/RailControls';
 import RailProgress from '@/components/Common/RailProgress';
-import { BAND } from '@/components/Common/styles';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import { TestimonialSectionFragment } from './fragments';
 
@@ -22,7 +21,7 @@ const COLUMNS = [
 
 // Black band of big white quotes. Below lg the quotes are a snap rail with a progress track (and
 // arrows from sm, for mouse users); from lg a grid whose authors line up along the bottom.
-const TestimonialsSection = ({ fragment }: Props) => {
+export default function Testimonials({ fragment }: Props) {
   const { id, title, testimonial } = readFragment(
     TestimonialSectionFragment,
     fragment,
@@ -32,7 +31,10 @@ const TestimonialsSection = ({ fragment }: Props) => {
   const columns = COLUMNS[Math.min(testimonial.length, 3)];
 
   return (
-    <section aria-labelledby={titleId} className={`${BAND} mt-(--section-gap)`}>
+    <section
+      aria-labelledby={titleId}
+      className="surface-ink py-(--band-y) mt-(--section-gap)"
+    >
       <div className="shell">
         <div className="mb-12 flex items-end justify-between gap-6 lg:mb-16">
           <h2 id={titleId} className="title-section">
@@ -71,6 +73,4 @@ const TestimonialsSection = ({ fragment }: Props) => {
       </div>
     </section>
   );
-};
-
-export default TestimonialsSection;
+}

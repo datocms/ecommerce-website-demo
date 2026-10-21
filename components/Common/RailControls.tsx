@@ -7,12 +7,7 @@ import { useRevealFocus } from './RailFocus';
 type Props = {
   /** id of the horizontal scroller the buttons drive */
   railId: string;
-  /** Adds a "01 / 03" position counter for that many items */
-  count?: number;
-  className?: string;
 };
-
-const pad = (value: number) => String(value).padStart(2, '0');
 
 // One item plus the gap
 function stepOf(rail: HTMLElement) {
@@ -35,38 +30,23 @@ function pageOf(rail: HTMLElement) {
   return step * Math.max(1, Math.floor((view + gap) / step));
 }
 
-// Previous/next squares for a rail rendered elsewhere on the page, with an optional "01 / 03"
-// counter. They hide themselves when everything fits (phones swipe instead), and flag the rail
-// with data-at-end. Keyboard focus on a card that is only partly in view scrolls the rail just
-// enough to show it whole.
-export default function RailControls({ railId, count, className }: Props) {
+// Previous/next buttons for the scroller with id `railId`. Hidden on phones (they swipe) and
+// whenever everything fits; flags the rail with data-at-end. Also reveals a keyboard-focused item
+// that is only partly in view (useRevealFocus).
+export default function RailControls({ railId }: Props) {
   useRevealFocus(railId);
-  const [position, setPosition] = useState({
-    atStart: true,
-    atEnd: false,
-    index: 0,
-  });
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
 
   useEffect(() => {
     const rail = document.getElementById(railId);
     if (!rail) return;
     const update = () => {
       const x = rail.scrollLeft;
-      const atStart = x <= 1;
-      const atEnd = x >= rail.scrollWidth - rail.clientWidth - 1;
-      // The first card in view; with two cards in view the end reads 02 / 03, not a skip to 03
-      const index = Math.min(
-        Math.max((count ?? 1) - 1, 0),
-        Math.round(x / stepOf(rail)),
-      );
-      rail.toggleAttribute('data-at-end', atEnd);
-      setPosition((current) =>
-        current.atStart === atStart &&
-        current.atEnd === atEnd &&
-        current.index === index
-          ? current
-          : { atStart, atEnd, index },
-      );
+      const reachedEnd = x >= rail.scrollWidth - rail.clientWidth - 1;
+      rail.toggleAttribute('data-at-end', reachedEnd);
+      setAtStart(x <= 1);
+      setAtEnd(reachedEnd);
     };
     update();
     rail.addEventListener('scroll', update, { passive: true });
@@ -76,7 +56,7 @@ export default function RailControls({ railId, count, className }: Props) {
       rail.removeEventListener('scroll', update);
       observer.disconnect();
     };
-  }, [railId, count]);
+  }, [railId]);
 
   const scroll = (direction: -1 | 1) => {
     const rail = document.getElementById(railId);
@@ -90,29 +70,16 @@ export default function RailControls({ railId, count, className }: Props) {
     });
   };
 
-  if (position.atStart && position.atEnd) return null;
+  if (atStart && atEnd) return null;
 
   return (
-    <div
-      className={['hidden items-center gap-2 sm:flex', className]
-        .filter(Boolean)
-        .join(' ')}
-    >
-      {count ? (
-        <p
-          aria-hidden="true"
-          className="mr-3 text-sm font-semibold tabular-nums"
-        >
-          {pad(position.index + 1)}{' '}
-          <span className="text-mute">/ {pad(count)}</span>
-        </p>
-      ) : null}
+    <div className="hidden items-center gap-2 sm:flex">
       <button
         type="button"
         aria-label="Previous"
         aria-controls={railId}
-        aria-disabled={position.atStart}
-        onClick={() => !position.atStart && scroll(-1)}
+        aria-disabled={atStart}
+        onClick={() => !atStart && scroll(-1)}
         className="rail-btn"
       >
         <ArrowLeftIcon aria-hidden="true" className="stroke-2" />
@@ -121,8 +88,8 @@ export default function RailControls({ railId, count, className }: Props) {
         type="button"
         aria-label="Next"
         aria-controls={railId}
-        aria-disabled={position.atEnd}
-        onClick={() => !position.atEnd && scroll(1)}
+        aria-disabled={atEnd}
+        onClick={() => !atEnd && scroll(1)}
         className="rail-btn"
       >
         <ArrowRightIcon aria-hidden="true" className="stroke-2" />

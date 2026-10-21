@@ -39,7 +39,6 @@ export const query = graphql(
             responsiveImage {
               ...ResponsiveImageFragment
             }
-            copyright
           }
           price
         }
@@ -59,13 +58,11 @@ export const query = graphql(
           }
         }
         cta {
-          id
           label
           slug
         }
         collections {
           name
-          slug
           id
           details {
             image {
@@ -78,7 +75,6 @@ export const query = graphql(
         collectionsCta {
           label
           slug
-          id
         }
       }
     }

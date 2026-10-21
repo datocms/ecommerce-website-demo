@@ -4,16 +4,17 @@ import { useEffect } from 'react';
 
 // Keyboard focus inside a horizontal scroller scrolls it just enough to show the focused item
 // (the scroller's child that holds focus) whole. Browsers leave a partly visible element where
-// it is and centre a hidden one, and the rails pause snapping while focus is inside, so without
+// it is and center a hidden one, and the rails pause snapping while focus is inside, so without
 // this a focused tile can stay mostly behind the rail's edge.
 export function useRevealFocus(railId: string) {
   useEffect(() => {
     const rail = document.getElementById(railId);
     if (!rail) return;
-    // Where the rail sat before the latest scroll event
-    let resting = rail.scrollLeft;
-    const settle = () => {
-      resting = rail.scrollLeft;
+    // scrollLeft as of the latest scroll event: when focusin fires, the browser's own focus
+    // scroll has not been reported yet
+    let lastScrollLeft = rail.scrollLeft;
+    const recordScroll = () => {
+      lastScrollLeft = rail.scrollLeft;
     };
     const reveal = (event: FocusEvent) => {
       const target = event.target;
@@ -29,7 +30,7 @@ export function useRevealFocus(railId: string) {
       }
       // The browser has already scrolled but not yet reported it; replace that with the
       // smallest scroll from where the rail was
-      const from = resting;
+      const from = lastScrollLeft;
       requestAnimationFrame(() => {
         if (rail.scrollWidth <= rail.clientWidth) return;
         const style = getComputedStyle(rail);
@@ -46,10 +47,10 @@ export function useRevealFocus(railId: string) {
         if (Math.abs(next - rail.scrollLeft) > 1) rail.scrollLeft = next;
       });
     };
-    rail.addEventListener('scroll', settle, { passive: true });
+    rail.addEventListener('scroll', recordScroll, { passive: true });
     rail.addEventListener('focusin', reveal);
     return () => {
-      rail.removeEventListener('scroll', settle);
+      rail.removeEventListener('scroll', recordScroll);
       rail.removeEventListener('focusin', reveal);
     };
   }, [railId]);

@@ -3,76 +3,12 @@ import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Rise from '@/components/Common/Rise';
-import { CAPTION, IMG_ZOOM, MEDIA, TILE } from '@/components/Common/styles';
+import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
-import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import ProductCard from '@/components/ProductCard';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
+import { coverSizes, FRAMES, hasImage, imageRatio } from './imageSizes';
 import type { PageProps, Query } from './meta';
-
-const hasImage = <T extends { responsiveImage?: unknown }>(
-  item: T,
-): item is T & { responsiveImage: NonNullable<T['responsiveImage']> } =>
-  Boolean(item.responsiveImage);
-
-// Photo frames per breakpoint, widest first: media query, frame width, frame aspect ratio.
-// From lg the display frames are 600px tall and the material photos stretch to the localized
-// copy, so each ratio is the narrowest one in its range.
-type Frame = [media: string, width: number, unit: 'px' | 'vw', ratio: number];
-const FRAMES: Record<
-  'wide' | 'narrow' | 'lone' | 'trio' | 'material' | 'loneMaterial',
-  Frame[]
-> = {
-  wide: [
-    ['(min-width: 1440px)', 787, 'px', 1.31],
-    ['(min-width: 1024px)', 54, 'vw', 0.9],
-    ['', 46, 'vw', 3 / 4],
-  ],
-  narrow: [
-    ['(min-width: 1440px)', 557, 'px', 0.93],
-    ['(min-width: 1024px)', 39, 'vw', 0.64],
-    ['', 46, 'vw', 3 / 4],
-  ],
-  lone: [
-    ['(min-width: 1440px)', 1360, 'px', 2.27],
-    ['(min-width: 1024px)', 94, 'vw', 1.57],
-    ['', 90, 'vw', 4 / 3],
-  ],
-  // Desktop frames only: below lg a trio photo keeps its pair or lone frame
-  trio: [
-    ['(min-width: 1440px)', 443, 'px', 0.74],
-    ['(min-width: 1024px)', 30, 'vw', 0.51],
-  ],
-  material: [
-    ['(min-width: 1440px)', 385, 'px', 0.75],
-    ['(min-width: 1024px)', 27, 'vw', 0.58],
-    ['', 46, 'vw', 4 / 5],
-  ],
-  loneMaterial: [
-    ['(min-width: 1440px)', 787, 'px', 1.3],
-    ['(min-width: 1024px)', 55, 'vw', 1.1],
-    ['', 90, 'vw', 4 / 3],
-  ],
-};
-
-// A photo wider than its frame is cropped by height, so its source must be wider than the frame
-const coverSizes = (frames: Frame[], imageRatio: number) =>
-  frames
-    .map(([media, width, unit, ratio]) =>
-      `${media} ${Math.ceil(width * Math.max(1, imageRatio / ratio))}${unit}`.trim(),
-    )
-    .join(', ');
-
-const imageRatio = (
-  responsiveImage: FragmentOf<typeof ResponsiveImageFragment>,
-) => {
-  const { width, height } = readFragment(
-    ResponsiveImageFragment,
-    responsiveImage,
-  );
-  return width / height;
-};
 
 const Content: ContentPage<PageProps, Query> = ({
   data,
@@ -107,10 +43,8 @@ const Content: ContentPage<PageProps, Query> = ({
   const endTile = Boolean(cta) && newProducts.length % 2 === 1;
 
   const ctaArrow = <ArrowRightIcon aria-hidden="true" className="stroke-2" />;
-  // Button content for the CMS CTA, whose localized label can wrap (es at 360px, or in the
-  // 304px title column at lg): the arrow follows the last word, glued to it by a word joiner,
-  // instead of sitting at the far edge of the wrapped label. The tighter leading keeps a wrapped
-  // label inside the 52px button height.
+  // The CTA label can wrap in some locales: a word joiner keeps the arrow on the last word, and
+  // the tighter leading keeps two lines inside the button.
   const ctaButtonLabel = cta && (
     <span className="leading-[1.15]">
       {cta.label}
@@ -179,6 +113,8 @@ const Content: ContentPage<PageProps, Query> = ({
               return (
                 <div
                   key={id}
+                  // The first two photos (in view on arrival, and loaded with priority) settle;
+                  // the rest stay still
                   className={`${MEDIA} ${i < 2 ? 'settle' : ''} lg:aspect-auto lg:h-[37.5rem] ${
                     slot === 'lone' ? 'col-span-2 aspect-[4/3]' : 'aspect-[3/4]'
                   } ${
@@ -230,9 +166,11 @@ const Content: ContentPage<PageProps, Query> = ({
                 key={collection.id}
                 className="flex w-[78%] shrink-0 snap-start sm:w-[44%] md:w-auto"
               >
+                {/* collectionsCta.slug is a catalog filter prefix ("products?collections="); the
+                    collection id completes it */}
                 <Link
                   href={`/${lng}/${stripStega(collectionsCta.slug)}${collection.id}`}
-                  className={`${TILE} w-full outline-offset-4`}
+                  className="group flex flex-col w-full outline-offset-4"
                   data-datocms-content-link-group
                 >
                   <div aria-hidden="true" className={`${MEDIA} aspect-[4/5]`}>
@@ -250,7 +188,7 @@ const Content: ContentPage<PageProps, Query> = ({
                   {/* The links line up even when a localized name wraps. Names wrap between
                       words only: balanced lines would otherwise split "Geschäftlich" in three
                       columns at md */}
-                  <div className={`${CAPTION} flex-1 pt-5`}>
+                  <div className="flex flex-col items-start gap-2 pt-4 flex-1 pt-5">
                     <h2 className="title-card hyphens-manual">
                       {collection.name}
                     </h2>
@@ -289,6 +227,8 @@ const Content: ContentPage<PageProps, Query> = ({
                 )}
               </div>
             </div>
+            {/* Several rows, so each card and the end tile reveal on their own (reveal);
+                reveal-stagger is for a single row */}
             <div className="-mb-(--card-row-gap) grid grid-cols-2 gap-x-3 [--card-row-gap:2.5rem] md:gap-x-4 lg:col-span-8">
               {newProducts.map((product) => (
                 <ProductCard
@@ -296,7 +236,7 @@ const Content: ContentPage<PageProps, Query> = ({
                   className="reveal"
                   href={`/${lng}/product/${stripStega(product.slug)}`}
                   name={product.name}
-                  brand={product.brand?.name}
+                  brand={product.brand.name}
                   image={product.productImages[0]?.responsiveImage}
                   hoverImage={product.productImages[1]?.responsiveImage}
                   price={product.price}

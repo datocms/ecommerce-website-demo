@@ -12,24 +12,24 @@ type Props = {
 };
 
 // A 2px track under a rail with a thumb sized to the visible share of the rail and moved with
-// its scroll position. It takes the surface colour (ink on white, white on black bands) and
+// its scroll position. It takes the surface color (ink on white, white on black bands) and
 // hides itself while everything fits. Decorative: the rail itself is the scrollable control.
 export default function RailProgress({ railId, tabStop, className }: Props) {
-  const thumb = useRef<HTMLSpanElement>(null);
+  const thumbRef = useRef<HTMLSpanElement>(null);
   const [scrollable, setScrollable] = useState(true);
 
   useEffect(() => {
     const rail = document.getElementById(railId);
-    const bar = thumb.current;
-    if (!rail || !bar) return;
+    const thumb = thumbRef.current;
+    if (!rail || !thumb) return;
     const update = () => {
       const { scrollLeft, scrollWidth, clientWidth } = rail;
       const max = scrollWidth - clientWidth;
       const visible = Math.min(1, clientWidth / scrollWidth);
       const progress = max > 0 ? Math.min(1, Math.max(0, scrollLeft / max)) : 0;
-      bar.style.width = `${visible * 100}%`;
+      thumb.style.width = `${visible * 100}%`;
       // translate is relative to the thumb, so convert the track offset to thumb widths
-      bar.style.translate = `${((progress * (1 - visible)) / visible) * 100}% 0`;
+      thumb.style.translate = `${((progress * (1 - visible)) / visible) * 100}% 0`;
       setScrollable(max > 1);
       if (tabStop) rail.tabIndex = max > 1 ? 0 : -1;
     };
@@ -55,7 +55,7 @@ export default function RailProgress({ railId, tabStop, className }: Props) {
         .join(' ')}
     >
       <span
-        ref={thumb}
+        ref={thumbRef}
         className="absolute inset-y-0 left-0 w-0 bg-(--surface-fg)"
       />
     </div>

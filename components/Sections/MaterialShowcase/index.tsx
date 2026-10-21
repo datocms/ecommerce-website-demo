@@ -24,8 +24,8 @@ const SIZES = {
   4: '(min-width: 1440px) 340px, (min-width: 1024px) 24vw, (min-width: 640px) 48vw, 100vw',
 } as const;
 
-// Laid out like the other sections: the title and copy as one column on top, then one photo
-// per material in a single row, each named under its photo with its line.
+// Title and copy on top, then a grid of material photo links (2, 3 or 4 columns), each with its
+// name and subtitle.
 const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
   const { id, title, description, subDescription, materials } = readFragment(
     MaterialShowcaseFragment,
@@ -33,6 +33,7 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
   );
   const { lng } = globalPageProps.params;
   const titleId = `${id}-title`;
+  // Four columns only when the count fills rows of four but not rows of three (4, 8, 16…)
   const columns =
     materials.length <= 2
       ? 2

@@ -9,13 +9,13 @@ import Hero from '@/components/Sections/Hero';
 import { HeroSectionFragment } from '@/components/Sections/Hero/fragments';
 import MaterialShowcase from '@/components/Sections/MaterialShowcase';
 import NewArrivals from '@/components/Sections/NewArrivals';
-import TestimonialsSection from '@/components/Sections/Testimonials';
+import Testimonials from '@/components/Sections/Testimonials';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { PageProps, Query } from './meta';
 
 type Section = NonNullable<Query['home']>['sections'][number];
-type ShowcaseSection = Extract<
+type CollectionCardShowcaseSection = Extract<
   Section,
   { __typename: 'CollectionCardShowcaseSectionRecord' }
 >;
@@ -23,8 +23,8 @@ type HeroSection = Extract<Section, { __typename: 'HeroSectionRecord' }>;
 type Menu = NonNullable<Query['layout']>['menu'];
 
 // Consecutive collection showcases render as one group of season columns
-function groupShowcases(sections: Section[]) {
-  const groups: (Section | ShowcaseSection[])[] = [];
+function groupCollectionCardShowcases(sections: Section[]) {
+  const groups: (Section | CollectionCardShowcaseSection[])[] = [];
   for (const section of sections) {
     const last = groups[groups.length - 1];
     if (section.__typename !== 'CollectionCardShowcaseSectionRecord') {
@@ -38,9 +38,14 @@ function groupShowcases(sections: Section[]) {
   return groups;
 }
 
-// The navigation column that lists the group's lead collections ("Seasons") names the group
-function seasonsLabel(menu: Menu, showcases: ShowcaseSection[]) {
+// The title of the header dropdown column ("Seasons") that lists the most of the group's lead
+// collections
+function menuColumnLabel(
+  menu: Menu,
+  showcases: CollectionCardShowcaseSection[],
+) {
   const leads = showcases.flatMap(
+    // Typed as the fragment so readFragment accepts the Extract-ed query union member
     (section: FragmentOf<typeof CollectionCardShowcaseFragment>) => {
       const lead = readFragment(CollectionCardShowcaseFragment, section)
         .collection[0];
@@ -72,15 +77,16 @@ const Content: ContentPage<PageProps, Query> = ({
   const { generalInterface, allProducts, layout } = data;
   const { lng } = globalPageProps.params;
   const menu = layout?.menu ?? [];
-  const groups = groupShowcases(data.home.sections);
+  const groups = groupCollectionCardShowcases(data.home.sections);
 
-  // The hero's second photo sits beside the first divider (in the hero when there is none)
+  // Typed as the fragment so readFragment accepts the Extract-ed query union member
   const hero: FragmentOf<typeof HeroSectionFragment> | undefined =
     data.home.sections.find(
       (section): section is HeroSection =>
         section.__typename === 'HeroSectionRecord',
     );
-  const dividerImage = hero
+  // The hero's second photo sits beside the first divider (in the hero when there is none)
+  const heroAdditionalImage = hero
     ? readFragment(HeroSectionFragment, hero).additionalImage.responsiveImage
     : null;
   const firstDivider = groups.find(
@@ -88,10 +94,11 @@ const Content: ContentPage<PageProps, Query> = ({
       !Array.isArray(group) && group.__typename === 'DividerSectionRecord',
   );
 
-  // The newest products follow the season group, or the first divider when there is none (the
-  // end of the page when there is neither)
-  const railAfter =
+  // New arrivals go after the collection showcases, else after the first divider, else at the
+  // end of the page
+  const newArrivalsAfter =
     groups.find((group) => Array.isArray(group)) ?? firstDivider;
+  // The showcase group links to the catalog using the header's own label for it ("All products")
   const catalogLink = menu.find(
     (entry) =>
       entry.__typename === 'LinkItemRecord' &&
@@ -116,6 +123,7 @@ const Content: ContentPage<PageProps, Query> = ({
   return (
     <div className={PAGE_VARS}>
       {groups.map((group) => {
+        // Arrays are runs of collection card showcases (see groupCollectionCardShowcases)
         if (Array.isArray(group)) {
           return (
             <Fragment key={group[0].id}>
@@ -123,10 +131,10 @@ const Content: ContentPage<PageProps, Query> = ({
                 id={group[0].id}
                 sections={group}
                 globalPageProps={globalPageProps}
-                title={seasonsLabel(menu, group)}
+                title={menuColumnLabel(menu, group)}
                 action={allProductsAction}
               />
-              {group === railAfter && newArrivals}
+              {group === newArrivalsAfter && newArrivals}
             </Fragment>
           );
         }
@@ -149,14 +157,16 @@ const Content: ContentPage<PageProps, Query> = ({
                 <DividerSection
                   globalPageProps={globalPageProps}
                   fragment={group}
-                  image={group === firstDivider ? dividerImage : undefined}
+                  image={
+                    group === firstDivider ? heroAdditionalImage : undefined
+                  }
                 />
-                {group === railAfter && newArrivals}
+                {group === newArrivalsAfter && newArrivals}
               </Fragment>
             );
 
           case 'TestimonialSectionRecord':
-            return <TestimonialsSection fragment={group} key={group.id} />;
+            return <Testimonials fragment={group} key={group.id} />;
 
           case 'MaterialShowcaseSectionRecord':
             return (
@@ -171,7 +181,7 @@ const Content: ContentPage<PageProps, Query> = ({
             return null;
         }
       })}
-      {!railAfter && newArrivals}
+      {!newArrivalsAfter && newArrivals}
     </div>
   );
 };

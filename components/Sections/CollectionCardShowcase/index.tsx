@@ -14,7 +14,7 @@ type Props = {
   /** Consecutive collection showcases (the seasons), shown side by side */
   sections: FragmentOf<typeof CollectionCardShowcaseFragment>[];
   globalPageProps: ResolvedGlobalPageProps;
-  /** Base of the heading id; the group is a labelled section only when it has a title */
+  /** Base of the heading id; the group is a labeled section only when it has a title */
   id: string;
   /** Navigation column label that groups these collections ("Seasons") */
   title?: string | null;
@@ -78,10 +78,9 @@ function Season({
               sizes="(min-width: 1440px) 310px, (min-width: 1024px) 22vw, (min-width: 640px) 44vw, 80vw"
             />
           )}
-          {/* The pretitle belongs to this showcase block, not to the lead collection the link
-              group edits, so it stays its own click-to-edit target. A long one wraps into
-              balanced lines whose white boxes hug the text and join into one label: 28px boxes
-              24px apart, the wrapper 2px lower so a single line sits 12px in like every tag. */}
+          {/* The pretitle belongs to the showcase block, not the lead collection, so it is its
+              own click-to-edit target. A long one wraps into one tag per line
+              (box-decoration-clone). */}
           {pretitle && (
             <span className="absolute top-3.5 left-3 max-w-[calc(100%-1.5rem)] text-xs leading-6 text-balance">
               <span
@@ -102,6 +101,7 @@ function Season({
           </span>
         </Link>
       ) : (
+        // Empty row: keeps every season on the same four subgrid rows
         <span aria-hidden="true" />
       )}
       <div className="mt-5">
@@ -162,13 +162,15 @@ function Season({
   );
 }
 
-const CollectionCardShowcase = ({
+// Renders a run of consecutive CollectionCardShowcaseSection blocks (grouped in
+// home/Content.tsx) as one group of season columns.
+export default function CollectionCardShowcase({
   sections,
   globalPageProps,
   id,
   title,
   action,
-}: Props) => {
+}: Props) {
   const { lng } = globalPageProps.params;
   const columns = Math.min(sections.length, 4);
   const titleId = `${id}-seasons-title`;
@@ -210,6 +212,4 @@ const CollectionCardShowcase = ({
       {grid}
     </section>
   );
-};
-
-export default CollectionCardShowcase;
+}

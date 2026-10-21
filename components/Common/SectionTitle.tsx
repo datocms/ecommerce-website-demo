@@ -3,12 +3,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 type SectionTitleProps = {
-  /** CMS pre-title only. Never invent one. */
-  eyebrow?: ReactNode;
   title: ReactNode;
-  /** CMS subtitle or description under the title */
-  description?: ReactNode;
-  as?: 'h1' | 'h2';
   /** Heading id, for the section's aria-labelledby */
   id?: string;
   /** Right-aligned text link with an arrow, such as "All products" */
@@ -18,13 +13,10 @@ type SectionTitleProps = {
   className?: string;
 };
 
-// Title block of a section: small label, h2 and an optional line
-// on the left; a text link and controls bottom-aligned on the right
+// Section heading on the left; an optional text link and controls (rail arrows) bottom-aligned
+// on the right.
 export default function SectionTitle({
-  eyebrow,
   title,
-  description,
-  as: Heading = 'h2',
   id,
   action,
   aside,
@@ -40,15 +32,9 @@ export default function SectionTitle({
         .join(' ')}
     >
       <div className="max-w-[51.25rem] min-w-0">
-        {eyebrow && <p className="eyebrow mb-4">{eyebrow}</p>}
-        <Heading id={id} className="title-section">
+        <h2 id={id} className="title-section">
           {title}
-        </Heading>
-        {description && (
-          <p className="mt-5 max-w-[36em] text-lg text-pretty text-ink-2 lg:text-xl lg:leading-[1.45] lg:tracking-[-0.015em]">
-            {description}
-          </p>
-        )}
+        </h2>
       </div>
       {(action || aside) && (
         <div className="flex shrink-0 items-center gap-6">

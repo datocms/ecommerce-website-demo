@@ -22,7 +22,8 @@ type Props = {
 const ID = 'new-arrivals';
 
 // The latest products as a rail that runs off the right edge, with the title, a catalog link
-// and the arrows above it and a progress track under it
+// and the arrows above it and a progress track under it. Not a CMS block: home/meta.ts fetches
+// the 8 newest products for it and home/Content.tsx decides where it goes.
 export default function NewArrivals({
   products,
   lng,

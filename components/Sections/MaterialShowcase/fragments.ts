@@ -5,14 +5,12 @@ export const MaterialShowcaseFragment = graphql(
   /* GraphQL */ `
     fragment MaterialShowcaseFragment on MaterialShowcaseSectionRecord {
       id
-      _modelApiKey
       title
       subDescription
       description
       materials {
         id
         name
-        slug
         details {
           subtitle
           image {

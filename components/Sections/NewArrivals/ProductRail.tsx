@@ -10,33 +10,23 @@ type Props = {
   lng: string;
   currencySymbol: string;
   saleLabel?: string | null;
-  className?: string;
 };
 
-// Full-width snap rail of product cards: starts on the content edge, bleeds off the viewport.
-// From lg four cards and a quarter show, so there is always a next one in sight. Each item is a
-// 4-row grid for the card's subgrid (photo / name / brand / price). The items stretch to the
-// tallest card and the brand row takes the slack, so the brand stays under the name and every
-// price sits on one line. py-2 (taken back by -my-2) leaves room for the cards' focus rings, 4px
-// out. Snapping pauses while keyboard focus is inside, so tabbing moves the rail only as far as
-// RailControls scrolls to reveal a hidden card.
+// Product cards in a snap rail that starts on the content edge and bleeds off the viewport. From
+// lg 4¼ cards show, so a next one is always in sight. Each <li> is the 4-row grid ProductCard's
+// subgrid needs. Snapping pauses while keyboard focus is inside. The scroll reveal
+// (reveal-stagger) sits on the scroller itself, so no card moves inside it.
 export default function ProductRail({
   id,
   products,
   lng,
   currencySymbol,
   saleLabel,
-  className,
 }: Props) {
   return (
     <ul
       id={id}
-      className={[
-        'rail reveal-stagger no-scrollbar flex snap-x snap-mandatory -my-2 gap-4 overflow-x-auto py-2 has-focus-visible:snap-none',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      className="rail reveal-stagger no-scrollbar flex snap-x snap-mandatory -my-2 gap-4 overflow-x-auto py-2 has-focus-visible:snap-none"
     >
       {products.map((fragment) => {
         const product = readFragment(ProductRailFragment, fragment);
@@ -48,7 +38,7 @@ export default function ProductRail({
             <ProductCard
               href={`/${lng}/product/${stripStega(product.slug)}`}
               name={product.name}
-              brand={product.brand?.name}
+              brand={product.brand.name}
               image={product.productImages[0]?.responsiveImage}
               hoverImage={product.productImages[1]?.responsiveImage}
               price={product.price}

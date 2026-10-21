@@ -1,7 +1,7 @@
-import type { SiteLocale } from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
+import type { SiteLocale } from '@/lib/i18n';
 import Content from './Content';
 import { type PageProps, type Query, query, type Variables } from './meta';
 import RealTime from './RealTime';

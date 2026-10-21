@@ -1,10 +1,10 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
+import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import { IMG_ZOOM, MEDIA } from '../ui';
+import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { MaterialShowcaseFragment } from './fragments';
 
 type Props = {

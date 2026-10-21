@@ -6,9 +6,9 @@ import {
   type TitleMetaLinkTag,
   toNextMetadata,
 } from 'react-datocms/seo';
-import { getFallbackLocale } from '@/app/i18n/settings';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
-import queryDatoCMS from '@/utils/queryDatoCMS';
+import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
+import { getFallbackLocale } from '@/lib/i18n';
 import type { BuildVariablesFn, ResolvedPageProps } from './types';
 
 export function generateMetadataFn<

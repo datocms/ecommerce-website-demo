@@ -1,7 +1,7 @@
 import { Geist } from 'next/font/google';
 import { draftMode } from 'next/headers';
-import ContentLink from '@/components/ContentLink';
-import ScrollToTop from '@/components/ScrollToTop';
+import ContentLink from '@/components/DraftMode/ContentLink';
+import DraftModeToggle from '@/components/DraftMode/DraftModeToggle';
 import '@/styles/global.css';
 
 // Variable weight: UI text at 400-600, display headings at 600
@@ -21,7 +21,7 @@ export default async function RootLayout({ children }: Params) {
     <html className={sans.variable}>
       <body className="flex min-h-svh flex-col bg-white font-sans text-base text-ink antialiased">
         {children}
-        <ScrollToTop isDraft={isDraft} />
+        <DraftModeToggle isDraft={isDraft} />
         {isDraft && <ContentLink />}
       </body>
     </html>

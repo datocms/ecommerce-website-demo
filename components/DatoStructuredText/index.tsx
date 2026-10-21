@@ -4,7 +4,7 @@ import {
   StructuredText,
   type StructuredTextPropTypes,
 } from 'react-datocms/structured-text';
-import Highlighter from '@/components/Common/Highlighter';
+import renderNodeWithHighlight from './renderNodeWithHighlight';
 
 function addBoundaryAttribute(
   result: ReactElement | null,
@@ -38,7 +38,7 @@ export default function DatoStructuredText<
     <div data-datocms-content-link-group className={className}>
       <StructuredText
         {...rest}
-        renderNode={renderNode ?? Highlighter}
+        renderNode={renderNode ?? renderNodeWithHighlight}
         renderBlock={
           renderBlock
             ? (ctx) => addBoundaryAttribute(renderBlock(ctx))

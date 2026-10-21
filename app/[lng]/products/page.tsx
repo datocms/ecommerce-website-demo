@@ -11,19 +11,21 @@ import type { Record, StructuredText } from 'datocms-structured-text-utils';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
 import { ViewTransition } from 'react';
-import { getFallbackLocale, type SiteLocale } from '@/app/i18n/settings';
 import LinkPending from '@/components/Common/LinkPending';
 import PageTransition from '@/components/Common/PageTransition';
-import ProductCard from '@/components/Common/ProductCard';
-import SideFilter, { SortTabs } from '@/components/Common/SideFilter';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
-import FilterDetail from '@/components/Products/FilterDetail';
-import { ProductsGeneralInterfaceFragment } from '@/components/Products/GeneralInterface/fragments';
-import { InitialParamsFragment } from '@/components/Products/InitialParams/fragments';
-import Pagination from '@/components/Products/Pagination';
-import ProductFilters from '@/components/Products/ProductFilters';
+import ProductCard from '@/components/ProductCard';
+import FilterDetail from '@/components/ProductListing/FilterDetail';
+import FilterPanel, { SortTabs } from '@/components/ProductListing/FilterPanel';
+import {
+  InitialParamsFragment,
+  ProductsGeneralInterfaceFragment,
+} from '@/components/ProductListing/fragments';
+import ListingToolbar from '@/components/ProductListing/ListingToolbar';
+import Pagination from '@/components/ProductListing/Pagination';
 import { graphql, readFragment } from '@/lib/datocms/graphql';
-import queryDatoCMS from '@/utils/queryDatoCMS';
+import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
+import { getFallbackLocale, type SiteLocale } from '@/lib/i18n';
 
 type ProductModelOrderBy = ReturnType<
   typeof graphql.scalar<'ProductModelOrderBy'>
@@ -222,7 +224,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
           ? MaterialRecord
           : null;
 
-  // Mirrors SideFilter: a group narrows the listing unless every option is on
+  // Mirrors FilterPanel: a group narrows the listing unless every option is on
   const isNarrowed = (selected: string[], options: { id: string }[]) =>
     options.some((option) => !selected.includes(option.id));
   const narrowed = [
@@ -276,7 +278,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
       ) : (
         <h1 className="sr-only">Products</h1>
       )}
-      <ProductFilters
+      <ListingToolbar
         count={count}
         lng={lng}
         narrowed={narrowed}
@@ -307,17 +309,17 @@ const Page = async ({ params, searchParams }: PageProps) => {
           ) : undefined
         }
       >
-        <SideFilter
+        <FilterPanel
           initialParams={initialParams}
           generalInterface={data.generalInterface}
           paramaterCollections={collections}
           parameterBrands={brands}
           parameterMaterials={materials}
         />
-      </ProductFilters>
+      </ListingToolbar>
       {/* A new listing replaces the old one in place: the old drops out where it was, and the
           new rises under the toolbar (swap in global.css). Keyed by the query, so the old and
-          new are separate groups that never travel, even when ProductFilters rewinds the
+          new are separate groups that never travel, even when ListingToolbar rewinds the
           scroll. The drawer's toggles and Clear all (type "filter") update it at once, behind
           the scrim */}
       <ViewTransition

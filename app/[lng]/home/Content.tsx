@@ -1,15 +1,15 @@
 import { stripStega } from '@datocms/content-link';
 import { notFound } from 'next/navigation';
 import { Fragment } from 'react';
+import { PAGE_VARS } from '@/components/Common/styles';
+import CollectionCardShowcase from '@/components/Sections/CollectionCardShowcase';
+import { CollectionCardShowcaseFragment } from '@/components/Sections/CollectionCardShowcase/fragments';
 import DividerSection from '@/components/Sections/DividerSection';
 import Hero from '@/components/Sections/Hero';
 import { HeroSectionFragment } from '@/components/Sections/Hero/fragments';
 import MaterialShowcase from '@/components/Sections/MaterialShowcase';
 import NewArrivals from '@/components/Sections/NewArrivals';
-import ProductShowcase from '@/components/Sections/ProductShowcase';
-import { CollectionCardShowcaseFragment } from '@/components/Sections/ProductShowcase/fragments';
 import TestimonialsSection from '@/components/Sections/Testimonials';
-import { PAGE_VARS } from '@/components/Sections/ui';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { PageProps, Query } from './meta';
@@ -119,7 +119,7 @@ const Content: ContentPage<PageProps, Query> = ({
         if (Array.isArray(group)) {
           return (
             <Fragment key={group[0].id}>
-              <ProductShowcase
+              <CollectionCardShowcase
                 id={group[0].id}
                 sections={group}
                 globalPageProps={globalPageProps}

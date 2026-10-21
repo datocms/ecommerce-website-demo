@@ -1,8 +1,8 @@
 import ReactMarkdown from 'react-markdown';
+import RailControls from '@/components/Common/RailControls';
+import RailProgress from '@/components/Common/RailProgress';
+import { BAND } from '@/components/Common/styles';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import { BAND } from '../ui';
-import RailControls from '../RailControls';
-import RailProgress from '../RailProgress';
 import { TestimonialSectionFragment } from './fragments';
 
 type Props = {

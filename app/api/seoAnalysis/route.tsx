@@ -1,7 +1,7 @@
 import { buildClient } from '@datocms/cma-client-node';
 import { parseHTML } from 'linkedom';
 import type { NextRequest } from 'next/server';
-import { localizedString } from '@/utils/localizedField';
+import { localizedString } from '@/lib/datocms/localizedString';
 
 const findSlugAndPermalink = async (
   item: any,

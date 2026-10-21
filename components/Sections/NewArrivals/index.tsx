@@ -1,11 +1,11 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import RailControls from '@/components/Common/RailControls';
+import RailProgress from '@/components/Common/RailProgress';
 import SectionTitle from '@/components/Common/SectionTitle';
 import type { FragmentOf } from '@/lib/datocms/graphql';
-import ProductRail from '../ProductRail';
-import type { ProductRailFragment } from '../ProductRail/fragments';
-import RailControls from '../RailControls';
-import RailProgress from '../RailProgress';
+import type { ProductRailFragment } from './fragments';
+import ProductRail from './ProductRail';
 
 type Props = {
   /** The newest products, already in order */

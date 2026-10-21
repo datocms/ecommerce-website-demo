@@ -1,9 +1,9 @@
 import type { TadaDocumentNode } from 'gql.tada';
-import type { SiteLocale } from '@/app/i18n/settings';
 import type {
   GlobalPageProps,
   ResolvedGlobalPageProps,
-} from '@/utils/globalPageProps';
+} from '@/lib/globalPageProps';
+import type { SiteLocale } from '@/lib/i18n';
 
 // Type for resolved page props (after awaiting params)
 export type ResolvedPageProps<T extends GlobalPageProps> = Omit<T, 'params'> & {

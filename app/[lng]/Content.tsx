@@ -1,8 +1,8 @@
-import CustomColor from '@/components/Common/CustomColor';
-import DocumentLang from '@/components/Common/DocumentLang';
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
-import Meta from '@/components/Meta';
+import CustomColor from '@/components/Layout/CustomColor';
+import DocumentLang from '@/components/Layout/DocumentLang';
+import Footer from '@/components/Layout/Footer';
+import Header from '@/components/Layout/Header';
+import SiteMeta from '@/components/Layout/SiteMeta';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
 
@@ -15,7 +15,7 @@ const Content: ContentPage<PageProps, Query> = ({
   return (
     <div lang={lang} className="contents">
       <DocumentLang lang={lang} />
-      <Meta data={data} />
+      <SiteMeta data={data} />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-60 focus:inline-flex focus:min-h-13 focus:items-center focus:bg-ink focus:px-6 focus:text-sm focus:font-semibold focus:text-white"

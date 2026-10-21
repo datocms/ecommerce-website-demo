@@ -1,11 +1,11 @@
 import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import { MEDIA } from '../ui';
+import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { DividerSectionFragment } from './fragments';
 
 type Props = {

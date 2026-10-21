@@ -1,4 +1,4 @@
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
 import WithRealTimeUpdates from '.';
 import type { ContentPage, RealtimeUpdatesPage } from './types';
 

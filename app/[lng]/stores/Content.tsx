@@ -7,9 +7,9 @@ import {
   ArrowUpRightIcon,
 } from '@heroicons/react/24/outline';
 import { type MouseEvent, useRef, useState } from 'react';
+import { IMG_ZOOM, MEDIA, PAGE_VARS } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
-import { IMG_ZOOM, MEDIA, PAGE_VARS } from '@/components/Sections/ui';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { PageProps, Query } from './meta';

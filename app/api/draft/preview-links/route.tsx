@@ -1,7 +1,7 @@
 import { headers as getHeaders } from 'next/headers';
 import type { NextRequest } from 'next/server';
-import type { SiteLocale } from '@/app/i18n/settings';
-import { localizedString } from '@/utils/localizedField';
+import { localizedString } from '@/lib/datocms/localizedString';
+import type { SiteLocale } from '@/lib/i18n';
 
 type generatePreviewUrlParams = {
   item: any;

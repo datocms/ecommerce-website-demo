@@ -1,9 +1,9 @@
-import getAvailableLocales, { type SiteLocale } from '@/app/i18n/settings';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import { graphql } from '@/lib/datocms/graphql';
-import queryDatoCMS from '@/utils/queryDatoCMS';
+import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
+import { getAvailableLocales, type SiteLocale } from '@/lib/i18n';
 import Content from './Content';
 import { type PageProps, type Query, query, type Variables } from './meta';
 import RealTime from './RealTime';

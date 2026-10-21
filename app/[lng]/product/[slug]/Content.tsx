@@ -8,12 +8,12 @@ import { notFound } from 'next/navigation';
 import { Fragment, isValidElement, type ReactNode } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
 import DatoStructuredText from '@/components/DatoStructuredText';
-import FeaturedProducts from '@/components/Grids/FeaturedProducts';
-import ProductInfoSection from '@/components/Products/Product/Blocks/ProductInfoSection';
-import QuestionsSection from '@/components/Products/Product/Blocks/QuestionsSection';
-import { PDP_RAIL } from '@/components/Products/Product/ui';
-import ProductView from '@/components/Products/ProductView';
-import Reviews from '@/components/Products/Reviews';
+import ProductInfoSection from '@/components/ProductDetail/Blocks/ProductInfoSection';
+import QuestionsSection from '@/components/ProductDetail/Blocks/QuestionsSection';
+import BuyBox from '@/components/ProductDetail/BuyBox';
+import RelatedProducts from '@/components/ProductDetail/RelatedProducts';
+import Reviews from '@/components/ProductDetail/Reviews';
+import { PDP_RAIL } from '@/components/ProductDetail/styles';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import type { PageProps, Query } from './meta';
 
@@ -33,7 +33,7 @@ const Content: ContentPage<PageProps, Query> = ({
   }
   return (
     <>
-      <ProductView data={data} globalPageProps={globalPageProps} />
+      <BuyBox data={data} globalPageProps={globalPageProps} />
       {data.product.description && (
         <div className="shell pt-(--section-gap)">
           <DatoStructuredText
@@ -152,7 +152,7 @@ const Content: ContentPage<PageProps, Query> = ({
           />
         </div>
       )}
-      <FeaturedProducts data={data} globalPageProps={globalPageProps} />
+      <RelatedProducts data={data} globalPageProps={globalPageProps} />
       <Reviews data={data} globalPageProps={globalPageProps} />
     </>
   );

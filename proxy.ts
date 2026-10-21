@@ -1,7 +1,7 @@
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 import { type NextRequest, NextResponse } from 'next/server';
-import getAvailableLocales, { type SiteLocale } from './app/i18n/settings';
+import { getAvailableLocales, type SiteLocale } from '@/lib/i18n';
 
 // Next.js ignores fetch caching inside Proxy, so keep the locales in memory
 // for a minute instead of querying DatoCMS on every request.

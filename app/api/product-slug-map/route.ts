@@ -1,7 +1,7 @@
 import { draftMode } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
-import getAvailableLocales, { type SiteLocale } from '@/app/i18n/settings';
-import { resolveProductSlug } from '@/utils/productSlugs';
+import { getAvailableLocales, type SiteLocale } from '@/lib/i18n';
+import { resolveProductSlug } from '@/lib/productSlugs';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

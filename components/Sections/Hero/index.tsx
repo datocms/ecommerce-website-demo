@@ -3,10 +3,10 @@ import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import Rise from '@/components/Common/Rise';
 import SvgRenderer from '@/components/Common/SvgRenderer';
+import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
-import { MEDIA } from '../ui';
+import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { HeroSectionFragment } from './fragments';
 
 type Props = {

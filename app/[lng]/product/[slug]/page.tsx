@@ -1,19 +1,20 @@
 import { draftMode } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { toNextMetadata } from 'react-datocms/seo';
-import getAvailableLocales, {
-  getFallbackLocale,
-  type SiteLocale,
-} from '@/app/i18n/settings';
 import PageTransition from '@/components/Common/PageTransition';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import { graphql } from '@/lib/datocms/graphql';
+import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
+import {
+  getAvailableLocales,
+  getFallbackLocale,
+  type SiteLocale,
+} from '@/lib/i18n';
 import {
   buildProductSlugMap,
   resolveProductSlug,
   slugForLocale,
-} from '@/utils/productSlugs';
-import queryDatoCMS from '@/utils/queryDatoCMS';
+} from '@/lib/productSlugs';
 import Content from './Content';
 import { type PageProps, type Query, query, type Variables } from './meta';
 import RealTime from './RealTime';

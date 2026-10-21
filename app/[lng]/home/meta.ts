@@ -1,15 +1,15 @@
+import { CollectionCardShowcaseFragment } from '@/components/Sections/CollectionCardShowcase/fragments';
 import { DividerSectionFragment } from '@/components/Sections/DividerSection/fragments';
 import { HeroSectionFragment } from '@/components/Sections/Hero/fragments';
 import { MaterialShowcaseFragment } from '@/components/Sections/MaterialShowcase/fragments';
-import { ProductRailFragment } from '@/components/Sections/ProductRail/fragments';
-import { CollectionCardShowcaseFragment } from '@/components/Sections/ProductShowcase/fragments';
+import { ProductRailFragment } from '@/components/Sections/NewArrivals/fragments';
 import { TestimonialSectionFragment } from '@/components/Sections/Testimonials/fragments';
 import {
   graphql,
   type ResultOf,
   type VariablesOf,
 } from '@/lib/datocms/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
 
 export type PageProps = GlobalPageProps;
 

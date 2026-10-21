@@ -4,7 +4,7 @@ import {
   type ResultOf,
   type VariablesOf,
 } from '@/lib/datocms/graphql';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
 
 export type PageProps = GlobalPageProps;
 

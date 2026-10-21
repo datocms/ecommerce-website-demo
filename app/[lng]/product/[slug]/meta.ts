@@ -1,8 +1,10 @@
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
-import { ProductInfoSectionFragment } from '@/components/Products/Product/Blocks/ProductInfoSection/fragments';
-import { QuestionSectionFragment } from '@/components/Products/Product/Blocks/QuestionsSection/fragments';
-import { ProductGeneralInterfaceFragment } from '@/components/Products/Product/GeneralInferface/fragments';
-import { MaterialProductFragment } from '@/components/Products/Product/Material/fragments';
+import {
+  MaterialProductFragment,
+  ProductInfoSectionFragment,
+} from '@/components/ProductDetail/Blocks/ProductInfoSection/fragments';
+import { QuestionSectionFragment } from '@/components/ProductDetail/Blocks/QuestionsSection/fragments';
+import { ProductGeneralInterfaceFragment } from '@/components/ProductDetail/fragments';
 import {
   graphql,
   type ResultOf,

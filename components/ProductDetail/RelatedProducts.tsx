@@ -3,16 +3,16 @@ import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
 import ProductCard from '@/components/ProductCard';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
-import { ProductGeneralInterfaceFragment } from './fragments';
+import { ProductPageLabelsFragment } from './fragments';
 
-type PropTypes = {
+type Props = {
   data: ProductQuery;
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-const RelatedProducts = ({ data, globalPageProps }: PropTypes) => {
+const RelatedProducts = ({ data, globalPageProps }: Props) => {
   const { sale, currencySymbol } =
-    readFragment(ProductGeneralInterfaceFragment, data.generalInterface) ?? {};
+    readFragment(ProductPageLabelsFragment, data.generalInterface) ?? {};
 
   const relatedProducts = data.product?.relatedProducts ?? [];
   if (relatedProducts.length === 0) return null;
@@ -39,12 +39,12 @@ const RelatedProducts = ({ data, globalPageProps }: PropTypes) => {
               <ProductCard
                 href={`/${globalPageProps.params.lng}/product/${stripStega(product.slug)}`}
                 name={product.name}
-                brand={product.brand?.name}
+                brand={product.brand.name}
                 image={product.productImages[0]?.responsiveImage}
                 hoverImage={product.productImages[1]?.responsiveImage}
                 price={product.price}
                 salePrice={product.salePrice}
-                onSale={stripStega(product.sale || '') === 'on_sale'}
+                onSale={stripStega(product.sale) === 'on_sale'}
                 currencySymbol={currencySymbol ?? ''}
                 saleLabel={sale}
                 sizes={`(min-width: 1440px) ${fourUp ? '330px' : '445px'}, (min-width: 1280px) ${fourUp ? '24vw' : '32vw'}, (min-width: 768px) 32vw, (min-width: 640px) 40vw, 72vw`}

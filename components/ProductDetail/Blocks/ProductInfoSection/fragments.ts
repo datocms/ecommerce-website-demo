@@ -10,12 +10,11 @@ export const ProductInfoSectionFragment = graphql(/* GraphQL */ `
   }
 `);
 
-export const MaterialProductFragment = graphql(
+export const ProductMaterialFragment = graphql(
   /* GraphQL */ `
-    fragment MaterialProductFragment on MaterialRecord {
+    fragment ProductMaterialFragment on MaterialRecord {
       id
       name
-      slug
       details {
         image {
           responsiveImage {

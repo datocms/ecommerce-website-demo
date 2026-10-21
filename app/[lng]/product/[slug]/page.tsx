@@ -16,7 +16,7 @@ import {
   slugForLocale,
 } from '@/lib/productSlugs';
 import Content from './Content';
-import { type PageProps, type Query, query, type Variables } from './meta';
+import { type PageProps, query, type Variables } from './meta';
 import RealTime from './RealTime';
 
 const staticParamsQuery = graphql(/* GraphQL */ `
@@ -59,6 +59,9 @@ const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
   slug: params.slug,
 });
 
+// Unlike other routes this page doesn't use generateWrapper: a slug from another locale must
+// redirect to this locale's slug before anything renders. So Page also does generateWrapper's other
+// jobs itself: the draft switch, and PageTransition around both branches.
 async function getProductPageData({
   params,
   fallbackLocale,
@@ -131,10 +134,10 @@ export async function generateMetadata(pageProps: PageProps) {
   return data.product?.seo ? toNextMetadata(data.product.seo) : {};
 }
 
-export default async function Page(unsanitizedPageProps: PageProps) {
+export default async function Page(nextPageProps: PageProps) {
   const fallbackLocale = await getFallbackLocale();
   const { isEnabled: isDraft } = await draftMode();
-  const params = await unsanitizedPageProps.params;
+  const params = await nextPageProps.params;
   const pageProps = { params };
   const { data, variables } = await getProductPageData({
     params,

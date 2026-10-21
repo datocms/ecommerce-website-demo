@@ -2,23 +2,29 @@ import ReactMarkdown from 'react-markdown';
 import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
-import { ProductGeneralInterfaceFragment } from './fragments';
+import { ProductPageLabelsFragment } from './fragments';
 import StarRating from './StarRating';
 
-type PropTypes = {
+type Props = {
   data: ProductQuery;
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-const Reviews = ({ data, globalPageProps }: PropTypes) => {
+const Reviews = ({ data, globalPageProps }: Props) => {
   const { reviewButton, reviews } =
-    readFragment(ProductGeneralInterfaceFragment, data.generalInterface) ?? {};
+    readFragment(ProductPageLabelsFragment, data.generalInterface) ?? {};
 
+  const { lng } = globalPageProps.params;
   const average = data.product?.reviewAverage ?? 0;
-  const formattedAverage = new Intl.NumberFormat(globalPageProps.params.lng, {
+  const formattedAverage = new Intl.NumberFormat(lng, {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
   }).format(average);
+  const dateFormatter = new Intl.DateTimeFormat(lng, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
   const featuredReviews = data.product?.featuredReviews ?? [];
 
   // A compact summary bar (score, stars, count and the button on one ruled line), then the
@@ -51,15 +57,9 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
       {featuredReviews.length > 0 && (
         <ul className="mt-8 grid gap-x-4 gap-y-10 md:grid-cols-2 lg:mt-10 lg:grid-cols-3">
           {featuredReviews.map((review) => {
-            const date = new Date(review.reviewDate);
-            const formattedDate = new Intl.DateTimeFormat(
-              globalPageProps.params.lng,
-              {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              },
-            ).format(date);
+            const formattedDate = dateFormatter.format(
+              new Date(review.reviewDate),
+            );
 
             return (
               <li key={review.id} className="flex flex-col lg:pr-10">

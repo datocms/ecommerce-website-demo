@@ -3,56 +3,53 @@ import Link from 'next/link';
 import type { ComponentPropsWithoutRef } from 'react';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
-import { ProductGeneralInterfaceFragment } from '@/components/ProductDetail/fragments';
+import { ProductPageLabelsFragment } from '@/components/ProductDetail/fragments';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import {
-  MaterialProductFragment,
   ProductInfoSectionFragment,
+  ProductMaterialFragment,
 } from './fragments';
 
 type Props = {
-  ProductInfoFragment: FragmentOf<typeof ProductInfoSectionFragment>;
-  MaterialFragment:
-    | FragmentOf<typeof MaterialProductFragment>
-    | null
-    | undefined;
+  fragment: FragmentOf<typeof ProductInfoSectionFragment>;
+  material: FragmentOf<typeof ProductMaterialFragment> | null | undefined;
   globalPageProps: ResolvedGlobalPageProps;
-  generalInterfaceFragment:
-    | FragmentOf<typeof ProductGeneralInterfaceFragment>
-    | null
-    | undefined;
+  labels: FragmentOf<typeof ProductPageLabelsFragment> | null | undefined;
 } & Omit<ComponentPropsWithoutRef<'section'>, 'children'>;
 
 const ProductInfoSection = ({
-  ProductInfoFragment,
-  MaterialFragment,
+  fragment,
+  material,
   globalPageProps,
-  generalInterfaceFragment,
+  labels,
   ...rest
 }: Props) => {
   const {
-    materials,
-    style: styleString,
-    weather: weatherString,
-    occasions: occasionsString,
+    materials: materialLabel,
+    style: styleLabel,
+    weather: weatherLabel,
+    occasions: occasionsLabel,
     more,
-  } = readFragment(ProductGeneralInterfaceFragment, generalInterfaceFragment) ??
-  {};
+  } = readFragment(ProductPageLabelsFragment, labels) ?? {};
 
-  const { material, style, weather, occasions } = readFragment(
-    ProductInfoSectionFragment,
-    ProductInfoFragment,
-  );
+  // The block's own spec values; materialSpec is free text, unlike the linked record below
+  const {
+    material: materialSpec,
+    style,
+    weather,
+    occasions,
+  } = readFragment(ProductInfoSectionFragment, fragment);
 
-  const { details, name, id } =
-    readFragment(MaterialProductFragment, MaterialFragment) ?? {};
+  // The product's linked material record: its name, photo and listing link
+  const materialRecord = readFragment(ProductMaterialFragment, material);
+  const { details, name, id } = materialRecord ?? {};
 
   const specs = [
-    { key: 'material', label: materials, value: material },
-    { key: 'style', label: styleString, value: style },
-    { key: 'weather', label: weatherString, value: weather },
-    { key: 'occasions', label: occasionsString, value: occasions },
+    { key: 'material', label: materialLabel, value: materialSpec },
+    { key: 'style', label: styleLabel, value: style },
+    { key: 'weather', label: weatherLabel, value: weather },
+    { key: 'occasions', label: occasionsLabel, value: occasions },
   ];
 
   // Specs on a mist well beside the material photo, both the same height so the row tiles.

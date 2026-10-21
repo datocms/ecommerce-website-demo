@@ -1,10 +1,10 @@
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import {
-  MaterialProductFragment,
   ProductInfoSectionFragment,
+  ProductMaterialFragment,
 } from '@/components/ProductDetail/Blocks/ProductInfoSection/fragments';
 import { QuestionSectionFragment } from '@/components/ProductDetail/Blocks/QuestionsSection/fragments';
-import { ProductGeneralInterfaceFragment } from '@/components/ProductDetail/fragments';
+import { ProductPageLabelsFragment } from '@/components/ProductDetail/fragments';
 import {
   graphql,
   type ResultOf,
@@ -54,7 +54,7 @@ export const query = graphql(
           review
         }
         material {
-          ...MaterialProductFragment
+          ...ProductMaterialFragment
         }
         description {
           value
@@ -104,16 +104,16 @@ export const query = graphql(
         }
       }
       generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
-        ...ProductGeneralInterfaceFragment
+        ...ProductPageLabelsFragment
       }
     }
   `,
   [
-    MaterialProductFragment,
+    ProductMaterialFragment,
     ProductInfoSectionFragment,
     QuestionSectionFragment,
     ResponsiveImageFragment,
-    ProductGeneralInterfaceFragment,
+    ProductPageLabelsFragment,
   ],
 );
 

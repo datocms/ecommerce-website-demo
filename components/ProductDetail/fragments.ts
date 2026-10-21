@@ -1,7 +1,8 @@
 import { graphql } from '@/lib/datocms/graphql';
 
-export const ProductGeneralInterfaceFragment = graphql(/* GraphQL */ `
-  fragment ProductGeneralInterfaceFragment on GeneralInterfaceRecord {
+// UI labels for the product page, from the General Interface singleton
+export const ProductPageLabelsFragment = graphql(/* GraphQL */ `
+  fragment ProductPageLabelsFragment on GeneralInterfaceRecord {
     currencySymbol
     weather
     style

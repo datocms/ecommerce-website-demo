@@ -1,6 +1,7 @@
 import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import Rise from '@/components/Common/Rise';
 import SvgRenderer from '@/components/Common/SvgRenderer';
 import DatoImage from '@/components/DatoImage';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
@@ -64,12 +65,12 @@ const Hero = ({
         {/* justify-self-stretch: a grid item with an aspect ratio otherwise shrinks to it, so a
             capped height (tablets) would narrow the photo instead of cropping it */}
         <div
-          className={`${second ? 'grid grid-cols-[2fr_1fr] gap-3 lg:gap-4' : MEDIA} -mx-(--gutter) aspect-[4/5] max-h-[62svh] justify-self-stretch lg:order-2 lg:col-span-7 lg:mx-0 lg:aspect-auto lg:max-h-none lg:bleed-r`}
+          className={`${second ? 'grid grid-cols-[2fr_1fr] gap-3 lg:gap-4' : `${MEDIA} settle`} -mx-(--gutter) aspect-[4/5] max-h-[62svh] justify-self-stretch lg:order-2 lg:col-span-7 lg:mx-0 lg:aspect-auto lg:max-h-none lg:bleed-r`}
         >
           {second ? (
             <>
-              <div className={`${MEDIA} h-full`}>{mainPhoto}</div>
-              <div className={`${MEDIA} h-full`}>
+              <div className={`${MEDIA} settle h-full`}>{mainPhoto}</div>
+              <div className={`${MEDIA} settle h-full`}>
                 <DatoImage
                   fragment={second}
                   layout="fill"
@@ -87,9 +88,9 @@ const Hero = ({
             rest keeps its distance from the photo */}
         <div className="flex flex-col justify-center pt-8 lg:order-1 lg:col-span-5 lg:py-12">
           <h1 id={titleId} className="title-hero">
-            {heroTitle}
+            <Rise>{heroTitle}</Rise>
           </h1>
-          <div className="lg:pr-10 xl:pr-14">
+          <div className="enter-stagger lg:pr-10 xl:pr-14 [--delay:200ms]">
             {heroSubtitle && (
               <p className="mt-5 max-w-[29.375rem] text-base leading-[1.6] text-ink-2 lg:mt-8 lg:text-lg lg:text-pretty">
                 {heroSubtitle}

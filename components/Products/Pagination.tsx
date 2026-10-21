@@ -3,6 +3,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import LinkPending from '@/components/Common/LinkPending';
 
 type PropTypes = {
   numberOfProducts: number;
@@ -49,6 +50,7 @@ const Pagination = ({ numberOfProducts, currentPage, pageSize }: PropTypes) => {
             className="rail-btn"
           >
             <ChevronLeftIcon aria-hidden="true" className="stroke-2" />
+            <LinkPending />
           </Link>
         ) : (
           <span aria-hidden="true" aria-disabled="true" className="rail-btn">
@@ -63,9 +65,10 @@ const Pagination = ({ numberOfProducts, currentPage, pageSize }: PropTypes) => {
                 key={page}
                 href={pageHref(page)}
                 aria-current={page === currentPage ? 'page' : undefined}
-                className={`grid size-11 shrink-0 place-items-center text-sm font-semibold tabular-nums outline-offset-[-2px] transition-colors duration-150 ${page === currentPage ? 'bg-ink text-white focus-visible:outline-white' : 'hover:bg-mist'}`}
+                className={`grid size-11 shrink-0 place-items-center text-sm font-semibold tabular-nums outline-offset-[-2px] press ${page === currentPage ? 'bg-ink text-white focus-visible:outline-white' : 'hover:bg-mist'}`}
               >
                 {page}
+                <LinkPending />
               </Link>
             ),
           )}
@@ -77,6 +80,7 @@ const Pagination = ({ numberOfProducts, currentPage, pageSize }: PropTypes) => {
             className="rail-btn"
           >
             <ChevronRightIcon aria-hidden="true" className="stroke-2" />
+            <LinkPending />
           </Link>
         ) : (
           <span aria-hidden="true" aria-disabled="true" className="rail-btn">

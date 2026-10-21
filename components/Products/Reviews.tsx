@@ -27,7 +27,7 @@ const Reviews = ({ data, globalPageProps }: PropTypes) => {
     <section id="reviews" className="shell pt-(--section-gap)">
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-6 border-b border-line pb-8">
         <div className="flex items-end gap-5">
-          <p className="text-[4rem] leading-[0.8] font-semibold tracking-[-0.05em] tabular-nums lg:text-[5rem]">
+          <p className="reveal mask text-[4rem] leading-[0.8] font-semibold tracking-[-0.05em] tabular-nums lg:text-[5rem]">
             {formattedAverage}
             <span className="sr-only"> out of 5</span>
           </p>

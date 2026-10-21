@@ -32,7 +32,7 @@ const SuccessPopUp = ({ open, onDismiss, returnFocusRef }: Props) => {
       className="fixed right-(--gutter) bottom-19 z-60 w-[min(100vw-2*var(--gutter),22.5rem)]"
     >
       {open && (
-        <div className="surface-ink flex items-center gap-3 py-2 pr-1 pl-2 text-sm font-semibold transition duration-200 ease-out starting:translate-y-2 starting:opacity-0">
+        <div className="surface-ink pop flex origin-bottom-right items-center gap-3 py-2 pr-1 pl-2 text-sm font-semibold">
           <span className="grid size-8 shrink-0 place-items-center bg-white text-ink">
             <CheckIcon aria-hidden="true" className="size-4 stroke-[2.5]" />
           </span>

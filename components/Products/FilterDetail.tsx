@@ -74,13 +74,14 @@ const FilterDetail = ({
           // while a longer description scrolls. A logo needs less room than a photo,
           // so on tablets its well stays a wide band
           <div
-            className={`relative -mx-(--gutter) overflow-hidden bg-mist lg:sticky lg:top-[calc(var(--header-h)+2.5rem)] lg:col-span-5 lg:mx-0 lg:h-auto lg:max-h-[calc(100svh-var(--header-h)-5rem)] lg:min-h-[min(35rem,calc(100svh-var(--header-h)-5rem))] ${logo ? 'h-[min(75vw,62svh)] md:h-[min(50vw,62svh)]' : 'h-[min(125vw,62svh)] md:h-[min(75vw,62svh)]'}`}
+            className={`settle relative -mx-(--gutter) overflow-hidden bg-mist lg:sticky lg:top-[calc(var(--header-h)+2.5rem)] lg:col-span-5 lg:mx-0 lg:h-auto lg:max-h-[calc(100svh-var(--header-h)-5rem)] lg:min-h-[min(35rem,calc(100svh-var(--header-h)-5rem))] ${logo ? 'h-[min(75vw,62svh)] md:h-[min(50vw,62svh)]' : 'h-[min(125vw,62svh)] md:h-[min(75vw,62svh)]'}`}
           >
             {logoData ? (
               // Sized against both sides of the well, so a logo of any shape fits
               // whole. Multiply blends a white backdrop into the mist; a logo drawn on its
-              // own tinted square keeps that square, a tile inside the well.
-              <div className="absolute inset-0 grid place-items-center [container-type:size] [--logo-h:80] md:[--logo-h:60]">
+              // own tinted square keeps that square, a tile inside the well. The mist
+              // repeats here because settle's scale isolates this layer from the well's
+              <div className="absolute inset-0 grid place-items-center bg-mist [container-type:size] [--logo-h:80] md:[--logo-h:60]">
                 <div
                   className="relative"
                   style={{
@@ -112,7 +113,7 @@ const FilterDetail = ({
           </div>
         )}
         <div
-          className={`[container-type:inline-size] ${image ? 'pt-8 lg:col-span-6 lg:col-start-7 lg:pt-0' : 'lg:col-span-8'}`}
+          className={`enter-stagger [container-type:inline-size] ${image ? 'pt-8 lg:col-span-6 lg:col-start-7 lg:pt-0' : 'lg:col-span-8'}`}
         >
           {type && <p className="eyebrow">{type}</p>}
           {/* Words never break: a long single word (German compounds) shrinks to

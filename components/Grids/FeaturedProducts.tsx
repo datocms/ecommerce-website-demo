@@ -21,13 +21,14 @@ const FeaturedProducts = ({ data, globalPageProps }: PropTypes) => {
   // name leaves no gap. The rail's 8px of block padding (taken back with -my-2) leaves room for the
   // cards' focus ring, which the scroller would otherwise clip. From md the wrappers drop out and
   // the cards share the grid's rows (names, brands and prices line up), aligned to the shell's
-  // content edges
+  // content edges. It rises as one block (reveal): a scroller's cards must not move inside it,
+  // and display:contents wrappers cannot move at all
   const fourUp = relatedProducts.length >= 4;
 
   return (
     <section className="pt-(--section-gap)">
       <div
-        className={`rail no-scrollbar -my-2 flex snap-x snap-mandatory gap-x-3 overflow-x-auto py-2 md:-mb-(--card-row-gap) md:mt-0 md:grid md:snap-none md:grid-cols-3 md:gap-x-4 md:overflow-visible md:py-0 md:[--card-row-gap:2rem] lg:[--card-row-gap:2.5rem] ${fourUp ? 'xl:grid-cols-4' : ''}`}
+        className={`rail no-scrollbar reveal -my-2 flex snap-x snap-mandatory gap-x-3 overflow-x-auto py-2 md:-mb-(--card-row-gap) md:mt-0 md:grid md:snap-none md:grid-cols-3 md:gap-x-4 md:overflow-visible md:py-0 md:[--card-row-gap:2rem] lg:[--card-row-gap:2.5rem] ${fourUp ? 'xl:grid-cols-4' : ''}`}
       >
         {relatedProducts.map((product) => {
           return (

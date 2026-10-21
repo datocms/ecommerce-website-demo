@@ -24,6 +24,7 @@ import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import type { SiteLocale } from '@/app/i18n/settings';
 import Drawer from '@/components/Common/Drawer';
+import LinkPending from '@/components/Common/LinkPending';
 import SvgRenderer from '@/components/Common/SvgRenderer';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
@@ -46,10 +47,11 @@ type PropTypes = {
 };
 
 // Bar items: full bar height, with a 2px ink bar on the header's bottom edge when hovered,
-// open or current. Their sides (--nav-x, set per cluster) grow with the viewport up to 14px
-// at xl, so the spacing never jumps.
+// open or current (it draws from the left, retracts the same way, and stays drawn while its
+// page is on its way). Their sides (--nav-x, set per cluster) grow with the viewport up to
+// 14px at xl, so the spacing never jumps.
 const NAV_ITEM =
-  'relative inline-flex h-18 items-center gap-1 px-(--nav-x) text-xs font-medium whitespace-nowrap after:absolute after:inset-x-(--nav-x) after:-bottom-px after:h-0.5 after:bg-ink after:opacity-0 after:transition-opacity after:duration-150 hover:after:opacity-100 focus-visible:outline-offset-[-2px] aria-[current=page]:after:opacity-100 data-open:after:opacity-100 xl:text-sm';
+  'bar-draw relative inline-flex h-18 items-center gap-1 px-(--nav-x) text-xs font-medium whitespace-nowrap after:absolute after:inset-x-(--nav-x) after:-bottom-px after:h-0.5 after:bg-ink hover:after:scale-x-100 focus-visible:outline-offset-[-2px] has-data-pending:after:scale-x-100 aria-[current=page]:after:scale-x-100 data-open:after:scale-x-100 xl:text-sm';
 
 // Header icon buttons: 40px, so the glyphs sit on the content edges with -mx-2.5
 const BAR_ICON = 'icon-btn size-10 [&>svg]:size-5.5';
@@ -330,7 +332,7 @@ export default function CategoryHeader({
                   className="size-5 shrink-0 stroke-2 transition-transform duration-200 group-data-open:rotate-180"
                 />
               </DisclosureButton>
-              <DisclosurePanel className="space-y-5 pb-6">
+              <DisclosurePanel className="quick enter space-y-5 pb-6">
                 {category.column.map((column) => (
                   <div key={column.id}>
                     <p
@@ -429,6 +431,7 @@ export default function CategoryHeader({
           dialogs' scrims do. Sticky makes it the mega menu's containing block. */}
       <header
         ref={headerRef}
+        data-chrome="header"
         className="peer sticky top-0 z-45 border-b border-line bg-white"
       >
         {/* Left items' sides: 6px at 1100 (the longest cluster, es, stays 40px+ clear of the
@@ -436,7 +439,7 @@ export default function CategoryHeader({
             panel is open only its button carries the bar, not the current page's link. */}
         <nav
           aria-label="Main"
-          className="shell grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-x-4 [--nav-x:clamp(0.375rem,calc((100vw_-_68.75rem)/22.5_+_0.375rem),0.875rem)] nav:h-18 [&:has([data-open])_[aria-current=page]:not(:hover)]:after:opacity-0"
+          className="shell grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-x-4 [--nav-x:clamp(0.375rem,calc((100vw_-_68.75rem)/22.5_+_0.375rem),0.875rem)] nav:h-18 [&:has([data-open])_[aria-current=page]:not(:hover)]:after:scale-x-0"
         >
           <div className="-ml-2.5 flex min-w-0 items-center justify-self-start nav:-ml-(--nav-x)">
             <button
@@ -470,6 +473,7 @@ export default function CategoryHeader({
                         className={NAV_ITEM}
                       >
                         {item.label}
+                        <LinkPending />
                       </Link>
                     </li>
                   );
@@ -490,14 +494,14 @@ export default function CategoryHeader({
                         />
                       </PopoverButton>
 
-                      {/* Under the header's hairline, full width */}
+                      {/* Under the header's hairline, full width, and unrolls from it */}
                       <PopoverPanel
                         transition
-                        className="absolute inset-x-0 top-[calc(100%+1px)] border-b border-line bg-white transition-opacity duration-150 ease-out data-closed:opacity-0"
+                        className="wipe absolute inset-x-0 top-[calc(100%+1px)] border-b border-line bg-white"
                       >
                         {({ close }) => (
-                          <div className="shell grid grid-cols-12 gap-4 pt-10 pb-12">
-                            <div className="col-span-6 grid grid-cols-3 content-start gap-6 pr-6 xl:gap-8 xl:pr-8">
+                          <div className="quick shell grid grid-cols-12 gap-4 pt-10 pb-12">
+                            <div className="enter-stagger col-span-6 grid grid-cols-3 content-start gap-6 pr-6 xl:gap-8 xl:pr-8 [--delay:60ms]">
                               {category.column.map((column) => (
                                 <div key={column.id} className="min-w-0">
                                   <p
@@ -528,7 +532,7 @@ export default function CategoryHeader({
                                 </div>
                               ))}
                             </div>
-                            <div className="col-span-6 grid grid-cols-2 grid-rows-[1fr_auto] gap-x-4 gap-y-3">
+                            <div className="enter-stagger col-span-6 grid grid-cols-2 grid-rows-[1fr_auto] gap-x-4 gap-y-3 [--delay:120ms]">
                               {featured(
                                 category,
                                 '(min-width: 1440px) 20.5rem, 23vw',
@@ -565,6 +569,7 @@ export default function CategoryHeader({
                       className={NAV_ITEM}
                     >
                       {link.label}
+                      <LinkPending />
                     </Link>
                   </li>
                 ))}
@@ -614,10 +619,12 @@ export default function CategoryHeader({
       </header>
 
       {/* The mega menu's scrim: outside the sticky header, so it can cover the page; a click
-          on it is a click outside the menu, which closes it */}
+          on it is a click outside the menu, which closes it. It dims with the unroll and
+          clears as quickly as the panel fades. */}
       <div
         aria-hidden="true"
-        className="invisible fixed inset-0 z-44 bg-ink/30 opacity-0 transition-[opacity,visibility] duration-200 ease-out peer-has-[[data-open]]:visible peer-has-[[data-open]]:opacity-100"
+        data-chrome="scrim"
+        className="invisible fixed inset-0 z-44 bg-ink/30 opacity-0 transition-[opacity,visibility] duration-(--dur-quick) ease-out peer-has-[[data-open]]:visible peer-has-[[data-open]]:opacity-100 peer-has-[[data-open]]:duration-(--dur-sheet)"
       />
     </>
   );

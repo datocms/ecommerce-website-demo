@@ -10,7 +10,10 @@ import {
 import type { Record, StructuredText } from 'datocms-structured-text-utils';
 import { draftMode } from 'next/headers';
 import Link from 'next/link';
+import { ViewTransition } from 'react';
 import { getFallbackLocale, type SiteLocale } from '@/app/i18n/settings';
+import LinkPending from '@/components/Common/LinkPending';
+import PageTransition from '@/components/Common/PageTransition';
 import ProductCard from '@/components/Common/ProductCard';
 import SideFilter, { SortTabs } from '@/components/Common/SideFilter';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
@@ -256,9 +259,10 @@ const Page = async ({ params, searchParams }: PageProps) => {
         };
 
   return (
-    <>
+    <PageTransition>
       {singleFilter ? (
         <FilterDetail
+          key={singleFilter.id}
           lng={lng}
           type={type}
           name={singleFilter.name}
@@ -285,7 +289,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
             <Link
               href={hrefWithout('productName', 'page')}
               aria-label={`Clear search “${nameSearch}”`}
-              className="relative inline-flex h-9 min-w-0 items-center gap-2 bg-mist pr-1 pl-3 text-sm font-medium transition-colors duration-150 after:absolute after:inset-x-0 after:-inset-y-1 hover:bg-line"
+              className="relative inline-flex h-9 min-w-0 items-center gap-2 bg-mist pr-1 pl-3 text-sm font-medium press after:absolute after:inset-x-0 after:-inset-y-1 hover:bg-line"
             >
               <MagnifyingGlassIcon
                 aria-hidden="true"
@@ -298,6 +302,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
               >
                 <XMarkIcon />
               </span>
+              <LinkPending />
             </Link>
           ) : undefined
         }
@@ -310,63 +315,78 @@ const Page = async ({ params, searchParams }: PageProps) => {
           parameterMaterials={materials}
         />
       </ProductFilters>
-      {/* Focus scrolls links clear of the header and, from lg, of the stuck toolbar too */}
-      <section className="shell pt-8 lg:pt-10 lg:[&_a]:scroll-mt-[calc(3.5rem+1px)]">
-        {data.allProducts.length > 0 ? (
-          // Cards space their rows with --card-row-gap; the negative margin
-          // takes the last row's back
-          <div className="-mb-(--card-row-gap) grid grid-cols-2 gap-x-3 [--card-row-gap:2.5rem] md:grid-cols-3 md:gap-x-4 lg:[--card-row-gap:3.5rem] xl:grid-cols-4">
-            {data.allProducts.map((product, index) => {
-              return (
-                <ProductCard
-                  key={product.id}
-                  href={`/${lng}/product/${product.slug}`}
-                  name={product.name}
-                  brand={product.brand?.name}
-                  image={product.productImages[0]?.responsiveImage}
-                  hoverImage={product.productImages[1]?.responsiveImage}
-                  price={product.price}
-                  salePrice={product.salePrice}
-                  onSale={stripStega(product.sale) === 'on_sale'}
-                  currencySymbol={currencySymbol ?? ''}
-                  saleLabel={sale}
-                  sizes="(min-width: 1440px) 330px, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 46vw"
-                  priority={!singleFilter && index < 4}
-                  titleAs="h2"
-                  data-datocms-content-link-group
-                />
-              );
-            })}
-          </div>
-        ) : (
-          // A mist well where the grid would be
-          <div className="flex flex-col items-center bg-mist px-6 py-20 text-center lg:py-28">
-            <span
-              aria-hidden="true"
-              className="grid size-16 place-items-center bg-white [&>svg]:size-6.5"
-            >
-              <MagnifyingGlassIcon />
-            </span>
-            <h2 className="title-card mt-8 max-w-[14em] text-balance">
-              {emptyState.title}
-            </h2>
-            <p className="mt-4 max-w-[40ch] text-md text-pretty text-ink-2 tabular-nums">
-              {emptyState.body}
-            </p>
-            <Link href={emptyState.href} className="btn mt-8">
-              {count > 0 && <ArrowLeftIcon aria-hidden="true" />}
-              {emptyState.cta}
-              {count === 0 && <ArrowRightIcon aria-hidden="true" />}
-            </Link>
-          </div>
-        )}
-      </section>
+      {/* A new listing replaces the old one in place: the old drops out where it was, and the
+          new rises under the toolbar (swap in global.css). Keyed by the query, so the old and
+          new are separate groups that never travel, even when ProductFilters rewinds the
+          scroll. The drawer's toggles and Clear all (type "filter") update it at once, behind
+          the scrim */}
+      <ViewTransition
+        key={JSON.stringify(resolvedSearchParams)}
+        enter={{ filter: 'none', default: 'swap' }}
+        exit={{ filter: 'none', default: 'swap' }}
+        default="none"
+      >
+        {/* Focus scrolls links clear of the header and, from lg, of the stuck toolbar too.
+            pending-dim sits here, not on a wrapper: a snapshot carries its element's own
+            opacity but not an ancestor's */}
+        <section className="pending-dim shell pt-8 lg:pt-10 lg:[&_a]:scroll-mt-[calc(3.5rem+1px)]">
+          {data.allProducts.length > 0 ? (
+            // Cards space their rows with --card-row-gap; the negative margin
+            // takes the last row's back
+            <div className="-mb-(--card-row-gap) grid grid-cols-2 gap-x-3 [--card-row-gap:2.5rem] md:grid-cols-3 md:gap-x-4 lg:[--card-row-gap:3.5rem] xl:grid-cols-4">
+              {data.allProducts.map((product, index) => {
+                return (
+                  <ProductCard
+                    key={product.id}
+                    href={`/${lng}/product/${product.slug}`}
+                    name={product.name}
+                    brand={product.brand?.name}
+                    image={product.productImages[0]?.responsiveImage}
+                    hoverImage={product.productImages[1]?.responsiveImage}
+                    price={product.price}
+                    salePrice={product.salePrice}
+                    onSale={stripStega(product.sale) === 'on_sale'}
+                    currencySymbol={currencySymbol ?? ''}
+                    saleLabel={sale}
+                    sizes="(min-width: 1440px) 330px, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 46vw"
+                    priority={!singleFilter && index < 4}
+                    titleAs="h2"
+                    data-datocms-content-link-group
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            // A mist well where the grid would be
+            <div className="flex flex-col items-center bg-mist px-6 py-20 text-center lg:py-28">
+              <span
+                aria-hidden="true"
+                className="grid size-16 place-items-center bg-white [&>svg]:size-6.5"
+              >
+                <MagnifyingGlassIcon />
+              </span>
+              <h2 className="title-card mt-8 max-w-[14em] text-balance">
+                {emptyState.title}
+              </h2>
+              <p className="mt-4 max-w-[40ch] text-md text-pretty text-ink-2 tabular-nums">
+                {emptyState.body}
+              </p>
+              <Link href={emptyState.href} className="btn mt-8">
+                {count > 0 && <ArrowLeftIcon aria-hidden="true" />}
+                {emptyState.cta}
+                {count === 0 && <ArrowRightIcon aria-hidden="true" />}
+                <LinkPending />
+              </Link>
+            </div>
+          )}
+        </section>
+      </ViewTransition>
       <Pagination
         numberOfProducts={count}
         currentPage={pageNumber}
         pageSize={PAGE_SIZE}
       />
-    </>
+    </PageTransition>
   );
 };
 

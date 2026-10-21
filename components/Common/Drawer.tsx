@@ -34,12 +34,14 @@ export default function Drawer({
     <Dialog open={open} onClose={onClose} className="relative z-50">
       <DialogBackdrop
         transition
-        className="fixed inset-0 bg-ink/30 transition-opacity duration-300 ease-out data-closed:opacity-0"
+        data-chrome="sheet-scrim"
+        className="fixed inset-0 bg-ink/30 transition-opacity duration-(--dur-sheet) ease-out data-closed:opacity-0 data-leave:duration-(--dur-pop)"
       />
       <DialogPanel
         transition
+        data-chrome="sheet"
         className={[
-          'fixed inset-y-0 flex w-full max-w-[28.75rem] flex-col overflow-hidden bg-white transition duration-300 ease-drawer data-leave:duration-200',
+          'quick fixed inset-y-0 flex w-full max-w-[28.75rem] flex-col overflow-hidden bg-white transition duration-(--dur-sheet) ease-drawer data-leave:duration-(--dur-pop) [--rise:0px]',
           side === 'left'
             ? 'left-0 data-closed:-translate-x-full'
             : 'right-0 data-closed:translate-x-full',
@@ -59,11 +61,11 @@ export default function Drawer({
             <XMarkIcon aria-hidden="true" />
           </button>
         </div>
-        <div className="flex flex-1 flex-col overflow-y-auto overscroll-contain px-(--inset) pt-6 pb-(--inset)">
+        <div className="enter-stagger flex flex-1 flex-col overflow-y-auto overscroll-contain px-(--inset) pt-6 pb-(--inset) [--delay:60ms]">
           {children}
         </div>
         {footer && (
-          <div className="shrink-0 border-t border-line px-(--inset) pt-5 pb-(--inset)">
+          <div className="enter shrink-0 border-t border-line px-(--inset) pt-5 pb-(--inset) [--delay:120ms]">
             {footer}
           </div>
         )}

@@ -2,6 +2,7 @@ import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
 import DocumentLang from '@/components/Common/DocumentLang';
+import Rise from '@/components/Common/Rise';
 import { MEDIA } from '@/components/Sections/ui';
 
 // No header or footer here (it renders outside [lng]): the photo runs to the viewport's edges
@@ -11,7 +12,9 @@ const NotFound = () => {
   return (
     <main className="grid min-h-svh grid-rows-[minmax(17.5rem,1fr)_auto] lg:grid-cols-12 lg:grid-rows-1">
       <DocumentLang lang="en" />
-      <div className={`${MEDIA} lg:order-last lg:col-span-6 xl:col-span-7`}>
+      <div
+        className={`${MEDIA} settle lg:order-last lg:col-span-6 xl:col-span-7`}
+      >
         <Image
           src="https://images.unsplash.com/photo-1590642916589-592bca10dfbf?auto=format&q=75&fit=crop&w=1600"
           alt="A person stands behind a red-tinted, foggy surface with hands pressed against it, wearing a cap and jacket."
@@ -26,9 +29,9 @@ const NotFound = () => {
           the bottom), so the column leaves that corner free */}
       <div className="flex flex-col px-(--gutter) pt-10 pb-20 sm:pb-12 lg:col-span-6 lg:justify-center lg:py-16 lg:pr-14 xl:col-span-5">
         <p className="-ml-[0.025em] text-[8.25rem] leading-[0.8] font-semibold tracking-[-0.06em] tabular-nums sm:text-[10.5rem] lg:text-[12.5rem] xl:text-[16rem]">
-          404
+          <Rise>404</Rise>
         </p>
-        <div className="mt-10 lg:mt-14">
+        <div className="enter-stagger mt-10 lg:mt-14 [--delay:200ms]">
           <h1 className="title-statement">Page not found</h1>
           <p className="mt-5 max-w-[30em] text-md leading-[1.6] text-pretty text-ink-2 lg:text-lg lg:leading-[1.6]">
             The page you’re looking for doesn’t exist.

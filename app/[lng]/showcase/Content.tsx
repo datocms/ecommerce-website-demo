@@ -3,6 +3,7 @@ import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import ProductCard from '@/components/Common/ProductCard';
+import Rise from '@/components/Common/Rise';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import { CAPTION, IMG_ZOOM, MEDIA, TILE } from '@/components/Sections/ui';
@@ -136,10 +137,10 @@ const Content: ContentPage<PageProps, Query> = ({
             id="showcase-title"
             className="title-display text-wrap lg:col-span-7 lg:pr-6 xl:col-span-8 xl:pr-10"
           >
-            {title}
+            <Rise>{title}</Rise>
           </h1>
           {(description || cta) && (
-            <div className="max-w-[34rem] lg:col-span-5 lg:max-w-none xl:col-span-4">
+            <div className="enter-stagger max-w-[34rem] lg:col-span-5 lg:max-w-none xl:col-span-4 [--delay:200ms]">
               {description && (
                 <p className="text-md leading-[1.6] text-pretty text-ink-2">
                   {description}
@@ -178,7 +179,7 @@ const Content: ContentPage<PageProps, Query> = ({
               return (
                 <div
                   key={id}
-                  className={`${MEDIA} lg:aspect-auto lg:h-[37.5rem] ${
+                  className={`${MEDIA} ${i < 2 ? 'settle' : ''} lg:aspect-auto lg:h-[37.5rem] ${
                     slot === 'lone' ? 'col-span-2 aspect-[4/3]' : 'aspect-[3/4]'
                   } ${
                     trio
@@ -220,9 +221,10 @@ const Content: ContentPage<PageProps, Query> = ({
           }
           className="shell pt-16 lg:pt-20"
         >
-          {/* A snap rail on phones (py-2 keeps the focus rings inside the scroller),
+          {/* A snap rail on phones (py-2 keeps the focus rings inside the scroller;
+              overflow-y-hidden stops the links' taller hit areas from scrolling it vertically),
               three columns from md */}
-          <ul className="no-scrollbar -mx-(--gutter) -my-2 flex snap-x snap-mandatory scroll-px-(--gutter) gap-4 overflow-x-auto px-(--gutter) py-2 md:mx-0 md:my-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 md:py-0">
+          <ul className="reveal-stagger no-scrollbar -mx-(--gutter) -my-2 flex snap-x snap-mandatory scroll-px-(--gutter) gap-4 overflow-x-auto overflow-y-hidden px-(--gutter) py-2 md:mx-0 md:my-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 md:py-0">
             {collections.map((collection) => (
               <li
                 key={collection.id}
@@ -291,6 +293,7 @@ const Content: ContentPage<PageProps, Query> = ({
               {newProducts.map((product) => (
                 <ProductCard
                   key={product.id}
+                  className="reveal"
                   href={`/${lng}/product/${stripStega(product.slug)}`}
                   name={product.name}
                   brand={product.brand?.name}
@@ -309,7 +312,7 @@ const Content: ContentPage<PageProps, Query> = ({
               ))}
               {/* Only the square is the link, so its focus ring wraps what shows */}
               {endTile && cta && (
-                <div className="row-span-4 mb-(--card-row-gap)">
+                <div className="reveal row-span-4 mb-(--card-row-gap)">
                   <Link
                     href={ctaHref}
                     className="group flex aspect-[4/5] items-center justify-center bg-mist p-6 text-center outline-offset-4"
@@ -379,7 +382,7 @@ const Content: ContentPage<PageProps, Query> = ({
           )}
           {hasMaterials && (
             <div
-              className={`mt-4 grid gap-3 lg:col-span-7 lg:mt-0 lg:gap-4 xl:col-start-6 xl:row-span-2 xl:row-start-1 ${loneMaterial ? '' : 'grid-cols-2'}`}
+              className={`reveal-stagger mt-4 grid gap-3 lg:col-span-7 lg:mt-0 lg:gap-4 xl:col-start-6 xl:row-span-2 xl:row-start-1 ${loneMaterial ? '' : 'grid-cols-2'}`}
             >
               {/* w-full: a stretched photo would otherwise widen with its ratio */}
               {materials.map(({ id, responsiveImage }) => (

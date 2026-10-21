@@ -5,6 +5,7 @@ import getAvailableLocales, {
   getFallbackLocale,
   type SiteLocale,
 } from '@/app/i18n/settings';
+import PageTransition from '@/components/Common/PageTransition';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import { graphql } from '@/lib/datocms/graphql';
 import {
@@ -140,16 +141,21 @@ export default async function Page(unsanitizedPageProps: PageProps) {
     isDraft,
   });
 
-  return isDraft ? (
-    <RealTime
-      token={process.env.DATOCMS_DRAFT_CONTENT_CDA_TOKEN!}
-      baseEditingUrl={process.env.DATOCMS_BASE_EDITING_URL!}
-      query={query}
-      variables={variables}
-      initialData={data}
-      pageProps={pageProps}
-    />
-  ) : (
-    <Content {...pageProps} data={data} />
+  // Around both branches, as in generateWrapper: a draft toggle is an update, not a new page
+  return (
+    <PageTransition>
+      {isDraft ? (
+        <RealTime
+          token={process.env.DATOCMS_DRAFT_CONTENT_CDA_TOKEN!}
+          baseEditingUrl={process.env.DATOCMS_BASE_EDITING_URL!}
+          query={query}
+          variables={variables}
+          initialData={data}
+          pageProps={pageProps}
+        />
+      ) : (
+        <Content {...pageProps} data={data} />
+      )}
+    </PageTransition>
   );
 }

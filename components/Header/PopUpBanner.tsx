@@ -30,12 +30,12 @@ const PopUpBanner = ({ open, onClose, popup, globalPageProps }: PropTypes) => {
     <Dialog open={open} onClose={onClose} className="relative z-50">
       <DialogBackdrop
         transition
-        className="fixed inset-0 bg-ink/30 transition-opacity duration-300 ease-out data-closed:opacity-0"
+        className="fixed inset-0 bg-ink/30 transition-opacity duration-(--dur-sheet) ease-out data-closed:opacity-0 data-leave:duration-(--dur-pop)"
       />
       <div className="fixed inset-0 grid place-items-center overflow-y-auto p-4 sm:p-8">
         <DialogPanel
           transition
-          className="relative grid w-full max-w-[55rem] bg-white transition duration-300 ease-out data-closed:translate-y-2 data-closed:opacity-0 md:grid-cols-2"
+          className="pop relative grid w-full max-w-[55rem] bg-white md:grid-cols-2"
         >
           {/* Over the photo on phones, in the white text column from md */}
           <button

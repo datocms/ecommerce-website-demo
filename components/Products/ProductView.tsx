@@ -145,6 +145,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
           {images.map((image, index) => (
             <div
               key={image.id}
+              data-morph={index === 0 ? 'pdp' : undefined}
               className={`relative aspect-[4/5] w-full shrink-0 snap-start overflow-hidden bg-mist lg:w-auto ${images.length > 1 ? 'sm:w-[calc(50%-0.125rem)]' : ''} ${paired && spansRow(index) ? 'lg:col-span-2' : ''}`}
             >
               {image.responsiveImage && (
@@ -201,7 +202,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
             ? ({ '--buy-box-h': `${buyBoxHeight}px` } as CSSProperties)
             : undefined
         }
-        className={`pt-7 md:pt-8 lg:sticky lg:top-[min(calc(var(--header-h)_+_2rem),calc(100vh_-_var(--buy-box-h,0px)_-_2rem))] lg:self-start lg:pt-0 ${PDP_RAIL}`}
+        className={`enter-stagger pt-7 md:pt-8 lg:sticky lg:top-[min(calc(var(--header-h)_+_2rem),calc(100vh_-_var(--buy-box-h,0px)_-_2rem))] lg:self-start lg:pt-0 ${PDP_RAIL}`}
       >
         {/* Both links reach 44px through ::after, so their focus rings hug the text */}
         <Link
@@ -262,7 +263,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                     aria-label={`${color ?? 'Color'}: ${hex}`}
                     aria-pressed={selected}
                     onClick={() => selectVariation(variation)}
-                    className="grid size-12 place-items-center border border-line transition-colors hover:border-ink aria-pressed:border-2 aria-pressed:border-ink"
+                    className="press grid size-12 place-items-center border border-line hover:border-ink aria-pressed:border-2 aria-pressed:border-ink"
                   >
                     <span
                       style={{ backgroundColor: hex }}
@@ -271,7 +272,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
                       {selected && (
                         <CheckIcon
                           aria-hidden="true"
-                          className="size-[1.125rem] stroke-[2.25]"
+                          className="size-[1.125rem] animate-pop stroke-[2.25]"
                         />
                       )}
                     </span>
@@ -321,7 +322,7 @@ const ProductView = ({ data, globalPageProps }: Props) => {
             <button
               type="button"
               aria-label="Add to wishlist"
-              className="icon-btn size-13 border border-line-strong transition-colors hover:border-ink"
+              className="icon-btn size-13 border border-line-strong hover:border-ink"
             >
               <HeartIcon aria-hidden="true" />
             </button>

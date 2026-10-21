@@ -1,12 +1,17 @@
-import { motion } from 'framer-motion';
-import { type FormEvent, useId, useRef, useState } from 'react';
+import {
+  type ComponentProps,
+  type FormEvent,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 
 type Props = {
   onClose: () => void;
   onSuccess: () => void;
-};
+} & Omit<ComponentProps<'form'>, 'onSubmit' | 'children'>;
 
-const AuthenticationModal = ({ onClose, onSuccess }: Props) => {
+const AuthenticationModal = ({ onClose, onSuccess, ...transition }: Props) => {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
@@ -34,18 +39,17 @@ const AuthenticationModal = ({ onClose, onSuccess }: Props) => {
   }
 
   return (
-    <motion.form
+    <form
+      // Headless UI's <Transition> hands the form its ref and data-closed/-enter/-leave
+      // (pop in global.css)
+      {...transition}
       id="draft-auth"
       aria-labelledby={`${id}-title`}
       onSubmit={enableDraft}
       onKeyDown={(e) => {
         if (e.key === 'Escape') onClose();
       }}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 8 }}
-      transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-      className="absolute right-0 bottom-full mb-3 w-[min(100vw-2*var(--gutter),25rem)] border border-ink bg-white p-5 sm:p-6"
+      className="pop absolute right-0 bottom-full mb-3 w-[min(100vw-2*var(--gutter),25rem)] origin-bottom-right border border-ink bg-white p-5 sm:p-6"
     >
       <h2 id={`${id}-title`} className="title-item">
         Authenticate first
@@ -79,7 +83,7 @@ const AuthenticationModal = ({ onClose, onSuccess }: Props) => {
         {hasError && (
           <p
             id={`${id}-error`}
-            className="mt-2 text-sm font-semibold text-sale"
+            className="quick enter mt-2 text-sm font-semibold text-sale"
           >
             That token doesn't match.
           </p>
@@ -93,7 +97,7 @@ const AuthenticationModal = ({ onClose, onSuccess }: Props) => {
           {isFetching ? 'Checking…' : 'Authenticate'}
         </button>
       </div>
-    </motion.form>
+    </form>
   );
 };
 

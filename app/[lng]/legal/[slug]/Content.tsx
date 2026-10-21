@@ -60,7 +60,7 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
       )}
       <article
         lang={params.lng}
-        className={`prose-dato [&_h1]:title-statement ${sections.length > 0 ? 'lg:col-span-8 lg:col-start-5' : 'lg:col-span-full'}`}
+        className={`prose-dato [&_h1]:title-statement [&_h1]:enter ${sections.length > 0 ? 'lg:col-span-8 lg:col-start-5' : 'lg:col-span-full'}`}
       >
         <DatoStructuredText
           data={value}

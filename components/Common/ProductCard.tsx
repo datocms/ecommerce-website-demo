@@ -48,6 +48,8 @@ export default function ProductCard({
     <Link
       {...rest}
       href={href}
+      // Its lead photo flies to the product page's (morph in global.css)
+      transitionTypes={['product']}
       className={[
         // In a grid parent the card spans 4 shared rows, so name, brand and price
         // line up across a row even when a name wraps. A parent row-gap would leak
@@ -61,7 +63,10 @@ export default function ProductCard({
         .filter(Boolean)
         .join(' ')}
     >
-      <div className="relative aspect-[4/5] overflow-hidden bg-mist">
+      <div
+        data-morph="card"
+        className="relative aspect-[4/5] overflow-hidden bg-mist"
+      >
         <div
           className={`absolute inset-0 ${hoverImage ? '' : 'transition-transform duration-700 ease-out group-hover:scale-[1.03]'}`}
         >

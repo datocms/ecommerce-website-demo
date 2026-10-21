@@ -1,6 +1,7 @@
 import type { TadaDocumentNode } from 'gql.tada';
 import { draftMode } from 'next/headers';
 import { getFallbackLocale } from '@/app/i18n/settings';
+import PageTransition from '@/components/Common/PageTransition';
 import type { GlobalPageProps } from '@/utils/globalPageProps';
 import queryDatoCMS from '@/utils/queryDatoCMS';
 import type {
@@ -46,7 +47,7 @@ export function generateWrapper<
 
     const { realtimeComponent: RealTime, contentComponent: Content } = options;
 
-    return isDraft ? (
+    const page = isDraft ? (
       <RealTime
         token={process.env.DATOCMS_DRAFT_CONTENT_CDA_TOKEN!}
         baseEditingUrl={process.env.DATOCMS_BASE_EDITING_URL!}
@@ -58,5 +59,8 @@ export function generateWrapper<
     ) : (
       <Content {...pageProps} data={data} />
     );
+
+    // Around both branches, so entering or leaving draft mode is an update, not a new page
+    return <PageTransition>{page}</PageTransition>;
   };
 }

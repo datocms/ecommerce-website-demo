@@ -68,7 +68,7 @@ const SectionIndex = ({
       aria-label={label}
       className="hidden lg:col-span-4 lg:block lg:pr-8 xl:col-span-3 xl:pr-0"
     >
-      <ol className="no-scrollbar sticky top-[calc(var(--header-h)+2rem)] max-h-[calc(100svh-var(--header-h)-4rem)] overflow-y-auto">
+      <ol className="enter no-scrollbar sticky top-[calc(var(--header-h)+2rem)] max-h-[calc(100svh-var(--header-h)-4rem)] overflow-y-auto [--delay:120ms]">
         {sections.map((section, index) => (
           <li key={section.id} className="border-l">
             <a

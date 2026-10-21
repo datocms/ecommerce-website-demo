@@ -64,7 +64,7 @@ const Wordmark = ({ text }: { text: string }) => {
     <p
       ref={ref}
       aria-hidden="true"
-      className="giant pb-6 select-none md:pb-10"
+      className="giant reveal mask pb-6 select-none md:pb-10"
       // Close to the fitted size before the script runs: the content width at about
       // 0.46em per glyph
       style={{
@@ -95,7 +95,9 @@ const Footer = ({ data, globalPageProps }: Props) => {
 
   return (
     <>
-      <footer className="surface-ink mt-(--section-gap)">
+      {/* overflow-y-clip: the wordmark waiting below its line never lengthens the page; x stays
+          visible so focus rings are not cut off */}
+      <footer className="surface-ink mt-(--section-gap) overflow-y-clip">
         {showNewsletter && (
           <>
             {/* One slim row: the invitation on the left, the field on the right, both on the

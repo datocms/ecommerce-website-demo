@@ -167,21 +167,28 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
               the h1 keeps its node (and focus) from one store to the next */}
           {pager('border-b pb-4 md:hidden')}
           <div className="grid grow max-md:mt-8">
-            <div className="col-start-1 row-start-1">
-              <p className="eyebrow">{store.country}</p>
+            <div className="quick col-start-1 row-start-1 [--rise:0px]">
+              <p key={`${store.id}-country`} className="eyebrow enter">
+                {store.country}
+              </p>
               <h1
                 ref={headingRef}
                 tabIndex={-1}
                 className="title-display mt-4 focus:outline-hidden 2xl:-mr-8"
               >
-                {store.storeName}
+                <span key={store.id} className="enter block">
+                  {store.storeName}
+                </span>
               </h1>
-              <p className={DESCRIPTION}>{store.storeDescription}</p>
+              <p key={`${store.id}-text`} className={`${DESCRIPTION} enter`}>
+                {store.storeDescription}
+              </p>
               <a
+                key={`${store.id}-map`}
                 href={`https://www.google.com/maps/?q=${store.storeLocation?.latitude},${store.storeLocation?.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={MAPS}
+                className={`${MAPS} enter`}
               >
                 {findOnMaps}
                 <ArrowUpRightIcon aria-hidden="true" className="stroke-2" />

@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import DatoImage from '@/components/DatoImage';
 import { MEDIA } from '@/components/Sections/ui';
@@ -36,15 +36,24 @@ type PropTypes = {
   cookieNotice: CookieNotice;
 };
 
+// It arrives once per page load, after the hero: a locale switch remounts it, and it should
+// hold still then instead of leaving for 600ms and rising again
+let arrived = false;
+
 // A white bar along the viewport's bottom edge, rendered right after the footer: it is
 // sticky, so it follows the viewport while scrolling and comes to rest under the footer,
 // never hiding the page's end. No scrim: the page stays usable.
 const CookiesNotice = ({ cookieNotice }: PropTypes) => {
+  const [enter] = useState(!arrived);
+  useEffect(() => {
+    arrived = true;
+  }, []);
+
   return (
     <section
       id="cookie-notice"
       aria-label={cookieNotice.header ?? undefined}
-      className="sticky bottom-0 z-40 border-t border-ink bg-white"
+      className={`${enter ? 'enter [--delay:600ms] ' : ''}sticky bottom-0 z-40 border-t border-ink bg-white`}
     >
       {/* One row from lg; below it the buttons go under the text (right-aligned from sm), so
           the text keeps its width instead of wrapping to four lines beside them */}

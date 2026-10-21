@@ -1,9 +1,9 @@
 'use client';
 
+import { Transition } from '@headlessui/react';
 import { LockClosedIcon } from '@heroicons/react/24/outline';
-import { AnimatePresence, MotionConfig } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import AuthenticationModal from '../Header/AuthenticationModal';
 import SuccessPopUp from '../Header/SuccessPopUp';
 
@@ -17,6 +17,7 @@ export default function ScrollToTop({ isDraft }: Props) {
   const toggleRef = useRef<HTMLButtonElement>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [successToast, setSuccessToast] = useState(false);
+  const [leaving, startLeaving] = useTransition();
 
   // Publishes the toggle's width, so the footer's legal bar keeps its own controls
   // clear of it (0 while the toggle steps aside for the cookie notice)
@@ -34,11 +35,16 @@ export default function ScrollToTop({ isDraft }: Props) {
     };
   }, []);
 
-  async function toggleDraft() {
-    if (isDraft) {
+  function toggleDraft() {
+    if (!isDraft) {
+      setModalOpen((open) => !open);
+      return;
+    }
+    // Pending until the published page has rendered; the toggle dims meanwhile
+    startLeaving(async () => {
       await fetch('/api/draft/disable');
-      router.refresh();
-    } else setModalOpen((open) => !open);
+      startLeaving(() => router.refresh());
+    });
   }
 
   const closeModal = () => {
@@ -55,10 +61,13 @@ export default function ScrollToTop({ isDraft }: Props) {
   const dismissToast = useCallback(() => setSuccessToast(false), []);
 
   return (
-    <MotionConfig reducedMotion="user">
+    <>
       {/* On the gutter line, 16px off the bottom edge: at the page end it comes to rest centred
           in the footer's legal bar. It steps aside while the cookie notice is open. */}
-      <div className="fixed right-(--gutter) bottom-4 z-40 [body:has(#cookie-notice)_&]:hidden">
+      <div
+        data-chrome="dock"
+        className="fixed right-(--gutter) bottom-4 z-40 [body:has(#cookie-notice)_&]:hidden"
+      >
         <button
           ref={toggleRef}
           type="button"
@@ -68,15 +77,16 @@ export default function ScrollToTop({ isDraft }: Props) {
           }}
           aria-expanded={!isDraft ? modalOpen : undefined}
           aria-controls={!isDraft ? 'draft-auth' : undefined}
+          aria-busy={leaving || undefined}
           // White with an ink edge, so it reads on the white page and on the black footer;
           // the focus ring is drawn inside it for the same reason
-          className="inline-flex h-12 items-center justify-center gap-2.5 border border-ink bg-white px-5 text-sm font-semibold whitespace-nowrap text-ink transition-colors duration-150 hover:bg-mist focus-visible:outline-offset-[-5px] max-sm:w-12 max-sm:px-0"
+          className="press inline-flex h-12 items-center justify-center gap-2.5 border border-ink bg-white px-5 text-sm font-semibold whitespace-nowrap text-ink hover:bg-mist focus-visible:outline-offset-[-5px] aria-busy:opacity-45 max-sm:w-12 max-sm:px-0"
         >
           {isDraft ? (
             <span className="grid size-4.5 place-items-center">
               <span
                 aria-hidden="true"
-                className="size-2 shrink-0 bg-ink forced-colors:bg-[CanvasText]"
+                className="size-2 shrink-0 animate-pop bg-ink forced-colors:bg-[CanvasText]"
               />
             </span>
           ) : (
@@ -86,21 +96,19 @@ export default function ScrollToTop({ isDraft }: Props) {
             {isDraft ? 'Enter published mode' : 'Enter draft mode'}
           </span>
         </button>
-        <AnimatePresence>
-          {modalOpen && (
-            <AuthenticationModal
-              key="draft-auth"
-              onClose={closeModal}
-              onSuccess={onAuthenticated}
-            />
-          )}
-        </AnimatePresence>
+        {/* Headless UI keeps the form mounted until its pop exit ends */}
+        <Transition show={modalOpen}>
+          <AuthenticationModal
+            onClose={closeModal}
+            onSuccess={onAuthenticated}
+          />
+        </Transition>
       </div>
       <SuccessPopUp
         open={successToast}
         onDismiss={dismissToast}
         returnFocusRef={toggleRef}
       />
-    </MotionConfig>
+    </>
   );
 }

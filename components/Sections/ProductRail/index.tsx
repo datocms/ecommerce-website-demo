@@ -32,7 +32,7 @@ export default function ProductRail({
     <ul
       id={id}
       className={[
-        'rail no-scrollbar flex snap-x snap-mandatory -my-2 gap-4 overflow-x-auto py-2 has-focus-visible:snap-none',
+        'rail reveal-stagger no-scrollbar flex snap-x snap-mandatory -my-2 gap-4 overflow-x-auto py-2 has-focus-visible:snap-none',
         className,
       ]
         .filter(Boolean)

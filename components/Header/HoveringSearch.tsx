@@ -46,15 +46,17 @@ const HoveringSearch = ({
     >
       <DialogBackdrop
         transition
-        className="fixed inset-0 bg-ink/30 transition-opacity duration-300 ease-out data-closed:opacity-0"
+        data-chrome="sheet-scrim"
+        className="fixed inset-0 bg-ink/30 transition-opacity duration-(--dur-sheet) ease-out data-closed:opacity-0 data-leave:duration-(--dur-pop)"
       />
       {/* A white sheet hanging from the top edge */}
       <DialogPanel
         transition
-        className="fixed inset-x-0 top-0 border-b border-line bg-white transition duration-300 ease-drawer data-leave:duration-200 data-closed:-translate-y-full"
+        data-chrome="sheet"
+        className="quick fixed inset-x-0 top-0 border-b border-line bg-white transition duration-(--dur-sheet) ease-drawer data-leave:duration-(--dur-pop) data-closed:-translate-y-full"
       >
         <div
-          className="shell flex items-center gap-2 py-6 sm:gap-4 sm:py-8 lg:py-10"
+          className="enter-stagger shell flex items-center gap-2 py-6 sm:gap-4 sm:py-8 lg:py-10 [--delay:60ms]"
           style={{ minHeight }}
         >
           <search className="min-w-0 flex-1">

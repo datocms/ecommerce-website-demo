@@ -27,12 +27,13 @@ type Props = {
 
 const PLACEMENT = {
   // The header's: its 40px trigger is centred in the 72px bar, so 16px down the list's ink
-  // top edge lies on the header's hairline, where the mega menu hangs too
-  'below-end': 'top-full right-0 mt-4',
-  'above-start': 'bottom-full left-0 mb-2',
-  'above-end': 'bottom-full right-0 mb-2',
+  // top edge lies on the header's hairline, where the mega menu hangs too; it drops from there
+  'below-end': 'top-full right-0 mt-4 origin-top-right [--pop-y:-0.5rem]',
+  'above-start': 'bottom-full left-0 mb-2 origin-bottom-left',
+  'above-end': 'bottom-full right-0 mb-2 origin-bottom-right',
   // A trigger on the left edge on phones, on the right edge from md
-  'above-start-md-end': 'bottom-full left-0 mb-2 md:right-0 md:left-auto',
+  'above-start-md-end':
+    'bottom-full left-0 mb-2 origin-bottom-left md:right-0 md:left-auto md:origin-bottom-right',
 };
 
 const LanguageSelector = ({
@@ -176,7 +177,7 @@ const LanguageSelector = ({
       <ul
         id={listId}
         hidden={!isOpen}
-        className={`absolute z-50 w-56 border border-ink bg-white p-1 text-ink [--focus-ring:var(--color-ink)] ${PLACEMENT[placement]}`}
+        className={`pop absolute z-50 w-56 border border-ink bg-white p-1 text-ink [--focus-ring:var(--color-ink)] ${PLACEMENT[placement]}`}
       >
         {languages.map((locale) => {
           const bcp47 = locale.replaceAll('_', '-');

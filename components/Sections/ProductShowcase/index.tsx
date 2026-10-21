@@ -175,7 +175,7 @@ const ProductShowcase = ({
   const railId = `${id}-seasons`;
 
   const grid = (
-    <div id={railId} className={`${GRID} ${COLUMNS[columns]}`}>
+    <div id={railId} className={`${GRID} ${COLUMNS[columns]} reveal-stagger`}>
       {sections.map((section, index) => (
         <Season
           key={readFragment(CollectionCardShowcaseFragment, section).id}

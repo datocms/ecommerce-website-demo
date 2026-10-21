@@ -19,6 +19,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useTransition,
 } from 'react';
 import { ProductsGeneralInterfaceFragment } from '@/components/Products/GeneralInterface/fragments';
 import { InitialParamsFragment } from '@/components/Products/InitialParams/fragments';
@@ -44,23 +45,36 @@ type FilterKey = 'collections' | 'materials' | 'brands';
 function usePendingQueryState(onPush?: (query: string) => void) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   const [query, setQuery] = useState(searchParams.toString());
   useEffect(() => {
     setQuery(searchParams.toString());
   }, [searchParams]);
 
-  function exportQueryParameters(key: string, value: string) {
+  // In a transition, so isPending lasts until the new listing commits. The drawer passes
+  // the "filter" type: its grid updates behind the scrim, without the swap
+  function exportQueryParameters(
+    key: string,
+    value: string,
+    transitionTypes?: string[],
+  ) {
     const params = new URLSearchParams(query);
     params.set(key, value);
     params.delete('page');
     const next = params.toString();
     setQuery(next);
     onPush?.(next);
-    router.push(`?${next}`, { scroll: false });
+    startTransition(() => {
+      router.push(`?${next}`, { scroll: false, transitionTypes });
+    });
   }
 
-  return { pendingParams: new URLSearchParams(query), exportQueryParameters };
+  return {
+    pendingParams: new URLSearchParams(query),
+    exportQueryParameters,
+    isPending,
+  };
 }
 
 const PendingQueryContext = createContext<ReturnType<
@@ -80,6 +94,8 @@ export function PendingQueryProvider({
   return (
     <PendingQueryContext.Provider value={pendingQuery}>
       {children}
+      {/* Dims the results (pending-dim) while the listing is on its way */}
+      {pendingQuery.isPending && <span data-pending hidden />}
     </PendingQueryContext.Provider>
   );
 }
@@ -148,7 +164,7 @@ export function SortTabs({
           value={sortOption.value}
           aria-pressed={current === sortOption.value}
           onClick={() => exportQueryParameters('orderBy', sortOption.value)}
-          className="relative inline-flex shrink-0 items-center px-2 text-sm font-medium whitespace-nowrap text-ink-2 transition-colors duration-150 outline-offset-[-2px] after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:bg-ink after:opacity-0 after:transition-opacity after:duration-150 hover:text-ink hover:after:opacity-100 aria-pressed:text-ink aria-pressed:after:opacity-100"
+          className="bar-draw relative inline-flex shrink-0 items-center px-2 text-sm font-medium whitespace-nowrap text-ink-2 transition-colors duration-150 outline-offset-[-2px] after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:bg-ink hover:text-ink hover:after:scale-x-100 aria-pressed:text-ink aria-pressed:after:scale-x-100"
         >
           {sortOption.label}
         </button>
@@ -201,6 +217,7 @@ const SideFilter = ({
         ? current.filter((option) => option !== id)
         : [...current, id]
       ).join('|'),
+      ['filter'],
     );
   }
 
@@ -223,7 +240,8 @@ const SideFilter = ({
   const current = pendingParams.get('orderBy');
 
   return (
-    <div>
+    // While it is open, the grid behind it updates at once (data-filter-drawer in global.css)
+    <div data-filter-drawer>
       <fieldset
         aria-label="Sort"
         className="flex min-w-0 flex-wrap items-center gap-2 pb-6"
@@ -241,11 +259,16 @@ const SideFilter = ({
               key={sortOption.value}
               type="button"
               aria-pressed={isSelected}
-              onClick={() => exportQueryParameters('orderBy', sortOption.value)}
+              onClick={() =>
+                exportQueryParameters('orderBy', sortOption.value, ['filter'])
+              }
               className="chip shrink-0"
             >
               {isSelected && (
-                <CheckIcon aria-hidden="true" className="stroke-2" />
+                <CheckIcon
+                  aria-hidden="true"
+                  className="animate-pop stroke-2"
+                />
               )}
               {sortOption.label}
             </button>
@@ -269,7 +292,10 @@ const SideFilter = ({
                     <span className="title-item flex items-center gap-3">
                       {section.name}
                       {narrowed && (
-                        <span className="tag-dark min-h-6 px-1.5">
+                        <span
+                          key={checked}
+                          className="tag-dark min-h-6 animate-pop px-1.5"
+                        >
                           <span className="sr-only"> (</span>
                           {checked}
                           <span className="sr-only"> applied)</span>
@@ -284,7 +310,7 @@ const SideFilter = ({
                     </span>
                   </DisclosureButton>
                 </h3>
-                <DisclosurePanel className="pb-6">
+                <DisclosurePanel className="quick enter pb-6">
                   <ul className="grid grid-cols-2 gap-x-4">
                     {options.map((option) => (
                       <li key={option.id}>

@@ -2,8 +2,14 @@
 
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { type ReactNode, useLayoutEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  type ReactNode,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import Drawer from '@/components/Common/Drawer';
 import { PendingQueryProvider } from '@/components/Common/SideFilter';
 
@@ -30,6 +36,8 @@ const ProductFilters = ({
   children,
 }: PropTypes) => {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const [clearing, startClearing] = useTransition();
   const results = `${count} ${count === 1 ? 'result' : 'results'}`;
 
   const landed = useSearchParams().toString();
@@ -57,9 +65,10 @@ const ProductFilters = ({
     <PendingQueryProvider onPush={awaitQuery}>
       {/* A hairline bar that sticks under the header from lg. Right under the header it
           shares the header's hairline; after a filter header it draws its own, which
-          tucks under the header's while stuck */}
+          tucks under the header's while stuck. data-chrome keeps it above a results swap */}
       <div
         ref={toolbar}
+        data-chrome="toolbar"
         className={`border-b border-line bg-white lg:sticky lg:z-20 ${framed ? 'mt-16 border-t lg:top-[calc(var(--header-h)-1px)] lg:mt-24' : 'lg:top-(--header-h)'}`}
       >
         <div className="shell flex flex-wrap items-center gap-x-6 lg:flex-nowrap">
@@ -68,12 +77,15 @@ const ProductFilters = ({
             onClick={() => setOpen(true)}
             aria-haspopup="dialog"
             aria-expanded={open}
-            className="-ml-2 inline-flex h-14 shrink-0 items-center gap-2.5 px-2 text-sm font-semibold underline-offset-4 outline-offset-[-2px] hover:underline [&>svg]:size-5"
+            className="press -ml-2 inline-flex h-14 shrink-0 items-center gap-2.5 px-2 text-sm font-semibold underline-offset-4 outline-offset-[-2px] hover:underline [&>svg]:size-5"
           >
             <AdjustmentsHorizontalIcon aria-hidden="true" />
             Filters
             {narrowed > 0 && (
-              <span className="tag-dark min-h-6 px-1.5">
+              <span
+                key={narrowed}
+                className="tag-dark min-h-6 animate-pop px-1.5"
+              >
                 <span className="sr-only"> (</span>
                 {narrowed}
                 <span className="sr-only"> applied)</span>
@@ -108,6 +120,7 @@ const ProductFilters = ({
       </div>
       {/* Where the results start: the toolbar's bottom edge while it isn't stuck */}
       <div ref={resultsTop} />
+      {clearing && <span data-pending hidden />}
       <Drawer
         open={open}
         onClose={() => setOpen(false)}
@@ -121,10 +134,19 @@ const ProductFilters = ({
             </p>
             <Link
               href={`/${lng}/products`}
-              scroll={false}
-              onClick={() => {
+              // Pushed in a transition of its own, so the results stay dim (pending-dim)
+              // until they land, after the drawer has closed and taken this link with it.
+              // Like the drawer's toggles, it updates the grid without the swap
+              onNavigate={(event) => {
+                event.preventDefault();
                 awaitQuery('');
                 setOpen(false);
+                startClearing(() => {
+                  router.push(`/${lng}/products`, {
+                    scroll: false,
+                    transitionTypes: ['filter'],
+                  });
+                });
               }}
               className="link-underline inline-flex min-h-11 shrink-0 items-center text-sm font-semibold"
             >

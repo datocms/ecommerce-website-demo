@@ -60,7 +60,7 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
 
       {materials.length > 0 && (
         <ul
-          className={`mt-10 grid gap-x-4 gap-y-10 lg:mt-14 ${GRID_COLUMNS[columns]}`}
+          className={`reveal-stagger mt-10 grid gap-x-4 gap-y-10 lg:mt-14 ${GRID_COLUMNS[columns]}`}
         >
           {materials.map((material) => (
             <li key={material.id}>

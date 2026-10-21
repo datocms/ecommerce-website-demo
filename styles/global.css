@@ -64,9 +64,18 @@
   --text-shadow-*: initial;
   --blur-*: initial;
 
+  /* Motion curves: arrivals, exits and hovers; anything that travels (sheets, the product photo);
+     a damped spring, about 4% over, for press release and pops */
   --ease-*: initial;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: linear(
+    0, 0.141, 0.413, 0.672, 0.863, 0.977, 1.031, 1.046, 1.041, 1.029, 1.016, 1.007, 1.002,
+    0.999, 0.998, 1
+  );
+  /* animate-pop: a tick or a count landing (mount it, or re-key it when it changes) */
+  --animate-*: initial;
+  --animate-pop: pop 360ms var(--ease-spring) backwards;
   --default-transition-duration: 150ms;
   --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
@@ -90,6 +99,17 @@
     --page-top: 3rem;
     /* Vertical padding inside black bands (testimonials, the footer top without a newsletter) */
     --band-y: 5rem;
+    /* Motion (see the Motion section; quick shortens enter, stagger and blur inside overlays) */
+    --dur-quick: 150ms; /* hovers, color, every exit, the old page leaving */
+    --dur-pop: 220ms; /* popovers, bars, a page or a results list coming in */
+    --dur-sheet: 380ms; /* drawers, search sheet, mega menu, the product photo's flight */
+    --dur-press: 420ms; /* a pressed control springing back */
+    --dur-enter: 640ms; /* enter, enter-stagger */
+    --dur-rise: 700ms; /* a page title's word rising out of its line */
+    --dur-settle: 1000ms; /* a photo coming to rest */
+    --stagger: 50ms;
+    --rise: 0.75rem;
+    --enter-blur: 4px;
   }
   @media (min-width: 40rem) {
     :root {
@@ -202,9 +222,17 @@
     ::before,
     ::after {
       animation-duration: 0.01ms !important;
+      animation-delay: 0s !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      transition-delay: 0s !important;
       scroll-behavior: auto !important;
+    }
+    /* Pages, results and the product photo swap without animating */
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
     }
   }
 }
@@ -359,9 +387,11 @@
   line-height: 1.25;
   font-weight: 600;
   letter-spacing: -0.005em;
+  --press: 0.98;
   transition:
     background-color 150ms var(--ease-out),
-    color 150ms var(--ease-out);
+    color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
   @media (hover: hover) {
     &:not(:disabled, [aria-disabled='true']):hover {
       background-color: color-mix(
@@ -400,9 +430,11 @@
   line-height: 1.25;
   font-weight: 600;
   letter-spacing: -0.005em;
+  --press: 0.98;
   transition:
     background-color 150ms var(--ease-out),
-    color 150ms var(--ease-out);
+    color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
   @media (hover: hover) {
     &:not(:disabled, [aria-disabled='true']):hover {
       background-color: var(--surface-fg);
@@ -474,7 +506,11 @@
   height: 2.75rem;
   flex-shrink: 0;
   color: inherit;
-  transition: background-color 150ms var(--ease-out);
+  --press: 0.9;
+  transition:
+    background-color 150ms var(--ease-out),
+    border-color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
   & > svg {
     width: 1.25rem;
     height: 1.25rem;
@@ -502,10 +538,12 @@
   flex-shrink: 0;
   border: 1px solid var(--color-line);
   color: var(--surface-fg);
+  --press: 0.9;
   transition:
     background-color 150ms var(--ease-out),
     border-color 150ms var(--ease-out),
-    color 150ms var(--ease-out);
+    color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
   & > svg {
     width: 1.125rem;
     height: 1.125rem;
@@ -581,10 +619,12 @@
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
   font-weight: 500;
+  --press: 0.95;
   transition:
     border-color 150ms var(--ease-out),
     background-color 150ms var(--ease-out),
-    color 150ms var(--ease-out);
+    color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
   @media (hover: hover) {
     &:is(a, button, label):hover {
       border-color: var(--surface-fg);
@@ -695,9 +735,11 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: 0.875rem;
+  --press: 0.9;
   transition:
     background-color 100ms var(--ease-out),
-    border-color 100ms var(--ease-out);
+    border-color 100ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
   @media (hover: hover) {
     &:hover {
       border-color: var(--color-ink);
@@ -845,6 +887,232 @@
   }
 }
 
+/* ---------- Motion ----------
+   Set and settle: content sharpens up on mount (enter, enter-stagger) or fades up with its row on
+   scroll (reveal, reveal-stagger); page titles rise word by word (rise, via Common/Rise.tsx);
+   photos come to rest in a still frame (settle); overlays pop from their trigger or travel from
+   their edge (pop, wipe) with quicker contents (quick); controls sink and spring back (press).
+   Only translate, scale, opacity, filter and clip-path move. Reduced motion stops all of it;
+   without JS, scroll timelines or sibling-index() everything simply shows. --delay, --rise and
+   --enter-blur inherit: set them on the element that moves, or on a stagger's parent. */
+@keyframes enter {
+  from {
+    opacity: 0;
+    translate: 0 var(--rise);
+    filter: blur(var(--enter-blur));
+  }
+}
+/* No filter, so nothing keeps a layer once it is in place: scroll reveals, pages and results */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 var(--rise);
+  }
+}
+@keyframes leave {
+  to {
+    opacity: 0;
+  }
+}
+/* A line of display type rising out of its own line: the translate and the clip's bottom edge
+   travel together, so the mask stays 0.2em under the line (Geist's descenders) */
+@keyframes rise {
+  from {
+    translate: 0 calc(100% + 0.3em);
+    clip-path: inset(-0.3em -0.5em calc(100% + 0.1em) -0.5em);
+  }
+  to {
+    clip-path: inset(-0.3em -0.5em -0.2em -0.5em);
+  }
+}
+@keyframes settle {
+  from {
+    scale: 1.04;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.7;
+  }
+}
+
+/* On mount, for what is on screen as it appears. --delay holds it back. */
+@utility enter {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: enter var(--dur-enter) var(--ease-out) var(--delay, 0ms) backwards;
+  }
+}
+/* The first eight children in turn, --stagger apart (later ones are below the fold and stay
+   still). Without sibling-index() they arrive together, at --delay. */
+@utility enter-stagger {
+  @media (prefers-reduced-motion: no-preference) {
+    & > :nth-child(-n + 8) {
+      animation: enter var(--dur-enter) var(--ease-out) var(--delay, 0ms) backwards;
+    }
+    @supports (animation-delay: calc(sibling-index() * 1ms)) {
+      & > :nth-child(-n + 8) {
+        animation-delay: calc(var(--delay, 0ms) + (sibling-index() - 1) * var(--stagger));
+      }
+    }
+  }
+}
+/* Contents of UI that opens on demand (the mega menu, search sheet, drawers, disclosures, the
+   stores pager): a shorter, softer enter, so the last item lands within ~450ms, coming down with
+   the panel. Where the panel travels sideways or the content is replaced in place, add
+   [--rise:0px]: it only sharpens. Starts a fresh --delay. */
+@utility quick {
+  --dur-enter: 320ms;
+  --stagger: 30ms;
+  --enter-blur: 2px;
+  --rise: -0.375rem;
+  --delay: 0ms;
+}
+/* On scroll, tied to position: rises over the element's first 8rem into view, so a jump (anchor,
+   End, restored scroll) lands on finished content and a re-render never replays it. Inset 0px,
+   because html's scroll-padding would start it 200px up the screen. Never within the last 8rem
+   of a page. Print and browsers without view timelines show it as is. */
+@utility reveal {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: var(--motion, reveal) auto var(--ease-out) both;
+      animation-timeline: view(0px);
+      animation-range: entry 0% entry var(--reveal-end, 8rem);
+    }
+  }
+}
+/* A row (a rail, a row of columns): the row rises as one while its items fade in from the left,
+   0.75rem of scroll apart (three steps at most). On a rail put it on the scroller itself: only
+   the scroller moves, so nothing overflows inside it. A grid of several rows takes reveal per
+   item instead. */
+@utility reveal-stagger {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      view-timeline: --row;
+      view-timeline-inset: 0px;
+      animation: reveal auto var(--ease-out) both;
+      animation-timeline: --row;
+      animation-range: entry 0% entry 8rem;
+      & > * {
+        --rise: 0px;
+        animation: reveal auto var(--ease-out) both;
+        animation-timeline: --row;
+        animation-range: entry 0% entry 8rem;
+        animation-range: entry calc(min(sibling-index() - 1, 3) * 0.75rem) entry
+          calc(8rem + min(sibling-index() - 1, 3) * 0.75rem);
+      }
+    }
+  }
+}
+/* With reveal: one line of display type rises out of its own line as it scrolls in, done once it
+   is fully in view (the footer wordmark, the review score) */
+@utility mask {
+  --motion: rise;
+  --reveal-end: 100%;
+}
+/* One word of a page title (Common/Rise.tsx sets --i): rises out of its line, --stagger after the
+   one before; from the sixth word on they rise together */
+@utility rise {
+  display: inline-block;
+  max-width: 100%;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: rise var(--dur-rise) var(--ease-out) backwards;
+    animation-delay: calc(var(--delay, 0ms) + min(var(--i, 0), 5) * var(--stagger));
+  }
+}
+/* A photo well (MEDIA) whose photo comes to rest from 104%. Scale only, so an LCP photo is never
+   hidden. */
+@utility settle {
+  @media (prefers-reduced-motion: no-preference) {
+    & > :first-child {
+      animation: settle var(--dur-settle) var(--ease-out) backwards;
+    }
+  }
+}
+/* Popovers, toasts and dialog panels: rise 8px from 97% with a fade, and leave quicker. Works
+   with [hidden] (display transitions out), Headless UI's data-closed and plain mounts
+   (@starting-style). Scales from origin-*; --pop-y: -0.5rem drops it from above instead. */
+@utility pop {
+  transition:
+    opacity var(--dur-pop) var(--ease-out),
+    translate var(--dur-pop) var(--ease-out),
+    scale var(--dur-pop) var(--ease-out),
+    display var(--dur-pop) allow-discrete;
+  &:is([hidden], [data-closed]) {
+    opacity: 0;
+    translate: 0 var(--pop-y, 0.5rem);
+    scale: 0.97;
+  }
+  &:is([hidden], [data-leave]) {
+    transition-duration: var(--dur-quick);
+  }
+  @starting-style {
+    &:not([hidden]) {
+      opacity: 0;
+      translate: 0 var(--pop-y, 0.5rem);
+      scale: 0.97;
+    }
+  }
+}
+/* The mega menu (Headless UI attributes): unrolls from the header's hairline and leaves with a
+   quick fade; switching menus swaps in place without a second unroll */
+@utility wipe {
+  transition:
+    clip-path var(--dur-sheet) var(--ease-drawer),
+    opacity var(--dur-quick) var(--ease-out);
+  &[data-enter] {
+    clip-path: inset(0);
+  }
+  &[data-enter][data-closed] {
+    clip-path: inset(0 0 100% 0);
+  }
+  :where(:has(.wipe[data-leave])) &[data-enter][data-closed] {
+    clip-path: inset(0);
+  }
+  &[data-leave][data-closed] {
+    opacity: 0;
+  }
+}
+/* A 2px bar on the ::after (placed with after:* classes) that draws from the left and retracts
+   the same way. Turn it on with after:scale-x-100 under a state variant. */
+@utility bar-draw {
+  &::after {
+    scale: 0 1;
+    transform-origin: left;
+    transition: scale var(--dur-pop) var(--ease-out);
+  }
+}
+/* One-off controls outside the btn/chip family: color, fill and dim fade, plus the press */
+@utility press {
+  transition-property: color, background-color, border-color, opacity, scale;
+  transition-duration:
+    var(--dur-quick), var(--dur-quick), var(--dur-quick), var(--dur-quick), var(--dur-press);
+  transition-timing-function:
+    var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-spring);
+}
+/* Listing results while a sort, filter or page change is on its way (a [data-pending] flag
+   anywhere in the document, drawers included); the delay keeps quick answers from flickering */
+@utility pending-dim {
+  transition: opacity var(--dur-pop) var(--ease-out);
+  :where(:root:has([data-pending])) & {
+    opacity: 0.45;
+    transition-delay: 120ms;
+  }
+}
+
+/* Press: controls sink while held (--press per control, set by its utility) and spring back on
+   release. Unlayered, so the 80ms press-in wins over a control's own durations. */
+@media (prefers-reduced-motion: no-preference) {
+  :is(.btn, .btn-line, .icon-btn, .rail-btn, .checkbox, .press, :is(a, button, label).chip):active:not(
+      :disabled,
+      [aria-disabled='true']
+    ) {
+    scale: var(--press, 0.97);
+    transition-duration: 80ms;
+    transition-timing-function: var(--ease-out);
+  }
+}
+
 /* Unlayered so selected states stay visible over utilities like aria-pressed:bg-ink */
 @media (forced-colors: active) {
   [aria-pressed='true'],
@@ -860,4 +1128,118 @@
 /* Visual editing: stega characters plus tracking misrender, so keep this rule. */
 [data-datocms-contains-stega] {
   letter-spacing: 0 !important;
+}
+
+/* ---------- View transitions (React <ViewTransition>) ----------
+   fade: pages (Common/PageTransition.tsx). The old page drops out fast and the new one comes in
+   just after it; its own enter and rise blocks carry the arrival. swap: catalog results replaced
+   in place. product: a product card's photo flies to the product page's lead photo. Chrome holds
+   still above all of it. */
+/* Clicks reach the page underneath while a transition runs */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(root) {
+  animation-duration: var(--dur-pop);
+}
+::view-transition-old(.fade),
+::view-transition-old(.swap),
+::view-transition-old(.chrome):only-child {
+  display: block;
+  animation: leave var(--dur-quick) var(--ease-out) both;
+}
+::view-transition-new(.fade),
+::view-transition-new(.chrome):only-child {
+  --rise: 0px;
+}
+::view-transition-new(.fade),
+::view-transition-new(.swap),
+::view-transition-new(.chrome):only-child {
+  animation: reveal var(--dur-pop) var(--ease-out) 60ms both;
+}
+/* Chrome that outlives the page (data-chrome in the TSX, and the cookie bar) is named while a
+   transition runs, so pages, results and the flying photo pass under it while it holds still,
+   and a drawer or search sheet closing over a navigation keeps sliding out on top. Only while one
+   runs: a name makes its element a stacking context, which would put Headless UI's dialogs under
+   the sticky header. Chrome that comes or goes with a page (the catalog toolbar) fades with it
+   (:only-child). */
+:root:active-view-transition {
+  & :is([data-chrome], #cookie-notice) {
+    view-transition-class: chrome;
+  }
+  & [data-chrome='strip'] {
+    view-transition-name: strip;
+  }
+  & [data-chrome='header'] {
+    view-transition-name: site-header;
+  }
+  & [data-chrome='scrim'] {
+    view-transition-name: mega-scrim;
+  }
+  & [data-chrome='toolbar'] {
+    view-transition-name: catalog-toolbar;
+  }
+  & [data-chrome='dock'] {
+    view-transition-name: draft-dock;
+  }
+  & #cookie-notice {
+    view-transition-name: cookie-notice;
+  }
+  & [data-chrome='sheet'] {
+    view-transition-name: sheet;
+  }
+  & [data-chrome='sheet-scrim'] {
+    view-transition-name: sheet-scrim;
+  }
+}
+::view-transition-group(.chrome) {
+  z-index: 2;
+  animation: none;
+}
+::view-transition-old(.chrome) {
+  display: none;
+}
+::view-transition-new(.chrome) {
+  animation: none;
+}
+/* ProductCard links carry the "product" type. Only the followed card's photo layer (the well's
+   first child) is named: the focused card, since a click focuses the link in Chrome and Firefox
+   (Chrome clears :hover before it captures the old page), or else the hovered one, which is also
+   a tap on iOS. A product listed twice never doubles the name. It lands on the product page's
+   lead photo, and that page's sale tag fades in above it. A product page linking to another
+   sets its own photo and tag aside. */
+:root:active-view-transition-type(product) {
+  & a:focus [data-morph='card'] > :first-child,
+  &:not(:has(a:focus [data-morph='card'])) a:hover [data-morph='card'] > :first-child,
+  & [data-morph='pdp'] > :first-child {
+    view-transition-name: product;
+  }
+  & [data-morph='pdp'] > .tag-dark {
+    view-transition-name: product-tag;
+    view-transition-class: fade;
+  }
+  &:has(a:is(:focus, :hover) [data-morph='card']) [data-morph='pdp'] > * {
+    view-transition-name: none;
+  }
+}
+::view-transition-group(product-tag) {
+  z-index: 1;
+}
+::view-transition-group(product) {
+  z-index: 1;
+  animation-duration: var(--dur-sheet);
+  animation-timing-function: var(--ease-drawer);
+}
+/* Filters toggled inside the drawer (type "filter") update the grid behind the scrim at once.
+   The open drawer counts too: for a query Next has not prefetched, its deferred render can
+   commit first and take the type with it */
+:root:is(
+    :active-view-transition-type(filter),
+    :active-view-transition:has([data-filter-drawer])
+  ) {
+  &::view-transition-group(*),
+  &::view-transition-old(*),
+  &::view-transition-new(*) {
+    animation: none;
+  }
 }

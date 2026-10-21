@@ -27,7 +27,7 @@ const NotificationStrip = ({
   onDismiss,
 }: Props) => {
   return (
-    <div className="surface-ink">
+    <div data-chrome="strip" className="surface-ink">
       <div className="shell relative flex min-h-10 items-center justify-center py-2.5 text-center">
         {/* px-10 keeps the centred message clear of the dismiss button */}
         <DatoStructuredText
@@ -53,13 +53,13 @@ const NotificationStrip = ({
               return (
                 <Link
                   href={`/${globalPageProps.params.lng}${node.url}`}
-                  className="inline-flex items-center gap-1 font-semibold whitespace-nowrap underline-offset-4 hover:underline"
+                  className="group inline-flex items-center gap-1 font-semibold whitespace-nowrap underline-offset-4 hover:underline"
                   key={key}
                 >
                   {children}
                   <ArrowRightIcon
                     aria-hidden="true"
-                    className="size-3.5 shrink-0 stroke-2"
+                    className="size-3.5 shrink-0 stroke-2 transition-transform duration-200 group-hover:translate-x-0.75"
                   />
                 </Link>
               );

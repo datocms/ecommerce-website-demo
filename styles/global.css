@@ -1,9 +1,13 @@
+/* Tailwind only scans app/ and components/ for class names. Add an @source line if you put
+   classes anywhere else. */
 @import 'tailwindcss' source(none);
 @source '../app';
 @source '../components';
 
 /* No @tailwindcss/forms: inputs and checkboxes are styled by the utilities below. */
 
+/* static: every token is emitted as a CSS variable, used or not, so var(--…) in the utilities
+   below and in arbitrary values always resolves */
 @theme static {
   --breakpoint-*: initial;
   --breakpoint-sm: 40rem;
@@ -64,16 +68,19 @@
   --text-shadow-*: initial;
   --blur-*: initial;
 
-  /* Motion curves: arrivals, exits and hovers; anything that travels (sheets, the product photo);
-     a damped spring, about 4% over, for press release and pops */
+  /* Motion curves */
   --ease-*: initial;
+  /* Arrivals, exits and hovers */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Anything that travels: sheets, the mega menu's unroll, the product photo */
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* A damped spring, about 4% over: a pressed control springing back, animate-pop */
   --ease-spring: linear(
     0, 0.141, 0.413, 0.672, 0.863, 0.977, 1.031, 1.046, 1.041, 1.029, 1.016, 1.007, 1.002,
     0.999, 0.998, 1
   );
-  /* animate-pop: a tick or a count landing (mount it, or re-key it when it changes) */
+  /* Only animate-pop exists: Tailwind's spin, ping, pulse and bounce are dropped. It marks a
+     tick or a count landing (mount it, or re-key it when it changes). */
   --animate-*: initial;
   --animate-pop: pop 360ms var(--ease-spring) backwards;
   --default-transition-duration: 150ms;
@@ -81,6 +88,10 @@
 }
 
 @layer base {
+  /* Plain variables, not @theme tokens. The layout ones change per breakpoint (the media queries
+     below). The motion ones are read by the Motion utilities and by classes such as
+     duration-(--dur-sheet); quick, or an arbitrary property such as [--rise:0px], overrides them
+     per element. Use them as px-(--gutter), pt-(--section-gap). */
   :root {
     /* Neutral until CustomColor writes the CMS accent (unlayered, so it wins); pages without
        it (404) still get a visible selection */
@@ -107,9 +118,9 @@
     --dur-enter: 640ms; /* enter, enter-stagger */
     --dur-rise: 700ms; /* a page title's word rising out of its line */
     --dur-settle: 1000ms; /* a photo coming to rest */
-    --stagger: 50ms;
-    --rise: 0.75rem;
-    --enter-blur: 4px;
+    --stagger: 50ms; /* between staggered children, and between a title's words */
+    --rise: 0.75rem; /* how far enter and reveal travel up; quick makes it negative (down) */
+    --enter-blur: 4px; /* how blurred enter starts */
   }
   @media (min-width: 40rem) {
     :root {
@@ -180,6 +191,8 @@
     quotes: '\00AB\202F' '\202F\00BB' '\2039\202F' '\202F\203A';
   }
 
+  /* Tailwind 4 defaults borders to currentColor and buttons to the default cursor: use the
+     hairline color and a pointer instead */
   *,
   ::after,
   ::before,
@@ -205,7 +218,7 @@
     background-color: var(--color-accent-wash);
     color: var(--color-ink);
   }
-  /* Highlighted copy: a marker stroke over the lower x-height, 12% of the text colour, so it
+  /* Highlighted copy: a marker stroke over the lower x-height, 12% of the text color, so it
      also reads on a black band */
   mark {
     background: linear-gradient(
@@ -306,7 +319,8 @@
     font-size: clamp(5rem, 7.8vw, 7rem);
   }
 }
-/* Page titles: showcase h1, store name, 404 (44 / 64 at 1024 / 80 at 1280) */
+/* Page titles: showcase and brand/material/collection pages, store names (44 / 64 at 1024 / 80
+   at 1280) */
 @utility title-display {
   font-weight: 600;
   font-size: 2.75rem;
@@ -346,8 +360,8 @@
   line-height: 1.05;
   letter-spacing: -0.035em;
 }
-/* Item names: store and material index rows, mobile menu rows, spotlight names, the header
-   wordmark */
+/* Item names: the store index, material names, filter groups, FAQ questions, product spec
+   values, mobile menu rows, the token form title, the header and footer wordmarks */
 @utility title-item {
   font-weight: 600;
   font-size: 1.25rem;
@@ -413,7 +427,8 @@
     flex-shrink: 0;
   }
 }
-/* Outline button: 1px ink rectangle that fills on hover */
+/* Outline button: 1px ink rectangle that fills on hover. Same box and type as btn: change both
+   together. */
 @utility btn-line {
   display: inline-flex;
   align-items: center;
@@ -486,7 +501,7 @@
     }
   }
 }
-/* Inline link in sentences and small utility links ("Not now", "Remove", "Clear all") */
+/* Underlined text action ("Clear all", the popup's dismiss) */
 @utility link-underline {
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
@@ -529,7 +544,8 @@
     cursor: not-allowed;
   }
 }
-/* Previous/next for rails: 44px hairline square that fills ink on hover */
+/* Previous/next squares for rails, pagination and the stores pager: 44px, hairline, fills ink
+   on hover */
 @utility rail-btn {
   display: inline-grid;
   place-items: center;
@@ -563,8 +579,8 @@
 }
 
 /* ---------- Labels ---------- */
-/* Small semibold label: CMS pre-titles, menu and footer column labels, filter group names.
-   Takes its surface's text colour. */
+/* Small semibold label above a title: CMS pre-titles, store countries, menu and footer column
+   labels. Takes its surface's text color. */
 @utility eyebrow {
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
@@ -586,7 +602,8 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-/* Black uppercase tag: Sale, counters on light surfaces */
+/* Black uppercase tag: Sale, counters on light surfaces. Same box as tag: change both
+   together. */
 @utility tag-dark {
   display: inline-flex;
   align-items: center;
@@ -603,9 +620,9 @@
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
 }
-/* Square selectable option (sort, filters, sizes, care labels, locales). Selected
-   (aria-pressed / aria-current / data-selected / a checked input inside) fills ink;
-   disabled is struck through. */
+/* Square option: the filter drawer's sort chips, the size buttons and, as plain labels, the
+   product description's care labels. Selected (aria-pressed / aria-current / data-selected / a
+   checked input inside) fills ink; disabled is struck through. */
 @utility chip {
   display: inline-flex;
   align-items: center;
@@ -697,7 +714,7 @@
     box-shadow: inset 0 0 0 1px var(--color-sale);
   }
 }
-/* Field that takes its surface's text colour: the newsletter field on black */
+/* Field that takes its surface's text color: the newsletter field on black */
 @utility input-line {
   display: block;
   width: 100%;
@@ -887,14 +904,37 @@
   }
 }
 
+/* ---------- Unlayered overrides ---------- */
+/* Unlayered so selected states stay visible over utilities like aria-pressed:bg-ink */
+@media (forced-colors: active) {
+  [aria-pressed='true'],
+  [aria-current]:not([aria-current='false']),
+  [aria-selected='true'] {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    border-color: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* Draft mode: @datocms/content-link marks elements whose text carries invisible stega
+   characters. Letter-spacing is added after each of those characters too, which visibly spreads
+   the text, so tracking is reset there. */
+[data-datocms-contains-stega] {
+  letter-spacing: 0 !important;
+}
+
 /* ---------- Motion ----------
    Set and settle: content sharpens up on mount (enter, enter-stagger) or fades up with its row on
    scroll (reveal, reveal-stagger); page titles rise word by word (rise, via Common/Rise.tsx);
-   photos come to rest in a still frame (settle); overlays pop from their trigger or travel from
-   their edge (pop, wipe) with quicker contents (quick); controls sink and spring back (press).
-   Only translate, scale, opacity, filter and clip-path move. Reduced motion stops all of it;
-   without JS, scroll timelines or sibling-index() everything simply shows. --delay, --rise and
-   --enter-blur inherit: set them on the element that moves, or on a stagger's parent. */
+   photos come to rest in a still frame (settle); overlays pop from their trigger (pop), the mega
+   menu unrolls (wipe) and sheets slide from their edge (Drawer, SearchDialog), with quicker
+   contents (quick); controls sink and spring back (press); nav and sort bars draw from the left
+   (bar-draw); counts and ticks pop (animate-pop); listing results dim while a navigation is
+   pending (pending-dim). Only translate, scale, opacity, filter and clip-path move. Reduced motion
+   stops all of it; without JS, scroll timelines or sibling-index() everything simply shows.
+   --delay, --rise and --enter-blur inherit: set them on the element that moves, or on a stagger's
+   parent. Page, results and product-photo transitions are in the View transitions section below. */
 @keyframes enter {
   from {
     opacity: 0;
@@ -907,11 +947,6 @@
   from {
     opacity: 0;
     translate: 0 var(--rise);
-  }
-}
-@keyframes leave {
-  to {
-    opacity: 0;
   }
 }
 /* A line of display type rising out of its own line: the translate and the clip's bottom edge
@@ -930,6 +965,7 @@
     scale: 1.04;
   }
 }
+/* animate-pop's keyframes. The pop utility below is a transition and does not use them. */
 @keyframes pop {
   from {
     opacity: 0;
@@ -958,9 +994,9 @@
   }
 }
 /* Contents of UI that opens on demand (the mega menu, search sheet, drawers, disclosures, the
-   stores pager): a shorter, softer enter, so the last item lands within ~450ms, coming down with
-   the panel. Where the panel travels sideways or the content is replaced in place, add
-   [--rise:0px]: it only sharpens. Starts a fresh --delay. */
+   store text the pager swaps): a shorter, softer enter, so the last item lands within ~450ms,
+   coming down with the panel. Where the panel travels sideways or the content is replaced in
+   place, add [--rise:0px]: it only sharpens. Starts a fresh --delay. */
 @utility quick {
   --dur-enter: 320ms;
   --stagger: 30ms;
@@ -970,8 +1006,9 @@
 }
 /* On scroll, tied to position: rises over the element's first 8rem into view, so a jump (anchor,
    End, restored scroll) lands on finished content and a re-render never replays it. Inset 0px,
-   because html's scroll-padding would start it 200px up the screen. Never within the last 8rem
-   of a page. Print and browsers without view timelines show it as is. */
+   because html's scroll-padding would start it 200px up the screen. Keep it off anything within
+   8rem of the page end: it could never scroll far enough to finish. Print and browsers without
+   view timelines show it as is. */
 @utility reveal {
   @media screen and (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
@@ -981,7 +1018,7 @@
     }
   }
 }
-/* A row (a rail, a row of columns): the row rises as one while its items fade in from the left,
+/* A row (a rail, a row of columns): the row rises as one while its items fade in left to right,
    0.75rem of scroll apart (three steps at most). On a rail put it on the scroller itself: only
    the scroller moves, so nothing overflows inside it. A grid of several rows takes reveal per
    item instead. */
@@ -997,6 +1034,8 @@
         --rise: 0px;
         animation: reveal auto var(--ease-out) both;
         animation-timeline: --row;
+        /* The first is a fallback: browsers without sibling-index() drop the second, and the
+           items fade in together */
         animation-range: entry 0% entry 8rem;
         animation-range: entry calc(min(sibling-index() - 1, 3) * 0.75rem) entry
           calc(8rem + min(sibling-index() - 1, 3) * 0.75rem);
@@ -1020,8 +1059,8 @@
     animation-delay: calc(var(--delay, 0ms) + min(var(--i, 0), 5) * var(--stagger));
   }
 }
-/* A photo well (MEDIA) whose photo comes to rest from 104%. Scale only, so an LCP photo is never
-   hidden. */
+/* A photo well (MEDIA) whose photo, its first child, comes to rest from 104%. Scale only, so an
+   LCP photo is never hidden. */
 @utility settle {
   @media (prefers-reduced-motion: no-preference) {
     & > :first-child {
@@ -1091,7 +1130,8 @@
     var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-spring);
 }
 /* Listing results while a sort, filter or page change is on its way (a [data-pending] flag
-   anywhere in the document, drawers included); the delay keeps quick answers from flickering */
+   anywhere in the document: LinkPending, PendingQueryProvider and the toolbar's Clear all); the
+   delay keeps quick answers from flickering */
 @utility pending-dim {
   transition: opacity var(--dur-pop) var(--ease-out);
   :where(:root:has([data-pending])) & {
@@ -1113,23 +1153,6 @@
   }
 }
 
-/* Unlayered so selected states stay visible over utilities like aria-pressed:bg-ink */
-@media (forced-colors: active) {
-  [aria-pressed='true'],
-  [aria-current]:not([aria-current='false']),
-  [aria-selected='true'] {
-    forced-color-adjust: none;
-    background-color: Highlight;
-    border-color: Highlight;
-    color: HighlightText;
-  }
-}
-
-/* Visual editing: stega characters plus tracking misrender, so keep this rule. */
-[data-datocms-contains-stega] {
-  letter-spacing: 0 !important;
-}
-
 /* ---------- View transitions (React <ViewTransition>) ----------
    fade: pages (Common/PageTransition.tsx). The old page drops out fast and the new one comes in
    just after it; its own enter and rise blocks carry the arrival. swap: catalog results replaced
@@ -1139,8 +1162,15 @@
 ::view-transition {
   pointer-events: none;
 }
+/* The root keeps whatever no transition names: on a page change the page background and the
+   footer, on a results swap the rest of the catalog page. A short crossfade. */
 ::view-transition-group(root) {
   animation-duration: var(--dur-pop);
+}
+@keyframes leave {
+  to {
+    opacity: 0;
+  }
 }
 ::view-transition-old(.fade),
 ::view-transition-old(.swap),

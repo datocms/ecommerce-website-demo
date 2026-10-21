@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ComponentPropsWithoutRef } from 'react';
+import { IMG_ZOOM } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import type { FragmentOf } from '@/lib/datocms/graphql';
@@ -48,7 +49,8 @@ export default function ProductCard({
     <Link
       {...rest}
       href={href}
-      // Its lead photo flies to the product page's (morph in global.css)
+      // The "product" view transition: this card's photo flies to the product page's lead
+      // photo (global.css)
       transitionTypes={['product']}
       className={[
         // In a grid parent the card spans 4 shared rows, so name, brand and price
@@ -64,12 +66,12 @@ export default function ProductCard({
         .join(' ')}
     >
       <div
+        // global.css names this well's first child, the photo layer, as the flying photo: keep it
+        // first (the hover photo and the Sale tag come after it and leave with the old page)
         data-morph="card"
         className="relative aspect-[4/5] overflow-hidden bg-mist"
       >
-        <div
-          className={`absolute inset-0 ${hoverImage ? '' : 'transition-transform duration-700 ease-out group-hover:scale-[1.03]'}`}
-        >
+        <div className={`absolute inset-0 ${hoverImage ? '' : IMG_ZOOM}`}>
           {image && (
             <DatoImage
               fragment={image}

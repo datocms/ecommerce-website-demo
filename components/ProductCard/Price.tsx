@@ -1,6 +1,10 @@
 export const formatPrice = (symbol: string, value: number) =>
   `${symbol}${value.toFixed(2)}`;
 
+// Spoken before each price: screen readers do not announce the strikethrough
+const SR_SALE = 'Sale price';
+const SR_ORIGINAL = 'Original price';
+
 type PriceProps = {
   price: number;
   salePrice?: number | null;
@@ -9,8 +13,6 @@ type PriceProps = {
   /** sm: 16px (cards), md: 18px (spotlights), lg: 24px (product page) */
   size?: 'sm' | 'md' | 'lg';
   className?: string;
-  srSaleLabel?: string;
-  srOriginalLabel?: string;
 };
 
 export default function Price({
@@ -20,8 +22,6 @@ export default function Price({
   currencySymbol,
   size = 'sm',
   className,
-  srSaleLabel = 'Sale price',
-  srOriginalLabel = 'Original price',
 }: PriceProps) {
   const showSale = onSale && salePrice != null;
   return (
@@ -37,7 +37,7 @@ export default function Price({
       {showSale ? (
         <>
           <span className="text-sale">
-            <span className="sr-only">{srSaleLabel}: </span>
+            <span className="sr-only">{SR_SALE}: </span>
             {formatPrice(currencySymbol, salePrice)}
           </span>
           {/* Regular weight and smaller: 15px beside a 16px card price, 18px beside the
@@ -45,7 +45,7 @@ export default function Price({
           <s
             className={`font-normal text-mute ${size === 'lg' ? 'text-[0.75em]' : 'text-[0.9375em]'}`}
           >
-            <span className="sr-only">{srOriginalLabel}: </span>
+            <span className="sr-only">{SR_ORIGINAL}: </span>
             {formatPrice(currencySymbol, price)}
           </s>
         </>

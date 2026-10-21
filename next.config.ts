@@ -2,19 +2,9 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   images: {
+    // Only the 404 photo goes through next/image; DatoCMS images use react-datocms
+    // (components/DatoImage)
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'i.ytimg.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.datocms-assets.com',
-        port: '',
-        pathname: '/**',
-      },
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
@@ -22,9 +12,6 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-  },
-  async redirects() {
-    return [];
   },
 };
 

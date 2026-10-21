@@ -1,3 +1,6 @@
+// Called by the LanguageSelector to link to the same product in another locale (product slugs
+// are localized)
+
 import { draftMode } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAvailableLocales, type SiteLocale } from '@/lib/i18n';
@@ -21,6 +24,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unsupported locale' }, { status: 422 });
   }
 
+  // The first locale is the fallback (as in lib/i18n.ts); reuses the locales fetched above
   const fallbackLocale = locales[0];
   const { isEnabled: isDraft } = await draftMode();
   const resolved = await resolveProductSlug({

@@ -1,44 +1,49 @@
+// Called by the SEO/Readability Analysis plugin with the record to analyze
+
 import { buildClient } from '@datocms/cma-client-node';
 import { parseHTML } from 'linkedom';
 import type { NextRequest } from 'next/server';
 import { localizedString } from '@/lib/datocms/localizedString';
+import { getSiteUrl } from '@/lib/siteUrl';
 
-const findSlugAndPermalink = async (
-  item: any,
+// The record's fields are keyed by API key, and slug may be localized
+const findSlugAndPermalink = (
+  item: Record<string, unknown>,
   itemTypeApiKey: string,
   locale: string,
-) => {
+): { slug: string | null; permalink: string } | null => {
   const slug = localizedString(item.slug, locale);
 
+  // Keep in sync with the model map in /api/draft/preview-links
   switch (itemTypeApiKey) {
     case 'home':
-      return [slug, `/${locale}/`];
+      return { slug, permalink: `/${locale}/` };
     case 'showcase':
-      return [slug, `/${locale}/showcase`];
+      return { slug, permalink: `/${locale}/showcase` };
     case 'store':
-      return [slug, `/${locale}/stores`];
+      return { slug, permalink: `/${locale}/stores` };
     case 'product':
-      return slug ? [slug, `/${locale}/product/${slug}`] : [null, null];
+      return slug ? { slug, permalink: `/${locale}/product/${slug}` } : null;
     default:
-      return [null, null];
+      return null;
   }
 };
 
-const headers = {
+const corsHeaders = {
   'Content-Type': 'text/html',
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET',
 };
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new Response('ok', {
     status: 200,
-    headers,
+    headers: corsHeaders,
   });
 }
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
 
   const itemId = searchParams.get('itemId');
   const itemTypeId = searchParams.get('itemTypeId');
@@ -47,10 +52,10 @@ export async function GET(req: NextRequest) {
   const sandboxEnvironmentId = searchParams.get('sandboxEnvironmentId');
 
   // The token is sent by the plugin as a request header (see /api/post-install)
-  const token = req.headers.get('authorization')?.replace(/^Bearer /, '');
+  const token = request.headers.get('authorization')?.replace(/^Bearer /, '');
 
   if (!token || token !== process.env.SEO_SECRET_TOKEN)
-    return new Response('Invalid token', { status: 401, headers });
+    return new Response('Invalid token', { status: 401, headers: corsHeaders });
 
   try {
     if (
@@ -62,7 +67,7 @@ export async function GET(req: NextRequest) {
     ) {
       return new Response('Missing required parameters!', {
         status: 422,
-        headers,
+        headers: corsHeaders,
       });
     }
 
@@ -72,27 +77,20 @@ export async function GET(req: NextRequest) {
     });
     const item = await client.items.find(itemId);
 
-    const [slug, permalink] = await findSlugAndPermalink(
-      item,
-      itemTypeApiKey,
-      locale,
-    );
+    const page = findSlugAndPermalink(item, itemTypeApiKey, locale);
 
-    if (!permalink) {
+    if (!page) {
       return new Response(
         `Don't know which route corresponds to record #${itemId} (model: ${itemTypeApiKey})!`,
         {
           status: 422,
-          headers,
+          headers: corsHeaders,
         },
       );
     }
 
-    const baseUrl = (
-      process.env.VERCEL_PROJECT_PRODUCTION_URL
-        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-        : process.env.URL
-    ) as string;
+    const { slug, permalink } = page;
+    const baseUrl = getSiteUrl();
 
     const response = await fetch(new URL(permalink, baseUrl).toString());
     const body = await response.text();
@@ -101,7 +99,10 @@ export async function GET(req: NextRequest) {
 
     const contentEl = document.querySelector('body');
     if (!contentEl)
-      return new Response('No content found', { status: 422, headers });
+      return new Response('No content found', {
+        status: 422,
+        headers: corsHeaders,
+      });
     const pageContent = contentEl.innerHTML;
     const pageLocale =
       document.querySelector('html')?.getAttribute('lang') || 'en';
@@ -119,13 +120,16 @@ export async function GET(req: NextRequest) {
         description: pageDescription,
         content: pageContent,
       }),
-      { status: 200, headers },
+      { status: 200, headers: corsHeaders },
     );
   } catch (error) {
     // Never return the error: the DatoCMS client stores the failed request in
     // it, Authorization header and payload included
     console.error(error);
 
-    return new Response('Internal server error', { status: 500, headers });
+    return new Response('Internal server error', {
+      status: 500,
+      headers: corsHeaders,
+    });
   }
 }

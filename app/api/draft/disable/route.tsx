@@ -1,3 +1,5 @@
+// Opened by the draft-mode toggle and the "Published version" preview link
+
 import { cookies, draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { isSafeRedirectUrl } from '@/lib/isSafeRedirectUrl';
@@ -16,7 +18,8 @@ export async function GET(request: Request) {
   if (!isSafeRedirectUrl(url, requestUrl))
     return new Response('URL must be relative!', { status: 422 });
 
-  //to avoid losing the cookie on redirect in the iFrame
+  // Reissued as SameSite=None; Secure so the cleared cookie survives the redirect inside the
+  // DatoCMS iframe
   const cookieStore = await cookies();
   const cookie = cookieStore.get('__prerender_bypass')!;
   cookieStore.set({

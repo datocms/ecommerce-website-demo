@@ -1,11 +1,17 @@
-import { headers as getHeaders } from 'next/headers';
+// Called by the Web Previews plugin (installed by /api/post-install) to list preview links for a record
+
 import type { NextRequest } from 'next/server';
 import { localizedString } from '@/lib/datocms/localizedString';
 import type { SiteLocale } from '@/lib/i18n';
+import { getSiteUrl } from '@/lib/siteUrl';
 
-type generatePreviewUrlParams = {
-  item: any;
-  itemType: any;
+type PreviewLinksRequest = {
+  item: {
+    id: string;
+    attributes: { slug?: unknown };
+    meta: { status: 'draft' | 'updated' | 'published' };
+  };
+  itemType: { attributes: { api_key: string } };
   locale: SiteLocale;
 };
 
@@ -13,7 +19,8 @@ const generatePreviewUrl = ({
   item,
   itemType,
   locale,
-}: generatePreviewUrlParams) => {
+}: PreviewLinksRequest) => {
+  // Keep in sync with the model map in /api/seoAnalysis
   switch (itemType.attributes.api_key) {
     case 'home':
       return `/${locale}/home`;
@@ -38,17 +45,17 @@ const generatePreviewUrl = ({
   }
 };
 
-const headers = {
+const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
 };
 
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new Response('ok', {
     status: 200,
-    headers,
+    headers: corsHeaders,
   });
 }
 
@@ -59,41 +66,38 @@ export async function POST(request: NextRequest) {
   if (!token || token !== process.env.DRAFT_SECRET_TOKEN)
     return new Response('Invalid token', { status: 401 });
 
-  const parsedRequest = await request.json();
-  const url = generatePreviewUrl(parsedRequest);
+  const body: PreviewLinksRequest = await request.json();
+  const path = generatePreviewUrl(body);
 
-  if (!url) {
+  if (!path) {
     return new Response(JSON.stringify({ previewLinks: [] }), {
       status: 200,
-      headers,
+      headers: corsHeaders,
     });
   }
 
-  const baseUrl = (
-    process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : process.env.URL
-  ) as string;
+  const baseUrl = getSiteUrl();
 
   const previewLinks = [];
 
-  if (parsedRequest.item.meta.status !== 'published') {
+  // Records with unpublished changes ('updated') get both links
+  if (body.item.meta.status !== 'published') {
     previewLinks.push({
       label: 'Draft version',
       // Opened by a browser, where we cannot set headers
-      url: `${baseUrl}/api/draft/enable?token=${token}&redirect=${url}`,
+      url: `${baseUrl}/api/draft/enable?token=${token}&redirect=${path}`,
     });
   }
 
-  if (parsedRequest.item.meta.status !== 'draft') {
+  if (body.item.meta.status !== 'draft') {
     previewLinks.push({
       label: 'Published version',
-      url: `${baseUrl}/api/draft/disable?redirect=${url}`,
+      url: `${baseUrl}/api/draft/disable?redirect=${path}`,
     });
   }
 
   return new Response(JSON.stringify({ previewLinks }), {
     status: 200,
-    headers,
+    headers: corsHeaders,
   });
 }

@@ -6,8 +6,7 @@ import { MEDIA } from '@/components/Common/styles';
 import DocumentLang from '@/components/Layout/DocumentLang';
 
 // No header or footer here (it renders outside [lng]): the photo runs to the viewport's edges
-// and, on phones, takes whatever height the text leaves. From lg the 4:5 photo fills its column
-// by height, so 80vh wide, on screens narrower than 8:5 (48:35 once the column is 7/12 at xl)
+// and, on phones, takes whatever height the text leaves
 const NotFound = () => {
   return (
     <main className="grid min-h-svh grid-rows-[minmax(17.5rem,1fr)_auto] lg:grid-cols-12 lg:grid-rows-1">
@@ -20,6 +19,8 @@ const NotFound = () => {
           alt="A person stands behind a red-tinted, foggy surface with hands pressed against it, wearing a cap and jacket."
           fill
           priority
+          // From lg the 4:5 photo fills its column by height (80vh wide) on screens narrower than
+          // 8:5, or 48:35 at xl
           sizes="(min-width: 1280px) and (max-aspect-ratio: 48/35) 80vh, (min-width: 1280px) 59vw, (min-width: 1024px) and (max-aspect-ratio: 8/5) 80vh, (min-width: 1024px) 50vw, 100vw"
           className="object-cover object-[50%_25%]"
         />

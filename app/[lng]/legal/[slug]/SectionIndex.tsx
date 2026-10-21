@@ -15,10 +15,11 @@ const SectionIndex = ({
   sections: Section[];
 }) => {
   const [active, setActive] = useState(0);
+  // Joined so the effect only re-runs when the set of ids changes
   const ids = sections.map((section) => section.id).join(' ');
 
   useEffect(() => {
-    const wide = window.matchMedia('(min-width: 64rem)');
+    const lgQuery = window.matchMedia('(min-width: 64rem)'); // lg
     const headings = ids.split(' ').map((id) => document.getElementById(id));
     let frame = 0;
     const update = () => {
@@ -43,19 +44,19 @@ const SectionIndex = ({
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
-    const listen = () => {
+    const syncScrollListeners = () => {
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
-      if (!wide.matches) return;
+      if (!lgQuery.matches) return;
       update();
       window.addEventListener('scroll', schedule, { passive: true });
       window.addEventListener('resize', schedule);
     };
-    listen();
-    wide.addEventListener('change', listen);
+    syncScrollListeners();
+    lgQuery.addEventListener('change', syncScrollListeners);
     return () => {
       cancelAnimationFrame(frame);
-      wide.removeEventListener('change', listen);
+      lgQuery.removeEventListener('change', syncScrollListeners);
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
     };

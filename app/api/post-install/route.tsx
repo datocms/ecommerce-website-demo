@@ -1,21 +1,18 @@
+// Called once by the "Deploy with DatoCMS" flow (postInstallUrl in datocms.json) to install the
+// Web Previews plugin and the cache-revalidation webhook. Safe to delete after setup.
+
 import { buildClient, type Client } from '@datocms/cma-client-node';
 import { NextResponse } from 'next/server';
+import { getSiteUrl } from '@/lib/siteUrl';
 
-const cors = {
-  headers: {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'OPTIONS, POST',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  },
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'OPTIONS, POST',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-/*
-  These endpoints are called right after bootstrapping the Starter project...
-  they can be removed afterwards!
-*/
-
 export async function OPTIONS() {
-  return new Response('OK', cors);
+  return new Response('OK', { headers: corsHeaders });
 }
 
 async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
@@ -55,25 +52,8 @@ async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
   });
 }
 
-// async function installSEOAnalysisPlugin(client: Client, baseUrl: string) {
-//   const seoPlugin = await client.plugins.create({
-//     package_name: 'datocms-plugin-seo-readability-analysis',
-//   });
-
-//   await client.plugins.update(seoPlugin.id, {
-//     parameters: {
-//       htmlGeneratorUrl: new URL('/api/seoAnalysis', baseUrl).toString(),
-//       customHeaders: [
-//         {
-//           name: 'Authorization',
-//           value: `Bearer ${process.env.SEO_SECRET_TOKEN}`,
-//         },
-//       ],
-//       autoApplyToFieldsWithApiKey: 'seo_analysis',
-//       setSeoReadabilityAnalysisFieldExtensionId: true,
-//     },
-//   });
-// }
+// The SEO/Readability Analysis plugin is not installed automatically. To enable it, point its
+// htmlGeneratorUrl at /api/seoAnalysis and send `Authorization: Bearer ${SEO_SECRET_TOKEN}`.
 
 async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
   await client.webhooks.create({
@@ -113,7 +93,7 @@ async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
  * endpoint would happily write our secret tokens into any project a caller
  * names, and the caller could then read them back from their own project.
  */
-async function ensureSameProject(client: Client, ourApiToken: string) {
+async function isSameProject(client: Client, ourApiToken: string) {
   const ourClient = buildClient({ apiToken: ourApiToken });
 
   const [callerProject, ourProject] = await Promise.all([
@@ -129,17 +109,13 @@ export async function POST(request: Request) {
 
   const client = buildClient({ apiToken: body.datocmsApiToken });
 
-  const baseUrl = (
-    process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : process.env.URL
-  ) as string;
+  const baseUrl = getSiteUrl();
 
   try {
-    if (!(await ensureSameProject(client, process.env.DATOCMS_CMA_TOKEN!))) {
+    if (!(await isSameProject(client, process.env.DATOCMS_CMA_TOKEN!))) {
       return NextResponse.json(
         { success: false, error: 'Invalid token' },
-        { status: 401, ...cors },
+        { status: 401, headers: corsHeaders },
       );
     }
 
@@ -148,7 +124,7 @@ export async function POST(request: Request) {
       createCacheInvalidationWebhook(client, baseUrl),
     ]);
 
-    return NextResponse.json({ success: true }, cors);
+    return NextResponse.json({ success: true }, { headers: corsHeaders });
   } catch (error) {
     // Never return the error: the DatoCMS client stores the failed request in
     // it, Authorization header and payload included
@@ -156,7 +132,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
-      { status: 500, ...cors },
+      { status: 500, headers: corsHeaders },
     );
   }
 }

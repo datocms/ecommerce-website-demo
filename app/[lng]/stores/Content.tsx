@@ -1,21 +1,20 @@
 'use client';
 
 import { stripStega } from '@datocms/content-link';
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  ArrowUpRightIcon,
-} from '@heroicons/react/24/outline';
+import { ArrowRightIcon, ArrowUpRightIcon } from '@heroicons/react/24/outline';
 import { type MouseEvent, useRef, useState } from 'react';
 import { IMG_ZOOM, MEDIA, PAGE_VARS } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { readFragment } from '@/lib/datocms/graphql';
+import { heroImageSizes } from './imageSizes';
 import type { PageProps, Query } from './meta';
+import StorePager from './StorePager';
 
-const pad = (value: number) => String(value).padStart(2, '0');
-
+// The copy is 16px from lg, with a tight rhythm, so even the longest store keeps the pager above
+// the fold of a 730px-tall screen; once the hero reaches its full 780px (2xl, 900px tall) the copy
+// grows to 17px and the rhythm opens up
 const DESCRIPTION =
   'mt-6 max-w-[36em] text-md text-pretty text-ink-2 lg:text-base 2xl:[@media(min-height:56.25rem)]:text-md';
 const MAPS = 'btn mt-6 w-full sm:w-auto 2xl:[@media(min-height:56.25rem)]:mt-8';
@@ -34,33 +33,10 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
   const image = store.storeImage?.responsiveImage;
   const findOnMaps = data.generalInterface?.findOnMaps;
 
-  // The photo covers its box, so it renders at the box's width or at its height × the photo's
-  // ratio, whichever is wider. Below lg the box is full width and 4:3; from lg it is 6 of 12
-  // columns plus the right gutter (50vw - 8px), 7 from 2xl (50vw + 107px), and at most 780px
-  // tall (--hero-h), unless a long description makes the text column taller
   const { width, height } = image
     ? readFragment(ResponsiveImageFragment, image)
     : { width: 1, height: 1 };
   const ratio = width / height;
-  const cover = (
-    from: number,
-    to: number,
-    vw: number,
-    offset: number,
-    boxHeight: number,
-  ) => {
-    const px = Math.round(boxHeight * ratio);
-    const box = `calc(${vw}vw ${offset < 0 ? '-' : '+'} ${Math.abs(offset)}px)`;
-    const crossing = Math.ceil(((px - offset) * 100) / vw);
-    if (crossing <= from) return `(min-width: ${from}px) ${box}`;
-    if (crossing >= to) return `(min-width: ${from}px) ${px}px`;
-    return `(min-width: ${crossing}px) ${box}, (min-width: ${from}px) ${px}px`;
-  };
-  const sizes = [
-    cover(1440, Number.POSITIVE_INFINITY, 50, 107, 780),
-    cover(1024, 1440, 50, -8, 780),
-    `${Math.round(Math.max(100, 75 * ratio))}vw`,
-  ].join(', ');
 
   const step = (by: number) => {
     setCurrentStore(
@@ -68,35 +44,6 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
         (currentStore + by + allStores.length) % allStores.length,
     );
   };
-
-  // Phones show the pager above the store, wider screens under it: each layout gets its own copy
-  // (the other one is display: none), so the tab and reading order always follow what is seen
-  const pager = (className: string) => (
-    <div className={`flex items-center justify-between gap-6 ${className}`}>
-      <p className="text-sm font-semibold tabular-nums">
-        {pad(currentStore + 1)}{' '}
-        <span className="font-normal text-mute">/ {pad(allStores.length)}</span>
-      </p>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          aria-label="Previous store"
-          className="rail-btn"
-          onClick={() => step(-1)}
-        >
-          <ArrowLeftIcon aria-hidden="true" className="stroke-2" />
-        </button>
-        <button
-          type="button"
-          aria-label="Next store"
-          className="rail-btn"
-          onClick={() => step(1)}
-        >
-          <ArrowRightIcon aria-hidden="true" className="stroke-2" />
-        </button>
-      </div>
-    </div>
-  );
 
   // Below lg the index sits under the store, so picking one there takes focus (and the view, when
   // the name is out of it) up to its name. From lg a click leaves the page where it is while a
@@ -119,7 +66,8 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
         Math.max(textBox.top, headerOffset) >=
       (window.innerHeight - headerOffset) / 4;
     if (
-      window.matchMedia('(min-width: 64rem)').matches &&
+      window.matchMedia('(min-width: 64rem)').matches && // lg
+      // event.detail is 0 when the button is activated from the keyboard
       (inView || (event.detail > 0 && textShown))
     ) {
       return;
@@ -143,7 +91,7 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
               fragment={image}
               layout="fill"
               objectFit="cover"
-              sizes={sizes}
+              sizes={heroImageSizes(ratio)}
               priority
             />
           )}
@@ -154,19 +102,20 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
           aria-live="polite"
           className="flex flex-col pt-4 md:pt-8 lg:col-span-6 lg:py-8 lg:pr-10 xl:py-10 xl:pr-14 2xl:col-span-5 2xl:[@media(min-height:56.25rem)]:py-12"
         >
-          {/* From md every store's text shares one cell, so the column keeps the longest store's
-              height: the pager under it and the index below stay put, and the spare room goes
-              under the shorter stores' link. Below md only the current store renders and the
-              pager sits above it, so the arrows never move under the thumb. Until 2xl the text
-              takes half the row; from 2xl it takes 5 columns, and only the name may run 32px into
-              the right padding, so the longest store name keeps one line while the copy, link
-              and pager keep their distance from the photo. The copy is 16px from lg, with a
-              tight rhythm, so even the longest store keeps the pager above the fold of a
-              730px-tall screen; once the hero reaches its full 780px (2xl, 900px tall) the copy
-              grows to 17px and the rhythm opens up. The current store always comes first, so
-              the h1 keeps its node (and focus) from one store to the next */}
-          {pager('border-b pb-4 md:hidden')}
+          {/* From md every store's text is stacked in one grid cell (only the current one
+              visible), so the column keeps the tallest store's height and the pager and list
+              below never jump. Below md only the current store renders, with the pager above it.
+              The current store renders first, so the h1 keeps its DOM node, and focus, between
+              stores. */}
+          <StorePager
+            current={currentStore}
+            total={allStores.length}
+            onStep={step}
+            className="border-b pb-4 md:hidden"
+          />
           <div className="grid grow max-md:mt-8">
+            {/* Each part is keyed by store, so it remounts and enters again on a switch (quick,
+                sharpening in place). The h1 is not keyed, only its text, so it keeps focus. */}
             <div className="quick col-start-1 row-start-1 [--rise:0px]">
               <p key={`${store.id}-country`} className="eyebrow enter">
                 {store.country}
@@ -196,6 +145,8 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
             </div>
             {allStores.map((item, index) =>
               index === currentStore ? null : (
+                // Invisible copies that only reserve height: stripStega keeps them from creating
+                // duplicate visual-editing overlays
                 <div
                   key={item.id}
                   aria-hidden="true"
@@ -217,9 +168,12 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
             )}
           </div>
 
-          {pager(
-            'mt-8 border-t pt-5 max-md:hidden 2xl:[@media(min-height:56.25rem)]:mt-10',
-          )}
+          <StorePager
+            current={currentStore}
+            total={allStores.length}
+            onStep={step}
+            className="mt-8 border-t pt-5 max-md:hidden 2xl:[@media(min-height:56.25rem)]:mt-10"
+          />
         </div>
       </section>
 

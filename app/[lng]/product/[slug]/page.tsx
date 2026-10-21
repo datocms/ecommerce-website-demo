@@ -1,7 +1,7 @@
 import { draftMode } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { toNextMetadata } from 'react-datocms/seo';
-import PageTransition from '@/components/Common/PageTransition';
+import PageTransition from '@/components/Motion/PageTransition';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import { graphql } from '@/lib/datocms/graphql';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';

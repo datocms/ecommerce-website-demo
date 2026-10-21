@@ -3,7 +3,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import LinkPending from '@/components/Common/LinkPending';
+import LinkPending from '@/components/Motion/LinkPending';
 
 type Props = {
   totalCount: number;

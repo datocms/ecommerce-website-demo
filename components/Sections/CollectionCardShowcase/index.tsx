@@ -1,11 +1,11 @@
 import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import RailControls from '@/components/Common/RailControls';
-import RailFocus from '@/components/Common/RailFocus';
 import SectionTitle from '@/components/Common/SectionTitle';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import RailControls from '@/components/Rail/RailControls';
+import RailFocus from '@/components/Rail/RailFocus';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { CollectionCardShowcaseFragment } from './fragments';

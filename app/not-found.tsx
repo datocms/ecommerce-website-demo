@@ -1,9 +1,9 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Link from 'next/link';
-import Rise from '@/components/Common/Rise';
 import { MEDIA } from '@/components/Common/styles';
 import DocumentLang from '@/components/Layout/DocumentLang';
+import Rise from '@/components/Motion/Rise';
 
 // No header or footer here (it renders outside [lng]): the photo runs to the viewport's edges
 // and, on phones, takes whatever height the text leaves

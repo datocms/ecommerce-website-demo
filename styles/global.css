@@ -926,7 +926,7 @@
 
 /* ---------- Motion ----------
    Set and settle: content sharpens up on mount (enter, enter-stagger) or fades up with its row on
-   scroll (reveal, reveal-stagger); page titles rise word by word (rise, via Common/Rise.tsx);
+   scroll (reveal, reveal-stagger); page titles rise word by word (rise, via Motion/Rise.tsx);
    photos come to rest in a still frame (settle); overlays pop from their trigger (pop), the mega
    menu unrolls (wipe) and sheets slide from their edge (Drawer, SearchDialog), with quicker
    contents (quick); controls sink and spring back (press); nav and sort bars draw from the left
@@ -1049,7 +1049,7 @@
   --motion: rise;
   --reveal-end: 100%;
 }
-/* One word of a page title (Common/Rise.tsx sets --i): rises out of its line, --stagger after the
+/* One word of a page title (Motion/Rise.tsx sets --i): rises out of its line, --stagger after the
    one before; from the sixth word on they rise together */
 @utility rise {
   display: inline-block;
@@ -1154,7 +1154,7 @@
 }
 
 /* ---------- View transitions (React <ViewTransition>) ----------
-   fade: pages (Common/PageTransition.tsx). The old page drops out fast and the new one comes in
+   fade: pages (Motion/PageTransition.tsx). The old page drops out fast and the new one comes in
    just after it; its own enter and rise blocks carry the arrival. swap: catalog results replaced
    in place. product: a product card's photo flies to the product page's lead photo. Chrome holds
    still above all of it. */

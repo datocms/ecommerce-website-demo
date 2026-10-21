@@ -1,9 +1,9 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import Rise from '@/components/Common/Rise';
 import SocialLink from '@/components/Common/SocialLink';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import Rise from '@/components/Motion/Rise';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { HeroSectionFragment } from './fragments';

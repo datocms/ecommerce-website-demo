@@ -1,8 +1,8 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import RailControls from '@/components/Common/RailControls';
-import RailProgress from '@/components/Common/RailProgress';
 import SectionTitle from '@/components/Common/SectionTitle';
+import RailControls from '@/components/Rail/RailControls';
+import RailProgress from '@/components/Rail/RailProgress';
 import type { FragmentOf } from '@/lib/datocms/graphql';
 import type { ProductRailFragment } from './fragments';
 import ProductRail from './ProductRail';

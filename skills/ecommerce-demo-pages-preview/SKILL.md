@@ -37,7 +37,7 @@ Record-backed pages use this route folder shape under `app/[lng]/...`:
 - `RealTime.tsx` for draft/live preview rendering.
 - Optional `staticParamsQuery` in `page.tsx` for slug-backed collection routes.
 
-A `page.tsx` that does not use `generateWrapper` wraps what it renders in `<PageTransition>` (`components/Common/PageTransition.tsx`), as `products/` and `product/[slug]/` do. Without it, navigating to the page skips the page fade.
+A `page.tsx` that does not use `generateWrapper` wraps what it renders in `<PageTransition>` (`components/Motion/PageTransition.tsx`), as `products/` and `product/[slug]/` do. Without it, navigating to the page skips the page fade.
 
 Existing examples:
 

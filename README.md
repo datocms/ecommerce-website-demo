@@ -90,20 +90,22 @@ app/
   api/                      draft mode, Web Previews links, cache revalidation,
                             SEO analysis, post-install setup, product slug map
 components/
-  Common/                   generic building blocks: drawer, section title, rail controls and
-                            progress, social link, SVG icon, shared class recipes (styles.ts),
-                            and the motion components PageTransition, Rise and LinkPending
+  Common/                   generic building blocks: drawer, section title, social link,
+                            SVG icon, shared class recipes (styles.ts)
   DatoImage/                DatoCMS responsive image and its ResponsiveImageFragment
   DatoStructuredText/       Structured Text renderer with visual-editing boundaries
   DraftMode/                draft-mode toggle, token form, success toast and the Content Link
                             overlay
   Layout/                   site shell: Header/, Footer/, cookie notice, language selector,
                             accent color, site-wide meta tags, <html lang> sync
+  Motion/                   PageTransition (page fades), Rise (word-by-word titles) and
+                            LinkPending (marks a link whose page is loading)
   ProductCard/              the product card shared by every product list, and Price.tsx
                             (the price block, also used by the buy box, and the cart's formatPrice)
   ProductDetail/            product page: gallery, buy box, description blocks, reviews,
                             related products
   ProductListing/           catalog page: FilterDetail header, toolbar, filters, sort, pagination
+  Rail/                     controls, keyboard focus and progress bar for horizontal scrollers
   Sections/                 home page sections, one folder per CMS block,
                             plus NewArrivals (the newest products)
   WithRealTimeUpdates/      renders a route from published content or live draft content
@@ -149,7 +151,7 @@ Feature areas with several components get a folder in `components/`. Small helpe
 
 Tailwind only scans `app/` and `components/` for class names, so keep class strings in those two folders.
 
-Motion lives in the Motion and View transitions sections at the end of `styles/global.css` (utilities such as `enter`, `reveal-stagger` and `press`, and the page, results and product-photo transitions; the durations and curves they use sit with the other tokens in `@theme` and `:root` at the top), and in three components in `components/Common/`: `PageTransition` (page fades), `Rise` (page titles, word by word) and `LinkPending` (marks a navigation in progress).
+Motion lives in the Motion and View transitions sections at the end of `styles/global.css` (utilities such as `enter`, `reveal-stagger` and `press`, and the page, results and product-photo transitions; the durations and curves they use sit with the other tokens in `@theme` and `:root` at the top), and in three components in `components/Motion/`: `PageTransition` (page fades), `Rise` (page titles, word by word) and `LinkPending` (marks a navigation in progress).
 
 ## Updating the GraphQL schema
 

@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown';
-import RailControls from '@/components/Common/RailControls';
-import RailProgress from '@/components/Common/RailProgress';
+import RailControls from '@/components/Rail/RailControls';
+import RailProgress from '@/components/Rail/RailProgress';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import { TestimonialSectionFragment } from './fragments';
 

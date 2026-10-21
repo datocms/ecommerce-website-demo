@@ -11,11 +11,11 @@ import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 
-type PropTypes = {
+type Props = {
   lng: string;
   name: string;
   subtitle: string;
-  type: string | null | undefined;
+  eyebrow: string | null | undefined;
   image: FragmentOf<typeof ResponsiveImageFragment> | null | undefined;
   description: StructuredText<Record, Record> | null | undefined;
   /** The image is a logo: shown whole on mist, never cropped */
@@ -27,16 +27,14 @@ type PropTypes = {
 const LOGO_SHARE = 60;
 
 // Advance widths of the title face, in em, erring wide so a word always fits
-const advance = (char: string) =>
-  /[.,'’iíìïjlI]/.test(char)
-    ? 0.25
-    : /[frtJ1-]/.test(char)
-      ? 0.39
-      : /[mwMW]/.test(char)
-        ? 0.9
-        : /\p{Lu}/u.test(char)
-          ? 0.66
-          : 0.57;
+const GLYPH_WIDTHS: [RegExp, number][] = [
+  [/[.,'’iíìïjlI]/, 0.25],
+  [/[frtJ1-]/, 0.39],
+  [/[mwMW]/, 0.9],
+  [/\p{Lu}/u, 0.66],
+];
+const glyphWidthEm = (char: string) =>
+  GLYPH_WIDTHS.find(([re]) => re.test(char))?.[1] ?? 0.57;
 
 /** The widest unbreakable part of a title, in em */
 const widestWord = (title: string) =>
@@ -44,18 +42,20 @@ const widestWord = (title: string) =>
     0,
     ...title
       .split(/\s+|(?<=-)/)
-      .map((word) => [...word].reduce((sum, char) => sum + advance(char), 0)),
+      .map((word) =>
+        [...word].reduce((sum, char) => sum + glyphWidthEm(char), 0),
+      ),
   );
 
 const FilterDetail = ({
   lng,
   name,
-  type,
+  eyebrow,
   image,
   description,
   subtitle,
   logo = false,
-}: PropTypes) => {
+}: Props) => {
   const logoData =
     image && logo ? readFragment(ResponsiveImageFragment, image) : null;
   const titleWidth = widestWord(stripStega(name));
@@ -79,8 +79,9 @@ const FilterDetail = ({
             {logoData ? (
               // Sized against both sides of the well, so a logo of any shape fits
               // whole. Multiply blends a white backdrop into the mist; a logo drawn on its
-              // own tinted square keeps that square, a tile inside the well. The mist
-              // repeats here because settle's scale isolates this layer from the well's
+              // own tinted square keeps that square, a tile inside the well. bg-mist repeats
+              // on this layer: while settle scales it, the layer is isolated, and multiply
+              // would show the logo's white box instead of blending it into the well
               <div className="absolute inset-0 grid place-items-center bg-mist [container-type:size] [--logo-h:80] md:[--logo-h:60]">
                 <div
                   className="relative"
@@ -115,10 +116,12 @@ const FilterDetail = ({
         <div
           className={`enter-stagger [container-type:inline-size] ${image ? 'pt-8 lg:col-span-6 lg:col-start-7 lg:pt-0' : 'lg:col-span-8'}`}
         >
-          {type && <p className="eyebrow">{type}</p>}
+          {eyebrow && <p className="eyebrow">{eyebrow}</p>}
           {/* Words never break: a long single word (German compounds) shrinks to
               fit the column instead */}
-          <h1 className={`title-display hyphens-manual ${type ? 'mt-4' : ''}`}>
+          <h1
+            className={`title-display hyphens-manual ${eyebrow ? 'mt-4' : ''}`}
+          >
             <span
               className="block"
               style={
@@ -142,6 +145,7 @@ const FilterDetail = ({
               data={description}
               className="prose-dato mt-10 max-w-[66ch] border-t border-line pt-8 lg:mt-12"
               customNodeRules={[
+                // Every list renders as a plain bulleted <ul>
                 renderNodeRule(isList, ({ children, key }) => (
                   <ul key={key}>{children}</ul>
                 )),

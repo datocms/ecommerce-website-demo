@@ -1,4 +1,6 @@
-export const dynamic = 'force-dynamic';
+// The catalog depends on search params, so it renders on every request and runs its
+// queries here instead of through generateWrapper; there is no RealTime view. It wraps
+// itself in PageTransition, as generateWrapper does for the other routes.
 
 import { stripStega } from '@datocms/content-link';
 import {
@@ -13,117 +15,28 @@ import Link from 'next/link';
 import { ViewTransition } from 'react';
 import LinkPending from '@/components/Common/LinkPending';
 import PageTransition from '@/components/Common/PageTransition';
-import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import ProductCard from '@/components/ProductCard';
 import FilterDetail from '@/components/ProductListing/FilterDetail';
-import FilterPanel, { SortTabs } from '@/components/ProductListing/FilterPanel';
+import FilterPanel from '@/components/ProductListing/FilterPanel';
 import {
-  InitialParamsFragment,
-  ProductsGeneralInterfaceFragment,
+  FilterOptionsFragment,
+  ProductListingLabelsFragment,
 } from '@/components/ProductListing/fragments';
 import ListingToolbar from '@/components/ProductListing/ListingToolbar';
 import Pagination from '@/components/ProductListing/Pagination';
-import { graphql, readFragment } from '@/lib/datocms/graphql';
+import SortTabs from '@/components/ProductListing/SortTabs';
+import { readFragment } from '@/lib/datocms/graphql';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
 import { getFallbackLocale, type SiteLocale } from '@/lib/i18n';
+import {
+  filterOptionsQuery,
+  PAGE_SIZE,
+  type PageProps,
+  type ProductModelOrderBy,
+  productsQuery,
+} from './meta';
 
-type ProductModelOrderBy = ReturnType<
-  typeof graphql.scalar<'ProductModelOrderBy'>
->;
-
-// Must match `first` in the products query below
-const PAGE_SIZE = 12;
-
-const productsQuery = graphql(
-  /* GraphQL */ `
-    query Products(
-      $locale: SiteLocale
-      $fallbackLocale: [SiteLocale!]
-      $skip: IntType
-      $orderBy: [ProductModelOrderBy]
-      $collections: [ItemId]
-      $brands: [ItemId]
-      $materials: [ItemId]
-      $nameSearch: String!
-    ) {
-      allProducts(
-        first: 12
-        locale: $locale
-        fallbackLocales: $fallbackLocale
-        skip: $skip
-        orderBy: $orderBy
-        filter: {
-          collections: { anyIn: $collections }
-          AND: {
-            brand: { in: $brands }
-            AND: {
-              material: { in: $materials }
-              AND: { name: { matches: { pattern: $nameSearch } } }
-            }
-          }
-        }
-      ) {
-        id
-        slug
-        sale
-        salePrice
-        productImages {
-          responsiveImage {
-            ...ResponsiveImageFragment
-          }
-        }
-        price
-        name
-        brand {
-          name
-        }
-      }
-      _allProductsMeta(
-        locale: $locale
-        filter: {
-          collections: { anyIn: $collections }
-          AND: {
-            brand: { in: $brands }
-            AND: {
-              material: { in: $materials }
-              AND: { name: { matches: { pattern: $nameSearch } } }
-            }
-          }
-        }
-      ) {
-        count
-      }
-      generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
-        ...ProductsGeneralInterfaceFragment
-      }
-    }
-  `,
-  [ResponsiveImageFragment, ProductsGeneralInterfaceFragment],
-);
-
-const initialParamsQuery = graphql(
-  /* GraphQL */ `
-    query InitialParams($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
-      ...InitialParamsFragment
-    }
-  `,
-  [InitialParamsFragment],
-);
-
-type PageProps = {
-  params: Promise<{
-    lng: string;
-    slug: string;
-  }>;
-  searchParams: Promise<{
-    page?: string;
-    orderBy?: ProductModelOrderBy;
-    productName?: string;
-    collections?: string;
-    brands?: string;
-    materials?: string;
-  }>;
-};
+export const dynamic = 'force-dynamic';
 
 const Page = async ({ params, searchParams }: PageProps) => {
   const { lng } = await params;
@@ -133,14 +46,14 @@ const Page = async ({ params, searchParams }: PageProps) => {
   // Out-of-range values like ?page=0 would make `skip` negative and fail the query
   const pageNumber = Math.max(
     1,
-    Number.parseInt(resolvedSearchParams?.page ?? '1', 10) || 1,
+    Number.parseInt(resolvedSearchParams.page ?? '1', 10) || 1,
   );
   const orderBy: ProductModelOrderBy =
-    resolvedSearchParams?.orderBy ?? '_createdAt_ASC';
-  const nameSearch = resolvedSearchParams?.productName ?? '';
+    resolvedSearchParams.orderBy ?? '_createdAt_ASC';
+  const nameSearch = resolvedSearchParams.productName ?? '';
 
-  const initialParams = await queryDatoCMS(
-    initialParamsQuery,
+  const filterOptions = await queryDatoCMS(
+    filterOptionsQuery,
     {
       locale: lng as SiteLocale,
       fallbackLocale: [fallbackLng],
@@ -149,39 +62,27 @@ const Page = async ({ params, searchParams }: PageProps) => {
   );
 
   const { allBrands, allCollections, allMaterials } =
-    readFragment(InitialParamsFragment, initialParams) ?? {};
+    readFragment(FilterOptionsFragment, filterOptions) ?? {};
 
-  const collectionParams = resolvedSearchParams?.collections
-    ?.split('|')
-    .filter((collection) => collection.length);
+  // A missing param means every option; an empty one means none
+  const selectedIds = (param: string | undefined, options: { id: string }[]) =>
+    param === undefined
+      ? options.map((option) => option.id)
+      : param.split('|').filter(Boolean);
 
-  const collections =
-    collectionParams === undefined
-      ? allCollections.map((collection) => collection.id)
-      : collectionParams;
-
-  const brandParams = resolvedSearchParams?.brands
-    ?.split('|')
-    .filter((brand) => brand.length);
-
-  const brands =
-    brandParams === undefined
-      ? allBrands.map((brand) => brand.id)
-      : brandParams;
-
-  const materialParams = resolvedSearchParams?.materials
-    ?.split('|')
-    .filter((material) => material.length);
-  const materials =
-    materialParams === undefined
-      ? allMaterials.map((material) => material.id)
-      : materialParams;
+  const collections = selectedIds(
+    resolvedSearchParams.collections,
+    allCollections,
+  );
+  const brands = selectedIds(resolvedSearchParams.brands, allBrands);
+  const materials = selectedIds(resolvedSearchParams.materials, allMaterials);
 
   const data = await queryDatoCMS(
     productsQuery,
     {
       locale: lng as SiteLocale,
       fallbackLocale: [fallbackLng],
+      first: PAGE_SIZE,
       skip: (pageNumber - 1) * PAGE_SIZE,
       orderBy: [orderBy],
       collections,
@@ -192,42 +93,28 @@ const Page = async ({ params, searchParams }: PageProps) => {
     isEnabled,
   );
 
-  let singleFilter = null;
+  // A header for a lone material, collection or brand, checked in that order. The
+  // first group with exactly one selected id decides, even if no record has that id
+  // (then there is no header)
+  const headerFilter =
+    materials.length === 1
+      ? allMaterials.find((material) => material.id === materials[0])
+      : collections.length === 1
+        ? allCollections.find((collection) => collection.id === collections[0])
+        : brands.length === 1
+          ? allBrands.find((brand) => brand.id === brands[0])
+          : undefined;
 
-  if (materials.length === 1) {
-    singleFilter = allMaterials.filter(
-      (material) => material.id === materials[0],
-    )[0];
-  } else if (collections.length === 1) {
-    singleFilter = allCollections.filter(
-      (collection) => collection.id === collections[0],
-    )[0];
-  } else if (brands.length === 1) {
-    singleFilter = allBrands.filter((brand) => brand.id === brands[0])[0];
-  }
-
-  const {
-    sale,
-    currencySymbol,
-    BrandRecord,
-    CollectionRecord,
-    MaterialRecord,
-  } =
-    readFragment(ProductsGeneralInterfaceFragment, data.generalInterface) ?? {};
-
-  const type =
-    singleFilter?.__typename === 'BrandRecord'
-      ? BrandRecord
-      : singleFilter?.__typename === 'CollectionRecord'
-        ? CollectionRecord
-        : singleFilter?.__typename === 'MaterialRecord'
-          ? MaterialRecord
-          : null;
+  const labels = readFragment(
+    ProductListingLabelsFragment,
+    data.generalInterface,
+  );
+  const filterLabel = headerFilter ? labels?.[headerFilter.__typename] : null;
 
   // Mirrors FilterPanel: a group narrows the listing unless every option is on
   const isNarrowed = (selected: string[], options: { id: string }[]) =>
     options.some((option) => !selected.includes(option.id));
-  const narrowed = [
+  const activeFilterCount = [
     isNarrowed(collections, allCollections),
     isNarrowed(materials, allMaterials),
     isNarrowed(brands, allBrands),
@@ -238,7 +125,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   const hrefWithout = (...keys: string[]) => {
     const params = new URLSearchParams();
-    for (const [key, value] of Object.entries(resolvedSearchParams ?? {})) {
+    for (const [key, value] of Object.entries(resolvedSearchParams)) {
       if (!keys.includes(key) && value !== undefined) params.set(key, value);
     }
     const query = params.toString();
@@ -262,18 +149,20 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   return (
     <PageTransition>
-      {singleFilter ? (
+      {headerFilter ? (
+        // Keyed by the record, so moving from one brand, collection or material to another
+        // remounts it and its arrival (settle, enter-stagger) plays again
         <FilterDetail
-          key={singleFilter.id}
+          key={headerFilter.id}
           lng={lng}
-          type={type}
-          name={singleFilter.name}
-          subtitle={singleFilter.details.subtitle ?? ''}
+          eyebrow={filterLabel}
+          name={headerFilter.name}
+          subtitle={headerFilter.details.subtitle ?? ''}
           description={
-            singleFilter.details.description as StructuredText<Record, Record>
+            headerFilter.details.description as StructuredText<Record, Record>
           }
-          image={singleFilter.details.image.responsiveImage}
-          logo={singleFilter.__typename === 'BrandRecord'}
+          image={headerFilter.details.image.responsiveImage}
+          logo={headerFilter.__typename === 'BrandRecord'}
         />
       ) : (
         <h1 className="sr-only">Products</h1>
@@ -281,8 +170,8 @@ const Page = async ({ params, searchParams }: PageProps) => {
       <ListingToolbar
         count={count}
         lng={lng}
-        narrowed={narrowed}
-        framed={Boolean(singleFilter)}
+        activeFilterCount={activeFilterCount}
+        hasFilterDetail={Boolean(headerFilter)}
         sort={<SortTabs generalInterface={data.generalInterface} />}
         searchChip={
           nameSearch ? (
@@ -310,18 +199,17 @@ const Page = async ({ params, searchParams }: PageProps) => {
         }
       >
         <FilterPanel
-          initialParams={initialParams}
+          filterOptions={filterOptions}
           generalInterface={data.generalInterface}
-          paramaterCollections={collections}
-          parameterBrands={brands}
-          parameterMaterials={materials}
+          selectedCollections={collections}
+          selectedBrands={brands}
+          selectedMaterials={materials}
         />
       </ListingToolbar>
-      {/* A new listing replaces the old one in place: the old drops out where it was, and the
-          new rises under the toolbar (swap in global.css). Keyed by the query, so the old and
-          new are separate groups that never travel, even when ListingToolbar rewinds the
-          scroll. The drawer's toggles and Clear all (type "filter") update it at once, behind
-          the scrim */}
+      {/* On a query change the results swap in place (swap in global.css). Keyed by the
+          query, so the old and new lists are separate groups that never travel, even when
+          ListingToolbar rewinds the scroll. Changes made in the drawer carry the "filter"
+          type and skip the swap: the grid updates behind the scrim */}
       <ViewTransition
         key={JSON.stringify(resolvedSearchParams)}
         enter={{ filter: 'none', default: 'swap' }}
@@ -342,16 +230,16 @@ const Page = async ({ params, searchParams }: PageProps) => {
                     key={product.id}
                     href={`/${lng}/product/${product.slug}`}
                     name={product.name}
-                    brand={product.brand?.name}
+                    brand={product.brand.name}
                     image={product.productImages[0]?.responsiveImage}
                     hoverImage={product.productImages[1]?.responsiveImage}
                     price={product.price}
                     salePrice={product.salePrice}
                     onSale={stripStega(product.sale) === 'on_sale'}
-                    currencySymbol={currencySymbol ?? ''}
-                    saleLabel={sale}
+                    currencySymbol={labels?.currencySymbol ?? ''}
+                    saleLabel={labels?.sale}
                     sizes="(min-width: 1440px) 330px, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 46vw"
-                    priority={!singleFilter && index < 4}
+                    priority={!headerFilter && index < 4}
                     titleAs="h2"
                     data-datocms-content-link-group
                   />
@@ -384,7 +272,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
         </section>
       </ViewTransition>
       <Pagination
-        numberOfProducts={count}
+        totalCount={count}
         currentPage={pageNumber}
         pageSize={PAGE_SIZE}
       />

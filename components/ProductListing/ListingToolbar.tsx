@@ -11,41 +11,41 @@ import {
   useTransition,
 } from 'react';
 import Drawer from '@/components/Common/Drawer';
-import { PendingQueryProvider } from './FilterPanel';
+import { PendingQueryProvider } from './PendingQuery';
 
-type PropTypes = {
+type Props = {
   count: number;
   lng: string;
   /** Filter groups that narrow the listing, shown as a count on the trigger */
-  narrowed?: number;
+  activeFilterCount?: number;
   /** Sort tabs, shown in the toolbar */
   sort?: ReactNode;
   searchChip?: ReactNode;
   /** The toolbar follows a filter header instead of the page header */
-  framed?: boolean;
+  hasFilterDetail?: boolean;
   children: ReactNode;
 };
 
 const ListingToolbar = ({
   count,
   lng,
-  narrowed = 0,
+  activeFilterCount = 0,
   sort,
   searchChip,
-  framed = false,
+  hasFilterDetail = false,
   children,
-}: PropTypes) => {
+}: Props) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const [clearing, startClearing] = useTransition();
-  const results = `${count} ${count === 1 ? 'result' : 'results'}`;
+  const [isClearing, startClearing] = useTransition();
+  const resultsLabel = `${count} ${count === 1 ? 'result' : 'results'}`;
 
-  const landed = useSearchParams().toString();
+  const currentQuery = useSearchParams().toString();
   const toolbar = useRef<HTMLDivElement>(null);
   const resultsTop = useRef<HTMLDivElement>(null);
-  const rewindTo = useRef<string | null>(null);
-  const awaitQuery = (query: string) => {
-    if (query !== landed) rewindTo.current = query;
+  const scrollBackQuery = useRef<string | null>(null);
+  const scrollBackWhenQueryLoads = (query: string) => {
+    if (query !== currentQuery) scrollBackQuery.current = query;
   };
 
   // From lg the toolbar sticks, so sort and filters can change far down the list.
@@ -53,23 +53,23 @@ const ListingToolbar = ({
   // of the page nothing moves. It waits for the drawer to close, whose scroll lock
   // would otherwise put the old position back on iOS
   useLayoutEffect(() => {
-    if (open || rewindTo.current !== landed) return;
-    rewindTo.current = null;
+    if (open || scrollBackQuery.current !== currentQuery) return;
+    scrollBackQuery.current = null;
     const overlap =
       (toolbar.current?.getBoundingClientRect().bottom ?? 0) -
       (resultsTop.current?.getBoundingClientRect().top ?? 0);
     if (overlap > 1) window.scrollBy({ top: -overlap, behavior: 'instant' });
-  }, [landed, open]);
+  }, [currentQuery, open]);
 
   return (
-    <PendingQueryProvider onPush={awaitQuery}>
+    <PendingQueryProvider onPush={scrollBackWhenQueryLoads}>
       {/* A hairline bar that sticks under the header from lg. Right under the header it
           shares the header's hairline; after a filter header it draws its own, which
           tucks under the header's while stuck. data-chrome keeps it above a results swap */}
       <div
         ref={toolbar}
         data-chrome="toolbar"
-        className={`border-b border-line bg-white lg:sticky lg:z-20 ${framed ? 'mt-16 border-t lg:top-[calc(var(--header-h)-1px)] lg:mt-24' : 'lg:top-(--header-h)'}`}
+        className={`border-b border-line bg-white lg:sticky lg:z-20 ${hasFilterDetail ? 'mt-16 border-t lg:top-[calc(var(--header-h)-1px)] lg:mt-24' : 'lg:top-(--header-h)'}`}
       >
         <div className="shell flex flex-wrap items-center gap-x-6 lg:flex-nowrap">
           <button
@@ -81,13 +81,14 @@ const ListingToolbar = ({
           >
             <AdjustmentsHorizontalIcon aria-hidden="true" />
             Filters
-            {narrowed > 0 && (
+            {activeFilterCount > 0 && (
+              // Re-keyed by the count, so it pops again when the count changes
               <span
-                key={narrowed}
+                key={activeFilterCount}
                 className="tag-dark min-h-6 animate-pop px-1.5"
               >
                 <span className="sr-only"> (</span>
-                {narrowed}
+                {activeFilterCount}
                 <span className="sr-only"> applied)</span>
               </span>
             )}
@@ -113,14 +114,15 @@ const ListingToolbar = ({
               className="shrink-0 text-sm text-mute tabular-nums"
               aria-live="polite"
             >
-              {results}
+              {resultsLabel}
             </p>
           </div>
         </div>
       </div>
       {/* Where the results start: the toolbar's bottom edge while it isn't stuck */}
       <div ref={resultsTop} />
-      {clearing && <span data-pending hidden />}
+      {/* Dims the results (pending-dim) until the cleared listing lands */}
+      {isClearing && <span data-pending hidden />}
       <Drawer
         open={open}
         onClose={() => setOpen(false)}
@@ -130,7 +132,7 @@ const ListingToolbar = ({
         footer={
           <div className="flex items-center gap-6">
             <p role="status" className="sr-only">
-              {results}
+              {resultsLabel}
             </p>
             <Link
               href={`/${lng}/products`}
@@ -139,7 +141,7 @@ const ListingToolbar = ({
               // Like the drawer's toggles, it updates the grid without the swap
               onNavigate={(event) => {
                 event.preventDefault();
-                awaitQuery('');
+                scrollBackWhenQueryLoads('');
                 setOpen(false);
                 startClearing(() => {
                   router.push(`/${lng}/products`, {
@@ -157,7 +159,7 @@ const ListingToolbar = ({
               onClick={() => setOpen(false)}
               className="btn flex-1 tabular-nums"
             >
-              Show {results}
+              Show {resultsLabel}
             </button>
           </div>
         }

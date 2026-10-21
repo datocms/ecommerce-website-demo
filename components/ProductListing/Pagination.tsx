@@ -5,20 +5,20 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import LinkPending from '@/components/Common/LinkPending';
 
-type PropTypes = {
-  numberOfProducts: number;
+type Props = {
+  totalCount: number;
   currentPage: number;
   pageSize: number;
 };
 
-const Pagination = ({ numberOfProducts, currentPage, pageSize }: PropTypes) => {
+const Pagination = ({ totalCount, currentPage, pageSize }: Props) => {
   const searchParams = useSearchParams();
 
-  const totalPages = Math.ceil(numberOfProducts / pageSize);
+  const totalPages = Math.ceil(totalCount / pageSize);
   const hasPrevious = currentPage > 1;
   const hasNext = currentPage < totalPages;
   const firstProductIndex = (currentPage - 1) * pageSize + 1;
-  const lastProductIndex = Math.min(currentPage * pageSize, numberOfProducts);
+  const lastProductIndex = Math.min(currentPage * pageSize, totalCount);
 
   function pageHref(page: number) {
     const params = new URLSearchParams(searchParams.toString());
@@ -27,8 +27,7 @@ const Pagination = ({ numberOfProducts, currentPage, pageSize }: PropTypes) => {
   }
 
   // One page needs no pager: the toolbar already shows the count
-  if (totalPages < 2 || currentPage < 1 || currentPage > totalPages)
-    return null;
+  if (totalPages < 2 || currentPage > totalPages) return null;
 
   return (
     // From lg focus scrolls the links clear of the stuck toolbar as well as the header
@@ -36,9 +35,9 @@ const Pagination = ({ numberOfProducts, currentPage, pageSize }: PropTypes) => {
       {/* A position, not a second counter: the toolbar already shows the total */}
       <p className="text-sm text-mute tabular-nums">
         <span className="sr-only">Showing </span>
-        {firstProductIndex}–{lastProductIndex} of {numberOfProducts}
+        {firstProductIndex}–{lastProductIndex} of {totalCount}
         <span className="sr-only">
-          {numberOfProducts === 1 ? ' result' : ' results'}
+          {totalCount === 1 ? ' result' : ' results'}
         </span>
       </p>
       {/* Both arrows always render, so the numbers never shift between pages */}

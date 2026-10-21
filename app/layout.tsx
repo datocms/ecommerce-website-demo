@@ -11,13 +11,14 @@ const sans = Geist({
   display: 'swap',
 });
 
-type Params = {
+type Props = {
   children: React.ReactNode;
 };
 
-export default async function RootLayout({ children }: Params) {
+export default async function RootLayout({ children }: Props) {
   const { isEnabled: isDraft } = await draftMode();
   return (
+    // lang is set per locale by DocumentLang: this layout renders above the [lng] segment
     <html className={sans.variable}>
       <body className="flex min-h-svh flex-col bg-white font-sans text-base text-ink antialiased">
         {children}

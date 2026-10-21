@@ -11,8 +11,8 @@ type Props = Omit<ImagePropTypes, 'data'> & {
 
 export default function DatoImage({ fragment, ...rest }: Props) {
   const data = readFragment(ResponsiveImageFragment, fragment);
-  // react-datocms sizes the blur-up placeholder by width only, so in a "fill"
-  // well with a different ratio it would only cover the top part
+  // With layout="fill", react-datocms sizes the blur-up placeholder from the image's own ratio,
+  // so in a box with a different ratio it covers only the top. Stretch it to fill the box.
   const placeholderStyle =
     rest.layout === 'fill'
       ? { height: '110%', ...rest.placeholderStyle }

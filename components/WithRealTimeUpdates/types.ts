@@ -1,11 +1,8 @@
 import type { TadaDocumentNode } from 'gql.tada';
-import type {
-  GlobalPageProps,
-  ResolvedGlobalPageProps,
-} from '@/lib/globalPageProps';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
 import type { SiteLocale } from '@/lib/i18n';
 
-// Type for resolved page props (after awaiting params)
+// A route's props after awaiting params (Next.js passes params as a Promise)
 export type ResolvedPageProps<T extends GlobalPageProps> = Omit<T, 'params'> & {
   params: Awaited<T['params']>;
 };
@@ -30,7 +27,6 @@ export type RealtimeUpdatesPage<
   query: TadaDocumentNode<TResult, TVariables>;
   token: string;
   baseEditingUrl: string;
-  children?: React.ReactNode;
 }) => React.ReactNode;
 
 export type ContentPage<
@@ -41,6 +37,3 @@ export type ContentPage<
     data: TResult;
   },
 ) => React.ReactNode;
-
-// Re-export for convenience
-export type { ResolvedGlobalPageProps };

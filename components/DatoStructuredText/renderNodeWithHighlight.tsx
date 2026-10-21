@@ -1,14 +1,18 @@
-import React from 'react';
+import { createElement, type ReactNode } from 'react';
 
-const Highlighter = (rawTagName: any, props: any, ...children: any) => {
-  if (rawTagName === 'mark')
+// Default renderNode: the CMS highlight mark renders as <mark>, padded so the marker wraps cleanly
+// across lines
+export function renderNodeWithHighlight(
+  tag: string,
+  props: { key?: string } | null,
+  ...children: ReactNode[]
+) {
+  if (tag === 'mark')
     return (
       <mark key={props?.key} className="-mx-0.5 box-decoration-clone px-0.5">
         {children}
       </mark>
     );
 
-  return React.createElement(rawTagName, props, ...children);
-};
-
-export default Highlighter;
+  return createElement(tag, props, ...children);
+}

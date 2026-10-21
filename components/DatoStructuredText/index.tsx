@@ -4,8 +4,10 @@ import {
   StructuredText,
   type StructuredTextPropTypes,
 } from 'react-datocms/structured-text';
-import renderNodeWithHighlight from './renderNodeWithHighlight';
+import { renderNodeWithHighlight } from './renderNodeWithHighlight';
 
+// Visual editing: the wrapper groups the whole field into one clickable overlay; each embedded
+// block or inline record is a boundary, so clicking it opens that record instead.
 function addBoundaryAttribute(
   result: ReactElement | null,
 ): ReactElement | null {
@@ -25,14 +27,8 @@ export default function DatoStructuredText<
     className?: string;
   },
 ) {
-  const {
-    renderBlock,
-    renderInlineRecord,
-    renderLinkToRecord,
-    renderNode,
-    className,
-    ...rest
-  } = props;
+  const { renderBlock, renderInlineRecord, renderNode, className, ...rest } =
+    props;
 
   return (
     <div data-datocms-content-link-group className={className}>
@@ -49,7 +45,6 @@ export default function DatoStructuredText<
             ? (ctx) => addBoundaryAttribute(renderInlineRecord(ctx))
             : undefined
         }
-        renderLinkToRecord={renderLinkToRecord}
       />
     </div>
   );

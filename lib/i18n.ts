@@ -18,5 +18,6 @@ export async function getAvailableLocales() {
 
 export async function getFallbackLocale() {
   const locales = await getAvailableLocales();
-  return locales[0]; //using the first ordered locale as fallback
+  // The first locale in the project settings is the fallback
+  return locales[0];
 }

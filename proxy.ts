@@ -1,3 +1,6 @@
+// Next.js 16 Proxy (formerly middleware.ts): redirects URLs without a locale prefix to the
+// visitor's preferred locale.
+
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 import { type NextRequest, NextResponse } from 'next/server';
@@ -8,7 +11,7 @@ import { getAvailableLocales, type SiteLocale } from '@/lib/i18n';
 const LOCALES_TTL_MS = 60_000;
 let cachedLocales: { locales: SiteLocale[]; expiresAt: number } | undefined;
 
-async function getLocales(): Promise<SiteLocale[]> {
+async function getCachedLocales(): Promise<SiteLocale[]> {
   if (!cachedLocales || cachedLocales.expiresAt < Date.now()) {
     try {
       cachedLocales = {
@@ -23,8 +26,9 @@ async function getLocales(): Promise<SiteLocale[]> {
   return cachedLocales.locales;
 }
 
-function getLocale(request: Request, locales: SiteLocale[]): string {
-  const fallbackLng = locales[0]; //using the first ordered locale as fallback
+function getPreferredLocale(request: Request, locales: SiteLocale[]): string {
+  // The first locale in the project settings is the fallback
+  const fallbackLng = locales[0];
   const headers = new Headers(request.headers);
   const acceptLanguage = headers.get('accept-language');
   if (acceptLanguage) {
@@ -43,33 +47,29 @@ function getLocale(request: Request, locales: SiteLocale[]): string {
 }
 
 export default async function proxy(request: NextRequest) {
-  // Check if there is any supported locale in the pathname
   const pathname = request.nextUrl.pathname;
-  const locales = await getLocales();
+  const locales = await getCachedLocales();
 
-  const pathnameIsMissingLocale = locales.every(
-    (locale) =>
-      !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
-  );
-
-  //go to home in browser language if pathname & locale is missing
+  // / -> /en/home, in the visitor's preferred locale
   if (pathname === '/') {
-    const locale = getLocale(request, locales);
+    const locale = getPreferredLocale(request, locales);
     return NextResponse.redirect(new URL(`/${locale}/home`, request.url));
   }
 
-  //go to pathname in browser language if locale is missing but pathname is set
-  if (pathnameIsMissingLocale) {
-    const locale = getLocale(request, locales);
+  const hasLocalePrefix = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
+  );
 
-    // e.g. incoming request is /products
-    // The new URL is now /en/products, keeping any search params
+  // /products -> /en/products, keeping the query string
+  if (!hasLocalePrefix) {
+    const locale = getPreferredLocale(request, locales);
     const url = request.nextUrl.clone();
     url.pathname = `/${locale}${pathname}`;
     return NextResponse.redirect(url);
   }
 }
 
+// Skip files with an extension, Next internals and /api routes
 export const config = {
   matcher: ['/((?!.*\\.|_next|api\\/).*)'],
 };

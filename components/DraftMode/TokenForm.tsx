@@ -6,17 +6,31 @@ import {
   useState,
 } from 'react';
 
+export const TOKEN_FORM_ID = 'draft-auth';
+
+/** What Headless UI's <Transition> hands its child: ref and data-closed/-enter/-leave */
+type TransitionChildProps = Omit<
+  ComponentProps<'form'>,
+  'onSubmit' | 'children'
+>;
+
 type Props = {
   onClose: () => void;
   onSuccess: () => void;
-} & Omit<ComponentProps<'form'>, 'onSubmit' | 'children'>;
+} & TransitionChildProps;
 
-const TokenForm = ({ onClose, onSuccess, ...transition }: Props) => {
+const TokenForm = ({ onClose, onSuccess, ...transitionProps }: Props) => {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
   const [hasError, setHasError] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+
+  function showError() {
+    setInputValue('');
+    setHasError(true);
+    inputRef.current?.focus();
+  }
 
   async function enableDraft(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,11 +42,9 @@ const TokenForm = ({ onClose, onSuccess, ...transition }: Props) => {
         onSuccess();
         return;
       }
-      throw new Error('Wrong token!');
+      showError();
     } catch {
-      setInputValue('');
-      setHasError(true);
-      inputRef.current?.focus();
+      showError();
     } finally {
       setIsFetching(false);
     }
@@ -42,8 +54,8 @@ const TokenForm = ({ onClose, onSuccess, ...transition }: Props) => {
     <form
       // Headless UI's <Transition> hands the form its ref and data-closed/-enter/-leave
       // (pop in global.css)
-      {...transition}
-      id="draft-auth"
+      {...transitionProps}
+      id={TOKEN_FORM_ID}
       aria-labelledby={`${id}-title`}
       onSubmit={enableDraft}
       onKeyDown={(e) => {

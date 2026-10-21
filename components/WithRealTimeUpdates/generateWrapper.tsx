@@ -11,6 +11,13 @@ import type {
   ResolvedPageProps,
 } from './types';
 
+/**
+ * Builds the server component for a route (page or layout). It runs the route query, then
+ * renders <Content> with the data, or in draft mode <RealTime>: a client component subscribed
+ * to DatoCMS real-time updates so editors see changes live. Only in that case is the read-only
+ * draft token sent to the browser. Either way the result is wrapped in PageTransition, so a
+ * route change fades while a draft toggle or a live update does not.
+ */
 export function generateWrapper<
   PageProps extends GlobalPageProps,
   TResult = unknown,
@@ -21,20 +28,20 @@ export function generateWrapper<
   contentComponent: ContentPage<PageProps, TResult>;
   realtimeComponent: RealtimeUpdatesPage<PageProps, TResult, TVariables>;
 }) {
-  return async function Page(unsanitizedPageProps: PageProps) {
+  return async function Page(nextPageProps: PageProps) {
     const fallbackLocale = await getFallbackLocale();
     const { isEnabled: isDraft } = await draftMode();
 
-    // Await params since they are now Promises in Next.js 16
-    const resolvedParams = await unsanitizedPageProps.params;
-
-    const { searchParams, params, ...pagePropsWithoutSearchParamsAndParams } =
-      unsanitizedPageProps as PageProps & { searchParams: unknown };
-
-    // Create resolved page props with awaited params
+    // searchParams is dropped: no Content reads it, and it must not be forwarded into the
+    // RealTime client props
+    const {
+      params,
+      searchParams: _searchParams,
+      ...otherProps
+    } = nextPageProps as PageProps & { searchParams?: unknown };
     const pageProps = {
-      ...pagePropsWithoutSearchParamsAndParams,
-      params: resolvedParams,
+      ...otherProps,
+      params: await params,
     } as unknown as ResolvedPageProps<PageProps>;
 
     const variables =

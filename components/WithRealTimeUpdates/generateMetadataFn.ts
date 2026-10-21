@@ -28,7 +28,7 @@ export function generateMetadataFn<
     const fallbackLocale = await getFallbackLocale();
     const { isEnabled: isDraft } = await draftMode();
 
-    // Await params since they are now Promises in Next.js 16
+    // Next.js passes params as a Promise
     const resolvedParams = await pageProps.params;
 
     const resolvedPageProps = {

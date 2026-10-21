@@ -1,15 +1,17 @@
+// WCAG contrast helpers, used to outline product color swatches that are too light on white.
+
 export type RGB = [number, number, number];
 
 export const WHITE: RGB = [255, 255, 255];
-export const INK: RGB = [10, 10, 10];
 
-const channel = (c: number) => {
+// sRGB channel (0-255) -> linear light, per WCAG relative luminance
+const toLinear = (c: number) => {
   const s = c / 255;
   return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
 };
 
-export const luminance = ([r, g, b]: RGB) =>
-  0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+const luminance = ([r, g, b]: RGB) =>
+  0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
 
 /** WCAG 2.x contrast ratio between two colors */
 export const contrast = (a: RGB, b: RGB) => {

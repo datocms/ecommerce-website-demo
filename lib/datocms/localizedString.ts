@@ -1,3 +1,7 @@
+/**
+ * Reads a localized CMA field value ({ en: "…", it: "…" }) for `locale`, falling back to
+ * `fallbackLocale`, then to any non-empty locale. Plain strings (non-localized fields) pass through.
+ */
 export function localizedString(
   value: unknown,
   locale: string,

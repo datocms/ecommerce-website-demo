@@ -1,11 +1,13 @@
 import { type ReactNode, ViewTransition } from 'react';
 
-// A page's content, wrapped once by generateWrapper (and by the product and catalog pages, which
-// render their own draft switch). On a route change the old page drops out and the new one comes
-// in under the still chrome (.fade in global.css). The [lng] layout is wrapped too: it persists,
-// except on a locale switch, which remounts it and crossfades the whole page (its display:contents
-// root is not captured). Search-param changes, router.refresh(), draft toggles and RealTime
-// updates are updates, so nothing plays.
+// Wraps a page's content. generateWrapper applies it to every route that uses it, the [lng] layout
+// included; product/[slug] and products skip generateWrapper and apply it themselves.
+// - A route change: the old page drops out and the new one comes in under the still chrome (.fade
+//   in global.css).
+// - A locale switch: it remounts the [lng] layout, so the whole page crossfades, because the
+//   layout's display:contents root is not captured.
+// - Updates (search params, router.refresh(), draft toggles, RealTime): nothing plays
+//   (default="none").
 export default function PageTransition({ children }: { children: ReactNode }) {
   return (
     <ViewTransition enter="fade" exit="fade" default="none">

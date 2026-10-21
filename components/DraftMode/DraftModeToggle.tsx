@@ -5,19 +5,19 @@ import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import SuccessToast from './SuccessToast';
-import TokenForm from './TokenForm';
+import TokenForm, { TOKEN_FORM_ID } from './TokenForm';
 
 type Props = {
   isDraft: boolean;
 };
 
-// Draft-mode toggle (the name is historical: there is no back-to-top control)
+// Fixed bottom-right button: turns Next.js draft mode on (after asking for the token) or off
 export default function DraftModeToggle({ isDraft }: Props) {
   const router = useRouter();
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [successToast, setSuccessToast] = useState(false);
-  const [leaving, startLeaving] = useTransition();
+  const [tokenFormOpen, setTokenFormOpen] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [isLeavingDraft, startLeavingDraft] = useTransition();
 
   // Publishes the toggle's width, so the footer's legal bar keeps its own controls
   // clear of it (0 while the toggle steps aside for the cookie notice)
@@ -35,30 +35,31 @@ export default function DraftModeToggle({ isDraft }: Props) {
     };
   }, []);
 
-  function toggleDraft() {
+  function handleToggleClick() {
     if (!isDraft) {
-      setModalOpen((open) => !open);
+      setTokenFormOpen((open) => !open);
       return;
     }
-    // Pending until the published page has rendered; the toggle dims meanwhile
-    startLeaving(async () => {
+    // Busy (aria-busy dims the toggle) until the published page has rendered. Updates after an
+    // await fall outside the transition, so the refresh gets a startTransition of its own.
+    startLeavingDraft(async () => {
       await fetch('/api/draft/disable');
-      startLeaving(() => router.refresh());
+      startLeavingDraft(() => router.refresh());
     });
   }
 
-  const closeModal = () => {
-    setModalOpen(false);
+  const closeTokenForm = () => {
+    setTokenFormOpen(false);
     toggleRef.current?.focus();
   };
 
-  const onAuthenticated = () => {
+  const handleAuthenticated = () => {
     router.refresh();
-    closeModal();
-    setSuccessToast(true);
+    closeTokenForm();
+    setShowSuccessToast(true);
   };
 
-  const dismissToast = useCallback(() => setSuccessToast(false), []);
+  const dismissToast = useCallback(() => setShowSuccessToast(false), []);
 
   return (
     <>
@@ -71,13 +72,13 @@ export default function DraftModeToggle({ isDraft }: Props) {
         <button
           ref={toggleRef}
           type="button"
-          onClick={toggleDraft}
+          onClick={handleToggleClick}
           onKeyDown={(e) => {
-            if (e.key === 'Escape' && modalOpen) closeModal();
+            if (e.key === 'Escape' && tokenFormOpen) closeTokenForm();
           }}
-          aria-expanded={!isDraft ? modalOpen : undefined}
-          aria-controls={!isDraft ? 'draft-auth' : undefined}
-          aria-busy={leaving || undefined}
+          aria-expanded={!isDraft ? tokenFormOpen : undefined}
+          aria-controls={!isDraft ? TOKEN_FORM_ID : undefined}
+          aria-busy={isLeavingDraft || undefined}
           // White with an ink edge, so it reads on the white page and on the black footer;
           // the focus ring is drawn inside it for the same reason
           className="press inline-flex h-12 items-center justify-center gap-2.5 border border-ink bg-white px-5 text-sm font-semibold whitespace-nowrap text-ink hover:bg-mist focus-visible:outline-offset-[-5px] aria-busy:opacity-45 max-sm:w-12 max-sm:px-0"
@@ -97,12 +98,12 @@ export default function DraftModeToggle({ isDraft }: Props) {
           </span>
         </button>
         {/* Headless UI keeps the form mounted until its pop exit ends */}
-        <Transition show={modalOpen}>
-          <TokenForm onClose={closeModal} onSuccess={onAuthenticated} />
+        <Transition show={tokenFormOpen}>
+          <TokenForm onClose={closeTokenForm} onSuccess={handleAuthenticated} />
         </Transition>
       </div>
       <SuccessToast
-        open={successToast}
+        open={showSuccessToast}
         onDismiss={dismissToast}
         returnFocusRef={toggleRef}
       />

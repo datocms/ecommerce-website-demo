@@ -1,3 +1,6 @@
+// Cross-locale product slugs: the product page redirects a slug from another locale to its own,
+// and /api/product-slug-map gives the language selector each locale's slug.
+
 import { graphql } from '@/lib/datocms/graphql';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
 import type { SiteLocale } from './i18n';
@@ -5,7 +8,6 @@ import type { SiteLocale } from './i18n';
 const productSlugLookupQuery = graphql(/* GraphQL */ `
   query ProductSlugLookup {
     allProducts(first: 100) {
-      id
       slug
       _allSlugLocales {
         locale
@@ -20,8 +22,9 @@ type SlugLocaleEntry = {
   value?: string | null;
 };
 
-export type ProductSlugMap = Partial<Record<SiteLocale, string>>;
+type ProductSlugMap = Partial<Record<SiteLocale, string>>;
 
+/** Collects a product's slug per locale from its _allSlugLocales entries. */
 export function buildProductSlugMap(
   entries: readonly SlugLocaleEntry[] | null | undefined,
   currentLocale?: SiteLocale,
@@ -35,6 +38,7 @@ export function buildProductSlugMap(
     }
   }
 
+  // product.slug has fallbacks applied, so it fills a locale that has no slug of its own
   if (currentLocale && currentSlug) {
     slugs[currentLocale] = currentSlug;
   }
@@ -42,6 +46,7 @@ export function buildProductSlugMap(
   return slugs;
 }
 
+/** The slug for `locale`, else the fallback locale's, else any slug the product has. */
 export function slugForLocale(
   slugs: ProductSlugMap,
   locale: SiteLocale,
@@ -54,6 +59,7 @@ export function slugForLocale(
   );
 }
 
+/** Finds the product with `slug` in any locale; returns its slugs and the one for `locale`. */
 export async function resolveProductSlug({
   slug,
   locale,
@@ -66,53 +72,18 @@ export async function resolveProductSlug({
   isDraft: boolean;
 }) {
   const data = await queryDatoCMS(productSlugLookupQuery, undefined, isDraft);
-  const slugIndex = new Map<
-    string,
-    {
-      productId: string;
-      slugs: ProductSlugMap;
-      matchedLocale: SiteLocale;
-    }
-  >();
 
+  // The first product with a matching slug wins
   for (const product of data.allProducts) {
     const slugs = buildProductSlugMap(
       product._allSlugLocales,
       fallbackLocale,
       product.slug,
     );
-
-    for (const [matchedLocale, productSlug] of Object.entries(slugs)) {
-      if (productSlug && !slugIndex.has(productSlug)) {
-        slugIndex.set(productSlug, {
-          productId: product.id,
-          slugs,
-          matchedLocale: matchedLocale as SiteLocale,
-        });
-      }
-    }
+    if (!Object.values(slugs).includes(slug)) continue;
+    const localizedSlug = slugForLocale(slugs, locale, fallbackLocale);
+    return localizedSlug ? { slugs, localizedSlug } : null;
   }
 
-  const matchedProduct = slugIndex.get(slug);
-
-  if (!matchedProduct) {
-    return null;
-  }
-
-  const localizedSlug = slugForLocale(
-    matchedProduct.slugs,
-    locale,
-    fallbackLocale,
-  );
-
-  if (!localizedSlug) {
-    return null;
-  }
-
-  return {
-    productId: matchedProduct.productId,
-    slugs: matchedProduct.slugs,
-    localizedSlug,
-    matchedLocale: matchedProduct.matchedLocale,
-  };
+  return null;
 }

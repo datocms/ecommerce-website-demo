@@ -1,5 +1,5 @@
 import type { GlobalPageProps } from '@/lib/globalPageProps';
-import WithRealTimeUpdates from '.';
+import WithRealTimeUpdates from './index';
 import type { ContentPage, RealtimeUpdatesPage } from './types';
 
 export function generateRealtimeComponent<
@@ -11,7 +11,7 @@ export function generateRealtimeComponent<
 }: {
   contentComponent: ContentPage<PageProps, TResult>;
 }) {
-  const component: RealtimeUpdatesPage<PageProps, TResult, TVariables> = (
+  const RealTime: RealtimeUpdatesPage<PageProps, TResult, TVariables> = (
     props,
   ) => {
     return (
@@ -21,5 +21,5 @@ export function generateRealtimeComponent<
     );
   };
 
-  return component;
+  return RealTime;
 }

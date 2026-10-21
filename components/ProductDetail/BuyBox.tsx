@@ -7,17 +7,17 @@ import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
 import Price from '@/components/ProductCard/Price';
 import { contrast, hexToRgb, WHITE } from '@/lib/color';
-import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import { ProductPageLabelsFragment } from './fragments';
+import { readFragment } from '@/lib/datocms/graphql';
+import { type ProductPageLabels, ProductPageLabelsFragment } from './fragments';
 import StarRating from './StarRating';
-import { PDP_RAIL } from './styles';
+import { BUY_BOX_COLUMN } from './styles';
 
 type Product = NonNullable<ProductQuery['product']>;
 type Variation = Product['productVariations'][number];
 
 type Props = {
   product: Product;
-  labels: FragmentOf<typeof ProductPageLabelsFragment> | null | undefined;
+  labels: ProductPageLabels;
   lng: string;
   isOnSale: boolean;
 };
@@ -86,7 +86,7 @@ export default function BuyBox({ product, labels, lng, isOnSale }: Props) {
           ? ({ '--buy-box-h': `${buyBoxHeight}px` } as CSSProperties)
           : undefined
       }
-      className={`enter-stagger pt-7 md:pt-8 lg:sticky lg:top-[min(calc(var(--header-h)_+_2rem),calc(100vh_-_var(--buy-box-h,0px)_-_2rem))] lg:self-start lg:pt-0 ${PDP_RAIL}`}
+      className={`enter-stagger pt-7 md:pt-8 lg:sticky lg:top-[min(calc(var(--header-h)_+_2rem),calc(100vh_-_var(--buy-box-h,0px)_-_2rem))] lg:self-start lg:pt-0 ${BUY_BOX_COLUMN}`}
     >
       {/* Both links reach 44px through ::after, so their focus rings hug the text */}
       <Link
@@ -104,7 +104,7 @@ export default function BuyBox({ product, labels, lng, isOnSale }: Props) {
         href="#reviews"
         className="group relative mt-4 flex min-h-6 w-fit items-center gap-2.5 text-sm after:absolute after:-inset-y-2.5 after:inset-x-0"
       >
-        <StarRating value={product.reviewAverage} size={16} />
+        <StarRating value={product.reviewAverage} />
         <span className="text-ink-2 underline decoration-line underline-offset-4 transition-colors group-hover:text-ink group-hover:decoration-ink">
           <span className="tabular-nums">{product.numberOfReviews}</span>{' '}
           {reviews}

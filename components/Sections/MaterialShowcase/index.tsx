@@ -26,7 +26,7 @@ const SIZES = {
 
 // Title and copy on top, then a grid of material photo links (2, 3 or 4 columns), each with its
 // name and subtitle.
-const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
+export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
   const { id, title, description, subDescription, materials } = readFragment(
     MaterialShowcaseFragment,
     fragment,
@@ -107,6 +107,4 @@ const MaterialShowcase = ({ fragment, globalPageProps }: Props) => {
       )}
     </section>
   );
-};
-
-export default MaterialShowcase;
+}

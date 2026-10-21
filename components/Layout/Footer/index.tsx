@@ -24,7 +24,7 @@ type Props = {
 const CLEAR_OF_DRAFT_TOGGLE =
   'max(var(--gutter), calc(var(--draft-toggle-w, 0px) + min(var(--draft-toggle-w, 0px), 1.5rem) + var(--gutter) - max(0px, (100vw - 90rem) / 2)))';
 
-const Footer = ({ data, globalPageProps }: Props) => {
+export default function Footer({ data, globalPageProps }: Props) {
   const { lng } = globalPageProps.params;
   const generalInterface = data.generalInterface;
   const footerTitle = data.layout?.footerTitle;
@@ -196,6 +196,4 @@ const Footer = ({ data, globalPageProps }: Props) => {
       {cookieNoticeVisible && <CookieNotice cookieNotice={cookieNotice} />}
     </>
   );
-};
-
-export default Footer;
+}

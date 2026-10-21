@@ -3,7 +3,7 @@ import {
   ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
 import Drawer from '@/components/Common/Drawer';
-import { formatPrice } from '@/components/ProductCard/Price';
+import { formatPrice } from '@/lib/formatPrice';
 
 type Props = {
   open: boolean;

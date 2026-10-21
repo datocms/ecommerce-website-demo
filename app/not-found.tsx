@@ -7,7 +7,7 @@ import Rise from '@/components/Motion/Rise';
 
 // No header or footer here (it renders outside [lng]): the photo runs to the viewport's edges
 // and, on phones, takes whatever height the text leaves
-const NotFound = () => {
+export default function NotFound() {
   return (
     <main className="grid min-h-svh grid-rows-[minmax(17.5rem,1fr)_auto] lg:grid-cols-12 lg:grid-rows-1">
       <DocumentLang lang="en" />
@@ -45,6 +45,4 @@ const NotFound = () => {
       </div>
     </main>
   );
-};
-
-export default NotFound;
+}

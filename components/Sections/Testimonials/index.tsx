@@ -44,7 +44,7 @@ export default function Testimonials({ fragment }: Props) {
         </div>
         <ul
           id={railId}
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: the quotes are not focusable, so the scroller takes focus for keyboard scrolling (RailProgress drops it while nothing scrolls)
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: the quotes are not focusable, so the scroller takes focus for keyboard scrolling (RailProgress's tabStop, via useScrollerTabStop, drops it while nothing scrolls)
           tabIndex={0}
           aria-labelledby={titleId}
           className={`no-scrollbar -mx-(--gutter) flex snap-x snap-mandatory scroll-px-(--gutter) gap-6 overflow-x-auto px-(--gutter) focus-visible:-outline-offset-2 lg:mx-0 lg:grid lg:gap-x-10 lg:gap-y-16 lg:overflow-visible lg:px-0 ${columns.grid}`}

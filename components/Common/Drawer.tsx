@@ -9,7 +9,7 @@ import {
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { ReactNode } from 'react';
 
-type DrawerProps = {
+type Props = {
   open: boolean;
   onClose: () => void;
   side?: 'left' | 'right';
@@ -31,7 +31,7 @@ export default function Drawer({
   footer,
   children,
   closeLabel = 'Close',
-}: DrawerProps) {
+}: Props) {
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
       <DialogBackdrop

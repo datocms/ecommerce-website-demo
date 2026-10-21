@@ -36,7 +36,7 @@ const PLACEMENT = {
     'bottom-full left-0 mb-2 origin-bottom-left md:right-0 md:left-auto md:origin-bottom-right',
 };
 
-const LanguageSelector = ({
+export default function LanguageSelector({
   languages,
   currencySymbol,
   placement = 'below-end',
@@ -44,7 +44,7 @@ const LanguageSelector = ({
   labelClassName,
   className,
   onNavigate,
-}: Props) => {
+}: Props) {
   const listId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [productSlugs, setProductSlugs] = useState<Record<string, string>>({});
@@ -213,6 +213,4 @@ const LanguageSelector = ({
       </ul>
     </div>
   );
-};
-
-export default LanguageSelector;
+}

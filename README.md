@@ -83,10 +83,13 @@ app/
   [lng]/                    every page lives under its locale (/en/..., /it/...)
     layout.tsx, meta.ts,    the site shell (header and footer), built from the Layout record
     Content.tsx, RealTime.tsx
-    home/                   home page: CMS sections plus the newest products
+    home/                   home page, served at /<locale>/home (proxy.ts redirects / there):
+                            CMS sections plus the newest products
     products/               catalog with filters, sorting, search and pagination
     product/[slug]/         product page
-    showcase/  stores/  legal/[slug]/
+    showcase/               lookbook: photos, collections, new products and materials
+    stores/                 store list with a pager
+    legal/[slug]/           legal pages with a section index
   api/                      draft mode, Web Previews links, cache revalidation,
                             SEO analysis, post-install setup, product slug map
 components/
@@ -98,10 +101,13 @@ components/
                             overlay
   Layout/                   site shell: Header/, Footer/, cookie notice, language selector,
                             accent color, site-wide meta tags, <html lang> sync
+    Header/                 nav bar, mega menu (MegaMenuPanel, links from Layout.menu via
+                            menu.ts), mobile menu, search, cart, notification strip and the
+                            CMS popup
   Motion/                   PageTransition (page fades), Rise (word-by-word titles) and
                             LinkPending (marks a link whose page is loading)
   ProductCard/              the product card shared by every product list, and Price.tsx
-                            (the price block, also used by the buy box, and the cart's formatPrice)
+                            (the price block, also used by the buy box)
   ProductDetail/            product page: gallery, buy box, description blocks, reviews,
                             related products
   ProductListing/           catalog page: FilterDetail header, toolbar, filters, sort, pagination
@@ -113,8 +119,8 @@ lib/
   datocms/                  gql.tada setup, generated schema types, queryDatoCMS(), and
                             localizedString() for CMA field values
   i18n.ts                   site locales, read from DatoCMS
-  ...                       small helpers: route prop types, product slugs, color contrast,
-                            redirect checks, site URL
+  ...                       small helpers: route prop types, product slugs, price formatting,
+                            color contrast, redirect checks, site URL
 styles/global.css           Tailwind theme tokens and utility classes, ending with the Motion
                             and View transitions sections
 proxy.ts                    sends locale-less URLs to the visitor's language
@@ -139,19 +145,34 @@ Two routes differ from this pattern, and both wrap their output in `PageTransiti
 - `products/` depends on search params, so its `page.tsx` runs the queries from `meta.ts` on every request and there is no `RealTime.tsx`.
 - `product/[slug]/page.tsx` runs its query itself so it can first redirect to the product's slug in the current language.
 
+### Draft mode and Visual Editing
+
+Editors reach draft mode in two ways. The Web Previews plugin, which `/api/post-install` installs, asks `/api/draft/preview-links` for a record's links and opens `/api/draft/enable?token=…`. The toggle at the bottom right of every page (`components/DraftMode/DraftModeToggle.tsx`, mounted in `app/layout.tsx`) asks for `DRAFT_SECRET_TOKEN` and calls the same route. `/api/draft/enable` and `/api/draft/disable` switch Next.js draft mode on and off.
+
+In draft mode `queryDatoCMS()` uses the draft token, skips the cache and asks for Content Link metadata. `generateWrapper()` renders `RealTime.tsx`, and `app/layout.tsx` mounts the `ContentLink` overlay, so clicking a piece of text opens its record in DatoCMS. Draft strings carry invisible stega characters for that overlay, so the code calls `stripStega()` before it uses a CMS string as a URL, a comparison key or an attribute.
+
+### Locales
+
+The locales come from the DatoCMS project settings (`lib/i18n.ts`), and the first one is the fallback that route queries pass as `fallbackLocales`. Every page sits under `app/[lng]/`, and `proxy.ts` sends a URL without a locale to the visitor's best `Accept-Language` match. Content is localized in DatoCMS, and UI labels such as button text, filter names and the currency symbol come from the localized General Interface singleton. A few strings are still hard-coded in English: the skip link, the catalog's empty state and result count, "Clear all", the draft-mode UI and some screen-reader labels (in `Price.tsx` and `Pagination.tsx`, for example). Product slugs differ per locale: the product page redirects a slug from another locale to the current one (`lib/productSlugs.ts`), and the language selector asks `/api/product-slug-map` for the slug in the locale it switches to.
+
 ### Where data and components live
 
 Reusable CMS blocks keep their GraphQL fragment in a `fragments.ts` next to the component: the home sections in `components/Sections/`, the product-description blocks in `components/ProductDetail/Blocks/`, and `DatoImage`. The route's `meta.ts` spreads the fragment into its query, and the component reads its data back with `readFragment()`. For example, `app/[lng]/home/meta.ts` spreads every section fragment inside `sections`, and `app/[lng]/home/Content.tsx` picks the component by `__typename`.
 
-Labels from the General Interface record that a whole feature folder uses sit in that folder's `fragments.ts` (`ProductListing/fragments.ts`, `ProductDetail/fragments.ts`).
+Labels from the General Interface record that a whole feature folder uses sit in that folder's `fragments.ts`, next to the type of the components' `labels` prop (`ListingLabels` in `ProductListing/fragments.ts`, `ProductPageLabels` in `ProductDetail/fragments.ts`).
 
-Route-specific UI, such as the site shell in `components/Layout/` and the product page in `components/ProductDetail/`, types its props from the route's `Query` instead. `ProductCard` takes plain props, so any query can feed it.
+Route-specific UI, such as the site shell in `components/Layout/` and the product page in `components/ProductDetail/`, types its props from the route's `Query` instead. `ProductCard` takes plain props, so any query can feed it. Four queries select its fields today, and each has a call site that maps them to props: `productsQuery` in `app/[lng]/products/meta.ts` (`products/page.tsx`), `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts` (`NewArrivals/ProductRail.tsx`), `showcase.newProducts` in `app/[lng]/showcase/meta.ts` (`showcase/Content.tsx`) and `product.relatedProducts` in `app/[lng]/product/[slug]/meta.ts` (`ProductDetail/RelatedProducts.tsx`). A new card field goes into all four.
 
 Feature areas with several components get a folder in `components/`. Small helpers used by a single route sit next to that route, like `legal/[slug]/SectionIndex.tsx` or `stores/StorePager.tsx`.
 
 Tailwind only scans `app/` and `components/` for class names, so keep class strings in those two folders.
 
-Motion lives in the Motion and View transitions sections at the end of `styles/global.css` (utilities such as `enter`, `reveal-stagger` and `press`, and the page, results and product-photo transitions; the durations and curves they use sit with the other tokens in `@theme` and `:root` at the top), and in three components in `components/Motion/`: `PageTransition` (page fades), `Rise` (page titles, word by word) and `LinkPending` (marks a navigation in progress).
+Motion lives in two places, `styles/global.css` and `components/Motion/`:
+
+- The utilities (`enter`, `reveal-stagger`, `press`…) and the page, results and product-photo view transitions sit in the Motion and View transitions sections at the end of `styles/global.css`. The durations and curves they use are tokens in `@theme` and `:root` at the top.
+- `components/Motion/` holds three components: `PageTransition` (page fades), `Rise` (page titles, word by word) and `LinkPending` (marks a link whose page is loading).
+- To add an animation, add its `@keyframes` and an `@utility` to the Motion section, inside a `prefers-reduced-motion: no-preference` media query like the others, then put the class on the element.
+- A fixed or sticky shell element that stays on screen across pages needs a `data-chrome` attribute and a name in the View transitions section, so pages pass under it during navigation.
 
 ## Updating the GraphQL schema
 

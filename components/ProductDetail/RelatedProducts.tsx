@@ -2,20 +2,19 @@ import { stripStega } from '@datocms/content-link';
 import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
 import ProductCard from '@/components/ProductCard';
 import { readFragment } from '@/lib/datocms/graphql';
-import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
-import { ProductPageLabelsFragment } from './fragments';
+import { type ProductPageLabels, ProductPageLabelsFragment } from './fragments';
 
 type Props = {
-  data: ProductQuery;
-  globalPageProps: ResolvedGlobalPageProps;
+  products: NonNullable<ProductQuery['product']>['relatedProducts'];
+  labels: ProductPageLabels;
+  lng: string;
 };
 
-const RelatedProducts = ({ data, globalPageProps }: Props) => {
+export default function RelatedProducts({ products, labels, lng }: Props) {
   const { sale, currencySymbol } =
-    readFragment(ProductPageLabelsFragment, data.generalInterface) ?? {};
+    readFragment(ProductPageLabelsFragment, labels) ?? {};
 
-  const relatedProducts = data.product?.relatedProducts ?? [];
-  if (relatedProducts.length === 0) return null;
+  if (products.length === 0) return null;
 
   // Below md a snap rail that runs edge to edge; each card sits in its own 4-row grid, so a short
   // name leaves no gap. The rail's 8px of block padding (taken back with -my-2) leaves room for the
@@ -23,21 +22,21 @@ const RelatedProducts = ({ data, globalPageProps }: Props) => {
   // the cards share the grid's rows (names, brands and prices line up), aligned to the shell's
   // content edges. It rises as one block (reveal): a scroller's cards must not move inside it,
   // and display:contents wrappers cannot move at all
-  const fourUp = relatedProducts.length >= 4;
+  const fourUp = products.length >= 4;
 
   return (
     <section className="pt-(--section-gap)">
       <div
         className={`rail no-scrollbar reveal -my-2 flex snap-x snap-mandatory gap-x-3 overflow-x-auto py-2 md:-mb-(--card-row-gap) md:mt-0 md:grid md:snap-none md:grid-cols-3 md:gap-x-4 md:overflow-visible md:py-0 md:[--card-row-gap:2rem] lg:[--card-row-gap:2.5rem] ${fourUp ? 'xl:grid-cols-4' : ''}`}
       >
-        {relatedProducts.map((product) => {
+        {products.map((product) => {
           return (
             <div
               key={product.id}
               className="grid w-[72vw] shrink-0 snap-start grid-rows-[auto_auto_1fr_auto] sm:w-[40vw] md:contents"
             >
               <ProductCard
-                href={`/${globalPageProps.params.lng}/product/${stripStega(product.slug)}`}
+                href={`/${lng}/product/${stripStega(product.slug)}`}
                 name={product.name}
                 brand={product.brand.name}
                 image={product.productImages[0]?.responsiveImage}
@@ -57,6 +56,4 @@ const RelatedProducts = ({ data, globalPageProps }: Props) => {
       </div>
     </section>
   );
-};
-
-export default RelatedProducts;
+}

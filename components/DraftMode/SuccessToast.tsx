@@ -7,7 +7,11 @@ type Props = {
   returnFocusRef?: RefObject<HTMLElement | null>;
 };
 
-const SuccessToast = ({ open, onDismiss, returnFocusRef }: Props) => {
+export default function SuccessToast({
+  open,
+  onDismiss,
+  returnFocusRef,
+}: Props) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
 
@@ -54,6 +58,4 @@ const SuccessToast = ({ open, onDismiss, returnFocusRef }: Props) => {
       )}
     </div>
   );
-};
-
-export default SuccessToast;
+}

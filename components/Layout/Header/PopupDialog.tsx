@@ -23,7 +23,12 @@ type Props = {
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-const PopupDialog = ({ open, onClose, popup, globalPageProps }: Props) => {
+export default function PopupDialog({
+  open,
+  onClose,
+  popup,
+  globalPageProps,
+}: Props) {
   const button = popup.button[0];
 
   return (
@@ -104,6 +109,4 @@ const PopupDialog = ({ open, onClose, popup, globalPageProps }: Props) => {
       </div>
     </Dialog>
   );
-};
-
-export default PopupDialog;
+}

@@ -1,10 +1,14 @@
 import { stripStega } from '@datocms/content-link';
 import { useEffect, useRef } from 'react';
 
+type Props = {
+  text: string;
+};
+
 // The giant wordmark, fitted to the content width: measure the ink at a reference size and
 // rescale (Geist's widths are linear in size, so one step converges; the loop also covers
 // fallback fonts), then shift the ink onto the content's left edge.
-export default function Wordmark({ text }: { text: string }) {
+export default function Wordmark({ text }: Props) {
   const ref = useRef<HTMLParagraphElement>(null);
   const plain = stripStega(text).trim();
 

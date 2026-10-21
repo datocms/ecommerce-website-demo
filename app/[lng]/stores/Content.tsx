@@ -123,6 +123,8 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
               <h1
                 ref={headingRef}
                 tabIndex={-1}
+                // 2xl:-mr-8: only the name may run 32px into the padding, so the longest name
+                // stays on one line
                 className="title-display mt-4 focus:outline-hidden 2xl:-mr-8"
               >
                 <span key={store.id} className="enter block">

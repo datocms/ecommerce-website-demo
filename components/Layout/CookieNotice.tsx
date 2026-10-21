@@ -44,7 +44,7 @@ let hasArrived = false;
 // A white bar along the viewport's bottom edge, rendered right after the footer: it is
 // sticky, so it follows the viewport while scrolling and comes to rest under the footer,
 // never hiding the page's end. No scrim: the page stays usable.
-const CookieNotice = ({ cookieNotice }: Props) => {
+export default function CookieNotice({ cookieNotice }: Props) {
   const [playArrival] = useState(!hasArrived);
   useEffect(() => {
     hasArrived = true;
@@ -102,6 +102,4 @@ const CookieNotice = ({ cookieNotice }: Props) => {
       </div>
     </section>
   );
-};
-
-export default CookieNotice;
+}

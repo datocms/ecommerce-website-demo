@@ -2,13 +2,12 @@ import type { TadaDocumentNode } from 'gql.tada';
 import { draftMode } from 'next/headers';
 import PageTransition from '@/components/Motion/PageTransition';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
-import type { GlobalPageProps } from '@/lib/globalPageProps';
+import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
 import { getFallbackLocale } from '@/lib/i18n';
 import type {
   BuildVariablesFn,
   ContentPage,
   RealtimeUpdatesPage,
-  ResolvedPageProps,
 } from './types';
 
 /**

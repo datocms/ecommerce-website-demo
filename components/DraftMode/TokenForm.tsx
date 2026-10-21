@@ -19,7 +19,11 @@ type Props = {
   onSuccess: () => void;
 } & TransitionChildProps;
 
-const TokenForm = ({ onClose, onSuccess, ...transitionProps }: Props) => {
+export default function TokenForm({
+  onClose,
+  onSuccess,
+  ...transitionProps
+}: Props) {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
@@ -111,6 +115,4 @@ const TokenForm = ({ onClose, onSuccess, ...transitionProps }: Props) => {
       </div>
     </form>
   );
-};
-
-export default TokenForm;
+}

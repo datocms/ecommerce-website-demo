@@ -47,7 +47,7 @@ const widestWord = (title: string) =>
       ),
   );
 
-const FilterDetail = ({
+export default function FilterDetail({
   lng,
   name,
   eyebrow,
@@ -55,7 +55,7 @@ const FilterDetail = ({
   description,
   subtitle,
   logo = false,
-}: Props) => {
+}: Props) {
   const logoData =
     image && logo ? readFragment(ResponsiveImageFragment, image) : null;
   const titleWidth = widestWord(stripStega(name));
@@ -156,6 +156,4 @@ const FilterDetail = ({
       </div>
     </section>
   );
-};
-
-export default FilterDetail;
+}

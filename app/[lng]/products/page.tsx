@@ -38,7 +38,7 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-const Page = async ({ params, searchParams }: PageProps) => {
+export default async function Page({ params, searchParams }: PageProps) {
   const { lng } = await params;
   const resolvedSearchParams = await searchParams;
   const { isEnabled } = await draftMode();
@@ -172,7 +172,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
         lng={lng}
         activeFilterCount={activeFilterCount}
         hasFilterDetail={Boolean(headerFilter)}
-        sort={<SortTabs generalInterface={data.generalInterface} />}
+        sort={<SortTabs labels={data.generalInterface} />}
         searchChip={
           nameSearch ? (
             // 36px on the toolbar's 56px row; the pseudo-element makes the hit area 44px.
@@ -200,7 +200,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
       >
         <FilterPanel
           filterOptions={filterOptions}
-          generalInterface={data.generalInterface}
+          labels={data.generalInterface}
           selectedCollections={collections}
           selectedBrands={brands}
           selectedMaterials={materials}
@@ -278,6 +278,4 @@ const Page = async ({ params, searchParams }: PageProps) => {
       />
     </PageTransition>
   );
-};
-
-export default Page;
+}

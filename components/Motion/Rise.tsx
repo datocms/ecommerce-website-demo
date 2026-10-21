@@ -1,10 +1,14 @@
 import { stripStega } from '@datocms/content-link';
 import { type CSSProperties, Fragment, type ReactNode } from 'react';
 
+type Props = {
+  children: ReactNode;
+};
+
 // A page title set word by word: each word rises out of its own line (the rise utility in
 // global.css). Callers put `enter-stagger [--delay:200ms]` on the block under the title, as the
 // hero, showcase and 404 do.
-export default function Rise({ children }: { children: ReactNode }) {
+export default function Rise({ children }: Props) {
   // Elements, and draft-mode text carrying stega, render untouched: visual editing keeps one
   // click target and live updates never replay the arrival
   const isPlainText =

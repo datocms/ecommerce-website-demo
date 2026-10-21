@@ -2,7 +2,7 @@ import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-type SectionTitleProps = {
+type Props = {
   title: ReactNode;
   /** Heading id, for the section's aria-labelledby */
   id?: string;
@@ -21,7 +21,7 @@ export default function SectionTitle({
   action,
   aside,
   className,
-}: SectionTitleProps) {
+}: Props) {
   return (
     <div
       className={[

@@ -7,9 +7,9 @@ import {
   toNextMetadata,
 } from 'react-datocms/seo';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
-import type { GlobalPageProps } from '@/lib/globalPageProps';
+import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
 import { getFallbackLocale } from '@/lib/i18n';
-import type { BuildVariablesFn, ResolvedPageProps } from './types';
+import type { BuildVariablesFn } from './types';
 
 export function generateMetadataFn<
   PageProps extends GlobalPageProps,

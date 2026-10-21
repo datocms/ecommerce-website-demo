@@ -14,7 +14,8 @@ const findSlugAndPermalink = (
 ): { slug: string | null; permalink: string } | null => {
   const slug = localizedString(item.slug, locale);
 
-  // Keep in sync with the model map in /api/draft/preview-links
+  // The routes the SEO plugin can analyze: add a model here only if it should get SEO analysis.
+  // Paths must match the routes /api/draft/preview-links uses.
   switch (itemTypeApiKey) {
     case 'home':
       return { slug, permalink: `/${locale}/` };

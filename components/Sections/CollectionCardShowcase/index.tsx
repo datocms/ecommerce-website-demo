@@ -80,7 +80,8 @@ function Season({
           )}
           {/* The pretitle belongs to the showcase block, not the lead collection, so it is its
               own click-to-edit target. A long one wraps into one tag per line
-              (box-decoration-clone). */}
+              (box-decoration-clone): 28px boxes 24px apart, the wrapper 2px lower so a single
+              line sits 12px in like every tag. */}
           {pretitle && (
             <span className="absolute top-3.5 left-3 max-w-[calc(100%-1.5rem)] text-xs leading-6 text-balance">
               <span

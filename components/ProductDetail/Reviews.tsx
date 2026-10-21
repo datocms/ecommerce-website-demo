@@ -1,21 +1,20 @@
 import ReactMarkdown from 'react-markdown';
 import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
 import { readFragment } from '@/lib/datocms/graphql';
-import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
-import { ProductPageLabelsFragment } from './fragments';
+import { type ProductPageLabels, ProductPageLabelsFragment } from './fragments';
 import StarRating from './StarRating';
 
 type Props = {
-  data: ProductQuery;
-  globalPageProps: ResolvedGlobalPageProps;
+  product: NonNullable<ProductQuery['product']>;
+  labels: ProductPageLabels;
+  lng: string;
 };
 
-const Reviews = ({ data, globalPageProps }: Props) => {
+export default function Reviews({ product, labels, lng }: Props) {
   const { reviewButton, reviews } =
-    readFragment(ProductPageLabelsFragment, data.generalInterface) ?? {};
+    readFragment(ProductPageLabelsFragment, labels) ?? {};
 
-  const { lng } = globalPageProps.params;
-  const average = data.product?.reviewAverage ?? 0;
+  const average = product.reviewAverage ?? 0;
   const formattedAverage = new Intl.NumberFormat(lng, {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -25,7 +24,7 @@ const Reviews = ({ data, globalPageProps }: Props) => {
     month: 'long',
     day: 'numeric',
   });
-  const featuredReviews = data.product?.featuredReviews ?? [];
+  const featuredReviews = product.featuredReviews ?? [];
 
   // A compact summary bar (score, stars, count and the button on one ruled line), then the
   // reviews in columns like the testimonials
@@ -38,11 +37,9 @@ const Reviews = ({ data, globalPageProps }: Props) => {
             <span className="sr-only"> out of 5</span>
           </p>
           <div className="pb-0.5">
-            <StarRating value={average} size={16} decorative />
+            <StarRating value={average} decorative />
             <h2 className="mt-2 text-md font-semibold">
-              <span className="tabular-nums">
-                {data.product?.numberOfReviews}
-              </span>{' '}
+              <span className="tabular-nums">{product.numberOfReviews}</span>{' '}
               {reviews}
             </h2>
           </div>
@@ -64,7 +61,7 @@ const Reviews = ({ data, globalPageProps }: Props) => {
             return (
               <li key={review.id} className="flex flex-col lg:pr-10">
                 <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                  <StarRating value={review.reviewScore} size={16} />
+                  <StarRating value={review.reviewScore} />
                   <time
                     dateTime={review.reviewDate}
                     className="text-sm text-mute"
@@ -85,6 +82,4 @@ const Reviews = ({ data, globalPageProps }: Props) => {
       )}
     </section>
   );
-};
-
-export default Reviews;
+}

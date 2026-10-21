@@ -1,5 +1,9 @@
 import { type ReactNode, ViewTransition } from 'react';
 
+type Props = {
+  children: ReactNode;
+};
+
 // Wraps a page's content. generateWrapper applies it to every route that uses it, the [lng] layout
 // included; product/[slug] and products skip generateWrapper and apply it themselves.
 // - A route change: the old page drops out and the new one comes in under the still chrome (.fade
@@ -8,7 +12,7 @@ import { type ReactNode, ViewTransition } from 'react';
 //   layout's display:contents root is not captured.
 // - Updates (search params, router.refresh(), draft toggles, RealTime): nothing plays
 //   (default="none").
-export default function PageTransition({ children }: { children: ReactNode }) {
+export default function PageTransition({ children }: Props) {
   return (
     <ViewTransition enter="fade" exit="fade" default="none">
       {children}

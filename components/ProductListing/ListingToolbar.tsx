@@ -26,7 +26,7 @@ type Props = {
   children: ReactNode;
 };
 
-const ListingToolbar = ({
+export default function ListingToolbar({
   count,
   lng,
   activeFilterCount = 0,
@@ -34,18 +34,18 @@ const ListingToolbar = ({
   searchChip,
   hasFilterDetail = false,
   children,
-}: Props) => {
+}: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [isClearing, startClearing] = useTransition();
   const resultsLabel = `${count} ${count === 1 ? 'result' : 'results'}`;
 
   const currentQuery = useSearchParams().toString();
-  const toolbar = useRef<HTMLDivElement>(null);
-  const resultsTop = useRef<HTMLDivElement>(null);
-  const scrollBackQuery = useRef<string | null>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const resultsTopRef = useRef<HTMLDivElement>(null);
+  const scrollBackQueryRef = useRef<string | null>(null);
   const scrollBackWhenQueryLoads = (query: string) => {
-    if (query !== currentQuery) scrollBackQuery.current = query;
+    if (query !== currentQuery) scrollBackQueryRef.current = query;
   };
 
   // From lg the toolbar sticks, so sort and filters can change far down the list.
@@ -53,11 +53,11 @@ const ListingToolbar = ({
   // of the page nothing moves. It waits for the drawer to close, whose scroll lock
   // would otherwise put the old position back on iOS
   useLayoutEffect(() => {
-    if (open || scrollBackQuery.current !== currentQuery) return;
-    scrollBackQuery.current = null;
+    if (open || scrollBackQueryRef.current !== currentQuery) return;
+    scrollBackQueryRef.current = null;
     const overlap =
-      (toolbar.current?.getBoundingClientRect().bottom ?? 0) -
-      (resultsTop.current?.getBoundingClientRect().top ?? 0);
+      (toolbarRef.current?.getBoundingClientRect().bottom ?? 0) -
+      (resultsTopRef.current?.getBoundingClientRect().top ?? 0);
     if (overlap > 1) window.scrollBy({ top: -overlap, behavior: 'instant' });
   }, [currentQuery, open]);
 
@@ -67,7 +67,7 @@ const ListingToolbar = ({
           shares the header's hairline; after a filter header it draws its own, which
           tucks under the header's while stuck. data-chrome keeps it above a results swap */}
       <div
-        ref={toolbar}
+        ref={toolbarRef}
         data-chrome="toolbar"
         className={`border-b border-line bg-white lg:sticky lg:z-20 ${hasFilterDetail ? 'mt-16 border-t lg:top-[calc(var(--header-h)-1px)] lg:mt-24' : 'lg:top-(--header-h)'}`}
       >
@@ -120,7 +120,7 @@ const ListingToolbar = ({
         </div>
       </div>
       {/* Where the results start: the toolbar's bottom edge while it isn't stuck */}
-      <div ref={resultsTop} />
+      <div ref={resultsTopRef} />
       {/* Dims the results (pending-dim) until the cleared listing lands */}
       {isClearing && <span data-pending hidden />}
       <Drawer
@@ -168,6 +168,4 @@ const ListingToolbar = ({
       </Drawer>
     </PendingQueryProvider>
   );
-};
-
-export default ListingToolbar;
+}

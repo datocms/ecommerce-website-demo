@@ -3,9 +3,11 @@ import Link from 'next/link';
 import type { ComponentPropsWithoutRef } from 'react';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
-import { ProductPageLabelsFragment } from '@/components/ProductDetail/fragments';
+import {
+  type ProductPageLabels,
+  ProductPageLabelsFragment,
+} from '@/components/ProductDetail/fragments';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import {
   ProductInfoSectionFragment,
   ProductMaterialFragment,
@@ -14,17 +16,18 @@ import {
 type Props = {
   fragment: FragmentOf<typeof ProductInfoSectionFragment>;
   material: FragmentOf<typeof ProductMaterialFragment> | null | undefined;
-  globalPageProps: ResolvedGlobalPageProps;
-  labels: FragmentOf<typeof ProductPageLabelsFragment> | null | undefined;
+  labels: ProductPageLabels;
+  lng: string;
+  // rest carries data-datocms-content-link-boundary, which DatoStructuredText adds to every block
 } & Omit<ComponentPropsWithoutRef<'section'>, 'children'>;
 
-const ProductInfoSection = ({
+export default function ProductInfoSection({
   fragment,
   material,
-  globalPageProps,
   labels,
+  lng,
   ...rest
-}: Props) => {
+}: Props) {
   const {
     materials: materialLabel,
     style: styleLabel,
@@ -77,7 +80,7 @@ const ProductInfoSection = ({
 
       {id && (
         <Link
-          href={`/${globalPageProps.params.lng}/products?materials=${id}`}
+          href={`/${lng}/products?materials=${id}`}
           className={`group ${MEDIA} block aspect-[4/3] md:aspect-[16/9] lg:col-span-6 lg:ml-12 lg:aspect-auto xl:col-span-5 xl:ml-0`}
         >
           {details?.image.responsiveImage && (
@@ -113,6 +116,4 @@ const ProductInfoSection = ({
       )}
     </section>
   );
-};
-
-export default ProductInfoSection;
+}

@@ -35,11 +35,11 @@ const renderMarkAsSemibold = (
     createElement(tag, props, ...children)
   );
 
-const NotificationStrip = ({
+export default function NotificationStrip({
   notification,
   globalPageProps,
   onDismiss,
-}: Props) => {
+}: Props) {
   return (
     <div data-chrome="strip" className="surface-ink">
       <div className="shell relative flex min-h-10 items-center justify-center py-2.5 text-center">
@@ -80,6 +80,4 @@ const NotificationStrip = ({
       </div>
     </div>
   );
-};
-
-export default NotificationStrip;
+}

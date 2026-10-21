@@ -1,14 +1,15 @@
 import type { ComponentPropsWithoutRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { PDP_RAIL } from '@/components/ProductDetail/styles';
+import { BUY_BOX_COLUMN } from '@/components/ProductDetail/styles';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import { QuestionSectionFragment } from './fragments';
 
 type Props = {
   fragment: FragmentOf<typeof QuestionSectionFragment>;
+  // rest carries data-datocms-content-link-boundary, which DatoStructuredText adds to every block
 } & Omit<ComponentPropsWithoutRef<'section'>, 'children'>;
 
-const QuestionsSection = ({ fragment, ...rest }: Props) => {
+export default function QuestionsSection({ fragment, ...rest }: Props) {
   const { questions } = readFragment(QuestionSectionFragment, fragment);
 
   // Hairline rows: the question on the left, the answer on the buy box's line
@@ -24,7 +25,7 @@ const QuestionsSection = ({ fragment, ...rest }: Props) => {
               {question.question}
             </dt>
             <dd
-              className={`text-md leading-[1.6] text-ink-2 [&_p+p]:mt-3 [&_p]:m-0 ${PDP_RAIL}`}
+              className={`text-md leading-[1.6] text-ink-2 [&_p+p]:mt-3 [&_p]:m-0 ${BUY_BOX_COLUMN}`}
             >
               <ReactMarkdown>{question.answer || ''}</ReactMarkdown>
             </dd>
@@ -33,6 +34,4 @@ const QuestionsSection = ({ fragment, ...rest }: Props) => {
       </dl>
     </section>
   );
-};
-
-export default QuestionsSection;
+}

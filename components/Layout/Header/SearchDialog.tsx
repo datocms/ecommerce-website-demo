@@ -19,13 +19,13 @@ type Props = {
   minHeight?: number;
 };
 
-const SearchDialog = ({
+export default function SearchDialog({
   lng,
   open,
   onClose,
   placeholder,
   minHeight,
-}: Props) => {
+}: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -110,6 +110,4 @@ const SearchDialog = ({
       </DialogPanel>
     </Dialog>
   );
-};
-
-export default SearchDialog;
+}

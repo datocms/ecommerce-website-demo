@@ -3,8 +3,8 @@
 
 import type { TadaDocumentNode } from 'gql.tada';
 import { useQuerySubscription } from 'react-datocms/use-query-subscription';
-import type { GlobalPageProps } from '@/lib/globalPageProps';
-import type { ContentPage, ResolvedPageProps } from './types';
+import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
+import type { ContentPage } from './types';
 
 export default function WithRealTimeUpdates<
   PageProps extends GlobalPageProps,

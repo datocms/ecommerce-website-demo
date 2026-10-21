@@ -10,18 +10,16 @@ import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { PageProps, Query } from './meta';
 
-const Content: ContentPage<PageProps, Query> = ({
-  data,
-  ...globalPageProps
-}) => {
+const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
   const { product } = data;
   if (!product) {
     notFound();
   }
 
+  const { lng } = params;
+  const labels = data.generalInterface;
   const isOnSale = stripStega(product.sale) === 'on_sale';
-  const { sale } =
-    readFragment(ProductPageLabelsFragment, data.generalInterface) ?? {};
+  const { sale } = readFragment(ProductPageLabelsFragment, labels) ?? {};
 
   return (
     <>
@@ -33,18 +31,18 @@ const Content: ContentPage<PageProps, Query> = ({
         />
         <BuyBox
           product={product}
-          labels={data.generalInterface}
-          lng={globalPageProps.params.lng}
+          labels={labels}
+          lng={lng}
           isOnSale={isOnSale}
         />
       </div>
-      <ProductDescription
-        product={product}
-        labels={data.generalInterface}
-        globalPageProps={globalPageProps}
+      <ProductDescription product={product} labels={labels} lng={lng} />
+      <RelatedProducts
+        products={product.relatedProducts}
+        labels={labels}
+        lng={lng}
       />
-      <RelatedProducts data={data} globalPageProps={globalPageProps} />
-      <Reviews data={data} globalPageProps={globalPageProps} />
+      <Reviews product={product} labels={labels} lng={lng} />
     </>
   );
 };

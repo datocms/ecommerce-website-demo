@@ -56,8 +56,33 @@ export function useRevealFocus(railId: string) {
   }, [railId]);
 }
 
+// For a scroller of non-focusable items that renders tabIndex={0}: keeps it a tab stop only while
+// it scrolls, so one that fits (a grid from lg) is not an extra stop. Off while `enabled` is false.
+export function useScrollerTabStop(railId: string, enabled = true) {
+  useEffect(() => {
+    if (!enabled) return;
+    const rail = document.getElementById(railId);
+    if (!rail) return;
+    const update = () => {
+      rail.tabIndex = rail.scrollWidth - rail.clientWidth > 1 ? 0 : -1;
+    };
+    update();
+    rail.addEventListener('scroll', update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(rail);
+    return () => {
+      rail.removeEventListener('scroll', update);
+      observer.disconnect();
+    };
+  }, [railId, enabled]);
+}
+
+type Props = {
+  railId: string;
+};
+
 // For a rail without RailControls (which does the same)
-export default function RailFocus({ railId }: { railId: string }) {
+export default function RailFocus({ railId }: Props) {
   useRevealFocus(railId);
   return null;
 }

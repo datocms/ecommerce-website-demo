@@ -1,5 +1,5 @@
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
-import { graphql } from '@/lib/datocms/graphql';
+import { type FragmentOf, graphql } from '@/lib/datocms/graphql';
 
 // UI labels for the catalog, from the General Interface singleton
 export const ProductListingLabelsFragment = graphql(/* GraphQL */ `
@@ -17,6 +17,11 @@ export const ProductListingLabelsFragment = graphql(/* GraphQL */ `
     BrandRecord: brand
   }
 `);
+
+export type ListingLabels =
+  | FragmentOf<typeof ProductListingLabelsFragment>
+  | null
+  | undefined;
 
 // Every collection, brand and material, for the filters and the FilterDetail header.
 // A fragment on Query: the operation that spreads it must declare $locale and

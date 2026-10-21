@@ -1,11 +1,6 @@
 import type { TadaDocumentNode } from 'gql.tada';
-import type { GlobalPageProps } from '@/lib/globalPageProps';
+import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
 import type { SiteLocale } from '@/lib/i18n';
-
-// A route's props after awaiting params (Next.js passes params as a Promise)
-export type ResolvedPageProps<T extends GlobalPageProps> = Omit<T, 'params'> & {
-  params: Awaited<T['params']>;
-};
 
 export type BuildVariablesFn<
   PageProps extends GlobalPageProps,

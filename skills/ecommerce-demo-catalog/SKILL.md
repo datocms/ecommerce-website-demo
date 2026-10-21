@@ -43,8 +43,8 @@ Before schema or content operations:
 ### Add or change a product field on listing cards
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
-2. Add the field to `productsQuery` in `app/[lng]/products/meta.ts`.
-3. Render it in the listing card while preserving existing sale-price logic and links.
+2. Add the field to all four queries that feed `ProductCard`: `productsQuery` in `app/[lng]/products/meta.ts`, `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts`, `showcase.newProducts` in `app/[lng]/showcase/meta.ts` and `product.relatedProducts` in `app/[lng]/product/[slug]/meta.ts`.
+3. Add an optional prop to `ProductCard` (`components/ProductCard/index.tsx`) and pass it from each call site (`app/[lng]/products/page.tsx`, `components/Sections/NewArrivals/ProductRail.tsx`, `app/[lng]/showcase/Content.tsx`, `components/ProductDetail/RelatedProducts.tsx`), preserving the existing sale-price logic and links.
 4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 5. Verify pagination, filters, and search still work.
 
@@ -76,7 +76,8 @@ Before schema or content operations:
 
 1. Inspect layout menu records and linked taxonomy records through MCP.
 2. Keep links in the form `/<locale>/products?<modelApiKey>s=<recordId>` unless changing the listing parser too.
-3. Verify mobile and desktop category menus.
+3. Hrefs come from `productsHref` in `components/Layout/Header/menu.ts`; columns render in `MegaMenuPanel.tsx` (desktop) and `MobileMenu.tsx`, the Trending/New tiles in `FeatureTiles.tsx`; the menu data is the `menu` selection in `app/[lng]/meta.ts`.
+4. Verify mobile and desktop category menus.
 
 ## Guardrails
 

@@ -21,12 +21,12 @@ type Props = {
 // line and button beside it, and the featured collections and socials as one quiet line under
 // a hairline. The hero's second photo belongs to the first divider (home Content); without
 // one it tiles beside the first photo here, so the field never goes missing.
-const Hero = ({
+export default function Hero({
   fragment,
   globalPageProps,
   shopNow,
   withAdditionalImage,
-}: Props) => {
+}: Props) {
   const {
     id,
     heroTitle,
@@ -156,6 +156,4 @@ const Hero = ({
       </div>
     </section>
   );
-};
-
-export default Hero;
+}

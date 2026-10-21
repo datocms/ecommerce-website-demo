@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useScrollerTabStop } from './RailFocus';
 
 type Props = {
   /** id of the horizontal scroller the track follows */
   railId: string;
-  /** For a rail of non-focusable items (it renders tabIndex={0}): keeps it a tab stop only while
-   * it scrolls, so a rail that fits (a grid from lg) is not an extra stop */
+  /** Also manage the rail's tab stop (useScrollerTabStop), for a rail of non-focusable items */
   tabStop?: boolean;
   className?: string;
 };
@@ -15,6 +15,7 @@ type Props = {
 // its scroll position. It takes the surface color (ink on white, white on black bands) and
 // hides itself while everything fits. Decorative: the rail itself is the scrollable control.
 export default function RailProgress({ railId, tabStop, className }: Props) {
+  useScrollerTabStop(railId, Boolean(tabStop));
   const thumbRef = useRef<HTMLSpanElement>(null);
   const [scrollable, setScrollable] = useState(true);
 
@@ -31,7 +32,6 @@ export default function RailProgress({ railId, tabStop, className }: Props) {
       // translate is relative to the thumb, so convert the track offset to thumb widths
       thumb.style.translate = `${((progress * (1 - visible)) / visible) * 100}% 0`;
       setScrollable(max > 1);
-      if (tabStop) rail.tabIndex = max > 1 ? 0 : -1;
     };
     update();
     rail.addEventListener('scroll', update, { passive: true });
@@ -41,7 +41,7 @@ export default function RailProgress({ railId, tabStop, className }: Props) {
       rail.removeEventListener('scroll', update);
       observer.disconnect();
     };
-  }, [railId, tabStop]);
+  }, [railId]);
 
   return (
     <div

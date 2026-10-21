@@ -6,7 +6,14 @@ import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import type { FragmentOf } from '@/lib/datocms/graphql';
 import Price from './Price';
 
-type ProductCardProps = {
+// Plain props, so any query can feed the card. Four do, each mapped to props at its call site
+// (route paths are under app/[lng]/):
+// - productsQuery (products/meta.ts), in products/page.tsx
+// - ProductRailFragment (components/Sections/NewArrivals/fragments.ts), in ProductRail.tsx there
+// - showcase.newProducts (showcase/meta.ts), in showcase/Content.tsx
+// - product.relatedProducts (product/[slug]/meta.ts), in ProductDetail/RelatedProducts.tsx
+// A new card field goes into all four queries and call sites.
+type Props = {
   href: string;
   name: string;
   brand?: string | null;
@@ -22,7 +29,8 @@ type ProductCardProps = {
   sizes: string;
   priority?: boolean;
   titleAs?: 'h2' | 'h3' | 'p';
-  /** md: 16px name (grids, rails); lg: 18px name, 20px from lg, and 18px price (spotlights) */
+  /** md: 16px name (grids, rails); lg: 18px name, 20px from lg, and 18px price (the showcase's
+   * new-products grid) */
   size?: 'md' | 'lg';
 } & Omit<ComponentPropsWithoutRef<typeof Link>, 'href' | 'children'>;
 
@@ -44,7 +52,7 @@ export default function ProductCard({
   size = 'md',
   className,
   ...rest
-}: ProductCardProps) {
+}: Props) {
   return (
     <Link
       {...rest}

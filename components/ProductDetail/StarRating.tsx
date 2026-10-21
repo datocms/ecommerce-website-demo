@@ -1,9 +1,7 @@
-type StarRatingProps = {
+type Props = {
   value: number;
-  size?: 12 | 14 | 16 | 20;
   /** true when the numeric value is printed next to the stars */
   decorative?: boolean;
-  className?: string;
 };
 
 const STAR =
@@ -13,29 +11,20 @@ const STAR =
 const FILLED = 'fill-ink';
 const EMPTY = 'fill-none stroke-mute';
 
-export default function StarRating({
-  value,
-  size = 16,
-  decorative = false,
-  className,
-}: StarRatingProps) {
+// Five 16px stars
+export default function StarRating({ value, decorative = false }: Props) {
   const filled = Math.round(value);
   const a11y = decorative
     ? { 'aria-hidden': true as const }
     : { role: 'img', 'aria-label': `${Math.round(value * 10) / 10} out of 5` };
   return (
-    <span
-      {...a11y}
-      className={['inline-flex items-center gap-0.5', className]
-        .filter(Boolean)
-        .join(' ')}
-    >
+    <span {...a11y} className="inline-flex items-center gap-0.5">
       {[0, 1, 2, 3, 4].map((i) => (
         <svg
           key={i}
           viewBox="0 0 24 24"
-          width={size}
-          height={size}
+          width={16}
+          height={16}
           aria-hidden="true"
           className={
             i < filled

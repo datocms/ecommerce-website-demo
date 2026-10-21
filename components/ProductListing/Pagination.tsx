@@ -11,7 +11,11 @@ type Props = {
   pageSize: number;
 };
 
-const Pagination = ({ totalCount, currentPage, pageSize }: Props) => {
+export default function Pagination({
+  totalCount,
+  currentPage,
+  pageSize,
+}: Props) {
   const searchParams = useSearchParams();
 
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -89,6 +93,4 @@ const Pagination = ({ totalCount, currentPage, pageSize }: Props) => {
       </nav>
     </div>
   );
-};
-
-export default Pagination;
+}

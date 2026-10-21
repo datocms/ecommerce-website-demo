@@ -2,18 +2,17 @@
 
 import { ArrowsUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef } from 'react';
-import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import { ProductListingLabelsFragment } from './fragments';
+import { readFragment } from '@/lib/datocms/graphql';
+import { type ListingLabels, ProductListingLabelsFragment } from './fragments';
 import { usePendingQuery } from './PendingQuery';
 
-export type ListingLabels =
-  | FragmentOf<typeof ProductListingLabelsFragment>
-  | null
-  | undefined;
+type Props = {
+  labels: ListingLabels;
+};
 
-function getSortOptions(generalInterface: ListingLabels) {
+function getSortOptions(labels: ListingLabels) {
   const { newArrivals, mostPopular, topRated, price, sales } =
-    readFragment(ProductListingLabelsFragment, generalInterface) ?? {};
+    readFragment(ProductListingLabelsFragment, labels) ?? {};
 
   return [
     { label: newArrivals, value: '_publishedAt_DESC' },
@@ -25,19 +24,15 @@ function getSortOptions(generalInterface: ListingLabels) {
 }
 
 /** The sort tabs of the listing toolbar: the header nav's ink bar, on the toolbar's hairline */
-export default function SortTabs({
-  generalInterface,
-}: {
-  generalInterface: ListingLabels;
-}) {
+export default function SortTabs({ labels }: Props) {
   const { pendingParams, pushQueryParam } = usePendingQuery();
   const current = pendingParams.get('orderBy');
-  const sortOptions = getSortOptions(generalInterface);
+  const sortOptions = getSortOptions(labels);
 
   // Where the row scrolls, bring the selected tab into view without moving the page
-  const scroller = useRef<HTMLFieldSetElement>(null);
+  const scrollerRef = useRef<HTMLFieldSetElement>(null);
   useEffect(() => {
-    const row = scroller.current;
+    const row = scrollerRef.current;
     const tab =
       current && row?.querySelector(`button[value="${CSS.escape(current)}"]`);
     if (!row || !tab) return;
@@ -51,7 +46,7 @@ export default function SortTabs({
   return (
     // One pixel taller than its row, so the bars cover the toolbar's bottom hairline
     <fieldset
-      ref={scroller}
+      ref={scrollerRef}
       aria-label="Sort"
       className="no-scrollbar -mb-px flex h-[calc(3rem+1px)] min-w-0 scroll-px-(--gutter) gap-2 overflow-x-auto px-(--gutter) lg:h-[calc(3.5rem+1px)] lg:gap-3 lg:px-0"
     >
@@ -78,11 +73,7 @@ export default function SortTabs({
 }
 
 /** The sort chips at the top of the filters drawer */
-export function SortChips({
-  generalInterface,
-}: {
-  generalInterface: ListingLabels;
-}) {
+export function SortChips({ labels }: Props) {
   const { pendingParams, pushQueryParam } = usePendingQuery();
   const currentSort = pendingParams.get('orderBy');
 
@@ -97,7 +88,7 @@ export function SortChips({
       >
         <ArrowsUpDownIcon />
       </span>
-      {getSortOptions(generalInterface).map((sortOption) => {
+      {getSortOptions(labels).map((sortOption) => {
         const isSelected = currentSort === sortOption.value;
         return (
           <button

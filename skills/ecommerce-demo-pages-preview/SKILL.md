@@ -33,8 +33,8 @@ Record-backed pages use this route folder shape under `app/[lng]/...`:
 
 - `meta.ts` for the route data query (`graphql()` from `@/lib/datocms/graphql`), its inferred `Query`/`Variables` types, and page prop types.
 - `page.tsx` for variables, metadata, static params when needed, and `generateWrapper`.
-- `Content.tsx` for published rendering.
-- `RealTime.tsx` for draft/live preview rendering.
+- `Content.tsx` renders the query result, in both modes.
+- `RealTime.tsx` (a `"use client"` file made with `generateRealtimeComponent`) re-renders `Content.tsx` from a live draft subscription.
 - Optional `staticParamsQuery` in `page.tsx` for slug-backed collection routes.
 
 A `page.tsx` that does not use `generateWrapper` wraps what it renders in `<PageTransition>` (`components/Motion/PageTransition.tsx`), as `products/` and `product/[slug]/` do. Without it, navigating to the page skips the page fade.

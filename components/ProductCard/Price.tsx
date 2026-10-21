@@ -1,16 +1,15 @@
-export const formatPrice = (symbol: string, value: number) =>
-  `${symbol}${value.toFixed(2)}`;
+import { formatPrice } from '@/lib/formatPrice';
 
 // Spoken before each price: screen readers do not announce the strikethrough
 const SR_SALE = 'Sale price';
 const SR_ORIGINAL = 'Original price';
 
-type PriceProps = {
+type Props = {
   price: number;
   salePrice?: number | null;
   onSale: boolean;
   currencySymbol: string;
-  /** sm: 16px (cards), md: 18px (spotlights), lg: 24px (product page) */
+  /** sm: 16px (cards), md: 18px (ProductCard size=lg), lg: 24px (product page) */
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 };
@@ -22,7 +21,7 @@ export default function Price({
   currencySymbol,
   size = 'sm',
   className,
-}: PriceProps) {
+}: Props) {
   const showSale = onSale && salePrice != null;
   return (
     <p

@@ -20,7 +20,7 @@ const generatePreviewUrl = ({
   itemType,
   locale,
 }: PreviewLinksRequest) => {
-  // Keep in sync with the model map in /api/seoAnalysis
+  // Every record-backed route; /api/seoAnalysis maps the subset that gets SEO analysis
   switch (itemType.attributes.api_key) {
     case 'home':
       return `/${locale}/home`;

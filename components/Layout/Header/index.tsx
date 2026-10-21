@@ -18,7 +18,7 @@ type Props = {
 // a full reload shows it again
 const dismissed = { strip: false, popup: false };
 
-const Header = ({ data, globalPageProps }: Props) => {
+export default function Header({ data, globalPageProps }: Props) {
   const notification = data.layout?.notification;
   const popup = data.layout?.popup;
 
@@ -71,6 +71,4 @@ const Header = ({ data, globalPageProps }: Props) => {
       )}
     </>
   );
-};
-
-export default Header;
+}

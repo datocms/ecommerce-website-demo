@@ -9,14 +9,15 @@ import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import {
   FilterOptionsFragment,
+  type ListingLabels,
   ProductListingLabelsFragment,
 } from './fragments';
 import { usePendingQuery } from './PendingQuery';
-import { type ListingLabels, SortChips } from './SortTabs';
+import { SortChips } from './SortTabs';
 
 type Props = {
   filterOptions: FragmentOf<typeof FilterOptionsFragment> | null | undefined;
-  generalInterface: ListingLabels;
+  labels: ListingLabels;
   selectedCollections: string[];
   selectedBrands: string[];
   selectedMaterials: string[];
@@ -29,7 +30,7 @@ export default function FilterPanel({
   selectedCollections,
   selectedBrands,
   selectedMaterials,
-  generalInterface,
+  labels,
 }: Props) {
   const { pendingParams, pushQueryParam } = usePendingQuery();
 
@@ -45,7 +46,7 @@ export default function FilterPanel({
       : selectedFromProps[key];
 
   const { BrandRecord, MaterialRecord, CollectionRecord } =
-    readFragment(ProductListingLabelsFragment, generalInterface) ?? {};
+    readFragment(ProductListingLabelsFragment, labels) ?? {};
 
   const { allCollections, allBrands, allMaterials } =
     readFragment(FilterOptionsFragment, filterOptions) ?? {};
@@ -93,7 +94,7 @@ export default function FilterPanel({
   return (
     // While it is open, the grid behind it updates at once (data-filter-drawer in global.css)
     <div data-filter-drawer>
-      <SortChips generalInterface={generalInterface} />
+      <SortChips labels={labels} />
 
       {groups.map((group, index) => {
         const { options, checked, narrowed } = group;

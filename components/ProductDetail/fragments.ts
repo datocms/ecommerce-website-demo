@@ -1,4 +1,4 @@
-import { graphql } from '@/lib/datocms/graphql';
+import { type FragmentOf, graphql } from '@/lib/datocms/graphql';
 
 // UI labels for the product page, from the General Interface singleton
 export const ProductPageLabelsFragment = graphql(/* GraphQL */ `
@@ -20,3 +20,8 @@ export const ProductPageLabelsFragment = graphql(/* GraphQL */ `
     color
   }
 `);
+
+export type ProductPageLabels =
+  | FragmentOf<typeof ProductPageLabelsFragment>
+  | null
+  | undefined;

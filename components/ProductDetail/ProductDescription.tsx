@@ -9,17 +9,15 @@ import { Fragment, isValidElement, type ReactNode } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
 import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
 import DatoStructuredText from '@/components/DatoStructuredText';
-import type { FragmentOf } from '@/lib/datocms/graphql';
-import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import ProductInfoSection from './Blocks/ProductInfoSection';
 import QuestionsSection from './Blocks/QuestionsSection';
-import type { ProductPageLabelsFragment } from './fragments';
-import { PDP_RAIL } from './styles';
+import type { ProductPageLabels } from './fragments';
+import { BUY_BOX_COLUMN } from './styles';
 
 type Props = {
   product: NonNullable<ProductQuery['product']>;
-  labels: FragmentOf<typeof ProductPageLabelsFragment> | null | undefined;
-  globalPageProps: ResolvedGlobalPageProps;
+  labels: ProductPageLabels;
+  lng: string;
 };
 
 type TextRow = { key: string; text: ReactNode[]; lists: ReactNode[] };
@@ -53,11 +51,7 @@ function groupTextBetweenBlocks(node: Root, children: ReactNode[] | undefined) {
   return parts;
 }
 
-export default function ProductDescription({
-  product,
-  labels,
-  globalPageProps,
-}: Props) {
+export default function ProductDescription({ product, labels, lng }: Props) {
   if (!product.description) return null;
 
   return (
@@ -73,7 +67,7 @@ export default function ProductDescription({
                   fragment={record}
                   material={product.material}
                   labels={labels}
-                  globalPageProps={globalPageProps}
+                  lng={lng}
                 />
               );
             case 'FeaturedQuestionsSectionRecord':
@@ -110,7 +104,7 @@ export default function ProductDescription({
                             )}
                             {row.lists.length > 0 && (
                               <div
-                                className={`grid content-start gap-2 ${both ? PDP_RAIL : 'lg:col-span-full'}`}
+                                className={`grid content-start gap-2 ${both ? BUY_BOX_COLUMN : 'lg:col-span-full'}`}
                               >
                                 {row.lists}
                               </div>

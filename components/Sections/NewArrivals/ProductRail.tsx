@@ -14,8 +14,9 @@ type Props = {
 
 // Product cards in a snap rail that starts on the content edge and bleeds off the viewport. From
 // lg 4¼ cards show, so a next one is always in sight. Each <li> is the 4-row grid ProductCard's
-// subgrid needs. Snapping pauses while keyboard focus is inside. The scroll reveal
-// (reveal-stagger) sits on the scroller itself, so no card moves inside it.
+// subgrid needs. py-2, taken back by -my-2, leaves room for the cards' focus rings. Snapping
+// pauses while keyboard focus is inside. The scroll reveal (reveal-stagger) sits on the scroller
+// itself, so no card moves inside it.
 export default function ProductRail({
   id,
   products,

@@ -9,20 +9,16 @@ type Props = {
   railId: string;
 };
 
-// One item plus the gap
-function stepOf(rail: HTMLElement) {
-  const item = rail.firstElementChild;
-  if (!item) return rail.clientWidth;
-  const gap = Number.parseFloat(getComputedStyle(rail).columnGap) || 0;
-  return item.getBoundingClientRect().width + gap;
-}
-
 // How far a press scrolls: every item that is fully in view, so the next press starts on the
 // first one that was cut off (one at a time where only one fits)
 function pageOf(rail: HTMLElement) {
-  const step = stepOf(rail);
   const style = getComputedStyle(rail);
   const gap = Number.parseFloat(style.columnGap) || 0;
+  // One item plus the gap
+  const item = rail.firstElementChild;
+  const step = item
+    ? item.getBoundingClientRect().width + gap
+    : rail.clientWidth;
   const view =
     rail.clientWidth -
     Number.parseFloat(style.paddingLeft) -

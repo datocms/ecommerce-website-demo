@@ -18,9 +18,11 @@ export function generateMetadataFn<
 >(options: {
   query: TadaDocumentNode<TResult, TVariables>;
   buildVariables?: BuildVariablesFn<PageProps, TVariables>;
+  // DatoCMS tags (_seoMetaTags, faviconMetaTags), converted with toNextMetadata, or a
+  // Metadata object for values that aren't tags
   generate: (
     data: TResult,
-  ) => TitleMetaLinkTag[] | SeoOrFaviconTag[] | undefined;
+  ) => TitleMetaLinkTag[] | SeoOrFaviconTag[] | Metadata | undefined;
 }) {
   return async function generateMetadata(
     pageProps: PageProps,
@@ -44,8 +46,9 @@ export function generateMetadataFn<
 
     const data = await queryDatoCMS(options.query, variables, isDraft);
 
-    const tags = options.generate(data);
+    const generated = options.generate(data);
 
-    return tags ? toNextMetadata(tags) : {};
+    if (!generated) return {};
+    return Array.isArray(generated) ? toNextMetadata(generated) : generated;
   };
 }

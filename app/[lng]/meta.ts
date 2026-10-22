@@ -27,9 +27,6 @@ export const query = graphql(
             description
           }
         }
-        favicon {
-          url
-        }
         locales
       }
       layout(locale: $locale, fallbackLocales: $fallbackLocale) {

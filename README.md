@@ -100,7 +100,7 @@ components/
   DraftMode/                draft-mode toggle, token form, success toast and the Content Link
                             overlay
   Layout/                   site shell: Header/, Footer/, cookie notice, language selector,
-                            accent color, site-wide meta tags, <html lang> sync
+                            accent color, <html lang> sync
     Header/                 nav bar, mega menu (MegaMenuPanel, links from Layout.menu via
                             menu.ts), mobile menu, search, cart, notification strip and the
                             CMS popup
@@ -134,7 +134,7 @@ skills/                     agent skills that describe how to extend this starte
 Most route folders under `app/[lng]/` contain the same four files:
 
 - `meta.ts` holds the page's GraphQL `query`, written with `graphql()` from `lib/datocms/graphql.ts`, and the `Query` and `Variables` types that gql.tada infers from it.
-- `page.tsx` builds the query variables and passes everything to `generateWrapper()`. It also exports `generateMetadata` for the SEO tags.
+- `page.tsx` builds the query variables and passes everything to `generateWrapper()`. It also exports `generateMetadata` for the SEO tags, which override the site-wide defaults from `app/[lng]/layout.tsx`: the favicons and the fallback title and description from the DatoCMS global SEO settings.
 - `Content.tsx` renders the query result.
 - `RealTime.tsx` wraps `Content.tsx` in a live subscription.
 

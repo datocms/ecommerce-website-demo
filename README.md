@@ -83,8 +83,8 @@ app/
   [lng]/                    every page lives under its locale (/en/..., /it/...)
     layout.tsx, meta.ts,    the site shell (header and footer), built from the Layout record
     Content.tsx, RealTime.tsx
-    home/                   home page, served at /<locale>/home (proxy.ts redirects / there):
-                            CMS sections plus the newest products
+    home/                   home page, served at /<locale>/home (proxy.ts redirects / and
+                            /<locale> there): CMS sections plus the newest products
     products/               catalog with filters, sorting, search and pagination
     product/[slug]/         product page
     showcase/               lookbook: photos, collections, new products and materials
@@ -153,7 +153,7 @@ In draft mode `queryDatoCMS()` uses the draft token, skips the cache and asks fo
 
 ### Locales
 
-The locales come from the DatoCMS project settings (`lib/i18n.ts`), and the first one is the fallback that route queries pass as `fallbackLocales`. Every page sits under `app/[lng]/`, and `proxy.ts` sends a URL without a locale to the visitor's best `Accept-Language` match. Content is localized in DatoCMS, and UI labels such as button text, filter names and the currency symbol come from the localized General Interface singleton. A few strings are still hard-coded in English: the skip link, the catalog's empty state and result count, "Clear all", the draft-mode UI and some screen-reader labels (in `Price.tsx` and `Pagination.tsx`, for example). Product slugs differ per locale: the product page redirects a slug from another locale to the current one (`lib/productSlugs.ts`), and the language selector asks `/api/product-slug-map` for the slug in the locale it switches to.
+The locales come from the DatoCMS project settings (`lib/i18n.ts`), and the first one is the fallback that route queries pass as `fallbackLocales`. Every page sits under `app/[lng]/`, and `proxy.ts` sends a URL without a locale to the visitor's best `Accept-Language` match, and a bare `/<locale>` to its home page. Content is localized in DatoCMS, and UI labels such as button text, filter names and the currency symbol come from the localized General Interface singleton. A few strings are still hard-coded in English: the skip link, the catalog's empty state and result count, "Clear all", the draft-mode UI and some screen-reader labels (in `Price.tsx` and `Pagination.tsx`, for example). Product slugs differ per locale: the product page redirects a slug from another locale to the current one (`lib/productSlugs.ts`), and the language selector asks `/api/product-slug-map` for the slug in the locale it switches to.
 
 ### Where data and components live
 

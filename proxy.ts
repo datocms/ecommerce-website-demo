@@ -1,5 +1,5 @@
 // Next.js 16 Proxy (formerly middleware.ts): redirects URLs without a locale prefix to the
-// visitor's preferred locale.
+// visitor's preferred locale, and a bare locale to its home page.
 
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
@@ -56,8 +56,15 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}/home`, request.url));
   }
 
-  const hasLocalePrefix = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
+  // /en -> /en/home, keeping the query string: there is no page at a locale's root
+  if (locales.some((locale) => pathname === `/${locale}`)) {
+    const url = request.nextUrl.clone();
+    url.pathname = `${pathname}/home`;
+    return NextResponse.redirect(url);
+  }
+
+  const hasLocalePrefix = locales.some((locale) =>
+    pathname.startsWith(`/${locale}/`),
   );
 
   // /products -> /en/products, keeping the query string

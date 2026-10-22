@@ -115,7 +115,8 @@ export default function NavBar({ globalPageProps, data }: Props) {
         currencySymbol={generalInterface?.currencySymbol}
       />
 
-      {/* Own boundary: its useSearchParams must not opt the whole header out of SSR */}
+      {/* Its own boundary, for its useSearchParams. Closed it renders nothing, so the empty
+          fallback takes no room. */}
       <Suspense>
         <SearchDialog
           lng={lng}
@@ -260,15 +261,13 @@ export default function NavBar({ globalPageProps, data }: Props) {
               className="mx-2 hidden h-5 w-px bg-line nav:block xl:mx-3"
             />
             <div className="hidden nav:block">
-              <Suspense>
-                <LanguageSelector
-                  languages={data._site.locales}
-                  currencySymbol={generalInterface?.currencySymbol}
-                  // Globe only until xl; screen readers always get the label
-                  labelClassName="max-xl:sr-only"
-                  className="h-10 px-2.5 text-sm hover:bg-mist aria-expanded:bg-mist max-xl:w-10 max-xl:justify-center max-xl:px-0 [&>svg]:size-5"
-                />
-              </Suspense>
+              <LanguageSelector
+                languages={data._site.locales}
+                currencySymbol={generalInterface?.currencySymbol}
+                // Globe only until xl; screen readers always get the label
+                labelClassName="max-xl:sr-only"
+                className="h-10 px-2.5 text-sm hover:bg-mist aria-expanded:bg-mist max-xl:w-10 max-xl:justify-center max-xl:px-0 [&>svg]:size-5"
+              />
             </div>
             <button
               type="button"

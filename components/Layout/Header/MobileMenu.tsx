@@ -10,7 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { type FormEvent, type ReactNode, Suspense } from 'react';
+import type { FormEvent, ReactNode } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import Drawer from '@/components/Common/Drawer';
 import SocialLink from '@/components/Common/SocialLink';
@@ -184,15 +184,13 @@ export default function MobileMenu({
       </nav>
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-        <Suspense>
-          <LanguageSelector
-            languages={locales}
-            currencySymbol={generalInterface?.currencySymbol}
-            placement="above-start"
-            className="h-11 border border-line px-4 text-sm hover:border-ink aria-expanded:border-ink"
-            onNavigate={onClose}
-          />
-        </Suspense>
+        <LanguageSelector
+          languages={locales}
+          currencySymbol={generalInterface?.currencySymbol}
+          placement="above-start"
+          className="h-11 border border-line px-4 text-sm hover:border-ink aria-expanded:border-ink"
+          onNavigate={onClose}
+        />
         {socials.length > 0 && (
           <div className="-mr-3 flex">
             {socials.map((social) => (

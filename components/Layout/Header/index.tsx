@@ -1,7 +1,7 @@
 'use client';
 
 import { isEmptyDocument } from 'datocms-structured-text-utils';
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import { useCookieNoticeOpen } from '@/components/Layout/CookieNotice';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
@@ -54,9 +54,11 @@ export default function Header({ data, globalPageProps }: Props) {
           }}
         />
       )}
-      <Suspense>
-        <NavBar globalPageProps={globalPageProps} data={data} />
-      </Suspense>
+      {/* Not in a Suspense boundary: React may stream a boundary's content after the page,
+          which would leave the bar out of the server HTML and push the page down when it
+          arrives. The parts that read the query string have tight boundaries of their own,
+          in NavBar and LanguageSelector. */}
+      <NavBar globalPageProps={globalPageProps} data={data} />
 
       {popup && (
         <PopupDialog

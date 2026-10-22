@@ -2,7 +2,6 @@
 
 import { stripStega } from '@datocms/content-link';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import SocialLink from '@/components/Common/SocialLink';
@@ -179,15 +178,13 @@ export default function Footer({ data, globalPageProps }: Props) {
             <p className="text-balance tabular-nums">
               {data.layout?.copyrightText}
             </p>
-            <Suspense>
-              <LanguageSelector
-                languages={data._site.locales}
-                currencySymbol={generalInterface?.currencySymbol}
-                placement="above-start-md-end"
-                chevron
-                className="-mx-2.5 min-h-11 px-2.5 text-ink-2 hover:text-white aria-expanded:text-white [&>svg:first-child]:size-4"
-              />
-            </Suspense>
+            <LanguageSelector
+              languages={data._site.locales}
+              currencySymbol={generalInterface?.currencySymbol}
+              placement="above-start-md-end"
+              chevron
+              className="-mx-2.5 min-h-11 px-2.5 text-ink-2 hover:text-white aria-expanded:text-white [&>svg:first-child]:size-4"
+            />
           </div>
         </div>
       </footer>

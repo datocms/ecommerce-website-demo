@@ -8,7 +8,14 @@ import {
 import { getLangNameFromCode } from 'language-name-map';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useEffect, useId, useRef, useState } from 'react';
+import {
+  type ReactNode,
+  Suspense,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 import type { SiteLocale } from '@/lib/i18n';
 
 type Props = {
@@ -36,6 +43,17 @@ const PLACEMENT = {
     'bottom-full left-0 mb-2 origin-bottom-left md:right-0 md:left-auto md:origin-bottom-right',
 };
 
+// Hands its children the current query string. On prerendered pages Next.js leaves whatever
+// reads it to the browser, up to the nearest Suspense boundary, so only this goes in one.
+function WithQueryString({
+  children,
+}: {
+  children: (queryString: string) => ReactNode;
+}) {
+  const queryString = useSearchParams().toString();
+  return children(queryString);
+}
+
 export default function LanguageSelector({
   languages,
   currencySymbol,
@@ -55,12 +73,10 @@ export default function LanguageSelector({
   // proxy.ts redirects every request to a locale-prefixed path, so the first segment is a
   // SiteLocale
   const currentLocale = pathSegments[0] as SiteLocale;
-  const searchParams = useSearchParams();
   const currentProductSlug =
     pathSegments[1] === 'product' ? pathSegments[2] : null;
 
   const pathString = pathSegments.slice(1).join('/');
-  const queryString = searchParams.toString();
 
   useEffect(() => {
     setProductSlugs({});
@@ -128,7 +144,8 @@ export default function LanguageSelector({
     };
   }, [isOpen]);
 
-  const hrefForLocale = (locale: SiteLocale) => {
+  // The query string is kept, so a switch on the listing keeps its filters
+  const hrefForLocale = (locale: SiteLocale, queryString: string) => {
     const localizedPath =
       currentProductSlug && productSlugs[locale]
         ? `product/${productSlugs[locale]}`
@@ -137,6 +154,46 @@ export default function LanguageSelector({
 
     return queryString ? `${href}?${queryString}` : href;
   };
+
+  // A white popover with an ink edge (like the draft-mode one) on every surface: the edge
+  // stays visible over the footer's white wordmark, and the ring is reset to ink
+  const localeList = (queryString: string) => (
+    <ul
+      id={listId}
+      hidden={!isOpen}
+      className={`pop absolute z-50 w-56 border border-ink bg-white p-1 text-ink [--focus-ring:var(--color-ink)] ${PLACEMENT[placement]}`}
+    >
+      {languages.map((locale) => {
+        const bcp47 = locale.replaceAll('_', '-');
+        const current = locale === currentLocale;
+        return (
+          <li key={locale}>
+            <Link
+              href={hrefForLocale(locale, queryString)}
+              hrefLang={bcp47}
+              prefetch={false}
+              aria-current={current ? 'true' : undefined}
+              onClick={() => {
+                setIsOpen(false);
+                onNavigate?.();
+              }}
+              className="flex min-h-11 items-center justify-between gap-4 px-3 text-base transition-colors duration-150 hover:bg-mist focus-visible:outline-offset-[-2px] aria-[current=true]:font-semibold"
+            >
+              <span lang={bcp47}>
+                {getLangNameFromCode(locale)?.native || locale}
+              </span>
+              {current && (
+                <CheckIcon
+                  aria-hidden="true"
+                  className="size-4.5 shrink-0 stroke-2"
+                />
+              )}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
 
   return (
     <div ref={selectorRef} className="relative">
@@ -174,43 +231,11 @@ export default function LanguageSelector({
         )}
       </button>
 
-      {/* A white popover with an ink edge (like the draft-mode one) on every surface: the edge
-          stays visible over the footer's white wordmark, and the ring is reset to ink */}
-      <ul
-        id={listId}
-        hidden={!isOpen}
-        className={`pop absolute z-50 w-56 border border-ink bg-white p-1 text-ink [--focus-ring:var(--color-ink)] ${PLACEMENT[placement]}`}
-      >
-        {languages.map((locale) => {
-          const bcp47 = locale.replaceAll('_', '-');
-          const current = locale === currentLocale;
-          return (
-            <li key={locale}>
-              <Link
-                href={hrefForLocale(locale)}
-                hrefLang={bcp47}
-                prefetch={false}
-                aria-current={current ? 'true' : undefined}
-                onClick={() => {
-                  setIsOpen(false);
-                  onNavigate?.();
-                }}
-                className="flex min-h-11 items-center justify-between gap-4 px-3 text-base transition-colors duration-150 hover:bg-mist focus-visible:outline-offset-[-2px] aria-[current=true]:font-semibold"
-              >
-                <span lang={bcp47}>
-                  {getLangNameFromCode(locale)?.native || locale}
-                </span>
-                {current && (
-                  <CheckIcon
-                    aria-hidden="true"
-                    className="size-4.5 shrink-0 stroke-2"
-                  />
-                )}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {/* Only the list reads the query string, so the trigger is always in the server HTML.
+          Until the browser has the query, the same list on the plain paths stands in. */}
+      <Suspense fallback={localeList('')}>
+        <WithQueryString>{localeList}</WithQueryString>
+      </Suspense>
     </div>
   );
 }

@@ -19,7 +19,9 @@ export const query = graphql(
         }
         country
         id
-        storeDescription
+        storeDescription {
+          value
+        }
         storeName
         storeLocation {
           latitude

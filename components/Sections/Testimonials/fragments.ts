@@ -6,7 +6,9 @@ export const TestimonialSectionFragment = graphql(/* GraphQL */ `
     title
     testimonial {
       id
-      testimonial
+      testimonial {
+        value
+      }
       author
     }
   }

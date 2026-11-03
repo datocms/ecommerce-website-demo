@@ -5,7 +5,9 @@ export const HeroSectionFragment = graphql(
   /* GraphQL */ `
     fragment HeroSectionFragment on HeroSectionRecord {
       id
-      heroSubtitle
+      heroSubtitle {
+        value
+      }
       heroTitle
       heroImage {
         responsiveImage {

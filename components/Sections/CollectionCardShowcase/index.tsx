@@ -1,9 +1,11 @@
 import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import SectionTitle from '@/components/Common/SectionTitle';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import DatoStructuredText from '@/components/DatoStructuredText';
 import RailControls from '@/components/Rail/RailControls';
 import RailFocus from '@/components/Rail/RailFocus';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
@@ -110,9 +112,10 @@ function Season({
           {title}
         </h3>
         {description && (
-          <p className="mt-3 text-sm leading-[1.5] text-pretty text-ink-2">
-            {description}
-          </p>
+          <DatoStructuredText
+            data={description as CdaStructuredTextValue}
+            className="mt-3 text-sm leading-[1.5] text-pretty text-ink-2"
+          />
         )}
       </div>
       {cta ? (

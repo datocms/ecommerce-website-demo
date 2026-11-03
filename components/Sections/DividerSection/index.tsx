@@ -1,9 +1,11 @@
 import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
+import DatoStructuredText from '@/components/DatoStructuredText';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { DividerSectionFragment } from './fragments';
@@ -38,9 +40,10 @@ export default function DividerSection({
         {title}
       </h2>
       {subtitle && (
-        <p className="mt-5 text-base leading-[1.6] text-pretty text-ink-2 lg:text-lg">
-          {subtitle}
-        </p>
+        <DatoStructuredText
+          data={subtitle as CdaStructuredTextValue}
+          className="mt-5 text-base leading-[1.6] text-pretty text-ink-2 lg:text-lg"
+        />
       )}
       {cta && (
         <Link

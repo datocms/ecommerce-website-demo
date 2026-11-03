@@ -6,13 +6,19 @@ export const MaterialShowcaseFragment = graphql(
     fragment MaterialShowcaseFragment on MaterialShowcaseSectionRecord {
       id
       title
-      subDescription
-      description
+      subDescription {
+        value
+      }
+      description {
+        value
+      }
       materials {
         id
         name
         details {
-          subtitle
+          subtitle {
+            value
+          }
           image {
             responsiveImage {
               ...ResponsiveImageFragment

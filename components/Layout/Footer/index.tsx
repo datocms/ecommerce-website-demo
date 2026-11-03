@@ -1,11 +1,13 @@
 'use client';
 
 import { stripStega } from '@datocms/content-link';
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import SocialLink from '@/components/Common/SocialLink';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
+import DatoStructuredText from '@/components/DatoStructuredText';
 import CookieNotice, {
   useCookieNoticeOpen,
 } from '@/components/Layout/CookieNotice';
@@ -119,9 +121,10 @@ export default function Footer({ data, globalPageProps }: Props) {
               </Link>
             )}
             {data.layout?.footerSubtitle && (
-              <p className="mt-6 max-w-[18.75rem] text-md text-pretty text-mute first:mt-0">
-                {data.layout.footerSubtitle}
-              </p>
+              <DatoStructuredText
+                data={data.layout.footerSubtitle as CdaStructuredTextValue}
+                className="mt-6 max-w-[18.75rem] text-md text-pretty text-mute first:mt-0"
+              />
             )}
             {socials.length > 0 && (
               // -ml-3: the first glyph sits on the content edge

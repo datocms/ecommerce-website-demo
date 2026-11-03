@@ -43,7 +43,9 @@ export const FilterOptionsFragment = graphql(
               ...ResponsiveImageFragment
             }
           }
-          subtitle
+          subtitle {
+            value
+          }
           description {
             value
           }
@@ -59,7 +61,9 @@ export const FilterOptionsFragment = graphql(
               ...ResponsiveImageFragment
             }
           }
-          subtitle
+          subtitle {
+            value
+          }
           description {
             value
           }
@@ -79,7 +83,9 @@ export const FilterOptionsFragment = graphql(
               ...ResponsiveImageFragment
             }
           }
-          subtitle
+          subtitle {
+            value
+          }
           description {
             value
           }

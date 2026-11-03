@@ -157,7 +157,9 @@ export default async function Page({ params, searchParams }: PageProps) {
           lng={lng}
           eyebrow={filterLabel}
           name={headerFilter.name}
-          subtitle={headerFilter.details.subtitle ?? ''}
+          subtitle={
+            headerFilter.details.subtitle as StructuredText<Record, Record>
+          }
           description={
             headerFilter.details.description as StructuredText<Record, Record>
           }

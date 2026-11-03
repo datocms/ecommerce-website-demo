@@ -1,4 +1,5 @@
-import ReactMarkdown from 'react-markdown';
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
+import { StructuredText } from 'react-datocms/structured-text';
 import RailControls from '@/components/Rail/RailControls';
 import RailProgress from '@/components/Rail/RailProgress';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
@@ -60,7 +61,9 @@ export default function Testimonials({ fragment }: Props) {
               >
                 {/* One pair of quotes in the page language around the whole testimonial */}
                 <blockquote className="text-[1.3125rem] leading-[1.32] font-medium tracking-[-0.02em] text-pretty xl:text-[1.625rem] [&>p+p]:mt-[0.75em] [&>p:first-child]:before:content-[open-quote] [&>p:last-child]:after:content-[close-quote]">
-                  <ReactMarkdown>{item.testimonial || ''}</ReactMarkdown>
+                  <StructuredText
+                    data={item.testimonial as CdaStructuredTextValue}
+                  />
                 </blockquote>
                 <figcaption className="mt-10 text-sm font-medium text-mute">
                   {item.author}

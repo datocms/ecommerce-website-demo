@@ -111,6 +111,13 @@ type BrandRecord implements RecordInterface {
   website: String!
 }
 
+type CollectionCardShowcaseSectionModelDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
 """
 Block of type 🃏 Collection Showcase Section (collection_card_showcase_section)
 """
@@ -135,10 +142,7 @@ type CollectionCardShowcaseSectionRecord implements RecordInterface {
   _updatedAt: DateTime!
   button: [SimpleButtonRecord!]!
   collection: [CollectionRecord!]!
-  description(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
+  description: CollectionCardShowcaseSectionModelDescriptionField
   direction: String
   id: ItemId!
   pretitle: String
@@ -276,6 +280,13 @@ input ColorFilter {
   exists: BooleanType
 }
 
+type CookieNoticeModelSubheaderField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
 """Block of type 🍪 Cookie Notice (cookie_notice)"""
 type CookieNoticeRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -301,10 +312,7 @@ type CookieNoticeRecord implements RecordInterface {
   id: ItemId!
   primaryButtonLabel: String
   secondaryButtonLabel: String
-  subheader(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
+  subheader: CookieNoticeModelSubheaderField
 }
 
 type CookieNoticeRecordMultiLocaleField {
@@ -358,6 +366,13 @@ scalar Date
 """A ISO 8601 compliant datetime value"""
 scalar DateTime
 
+type DividerSectionModelSubtitleField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
 """Block of type ➗ Divider Section (divider_section)"""
 type DividerSectionRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -381,10 +396,7 @@ type DividerSectionRecord implements RecordInterface {
   button: [SimpleButtonRecord!]!
   id: ItemId!
   preTitle: String
-  subtitle(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
+  subtitle: DividerSectionModelSubtitleField
   title: String
 }
 
@@ -478,6 +490,13 @@ type FeaturedQuestionsSectionRecord implements RecordInterface {
   questions: [ProductQuestionRecord!]!
 }
 
+type FeaturedReviewModelReviewField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
 """Block of type ⭐ ️ Featured Review (featured_review)"""
 type FeaturedReviewRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -499,10 +518,7 @@ type FeaturedReviewRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   id: ItemId!
-  review(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String!
+  review: FeaturedReviewModelReviewField!
   reviewDate: Date!
   reviewScore: IntType!
   reviewerName: String!
@@ -742,6 +758,13 @@ type FilterDetailModelDescriptionField {
   value: JsonField!
 }
 
+type FilterDetailModelSubtitleField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
 """Block of type 🏷️ Filter Detail (filter_detail)"""
 type FilterDetailRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -765,10 +788,7 @@ type FilterDetailRecord implements RecordInterface {
   description: FilterDetailModelDescriptionField!
   id: ItemId!
   image: FileField!
-  subtitle(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String!
+  subtitle: FilterDetailModelSubtitleField!
 }
 
 type FilterDetailRecordNonNullMultiLocaleField {
@@ -1432,6 +1452,13 @@ type GlobalSeoField {
   twitterAccount: String
 }
 
+type HeroSectionModelHeroSubtitleField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
 """Block of type 🚀 Hero Section (hero_section)"""
 type HeroSectionRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -1455,10 +1482,7 @@ type HeroSectionRecord implements RecordInterface {
   additionalImage: ImageFileField!
   featuredCollections: [CollectionRecord!]!
   heroImage: ImageFileField!
-  heroSubtitle(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
+  heroSubtitle: HeroSectionModelHeroSubtitleField
   heroTitle: String!
   id: ItemId!
   socialLabel: String
@@ -3691,6 +3715,18 @@ input LatLonNearFilter {
   radius: FloatType!
 }
 
+type LayoutModelFooterSubtitleField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type LayoutModelFooterSubtitleFieldMultiLocaleField {
+  locale: SiteLocale
+  value: LayoutModelFooterSubtitleField
+}
+
 union LayoutModelMenuField = DropdownMenuRecord | LinkItemRecord
 
 type LayoutModelMenuFieldListListNonNullMultiLocaleField {
@@ -3731,14 +3767,11 @@ type LayoutRecord implements RecordInterface {
     fallbackLocales: [SiteLocale!]
   ): [FooterColumnRecordListListNonNullMultiLocaleField!]
   _allFooterSubtitleLocales(
-    """Process content as markdown"""
-    markdown: Boolean
-
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [StringMultiLocaleField!]
+  ): [LayoutModelFooterSubtitleFieldMultiLocaleField!]
   _allMenuLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -3805,9 +3838,6 @@ type LayoutRecord implements RecordInterface {
   ): [FooterColumnRecord!]!
   footerLogo: FileField
   footerSubtitle(
-    """Process content as markdown"""
-    markdown: Boolean
-
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -3815,7 +3845,7 @@ type LayoutRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): String
+  ): LayoutModelFooterSubtitleField
   footerTitle: String
   id: ItemId!
   logo: ImageFileField!
@@ -4144,6 +4174,20 @@ type MaterialRecord implements RecordInterface {
   slug: String!
 }
 
+type MaterialShowcaseSectionModelDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type MaterialShowcaseSectionModelSubDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
 """Block of type 🧶 Material Showcase Section (material_showcase_section)"""
 type MaterialShowcaseSectionRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -4164,16 +4208,10 @@ type MaterialShowcaseSectionRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  description(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
+  description: MaterialShowcaseSectionModelDescriptionField
   id: ItemId!
   materials: [MaterialRecord!]!
-  subDescription(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
+  subDescription: MaterialShowcaseSectionModelSubDescriptionField
   title: String
 }
 
@@ -4346,10 +4384,10 @@ enum ProductModelOrderBy {
   price_DESC
   reviewAverage_ASC
   reviewAverage_DESC
-  salePrice_ASC
-  salePrice_DESC
   sale_ASC
   sale_DESC
+  salePrice_ASC
+  salePrice_DESC
 }
 
 """Specify nested blocks fields conditions"""
@@ -4365,7 +4403,7 @@ input ProductModelProductVariationsFieldBlocksPresence {
 """Specify how to filter this specific Modular Content field instance"""
 input ProductModelProductVariationsFieldFilter {
   """
-  Filter records containing at least one block matching the specified conditions
+  Filter records containing at least one block matching the specified conditions. All the conditions for a block model must match the same block
   """
   any: ProductModelProductVariationsFieldBlocksConditions
 
@@ -4374,6 +4412,13 @@ input ProductModelProductVariationsFieldFilter {
 
   """Filter records containing at least one block of specified type or not"""
   containsAny: ProductModelProductVariationsFieldBlocksPresence
+}
+
+type ProductQuestionModelAnswerField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
 }
 
 """Block of type ❓ Product Question (product_question)"""
@@ -4396,10 +4441,7 @@ type ProductQuestionRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  answer(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String!
+  answer: ProductQuestionModelAnswerField!
   id: ItemId!
   question: String!
 }
@@ -5023,6 +5065,30 @@ input SeoFilter {
   exists: BooleanType
 }
 
+type ShowcaseModelDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type ShowcaseModelDescriptionFieldMultiLocaleField {
+  locale: SiteLocale
+  value: ShowcaseModelDescriptionField
+}
+
+type ShowcaseModelMaterialsDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type ShowcaseModelMaterialsDescriptionFieldMultiLocaleField {
+  locale: SiteLocale
+  value: ShowcaseModelMaterialsDescriptionField
+}
+
 """Record of type ✨ Showcase (showcase)"""
 type ShowcaseRecord implements RecordInterface {
   _allCollectionsCtaLocales(
@@ -5038,23 +5104,17 @@ type ShowcaseRecord implements RecordInterface {
     fallbackLocales: [SiteLocale!]
   ): [SimpleButtonRecordListListNonNullMultiLocaleField!]
   _allDescriptionLocales(
-    """Process content as markdown"""
-    markdown: Boolean
-
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [StringMultiLocaleField!]
+  ): [ShowcaseModelDescriptionFieldMultiLocaleField!]
   _allMaterialsDescriptionLocales(
-    """Process content as markdown"""
-    markdown: Boolean
-
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [StringMultiLocaleField!]
+  ): [ShowcaseModelMaterialsDescriptionFieldMultiLocaleField!]
   _allMaterialsTitleLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -5118,9 +5178,6 @@ type ShowcaseRecord implements RecordInterface {
     fallbackLocales: [SiteLocale!]
   ): [SimpleButtonRecord!]!
   description(
-    """Process content as markdown"""
-    markdown: Boolean
-
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -5128,13 +5185,10 @@ type ShowcaseRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): String
+  ): ShowcaseModelDescriptionField
   displays: [FileField!]!
   id: ItemId!
   materialsDescription(
-    """Process content as markdown"""
-    markdown: Boolean
-
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -5142,7 +5196,7 @@ type ShowcaseRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): String
+  ): ShowcaseModelMaterialsDescriptionField
   materialsDisplay: [FileField!]!
   materialsTitle(
     """The locale to use to fetch the field's content"""
@@ -5311,7 +5365,7 @@ input StoreModelFilter {
   country: StringFilter
   seoMeta: SeoFilter
   slug: SlugFilter
-  storeDescription: TextFilter
+  storeDescription: StructuredTextFilter
   storeImage: FileFilter
   storeLocation: LatLonFilter
   storeName: StringFilter
@@ -5344,6 +5398,18 @@ enum StoreModelOrderBy {
   storeName_DESC
 }
 
+type StoreModelStoreDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type StoreModelStoreDescriptionFieldMultiLocaleField {
+  locale: SiteLocale
+  value: StoreModelStoreDescriptionField
+}
+
 """Record of type 🏪 Store (store)"""
 type StoreRecord implements RecordInterface {
   _allCountryLocales(
@@ -5359,14 +5425,11 @@ type StoreRecord implements RecordInterface {
     fallbackLocales: [SiteLocale!]
   ): [SeoFieldMultiLocaleField!]
   _allStoreDescriptionLocales(
-    """Process content as markdown"""
-    markdown: Boolean
-
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [StringMultiLocaleField!]
+  ): [StoreModelStoreDescriptionFieldMultiLocaleField!]
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -5407,9 +5470,6 @@ type StoreRecord implements RecordInterface {
   ): SeoField
   slug: String!
   storeDescription(
-    """Process content as markdown"""
-    markdown: Boolean
-
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -5417,7 +5477,7 @@ type StoreRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): String
+  ): StoreModelStoreDescriptionField
   storeImage: FileField
   storeLocation: LatLonField
   storeName: String
@@ -5505,6 +5565,13 @@ type Tag {
   tag: String!
 }
 
+type TestimonialModelTestimonialField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
 """Block of type ⭐ ️ Testimonial (testimonial)"""
 type TestimonialRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -5527,10 +5594,7 @@ type TestimonialRecord implements RecordInterface {
   _updatedAt: DateTime!
   author: String
   id: ItemId!
-  testimonial(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
+  testimonial: TestimonialModelTestimonialField
 }
 
 """Block of type 💬 Testimonial Section (testimonial_section)"""
@@ -5556,30 +5620,6 @@ type TestimonialSectionRecord implements RecordInterface {
   id: ItemId!
   testimonial: [TestimonialRecord!]!
   title: String
-}
-
-"""Specifies how to filter text fields"""
-input TextFilter {
-  """Filter records based on a regular expression"""
-  matches: StringMatchesFilter
-
-  """Exclude records based on a regular expression"""
-  notMatches: StringMatchesFilter
-
-  """
-  Filter records with the specified field set as blank (null or empty string)
-  """
-  isBlank: BooleanType
-
-  """
-  Filter records with the specified field present (neither null, nor empty string)
-  """
-  isPresent: BooleanType
-
-  """
-  Filter records with the specified field defined (i.e. with any value) or not [DEPRECATED]
-  """
-  exists: BooleanType
 }
 
 """Specifies how to filter by upload type"""

@@ -1,5 +1,6 @@
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import type { ComponentPropsWithoutRef } from 'react';
-import ReactMarkdown from 'react-markdown';
+import DatoStructuredText from '@/components/DatoStructuredText';
 import { BUY_BOX_COLUMN } from '@/components/ProductDetail/styles';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import { QuestionSectionFragment } from './fragments';
@@ -27,7 +28,9 @@ export default function QuestionsSection({ fragment, ...rest }: Props) {
             <dd
               className={`text-md leading-[1.6] text-ink-2 [&_p+p]:mt-3 [&_p]:m-0 ${BUY_BOX_COLUMN}`}
             >
-              <ReactMarkdown>{question.answer || ''}</ReactMarkdown>
+              <DatoStructuredText
+                data={question.answer as CdaStructuredTextValue}
+              />
             </dd>
           </div>
         ))}

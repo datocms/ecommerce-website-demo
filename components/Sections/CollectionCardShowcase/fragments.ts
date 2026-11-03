@@ -22,7 +22,9 @@ export const CollectionCardShowcaseFragment = graphql(
           }
         }
       }
-      description
+      description {
+        value
+      }
     }
   `,
   [ResponsiveImageFragment],

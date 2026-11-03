@@ -1,11 +1,24 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import {
+  type CdaStructuredTextValue,
+  hasChildren,
+} from 'datocms-structured-text-utils';
 import Link from 'next/link';
-import ReactMarkdown from 'react-markdown';
+import { Fragment } from 'react';
+import { renderNodeRule, StructuredText } from 'react-datocms/structured-text';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import DatoStructuredText from '@/components/DatoStructuredText';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { MaterialShowcaseFragment } from './fragments';
+
+// Every node with children (paragraphs, headings, lists, links) unwraps to its content
+const INLINE_ONLY = [
+  renderNodeRule(hasChildren, ({ children, key }) => (
+    <Fragment key={key}>{children}</Fragment>
+  )),
+];
 
 type Props = {
   fragment: FragmentOf<typeof MaterialShowcaseFragment>;
@@ -48,14 +61,16 @@ export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
           {title}
         </h2>
         {description && (
-          <p className="mt-5 text-lg leading-[1.5] text-pretty">
-            {description}
-          </p>
+          <DatoStructuredText
+            data={description as CdaStructuredTextValue}
+            className="mt-5 text-lg leading-[1.5] text-pretty"
+          />
         )}
         {subDescription && (
-          <p className="mt-3 text-base leading-[1.65] text-pretty text-ink-2">
-            {subDescription}
-          </p>
+          <DatoStructuredText
+            data={subDescription as CdaStructuredTextValue}
+            className="mt-3 text-base leading-[1.65] text-pretty text-ink-2"
+          />
         )}
       </div>
 
@@ -90,14 +105,12 @@ export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
                 </h3>
                 {material.details.subtitle && (
                   <p className="mt-1.5 max-w-[26rem] text-sm text-pretty text-mute">
-                    {/* Markdown in the CMS (the listing header renders it too): inline marks
-                        only, inside this one line */}
-                    <ReactMarkdown
-                      allowedElements={['strong', 'em']}
-                      unwrapDisallowed
-                    >
-                      {material.details.subtitle}
-                    </ReactMarkdown>
+                    {/* The listing header renders the whole subtitle; here it is inline marks
+                        only, inside this one line of the card's link */}
+                    <StructuredText
+                      data={material.details.subtitle as CdaStructuredTextValue}
+                      customNodeRules={INLINE_ONLY}
+                    />
                   </p>
                 )}
               </Link>

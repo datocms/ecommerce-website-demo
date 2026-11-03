@@ -4,7 +4,9 @@ export const DividerSectionFragment = graphql(/* GraphQL */ `
   fragment DividerSectionFragment on DividerSectionRecord {
     id
     title
-    subtitle
+    subtitle {
+      value
+    }
     preTitle
     button {
       label

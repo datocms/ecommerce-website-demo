@@ -51,7 +51,9 @@ export const query = graphql(
           reviewerName
           reviewDate
           reviewScore
-          review
+          review {
+            value
+          }
         }
         material {
           ...ProductMaterialFragment

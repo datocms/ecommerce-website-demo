@@ -49,8 +49,12 @@ export const query = graphql(
             ...ResponsiveImageFragment
           }
         }
-        materialsDescription
-        description
+        materialsDescription {
+          value
+        }
+        description {
+          value
+        }
         displays {
           id
           responsiveImage {

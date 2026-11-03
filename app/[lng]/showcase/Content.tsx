@@ -1,9 +1,11 @@
 import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import DatoStructuredText from '@/components/DatoStructuredText';
 import Rise from '@/components/Motion/Rise';
 import ProductCard from '@/components/ProductCard';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
@@ -76,9 +78,10 @@ const Content: ContentPage<PageProps, Query> = ({
           {(description || cta) && (
             <div className="enter-stagger max-w-[34rem] lg:col-span-5 lg:max-w-none xl:col-span-4 [--delay:200ms]">
               {description && (
-                <p className="text-md leading-[1.6] text-pretty text-ink-2">
-                  {description}
-                </p>
+                <DatoStructuredText
+                  data={description as CdaStructuredTextValue}
+                  className="text-md leading-[1.6] text-pretty text-ink-2"
+                />
               )}
               {cta && (
                 <Link
@@ -308,9 +311,10 @@ const Content: ContentPage<PageProps, Query> = ({
               }`}
             >
               {materialsDescription && (
-                <p className="text-md leading-[1.65] text-pretty text-ink-2">
-                  {materialsDescription}
-                </p>
+                <DatoStructuredText
+                  data={materialsDescription as CdaStructuredTextValue}
+                  className="text-md leading-[1.65] text-pretty text-ink-2"
+                />
               )}
               {shopNow && (
                 <Link href={`/${lng}/products`} className="btn">

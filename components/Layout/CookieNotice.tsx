@@ -1,7 +1,9 @@
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import DatoStructuredText from '@/components/DatoStructuredText';
 
 type CookieNoticeContent = NonNullable<
   NonNullable<LayoutQuery['layout']>['cookieNotice']
@@ -74,9 +76,10 @@ export default function CookieNotice({ cookieNotice }: Props) {
             <h2 className="text-md font-semibold tracking-[-0.01em] sm:text-lg">
               {cookieNotice.header}
             </h2>
-            <p className="mt-1 max-w-[86ch] text-sm text-pretty text-ink-2">
-              {cookieNotice.subheader}
-            </p>
+            <DatoStructuredText
+              data={cookieNotice.subheader as CdaStructuredTextValue}
+              className="mt-1 max-w-[86ch] text-sm text-pretty text-ink-2"
+            />
           </div>
         </div>
 

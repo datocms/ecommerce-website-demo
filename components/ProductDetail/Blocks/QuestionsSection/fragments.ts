@@ -5,7 +5,9 @@ export const QuestionSectionFragment = graphql(/* GraphQL */ `
     questions {
       id
       question
-      answer
+      answer {
+        value
+      }
     }
   }
 `);

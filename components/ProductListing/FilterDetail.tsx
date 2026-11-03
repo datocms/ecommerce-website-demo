@@ -5,7 +5,6 @@ import {
   type StructuredText,
 } from 'datocms-structured-text-utils';
 import { renderNodeRule } from 'react-datocms/structured-text';
-import ReactMarkdown from 'react-markdown';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import DatoStructuredText from '@/components/DatoStructuredText';
@@ -14,7 +13,7 @@ import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 type Props = {
   lng: string;
   name: string;
-  subtitle: string;
+  subtitle: StructuredText<Record, Record> | null | undefined;
   eyebrow: string | null | undefined;
   image: FragmentOf<typeof ResponsiveImageFragment> | null | undefined;
   description: StructuredText<Record, Record> | null | undefined;
@@ -136,9 +135,10 @@ export default function FilterDetail({
             </span>
           </h1>
           {subtitle && (
-            <div className="mt-5 max-w-[30em] text-xl leading-[1.42] text-pretty text-ink-2 xl:text-2xl [&>p+p]:mt-3">
-              <ReactMarkdown>{subtitle}</ReactMarkdown>
-            </div>
+            <DatoStructuredText
+              data={subtitle}
+              className="mt-5 max-w-[30em] text-xl leading-[1.42] text-pretty text-ink-2 xl:text-2xl [&>p+p]:mt-3"
+            />
           )}
           {description && (
             <DatoStructuredText

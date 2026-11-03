@@ -2,10 +2,13 @@
 
 import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon, ArrowUpRightIcon } from '@heroicons/react/24/outline';
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import { type MouseEvent, useRef, useState } from 'react';
+import { StructuredText } from 'react-datocms/structured-text';
 import { IMG_ZOOM, MEDIA, PAGE_VARS } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
+import DatoStructuredText from '@/components/DatoStructuredText';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { readFragment } from '@/lib/datocms/graphql';
 import { heroImageSizes } from './imageSizes';
@@ -131,9 +134,11 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
                   {store.storeName}
                 </span>
               </h1>
-              <p key={`${store.id}-text`} className={`${DESCRIPTION} enter`}>
-                {store.storeDescription}
-              </p>
+              <DatoStructuredText
+                key={`${store.id}-text`}
+                data={store.storeDescription as CdaStructuredTextValue}
+                className={`${DESCRIPTION} enter`}
+              />
               <a
                 key={`${store.id}-map`}
                 href={`https://www.google.com/maps/?q=${store.storeLocation?.latitude},${store.storeLocation?.longitude}`}
@@ -158,9 +163,15 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
                   <p className="title-display mt-4 2xl:-mr-8">
                     {stripStega(item.storeName)}
                   </p>
-                  <p className={DESCRIPTION}>
-                    {stripStega(item.storeDescription)}
-                  </p>
+                  <div className={DESCRIPTION}>
+                    <StructuredText
+                      data={
+                        stripStega(
+                          item.storeDescription,
+                        ) as CdaStructuredTextValue
+                      }
+                    />
+                  </div>
                   <span className={MAPS}>
                     {stripStega(findOnMaps)}
                     <ArrowUpRightIcon className="stroke-2" />

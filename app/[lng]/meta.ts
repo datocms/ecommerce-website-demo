@@ -39,7 +39,9 @@ export const query = graphql(
             url
           }
         }
-        footerSubtitle
+        footerSubtitle {
+          value
+        }
         footerTitle
         footerLogo {
           responsiveImage {
@@ -58,7 +60,9 @@ export const query = graphql(
         cookieNotice {
           primaryButtonLabel
           secondaryButtonLabel
-          subheader
+          subheader {
+            value
+          }
           header
           cookieNoticeImage {
             responsiveImage {

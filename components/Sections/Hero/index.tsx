@@ -1,8 +1,10 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import SocialLink from '@/components/Common/SocialLink';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import DatoStructuredText from '@/components/DatoStructuredText';
 import Rise from '@/components/Motion/Rise';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
@@ -95,9 +97,10 @@ export default function Hero({
           </h1>
           <div className="enter-stagger lg:pr-10 xl:pr-14 [--delay:200ms]">
             {heroSubtitle && (
-              <p className="mt-5 max-w-[29.375rem] text-base leading-[1.6] text-ink-2 lg:mt-8 lg:text-lg lg:text-pretty">
-                {heroSubtitle}
-              </p>
+              <DatoStructuredText
+                data={heroSubtitle as CdaStructuredTextValue}
+                className="mt-5 max-w-[29.375rem] text-base leading-[1.6] text-ink-2 lg:mt-8 lg:text-lg lg:text-pretty"
+              />
             )}
             {shopNow && (
               <div className="mt-8">

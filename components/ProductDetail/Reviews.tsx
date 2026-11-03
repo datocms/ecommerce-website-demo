@@ -1,5 +1,6 @@
-import ReactMarkdown from 'react-markdown';
+import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
+import DatoStructuredText from '@/components/DatoStructuredText';
 import { readFragment } from '@/lib/datocms/graphql';
 import { type ProductPageLabels, ProductPageLabelsFragment } from './fragments';
 import StarRating from './StarRating';
@@ -69,9 +70,10 @@ export default function Reviews({ product, labels, lng }: Props) {
                     {formattedDate}
                   </time>
                 </div>
-                <div className="mt-4 text-lg leading-[1.45] font-medium tracking-[-0.01em] text-pretty [&_p+p]:mt-3">
-                  <ReactMarkdown>{review.review || ''}</ReactMarkdown>
-                </div>
+                <DatoStructuredText
+                  data={review.review as CdaStructuredTextValue}
+                  className="mt-4 text-lg leading-[1.45] font-medium tracking-[-0.01em] text-pretty [&_p+p]:mt-3"
+                />
                 <p className="mt-5 text-sm font-semibold">
                   {review.reviewerName}
                 </p>

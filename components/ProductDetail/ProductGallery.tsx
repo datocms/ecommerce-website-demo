@@ -1,8 +1,11 @@
 'use client';
 
 import { type UIEvent, useEffect, useRef, useState } from 'react';
+import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
 import DatoImage from '@/components/DatoImage';
+import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
+import { readFragment } from '@/lib/datocms/graphql';
 
 type Props = {
   images: NonNullable<ProductQuery['product']>['productImages'];
@@ -53,6 +56,10 @@ export default function ProductGallery({
     !paired ||
     index === 0 ||
     (index === images.length - 1 && images.length % 2 === 0);
+  const sizesFor = (index: number) =>
+    spansRow(index)
+      ? '(min-width: 1440px) 672px, (min-width: 1024px) 47vw, (min-width: 640px) 50vw, 100vw'
+      : '(min-width: 1440px) 328px, (min-width: 1024px) 23vw, (min-width: 640px) 50vw, 100vw';
 
   return (
     <div className="relative -mx-(--gutter) min-w-0 lg:col-span-6 lg:mx-0">
@@ -71,19 +78,34 @@ export default function ProductGallery({
             data-morph={index === 0 ? 'pdp' : undefined}
             className={`relative aspect-[4/5] w-full shrink-0 snap-start overflow-hidden bg-mist lg:w-auto ${images.length > 1 ? 'sm:w-[calc(50%-0.125rem)]' : ''} ${paired && spansRow(index) ? 'lg:col-span-2' : ''}`}
           >
-            {image.responsiveImage && (
-              <DatoImage
-                fragment={image.responsiveImage}
-                layout="fill"
-                objectFit="cover"
-                sizes={
-                  spansRow(index)
-                    ? '(min-width: 1440px) 672px, (min-width: 1024px) 47vw, (min-width: 640px) 50vw, 100vw'
-                    : '(min-width: 1440px) 328px, (min-width: 1024px) 23vw, (min-width: 640px) 50vw, 100vw'
-                }
-                priority={index === 0}
-              />
-            )}
+            {image.responsiveImage &&
+              (index === 0 ? (
+                // A plain <img> with no onLoad, which React waits for (up to 500ms) before it
+                // starts the "product" view transition. DatoImage's onLoad opts out of that wait,
+                // and the card's photo would fly into an empty well while this one downloads.
+                <RSCImage
+                  data={readFragment(
+                    ResponsiveImageFragment,
+                    image.responsiveImage,
+                  )}
+                  pictureClassName="absolute inset-0"
+                  imgStyle={{
+                    width: '100%',
+                    height: '100%',
+                    maxWidth: 'none',
+                    objectFit: 'cover',
+                  }}
+                  sizes={sizesFor(index)}
+                  priority
+                />
+              ) : (
+                <DatoImage
+                  fragment={image.responsiveImage}
+                  layout="fill"
+                  objectFit="cover"
+                  sizes={sizesFor(index)}
+                />
+              ))}
             {/* While the photo bleeds, the tag sits on the text's gutter */}
             {index === 0 && saleTag && (
               <span className="tag-dark absolute top-(--gutter) left-(--gutter) z-10 lg:top-4 lg:left-4">

@@ -2,6 +2,10 @@ import {
   InformationCircleIcon,
   ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
+import DemoActionButton, {
+  DEMO_NOTICE_TEXT,
+  DEMO_NOTICE_TITLE,
+} from '@/components/Common/DemoActionButton';
 import Drawer from '@/components/Common/Drawer';
 import { formatPrice } from '@/lib/formatPrice';
 
@@ -34,13 +38,9 @@ export default function Cart({ open, onClose, currencySymbol }: Props) {
           <p className="mt-1 text-sm text-mute">
             Shipping and taxes calculated at checkout.
           </p>
-          <button
-            type="button"
-            className="btn mt-5 w-full"
-            aria-disabled="true"
-          >
+          <DemoActionButton className="btn mt-5 w-full">
             Checkout
-          </button>
+          </DemoActionButton>
         </>
       }
     >
@@ -50,10 +50,9 @@ export default function Cart({ open, onClose, currencySymbol }: Props) {
           className="mt-0.5 size-5 shrink-0"
         />
         <div>
-          <p className="text-base font-semibold">This is a DatoCMS Demo</p>
+          <p className="text-base font-semibold">{DEMO_NOTICE_TITLE}</p>
           <p className="mt-1 text-sm text-pretty text-ink-2">
-            To use the cart and enable purchases, an integration with Shopify or
-            Commerce Layer is necessary.
+            {DEMO_NOTICE_TEXT}
           </p>
         </div>
       </div>

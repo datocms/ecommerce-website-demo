@@ -5,6 +5,7 @@ import { CheckIcon, HeartIcon, TruckIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
+import DemoActionButton from '@/components/Common/DemoActionButton';
 import Price from '@/components/ProductCard/Price';
 import { contrast, hexToRgb, WHITE } from '@/lib/color';
 import { readFragment } from '@/lib/datocms/graphql';
@@ -200,20 +201,19 @@ export default function BuyBox({ product, labels, lng, isOnSale }: Props) {
 
       <div className="mt-8 grid gap-2 md:grid-cols-2 lg:grid-cols-1">
         <div className="flex gap-2">
-          <button type="button" className="btn flex-1">
+          <DemoActionButton className="btn flex-1">
             {primaryButton}
-          </button>
-          <button
-            type="button"
+          </DemoActionButton>
+          <DemoActionButton
             aria-label="Add to wishlist"
             className="icon-btn size-13 border border-line-strong hover:border-ink"
           >
             <HeartIcon aria-hidden="true" />
-          </button>
+          </DemoActionButton>
         </div>
-        <button type="button" className="btn-line w-full">
+        <DemoActionButton className="btn-line w-full">
           {secondaryButton}
-        </button>
+        </DemoActionButton>
       </div>
 
       {shippingText && (

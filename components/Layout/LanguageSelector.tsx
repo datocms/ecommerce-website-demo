@@ -21,6 +21,11 @@ import type { SiteLocale } from '@/lib/i18n';
 type Props = {
   languages: SiteLocale[];
   currencySymbol?: string | null;
+  /** Each locale's currency symbol, shown beside its name in the list */
+  currencySymbols?: ReadonlyArray<{
+    locale: SiteLocale | null;
+    value: string | null;
+  }> | null;
   /** Where the list opens: below the header trigger, above the mobile menu and footer ones */
   placement?: 'below-end' | 'above-start' | 'above-start-md-end';
   /** A chevron after the label (the footer's switch) */
@@ -57,6 +62,7 @@ function WithQueryString({
 export default function LanguageSelector({
   languages,
   currencySymbol,
+  currencySymbols,
   placement = 'below-end',
   chevron = false,
   labelClassName,
@@ -166,6 +172,9 @@ export default function LanguageSelector({
       {languages.map((locale) => {
         const bcp47 = locale.replaceAll('_', '-');
         const current = locale === currentLocale;
+        const symbol = currencySymbols?.find(
+          (entry) => entry.locale === locale,
+        )?.value;
         return (
           <li key={locale}>
             <Link
@@ -182,12 +191,22 @@ export default function LanguageSelector({
               <span lang={bcp47}>
                 {getLangNameFromCode(locale)?.native || locale}
               </span>
-              {current && (
-                <CheckIcon
-                  aria-hidden="true"
-                  className="size-4.5 shrink-0 stroke-2"
-                />
-              )}
+              {/* The check keeps its slot on every row, so the symbols line up. The symbol dims
+                  the list's ink rather than using text-mute, which surface-ink (the footer) turns
+                  white on this white list. */}
+              <span className="flex items-center gap-3">
+                {symbol && (
+                  <span className="font-normal opacity-60">{symbol}</span>
+                )}
+                <span className="size-4.5 shrink-0">
+                  {current && (
+                    <CheckIcon
+                      aria-hidden="true"
+                      className="size-4.5 stroke-2"
+                    />
+                  )}
+                </span>
+              </span>
             </Link>
           </li>
         );

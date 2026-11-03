@@ -187,6 +187,7 @@ export default function MobileMenu({
         <LanguageSelector
           languages={locales}
           currencySymbol={generalInterface?.currencySymbol}
+          currencySymbols={generalInterface?._allCurrencySymbolLocales}
           placement="above-start"
           className="h-11 border border-line px-4 text-sm hover:border-ink aria-expanded:border-ink"
           onNavigate={onClose}

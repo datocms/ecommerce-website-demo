@@ -184,6 +184,7 @@ export default function Footer({ data, globalPageProps }: Props) {
             <LanguageSelector
               languages={data._site.locales}
               currencySymbol={generalInterface?.currencySymbol}
+              currencySymbols={generalInterface?._allCurrencySymbolLocales}
               placement="above-start-md-end"
               chevron
               className="-mx-2.5 min-h-11 px-2.5 text-ink-2 hover:text-white aria-expanded:text-white [&>svg:first-child]:size-4"

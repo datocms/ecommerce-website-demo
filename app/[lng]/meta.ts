@@ -217,6 +217,11 @@ export const query = graphql(
       }
       generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
         currencySymbol
+        # Every locale's symbol, for the language selector's list
+        _allCurrencySymbolLocales {
+          locale
+          value
+        }
         trending
         new
         shopNow

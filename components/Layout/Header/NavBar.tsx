@@ -264,6 +264,7 @@ export default function NavBar({ globalPageProps, data }: Props) {
               <LanguageSelector
                 languages={data._site.locales}
                 currencySymbol={generalInterface?.currencySymbol}
+                currencySymbols={generalInterface?._allCurrencySymbolLocales}
                 // Globe only until xl; screen readers always get the label
                 labelClassName="max-xl:sr-only"
                 className="h-10 px-2.5 text-sm hover:bg-mist aria-expanded:bg-mist max-xl:w-10 max-xl:justify-center max-xl:px-0 [&>svg]:size-5"

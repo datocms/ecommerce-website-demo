@@ -5,8 +5,8 @@ type Props = {
   social: { url: string; name?: string | null; icon: { url: string } };
 };
 
-// A CMS social link as an icon button. The aria-label is stripped of draft-mode stega, which
-// would otherwise end up in the accessible name.
+// A CMS social link as an icon button; stripStega keeps draft-mode stega out of its accessible
+// name
 export default function SocialLink({ social }: Props) {
   return (
     <a

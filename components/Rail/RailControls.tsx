@@ -3,6 +3,7 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
 import { useRevealFocus } from './RailFocus';
+import { watchScroller } from './watchScroller';
 
 type Props = {
   /** id of the horizontal scroller the buttons drive */
@@ -11,10 +12,9 @@ type Props = {
 
 // How far a press scrolls: every item that is fully in view, so the next press starts on the
 // first one that was cut off (one at a time where only one fits)
-function pageOf(rail: HTMLElement) {
+function scrollDistance(rail: HTMLElement) {
   const style = getComputedStyle(rail);
   const gap = Number.parseFloat(style.columnGap) || 0;
-  // One item plus the gap
   const item = rail.firstElementChild;
   const step = item
     ? item.getBoundingClientRect().width + gap
@@ -26,9 +26,10 @@ function pageOf(rail: HTMLElement) {
   return step * Math.max(1, Math.floor((view + gap) / step));
 }
 
-// Previous/next buttons for the scroller with id `railId`. Hidden on phones (they swipe) and
-// whenever everything fits; flags the rail with data-at-end. Also reveals a keyboard-focused item
-// that is only partly in view (useRevealFocus).
+/**
+ * Previous/next buttons for the scroller with id railId; hidden on phones and when everything
+ * fits. Also reveals a partly hidden focused item.
+ */
 export default function RailControls({ railId }: Props) {
   useRevealFocus(railId);
   const [atStart, setAtStart] = useState(true);
@@ -44,14 +45,7 @@ export default function RailControls({ railId }: Props) {
       setAtStart(x <= 1);
       setAtEnd(reachedEnd);
     };
-    update();
-    rail.addEventListener('scroll', update, { passive: true });
-    const observer = new ResizeObserver(update);
-    observer.observe(rail);
-    return () => {
-      rail.removeEventListener('scroll', update);
-      observer.disconnect();
-    };
+    return watchScroller(rail, update);
   }, [railId]);
 
   const scroll = (direction: -1 | 1) => {
@@ -61,7 +55,7 @@ export default function RailControls({ railId }: Props) {
       '(prefers-reduced-motion: reduce)',
     ).matches;
     rail.scrollBy({
-      left: direction * pageOf(rail),
+      left: direction * scrollDistance(rail),
       behavior: instant ? 'auto' : 'smooth',
     });
   };

@@ -1,19 +1,17 @@
-import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
-import type { ComponentPropsWithoutRef } from 'react';
-import DatoStructuredText from '@/components/DatoStructuredText';
+import DatoStructuredText, {
+  type BlockBoundaryProps,
+} from '@/components/DatoStructuredText';
 import { BUY_BOX_COLUMN } from '@/components/ProductDetail/styles';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import { QuestionSectionFragment } from './fragments';
+import { QuestionsSectionFragment } from './fragments';
 
 type Props = {
-  fragment: FragmentOf<typeof QuestionSectionFragment>;
-  // rest carries data-datocms-content-link-boundary, which DatoStructuredText adds to every block
-} & Omit<ComponentPropsWithoutRef<'section'>, 'children'>;
+  fragment: FragmentOf<typeof QuestionsSectionFragment>;
+} & BlockBoundaryProps;
 
 export default function QuestionsSection({ fragment, ...rest }: Props) {
-  const { questions } = readFragment(QuestionSectionFragment, fragment);
+  const { questions } = readFragment(QuestionsSectionFragment, fragment);
 
-  // Hairline rows: the question on the left, the answer on the buy box's line
   return (
     <section {...rest}>
       <dl className="border-b border-line">
@@ -28,9 +26,7 @@ export default function QuestionsSection({ fragment, ...rest }: Props) {
             <dd
               className={`text-md leading-[1.6] text-ink-2 [&_p+p]:mt-3 [&_p]:m-0 ${BUY_BOX_COLUMN}`}
             >
-              <DatoStructuredText
-                data={question.answer as CdaStructuredTextValue}
-              />
+              <DatoStructuredText data={question.answer} />
             </dd>
           </div>
         ))}

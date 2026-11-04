@@ -1,6 +1,5 @@
 'use client';
 
-import { stripStega } from '@datocms/content-link';
 import {
   Dialog,
   DialogBackdrop,
@@ -10,9 +9,9 @@ import {
 import { ArrowRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
-import { MEDIA } from '@/components/Common/styles';
+import { MEDIA, SCRIM } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
-import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
+import { linkHref } from './menu';
 
 type Popup = NonNullable<NonNullable<LayoutQuery['layout']>['popup']>;
 
@@ -20,23 +19,15 @@ type Props = {
   open: boolean;
   onClose: () => void;
   popup: Popup;
-  globalPageProps: ResolvedGlobalPageProps;
+  lng: string;
 };
 
-export default function PopupDialog({
-  open,
-  onClose,
-  popup,
-  globalPageProps,
-}: Props) {
+export default function PopupDialog({ open, onClose, popup, lng }: Props) {
   const button = popup.button[0];
 
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
-      <DialogBackdrop
-        transition
-        className="fixed inset-0 bg-ink/30 transition-opacity duration-(--dur-sheet) ease-out data-closed:opacity-0 data-leave:duration-(--dur-pop)"
-      />
+      <DialogBackdrop transition className={SCRIM} />
       <div className="fixed inset-0 grid place-items-center overflow-y-auto p-4 sm:p-8">
         <DialogPanel
           transition
@@ -82,7 +73,7 @@ export default function PopupDialog({
               <Link
                 onClick={onClose}
                 className="btn mt-8 w-full"
-                href={`/${globalPageProps.params.lng}/${stripStega(button.slug)}`}
+                href={linkHref(lng, button)}
               >
                 {button.label}
                 <ArrowRightIcon aria-hidden="true" className="stroke-2" />

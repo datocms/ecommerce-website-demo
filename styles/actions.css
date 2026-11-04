@@ -1,0 +1,198 @@
+/* Buttons and text links: square and flat */
+
+/* btn-sm only sets the variables below, so it works whatever the class order */
+@utility btn-sm {
+  --btn-h: 2.75rem;
+  --btn-px: 1.25rem;
+  --btn-gap: 0.5rem;
+  --btn-icon: 1rem;
+}
+/* Solid button: ink on light surfaces, white inside surface-ink */
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap, 0.625rem);
+  min-height: var(--btn-h, 3.25rem);
+  padding: 0.5rem var(--btn-px, 1.75rem);
+  text-align: center;
+  text-wrap: balance;
+  background-color: var(--surface-fg);
+  color: var(--surface-bg);
+  font-size: var(--text-sm);
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  --press: 0.98;
+  transition:
+    background-color 150ms var(--ease-out),
+    color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
+  @media (hover: hover) {
+    &:not(:disabled, [aria-disabled='true']):hover {
+      background-color: color-mix(
+        in oklab,
+        var(--surface-fg) 82%,
+        var(--surface-bg)
+      );
+    }
+  }
+  &:disabled,
+  &[aria-disabled='true'] {
+    background-color: var(--color-mist);
+    color: var(--color-mute);
+    cursor: not-allowed;
+  }
+  & > svg {
+    width: var(--btn-icon, 1.125rem);
+    height: var(--btn-icon, 1.125rem);
+    flex-shrink: 0;
+  }
+}
+/* Outline button that fills on hover. Same box and type as btn: change both together. */
+@utility btn-line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap, 0.625rem);
+  min-height: var(--btn-h, 3.25rem);
+  padding: 0.5rem var(--btn-px, 1.75rem);
+  text-align: center;
+  text-wrap: balance;
+  border: 1px solid var(--surface-fg);
+  background-color: transparent;
+  color: var(--surface-fg);
+  font-size: var(--text-sm);
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  --press: 0.98;
+  transition:
+    background-color 150ms var(--ease-out),
+    color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
+  @media (hover: hover) {
+    &:not(:disabled, [aria-disabled='true']):hover {
+      background-color: var(--surface-fg);
+      color: var(--surface-bg);
+    }
+  }
+  &:disabled,
+  &[aria-disabled='true'] {
+    border-color: var(--color-line);
+    color: var(--color-disabled);
+    cursor: not-allowed;
+  }
+  & > svg {
+    width: var(--btn-icon, 1.125rem);
+    height: var(--btn-icon, 1.125rem);
+    flex-shrink: 0;
+  }
+}
+/* Text link with a trailing arrow that nudges on hover (also on its .group's hover); ::after
+   enlarges the hit area */
+@utility tlink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  font-weight: 600;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -0.75rem -0.25rem;
+  }
+  & > svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    transition: translate 200ms var(--ease-out);
+  }
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-line: underline;
+    }
+    &:hover > svg,
+    :where(.group):hover & > svg {
+      translate: 0.1875rem 0;
+    }
+  }
+}
+@utility link-underline {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  @media (hover: hover) {
+    &:hover {
+      text-decoration-thickness: 2px;
+    }
+  }
+}
+/* Icon button without a fill; hover tints whatever surface it is on */
+@utility icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  color: inherit;
+  --press: 0.9;
+  transition:
+    background-color 150ms var(--ease-out),
+    border-color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
+  & > svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  @media (hover: hover) {
+    &:hover:where(:not(:disabled, [aria-disabled='true'])) {
+      background-image: linear-gradient(
+        color-mix(in oklab, currentColor 8%, transparent),
+        color-mix(in oklab, currentColor 8%, transparent)
+      );
+    }
+  }
+  &:disabled,
+  &[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+/* Previous/next squares for rails and pagination */
+@utility rail-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border: 1px solid var(--color-line);
+  color: var(--surface-fg);
+  --press: 0.9;
+  transition:
+    background-color 150ms var(--ease-out),
+    border-color 150ms var(--ease-out),
+    color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
+  & > svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+  @media (hover: hover) {
+    &:not(:disabled, [aria-disabled='true']):hover {
+      border-color: var(--surface-fg);
+      background-color: var(--surface-fg);
+      color: var(--surface-bg);
+    }
+  }
+  &:disabled,
+  &[aria-disabled='true'] {
+    color: var(--color-disabled);
+    cursor: not-allowed;
+  }
+}

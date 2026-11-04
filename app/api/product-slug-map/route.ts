@@ -3,7 +3,7 @@
 
 import { draftMode } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
-import { getAvailableLocales, type SiteLocale } from '@/lib/i18n';
+import { getAvailableLocales } from '@/lib/i18n';
 import { resolveProductSlug } from '@/lib/productSlugs';
 
 export async function GET(request: NextRequest) {
@@ -20,16 +20,18 @@ export async function GET(request: NextRequest) {
 
   const locales = await getAvailableLocales();
 
-  if (!locales.includes(locale as SiteLocale)) {
+  const siteLocale = locales.find((available) => available === locale);
+
+  if (!siteLocale) {
     return NextResponse.json({ error: 'Unsupported locale' }, { status: 422 });
   }
 
-  // The first locale is the fallback (as in lib/i18n.ts); reuses the locales fetched above
+  // Same rule as getFallbackLocale(), without a second locales query
   const fallbackLocale = locales[0];
   const { isEnabled: isDraft } = await draftMode();
   const resolved = await resolveProductSlug({
     slug,
-    locale: locale as SiteLocale,
+    locale: siteLocale,
     fallbackLocale,
     isDraft,
   });

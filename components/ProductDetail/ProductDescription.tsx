@@ -7,7 +7,7 @@ import {
 } from 'datocms-structured-text-utils';
 import { Fragment, isValidElement, type ReactNode } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
-import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
+import type { Product } from '@/app/[lng]/product/[slug]/meta';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import ProductInfoSection from './Blocks/ProductInfoSection';
 import QuestionsSection from './Blocks/QuestionsSection';
@@ -15,7 +15,7 @@ import type { ProductPageLabels } from './fragments';
 import { BUY_BOX_COLUMN } from './styles';
 
 type Props = {
-  product: NonNullable<ProductQuery['product']>;
+  product: Product;
   labels: ProductPageLabels;
   lng: string;
 };
@@ -23,7 +23,8 @@ type Props = {
 type TextRow = { key: string; text: ReactNode[]; lists: ReactNode[] };
 type TextGroup = { key: string; rows: TextRow[] };
 
-// The renderer keys top-level nodes "t-<index>", which leads back to the node's type
+// The renderer drops null children, so array positions don't match node.children; its
+// "t-<index>" keys do
 const nodeIndex = (child: ReactNode) =>
   isValidElement(child) ? Number(String(child.key).split('-').pop()) : -1;
 
@@ -49,6 +50,36 @@ function groupTextBetweenBlocks(node: Root, children: ReactNode[] | undefined) {
     (type === 'list' ? row.lists : row.text).push(child);
   }
   return parts;
+}
+
+function DescriptionText({ rows }: { rows: TextRow[] }) {
+  return (
+    <div className="grid gap-6 lg:grid-cols-12 lg:gap-x-4 lg:gap-y-10">
+      {rows.map((row) => {
+        const hasTextAndLists = row.text.length > 0 && row.lists.length > 0;
+        return (
+          <Fragment key={row.key}>
+            {row.text.length > 0 && (
+              // The first paragraph is the lead; copy without care labels keeps a readable
+              // measure instead of running the full width
+              <div
+                className={`prose-dato [&>p:first-of-type]:text-xl [&>p:first-of-type]:leading-[1.5] xl:[&>p:first-of-type]:text-2xl xl:[&>p:first-of-type]:leading-[1.45] ${hasTextAndLists ? 'lg:col-span-6' : 'lg:col-span-8 xl:col-span-7'}`}
+              >
+                {row.text}
+              </div>
+            )}
+            {row.lists.length > 0 && (
+              <div
+                className={`grid content-start gap-2 ${hasTextAndLists ? BUY_BOX_COLUMN : 'lg:col-span-full'}`}
+              >
+                {row.lists}
+              </div>
+            )}
+          </Fragment>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function ProductDescription({ product, labels, lng }: Props) {
@@ -77,47 +108,17 @@ export default function ProductDescription({ product, labels, lng }: Props) {
           }
         }}
         customNodeRules={[
-          renderNodeRule(isRoot, ({ node, children, key }) => {
-            const parts = groupTextBetweenBlocks(node, children);
-            return (
-              <Fragment key={key}>
-                {parts.map((part) => {
-                  if ('block' in part) return part.block;
-                  return (
-                    <div
-                      key={part.key}
-                      className="grid gap-6 lg:grid-cols-12 lg:gap-x-4 lg:gap-y-10"
-                    >
-                      {part.rows.map((row) => {
-                        const both =
-                          row.text.length > 0 && row.lists.length > 0;
-                        return (
-                          <Fragment key={row.key}>
-                            {row.text.length > 0 && (
-                              // The first paragraph is the lead; copy without care labels keeps a
-                              // readable measure instead of running the full width
-                              <div
-                                className={`prose-dato [&>p:first-of-type]:text-xl [&>p:first-of-type]:leading-[1.5] xl:[&>p:first-of-type]:text-2xl xl:[&>p:first-of-type]:leading-[1.45] ${both ? 'lg:col-span-6' : 'lg:col-span-8 xl:col-span-7'}`}
-                              >
-                                {row.text}
-                              </div>
-                            )}
-                            {row.lists.length > 0 && (
-                              <div
-                                className={`grid content-start gap-2 ${both ? BUY_BOX_COLUMN : 'lg:col-span-full'}`}
-                              >
-                                {row.lists}
-                              </div>
-                            )}
-                          </Fragment>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </Fragment>
-            );
-          }),
+          renderNodeRule(isRoot, ({ node, children, key }) => (
+            <Fragment key={key}>
+              {groupTextBetweenBlocks(node, children).map((part) =>
+                'block' in part ? (
+                  part.block
+                ) : (
+                  <DescriptionText key={part.key} rows={part.rows} />
+                ),
+              )}
+            </Fragment>
+          )),
           renderNodeRule(isHeading, ({ node, children, key }) => {
             // The page already has its h1
             const Heading =

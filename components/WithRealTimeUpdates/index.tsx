@@ -1,10 +1,9 @@
 // Client-only (uses a hook): rendered from each route's 'use client' RealTime.tsx via
 // generateRealtimeComponent.
 
-import type { TadaDocumentNode } from 'gql.tada';
 import { useQuerySubscription } from 'react-datocms/use-query-subscription';
-import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
-import type { ContentPage } from './types';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
+import type { ContentPage, RealtimeUpdatesProps } from './types';
 
 export default function WithRealTimeUpdates<
   PageProps extends GlobalPageProps,
@@ -18,14 +17,8 @@ export default function WithRealTimeUpdates<
   children,
   pageProps,
   baseEditingUrl,
-}: {
-  initialData: TResult;
-  variables: TVariables;
-  query: TadaDocumentNode<TResult, TVariables>;
+}: RealtimeUpdatesProps<PageProps, TResult, TVariables> & {
   children: ContentPage<PageProps, TResult>;
-  pageProps: ResolvedPageProps<PageProps>;
-  token: string;
-  baseEditingUrl: string;
 }) {
   const { data } = useQuerySubscription({
     query,

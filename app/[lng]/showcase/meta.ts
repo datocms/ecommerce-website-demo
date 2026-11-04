@@ -87,4 +87,5 @@ export const query = graphql(
 );
 
 export type Query = ResultOf<typeof query>;
+export type Showcase = NonNullable<Query['showcase']>;
 export type Variables = VariablesOf<typeof query>;

@@ -23,8 +23,7 @@ export async function GET(request: NextRequest) {
   if (!isSafeRedirectUrl(url, requestUrl))
     return new Response('Redirect must point to this site', { status: 422 });
 
-  // DatoCMS shows the site in an iframe (a third-party context), so the draft cookie is reissued
-  // as SameSite=None; Secure; Partitioned to survive the redirect
+  // DatoCMS shows the site in an iframe: reissue the cookie as SameSite=None; Secure; Partitioned
   const cookieStore = await cookies();
   const cookie = cookieStore.get('__prerender_bypass')!;
   cookieStore.set({

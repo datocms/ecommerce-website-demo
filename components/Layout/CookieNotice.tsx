@@ -1,4 +1,5 @@
-import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
+'use client';
+
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import { MEDIA } from '@/components/Common/styles';
@@ -9,9 +10,8 @@ type CookieNoticeContent = NonNullable<
   NonNullable<LayoutQuery['layout']>['cookieNotice']
 >;
 
-// Shared by the header (the popup waits for the dismissal) and the footer (which renders the
-// bar). Kept outside React so a dismissal survives the [lng] layout remounting on a locale
-// switch; a full reload shows it again.
+// Module-level so a dismissal survives the [lng] layout remounting on a locale switch. The
+// header reads it too: the popup waits for it.
 let dismissed = false;
 const listeners = new Set<() => void>();
 
@@ -27,8 +27,8 @@ const dismiss = () => {
   for (const listener of listeners) listener();
 };
 
-export const useCookieNoticeOpen = () =>
-  !useSyncExternalStore(
+export const useCookieNoticeDismissed = () =>
+  useSyncExternalStore(
     subscribe,
     () => dismissed,
     () => false,
@@ -38,19 +38,17 @@ type Props = {
   cookieNotice: CookieNoticeContent;
 };
 
-// The bar arrives once per page load (enter, 600ms in, after the hero). Kept outside React
-// like `dismissed`: a locale switch remounts the bar, and it should hold still then rather
-// than vanish for 600ms and rise again.
+// The entrance plays once per page load, not again when a locale switch remounts the bar
 let hasArrived = false;
 
-// A white bar along the viewport's bottom edge, rendered right after the footer: it is
-// sticky, so it follows the viewport while scrolling and comes to rest under the footer,
-// never hiding the page's end. No scrim: the page stays usable.
 export default function CookieNotice({ cookieNotice }: Props) {
   const [playArrival] = useState(!hasArrived);
   useEffect(() => {
     hasArrived = true;
   }, []);
+  const isDismissed = useCookieNoticeDismissed();
+
+  if (isDismissed) return null;
 
   return (
     <section
@@ -58,8 +56,7 @@ export default function CookieNotice({ cookieNotice }: Props) {
       aria-label={cookieNotice.header ?? undefined}
       className={`${playArrival ? 'enter [--delay:600ms] ' : ''}sticky bottom-0 z-40 border-t border-ink bg-white`}
     >
-      {/* One row from lg; below it the buttons go under the text (right-aligned from sm), so
-          the text keeps its width instead of wrapping to four lines beside them */}
+      {/* Below lg the buttons go under the text, so it keeps its width */}
       <div className="shell flex flex-col gap-4 py-4 md:py-5 lg:flex-row lg:items-center lg:gap-8">
         <div className="flex min-w-0 flex-1 items-start gap-4 md:items-center">
           <div className={`${MEDIA} size-14 shrink-0 sm:size-16`}>
@@ -77,15 +74,14 @@ export default function CookieNotice({ cookieNotice }: Props) {
               {cookieNotice.header}
             </h2>
             <DatoStructuredText
-              data={cookieNotice.subheader as CdaStructuredTextValue}
+              data={cookieNotice.subheader}
               className="mt-1 max-w-[86ch] text-sm text-pretty text-ink-2"
             />
           </div>
         </div>
 
-        {/* Phones: equal halves while both labels fit on one line (a longer label takes what it
-            needs), stacked when they don't, so a label never wraps inside its button. The
-            primary's clear border matches the outline's, so the halves come out equal. */}
+        {/* A label never wraps inside its button: equal halves when both fit, stacked otherwise
+            (the transparent border evens out the halves) */}
         <div className="flex flex-wrap gap-2 sm:grid sm:grid-cols-2 sm:self-end lg:shrink-0 lg:self-auto">
           <button
             type="button"

@@ -14,13 +14,13 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Suspense, useRef, useState } from 'react';
+import { type ReactNode, Suspense, useRef, useState } from 'react';
 import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import LanguageSelector from '@/components/Layout/LanguageSelector';
 import LinkPending from '@/components/Motion/LinkPending';
-import { readFragment } from '@/lib/datocms/graphql';
+import { type ResultOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import Cart from './Cart';
 import MegaMenuPanel from './MegaMenuPanel';
@@ -33,57 +33,47 @@ type Props = {
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-// Bar items: full bar height, with a 2px ink bar on the header's bottom edge when hovered,
-// open or current (it draws from the left, retracts the same way, and stays drawn while its
-// page is on its way: the LinkPending inside the link sets data-pending, which
-// has-data-pending: reads). Their sides (--nav-x, set per cluster) grow with the viewport up
-// to 14px at xl, so the spacing never jumps.
+// Full-height bar item. Its ::after is the 2px underline, drawn on hover, while open, on the
+// current page and while its page loads (LinkPending's data-pending).
 const NAV_ITEM =
   'bar-draw relative inline-flex h-18 items-center gap-1 px-(--nav-x) text-xs font-medium whitespace-nowrap after:absolute after:inset-x-(--nav-x) after:-bottom-px after:h-0.5 after:bg-ink hover:after:scale-x-100 focus-visible:outline-offset-[-2px] has-data-pending:after:scale-x-100 aria-[current=page]:after:scale-x-100 data-open:after:scale-x-100 xl:text-sm';
 
-// 40px icon buttons; the clusters' -ml-2.5/-mr-2.5 pull the outermost glyphs
-// onto the content edges
 const BAR_ICON = 'icon-btn size-10 [&>svg]:size-5.5';
 
-export default function NavBar({ globalPageProps, data }: Props) {
-  const lng = globalPageProps.params.lng;
-  const pathname = usePathname();
-  const [menuIsOpen, setMenuIsOpen] = useState(false);
-  const [searchIsOpen, setSearchIsOpen] = useState(false);
-  const [searchCover, setSearchCover] = useState(0);
-  const headerRef = useRef<HTMLElement>(null);
-  const [cartIsOpen, setCartIsOpen] = useState(false);
+type NavLinkProps = {
+  href: string;
+  current: boolean;
+  children: ReactNode;
+};
 
-  const menu = data.layout?.menu ?? [];
-  const links = menu.filter(
-    (item): item is LinkItem => item.__typename === 'LinkItemRecord',
+function NavLink({ href, current, children }: NavLinkProps) {
+  return (
+    <li>
+      <Link
+        href={href}
+        aria-current={current ? 'page' : undefined}
+        className={NAV_ITEM}
+      >
+        {children}
+        <LinkPending />
+      </Link>
+    </li>
   );
-  const categories = menu.filter(
-    (item): item is DropdownMenu => item.__typename === 'DropdownMenuRecord',
-  );
-  // The bar splits around the centred lockup: the dropdowns and the first link on the left,
-  // the other links on the right
-  const leftItems = menu.filter(
-    (item) => item.__typename === 'DropdownMenuRecord' || item === links[0],
-  );
-  const rightLinks = links.slice(1);
+}
 
-  const generalInterface = data.generalInterface;
-  const searchPlaceholder = generalInterface?.searchPlaceholder || 'Search';
-  const socials = data.layout?.socialMediaLinks ?? [];
-  const closeMenu = () => setMenuIsOpen(false);
+type SiteLogoProps = {
+  logo: ResultOf<typeof ResponsiveImageFragment> | null | undefined;
+  wordmark: string | null | undefined;
+  wordmarkClassName?: string;
+};
 
-  const isCurrent = (link: LinkItem) => pathname === linkHref(lng, link);
-
-  const logo = data.layout?.logo.responsiveImage;
-  const logoData = logo && readFragment(ResponsiveImageFragment, logo);
-  // The Layout model has no site-name field: footerTitle doubles as the header wordmark
-  const wordmark = data.layout?.footerTitle;
-  const lockup = (wordmarkClassName = '') => (
+function SiteLogo({ logo, wordmark, wordmarkClassName = '' }: SiteLogoProps) {
+  return (
     <>
-      {logoData && (
+      {logo && (
+        // RSCImage, not DatoImage: a bare <picture>, so the logo can be sized by its height
         <RSCImage
-          data={wordmark ? { ...logoData, alt: '' } : logoData}
+          data={wordmark ? { ...logo, alt: '' } : logo}
           usePlaceholder={false}
           sizes="30px"
           imgClassName="logo-ink"
@@ -99,11 +89,45 @@ export default function NavBar({ globalPageProps, data }: Props) {
       )}
     </>
   );
+}
 
-  // The search sheet covers the strip and the header whatever their height (the strip wraps
-  // to 2-3 lines on phones), so no slice of the bar shows under it
+export default function NavBar({ globalPageProps, data }: Props) {
+  const lng = globalPageProps.params.lng;
+  const pathname = usePathname();
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const [searchIsOpen, setSearchIsOpen] = useState(false);
+  const [searchMinHeight, setSearchMinHeight] = useState(0);
+  const headerRef = useRef<HTMLElement>(null);
+  const [cartIsOpen, setCartIsOpen] = useState(false);
+
+  const menu = data.layout?.menu ?? [];
+  const links = menu.filter(
+    (item): item is LinkItem => item.__typename === 'LinkItemRecord',
+  );
+  const categories = menu.filter(
+    (item): item is DropdownMenu => item.__typename === 'DropdownMenuRecord',
+  );
+  // Dropdowns and the first link sit left of the logo, the other links right
+  const leftItems = menu.filter(
+    (item) => item.__typename === 'DropdownMenuRecord' || item === links[0],
+  );
+  const rightLinks = links.slice(1);
+
+  const generalInterface = data.generalInterface;
+  const searchPlaceholder = generalInterface?.searchPlaceholder || 'Search';
+  const socials = data.layout?.socialMediaLinks ?? [];
+
+  const isCurrent = (link: LinkItem) => pathname === linkHref(lng, link);
+
+  const logo = data.layout?.logo.responsiveImage;
+  const logoData = logo && readFragment(ResponsiveImageFragment, logo);
+  // The Layout model has no site-name field: footerTitle doubles as the header wordmark
+  const wordmark = data.layout?.footerTitle;
+
+  // The sheet covers at least the strip and the header, whatever their height (the strip wraps
+  // on phones)
   const openSearch = () => {
-    setSearchCover(headerRef.current?.getBoundingClientRect().bottom ?? 0);
+    setSearchMinHeight(headerRef.current?.getBoundingClientRect().bottom ?? 0);
     setSearchIsOpen(true);
   };
 
@@ -115,22 +139,21 @@ export default function NavBar({ globalPageProps, data }: Props) {
         currencySymbol={generalInterface?.currencySymbol}
       />
 
-      {/* Its own boundary, for its useSearchParams. Closed it renders nothing, so the empty
-          fallback takes no room. */}
+      {/* SearchDialog reads useSearchParams, so it gets its own boundary */}
       <Suspense>
         <SearchDialog
           lng={lng}
           open={searchIsOpen}
           onClose={() => setSearchIsOpen(false)}
           placeholder={searchPlaceholder}
-          minHeight={searchCover}
+          minHeight={searchMinHeight}
         />
       </Suspense>
 
       <MobileMenu
         open={menuIsOpen}
-        onClose={closeMenu}
-        title={lockup()}
+        onClose={() => setMenuIsOpen(false)}
+        title={<SiteLogo logo={logoData} wordmark={wordmark} />}
         lng={lng}
         categories={categories}
         links={links}
@@ -141,15 +164,15 @@ export default function NavBar({ globalPageProps, data }: Props) {
         locales={data._site.locales}
       />
 
-      {/* Above the floating controls (z-40), so the mega menu's scrim dims them like the
-          dialogs' scrims do. Sticky makes it the mega menu's containing block. */}
+      {/* z-45: above the floating controls (z-40), so the mega menu's scrim dims them too.
+          Sticky also makes it the mega menu's containing block. */}
       <header
         ref={headerRef}
         data-chrome="header"
         className="peer sticky top-0 z-45 border-b border-line bg-white"
       >
-        {/* --nav-x grows 6px→14px between 1100px and 1280px so the longest locale's items
-            clear the logo. While a panel is open, only its button shows the bar. */}
+        {/* --nav-x grows from 6px to 14px between 1100px and 1280px, so the longest locale's
+            items clear the logo. While a panel is open, only its button keeps the underline. */}
         <nav
           aria-label="Main"
           className="shell grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-x-4 [--nav-x:clamp(0.375rem,calc((100vw_-_68.75rem)/22.5_+_0.375rem),0.875rem)] nav:h-18 [&:has([data-open])_[aria-current=page]:not(:hover)]:after:scale-x-0"
@@ -179,16 +202,13 @@ export default function NavBar({ globalPageProps, data }: Props) {
               {leftItems.map((item) => {
                 if (item.__typename === 'LinkItemRecord') {
                   return (
-                    <li key={item.id}>
-                      <Link
-                        href={linkHref(lng, item)}
-                        aria-current={isCurrent(item) ? 'page' : undefined}
-                        className={NAV_ITEM}
-                      >
-                        {item.label}
-                        <LinkPending />
-                      </Link>
-                    </li>
+                    <NavLink
+                      key={item.id}
+                      href={linkHref(lng, item)}
+                      current={isCurrent(item)}
+                    >
+                      {item.label}
+                    </NavLink>
                   );
                 }
 
@@ -207,7 +227,6 @@ export default function NavBar({ globalPageProps, data }: Props) {
                         />
                       </PopoverButton>
 
-                      {/* Under the header's hairline, full width, and unrolls from it */}
                       <PopoverPanel
                         transition
                         className="wipe absolute inset-x-0 top-[calc(100%+1px)] border-b border-line bg-white"
@@ -217,8 +236,7 @@ export default function NavBar({ globalPageProps, data }: Props) {
                             category={category}
                             generalInterface={generalInterface}
                             lng={lng}
-                            // Wrapped: close() takes an element to refocus, so it must not be
-                            // handed the click event
+                            // close() takes an element to refocus, so don't pass it the click event
                             onNavigate={() => close()}
                           />
                         )}
@@ -235,7 +253,11 @@ export default function NavBar({ globalPageProps, data }: Props) {
             className="flex items-center gap-2.5 justify-self-center"
           >
             {/* Under 360px the mark alone clears the menu and search buttons */}
-            {lockup('max-[22.5rem]:sr-only')}
+            <SiteLogo
+              logo={logoData}
+              wordmark={wordmark}
+              wordmarkClassName="max-[22.5rem]:sr-only"
+            />
             {!wordmark && <span className="sr-only">Home</span>}
           </Link>
 
@@ -243,16 +265,13 @@ export default function NavBar({ globalPageProps, data }: Props) {
             {rightLinks.length > 0 && (
               <ul className="hidden items-center [--nav-x:clamp(0.625rem,calc((100vw_-_68.75rem)/45_+_0.625rem),0.875rem)] nav:flex">
                 {rightLinks.map((link) => (
-                  <li key={link.id}>
-                    <Link
-                      href={linkHref(lng, link)}
-                      aria-current={isCurrent(link) ? 'page' : undefined}
-                      className={NAV_ITEM}
-                    >
-                      {link.label}
-                      <LinkPending />
-                    </Link>
-                  </li>
+                  <NavLink
+                    key={link.id}
+                    href={linkHref(lng, link)}
+                    current={isCurrent(link)}
+                  >
+                    {link.label}
+                  </NavLink>
                 ))}
               </ul>
             )}
@@ -279,9 +298,7 @@ export default function NavBar({ globalPageProps, data }: Props) {
             >
               <MagnifyingGlassIcon aria-hidden="true" />
             </button>
-            {/* The glyph ends about on the content edge, mirroring the menu button. The
-                counter overlaps the body's top-right corner, clear of the handle, and
-                overhangs 12px into the gutter (mr-0.75 keeps it 8px off a phone's edge). */}
+            {/* mr-0.75 keeps the count badge 8px off a phone's edge */}
             <button
               type="button"
               aria-haspopup="dialog"
@@ -299,9 +316,8 @@ export default function NavBar({ globalPageProps, data }: Props) {
         </nav>
       </header>
 
-      {/* The mega menu's scrim: outside the sticky header, so it can cover the page; a click
-          on it is a click outside the menu, which closes it. It dims with the unroll and
-          clears as quickly as the panel fades. */}
+      {/* Mega menu scrim: outside the sticky header so it covers the page; clicking it closes
+          the menu */}
       <div
         aria-hidden="true"
         data-chrome="scrim"

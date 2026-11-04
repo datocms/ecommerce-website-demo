@@ -1,5 +1,5 @@
 # synced_from_name: ecommerce-demo-pages-preview
-# synced_from_description_sha256: b13bd86a2587c3a559caba5017170a642689e3f422b3541fe224debc98cd26e0
+# synced_from_description_sha256: b5ccb1a6a1680c7200a5585858f9c0de329947b312103ef1f998d6be74971f27
 interface:
   display_name: "Ecommerce Demo Pages Preview"
   short_description: "Add ecommerce demo page previews"

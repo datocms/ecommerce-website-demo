@@ -2,10 +2,8 @@ import { executeQuery } from '@datocms/cda-client';
 import type { TadaDocumentNode } from 'gql.tada';
 
 /**
- * Runs a gql.tada query against the DatoCMS Content Delivery API. Published: published-content
- * token, cached by Next and tagged "datocms" (purged by /api/revalidateCache). Draft: draft token,
- * never cached, and with Content Link metadata for visual editing. excludeInvalid matches the
- * X-Exclude-Invalid header used by `npm run generate-schema`.
+ * Runs a query against the Content Delivery API. Published reads are cached under the "datocms" tag
+ * that /api/revalidateCache purges; draft reads skip the cache and carry Content Link metadata.
  */
 export async function queryDatoCMS<
   TResult = unknown,
@@ -21,6 +19,7 @@ export async function queryDatoCMS<
       : process.env.DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN!,
     variables,
     includeDrafts: isDraft,
+    // Same as X-Exclude-Invalid in `npm run generate-schema`, so results match the generated types
     excludeInvalid: true,
     ...(isDraft
       ? {

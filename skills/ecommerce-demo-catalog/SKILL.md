@@ -44,7 +44,7 @@ Before schema or content operations:
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
 2. Add the field to all four queries that feed `ProductCard`: `productsQuery` in `app/[lng]/products/meta.ts`, `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts`, `showcase.newProducts` in `app/[lng]/showcase/meta.ts` and `product.relatedProducts` in `app/[lng]/product/[slug]/meta.ts`.
-3. Add an optional prop to `ProductCard` (`components/ProductCard/index.tsx`) and pass it from each call site (`app/[lng]/products/page.tsx`, `components/Sections/NewArrivals/ProductRail.tsx`, `app/[lng]/showcase/Content.tsx`, `components/ProductDetail/RelatedProducts.tsx`), preserving the existing sale-price logic and links.
+3. Add an optional prop to `ProductCard` (`components/ProductCard/index.tsx`) and pass it from each call site (`app/[lng]/products/page.tsx`, `components/Sections/NewArrivals/ProductRail.tsx`, `app/[lng]/showcase/NewProducts.tsx`, `components/ProductDetail/RelatedProducts.tsx`), preserving the existing sale logic (`isOnSale()`) and links (`productPath()`).
 4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 5. Verify pagination, filters, and search still work.
 

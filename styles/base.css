@@ -1,0 +1,97 @@
+/* Element defaults */
+@layer base {
+  html {
+    background-color: var(--color-white);
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+    scroll-padding-bottom: 5rem; /* keeps focused elements clear of the draft toggle */
+  }
+  html:has(#cookie-notice) {
+    scroll-padding-bottom: 14rem; /* ...and of the cookie bar while it is open */
+  }
+  @media (min-width: 48rem) {
+    html:has(#cookie-notice) {
+      scroll-padding-bottom: 9rem;
+    }
+  }
+  body {
+    overflow-x: clip;
+    background-color: var(--color-white);
+    color: var(--color-ink);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    text-rendering: optimizeLegibility;
+  }
+  /* Hyphenate long localized words (the [lng] wrapper sets lang); under 12 letters stay whole */
+  h1,
+  h2 {
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    hyphenate-limit-chars: 12 4 4;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  /* French sets guillemets off with a narrow no-break space, which Chrome's own quotes omit */
+  :lang(fr) {
+    quotes: '\00AB\202F' '\202F\00BB' '\2039\202F' '\202F\203A';
+  }
+
+  /* Tailwind 4 defaults borders to currentColor and buttons to the default cursor: use the
+     hairline color and a pointer instead */
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-line);
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+  /* Heroicons outline glyphs at the weight of Geist's medium UI text */
+  svg[data-slot='icon'][stroke='currentColor'] {
+    stroke-width: 1.75;
+  }
+  /* Black bands (surface-ink) switch the ring to white through --focus-ring */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring, var(--color-ink));
+    outline-offset: 2px;
+  }
+  /* Ink text keeps the selection readable on black bands too */
+  ::selection {
+    background-color: var(--color-accent-wash);
+    color: var(--color-ink);
+  }
+  /* Structured Text's highlight mark: a highlighter stroke in 12% of the text color */
+  mark {
+    background: linear-gradient(
+      to top,
+      transparent 0.23em,
+      color-mix(in srgb, currentColor 12%, transparent) 0.23em 0.62em,
+      transparent 0.62em
+    );
+    color: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0s !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0s !important;
+      scroll-behavior: auto !important;
+    }
+    /* View transitions are pseudo-elements, which * does not match */
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
+  }
+}

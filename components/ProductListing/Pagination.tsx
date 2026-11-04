@@ -11,6 +11,29 @@ type Props = {
   pageSize: number;
 };
 
+function PageArrow({
+  href,
+  label,
+  Icon,
+}: {
+  href: string | undefined;
+  label: string;
+  Icon: typeof ChevronLeftIcon;
+}) {
+  if (!href)
+    return (
+      <span aria-hidden="true" aria-disabled="true" className="rail-btn">
+        <Icon className="stroke-2" />
+      </span>
+    );
+  return (
+    <Link href={href} aria-label={label} className="rail-btn">
+      <Icon aria-hidden="true" className="stroke-2" />
+      <LinkPending />
+    </Link>
+  );
+}
+
 export default function Pagination({
   totalCount,
   currentPage,
@@ -46,20 +69,11 @@ export default function Pagination({
       </p>
       {/* Both arrows always render, so the numbers never shift between pages */}
       <nav aria-label="Pagination" className="flex max-w-full items-center">
-        {hasPrevious ? (
-          <Link
-            href={pageHref(currentPage - 1)}
-            aria-label="Previous page"
-            className="rail-btn"
-          >
-            <ChevronLeftIcon aria-hidden="true" className="stroke-2" />
-            <LinkPending />
-          </Link>
-        ) : (
-          <span aria-hidden="true" aria-disabled="true" className="rail-btn">
-            <ChevronLeftIcon className="stroke-2" />
-          </span>
-        )}
+        <PageArrow
+          href={hasPrevious ? pageHref(currentPage - 1) : undefined}
+          label="Previous page"
+          Icon={ChevronLeftIcon}
+        />
         {/* Many pages scroll here, so the rings sit inside the squares */}
         <span className="no-scrollbar mx-2 flex min-w-0 gap-1 overflow-x-auto">
           {Array.from({ length: totalPages }, (_, index) => index + 1).map(
@@ -76,20 +90,11 @@ export default function Pagination({
             ),
           )}
         </span>
-        {hasNext ? (
-          <Link
-            href={pageHref(currentPage + 1)}
-            aria-label="Next page"
-            className="rail-btn"
-          >
-            <ChevronRightIcon aria-hidden="true" className="stroke-2" />
-            <LinkPending />
-          </Link>
-        ) : (
-          <span aria-hidden="true" aria-disabled="true" className="rail-btn">
-            <ChevronRightIcon className="stroke-2" />
-          </span>
-        )}
+        <PageArrow
+          href={hasNext ? pageHref(currentPage + 1) : undefined}
+          label="Next page"
+          Icon={ChevronRightIcon}
+        />
       </nav>
     </div>
   );

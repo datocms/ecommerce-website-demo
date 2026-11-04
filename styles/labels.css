@@ -1,0 +1,94 @@
+/* Labels, tags and chips */
+
+/* Small semibold label above a title; takes its surface's text color */
+@utility eyebrow {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+/* White tag for photos */
+@utility tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 1.75rem;
+  padding-inline: 0.625rem;
+  white-space: nowrap;
+  background-color: var(--color-white);
+  color: var(--color-ink);
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+/* Black uppercase tag (Sale, counters). Same box as tag: change both together. */
+@utility tag-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 1.75rem;
+  padding-inline: 0.625rem;
+  white-space: nowrap;
+  background-color: var(--color-ink);
+  color: var(--color-white);
+  font-size: var(--text-xs);
+  line-height: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+/* Square option (sort chips, sizes, care labels). Selected states fill it with ink; disabled
+   is struck through. */
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.375rem 1rem;
+  border: 1px solid var(--color-line-strong);
+  background-color: transparent;
+  color: var(--surface-fg);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  font-weight: 500;
+  --press: 0.95;
+  transition:
+    border-color 150ms var(--ease-out),
+    background-color 150ms var(--ease-out),
+    color 150ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
+  @media (hover: hover) {
+    &:is(a, button, label):hover {
+      border-color: var(--surface-fg);
+    }
+  }
+  &[aria-pressed='true'],
+  &[aria-current='true'],
+  &[aria-current='page'],
+  &[data-selected],
+  &:has(input:checked) {
+    border-color: var(--surface-fg);
+    background-color: var(--surface-fg);
+    color: var(--surface-bg);
+  }
+  &:disabled,
+  &[aria-disabled='true'] {
+    border-color: var(--color-line);
+    background-color: transparent;
+    color: var(--color-disabled);
+    text-decoration-line: line-through;
+    cursor: not-allowed;
+  }
+  &:has(input:focus-visible) {
+    outline: 2px solid var(--focus-ring, var(--color-ink));
+    outline-offset: 2px;
+  }
+  & > svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+}

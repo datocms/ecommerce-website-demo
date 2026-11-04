@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Disclosure,
   DisclosureButton,
@@ -9,8 +11,7 @@ import {
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import type { FormEvent, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import Drawer from '@/components/Common/Drawer';
 import SocialLink from '@/components/Common/SocialLink';
@@ -21,14 +22,14 @@ import {
   type DropdownMenu,
   type LinkItem,
   linkHref,
-  productSearchHref,
   productsHref,
 } from './menu';
+import { useProductSearch } from './useProductSearch';
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  /** The header's logo lockup, shown in the drawer's title bar */
+  /** The site logo, for the drawer's title bar */
   title: ReactNode;
   lng: string;
   categories: DropdownMenu[];
@@ -40,13 +41,11 @@ type Props = {
   locales: SiteLocale[];
 };
 
-// Rows of the mobile menu
 const MENU_ROW =
   'title-item flex h-16 w-full items-center justify-between gap-4 text-left text-[1.375rem] tracking-[-0.03em] focus-visible:outline-offset-[-2px]';
 
-// The menu below the nav breakpoint: a left drawer with the search field, each dropdown as a
-// disclosure, the links, then the language switch and socials. The search, the nav and the
-// last row are the Drawer's direct children, so its body staggers them in.
+// Below the nav breakpoint: search, dropdowns as disclosures, links, then language and socials.
+// Keep these three blocks direct children of Drawer, which staggers them in.
 export default function MobileMenu({
   open,
   onClose,
@@ -60,18 +59,7 @@ export default function MobileMenu({
   socials,
   locales,
 }: Props) {
-  const router = useRouter();
-
-  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    router.push(
-      productSearchHref(
-        lng,
-        new FormData(event.currentTarget).get('productName'),
-      ),
-    );
-    onClose();
-  };
+  const submitSearch = useProductSearch(lng, onClose);
 
   return (
     <Drawer
@@ -82,7 +70,7 @@ export default function MobileMenu({
       title={title}
     >
       <search>
-        <form onSubmit={handleSearch} className="relative">
+        <form onSubmit={submitSearch} className="relative">
           <label htmlFor="menu-search" className="sr-only">
             {searchPlaceholder}
           </label>

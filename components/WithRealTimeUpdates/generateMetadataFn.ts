@@ -18,29 +18,26 @@ export function generateMetadataFn<
 >(options: {
   query: TadaDocumentNode<TResult, TVariables>;
   buildVariables?: BuildVariablesFn<PageProps, TVariables>;
-  // DatoCMS tags (_seoMetaTags, faviconMetaTags), converted with toNextMetadata, or a
-  // Metadata object for values that aren't tags
+  // DatoCMS meta tags (_seoMetaTags, faviconMetaTags), or a Metadata object for anything else
   generate: (
     data: TResult,
   ) => TitleMetaLinkTag[] | SeoOrFaviconTag[] | Metadata | undefined;
 }) {
   return async function generateMetadata(
-    pageProps: PageProps,
+    nextPageProps: PageProps,
   ): Promise<Metadata> {
     const fallbackLocale = await getFallbackLocale();
     const { isEnabled: isDraft } = await draftMode();
 
-    // Next.js passes params as a Promise
-    const resolvedParams = await pageProps.params;
-
-    const resolvedPageProps = {
-      ...pageProps,
-      params: resolvedParams,
+    const { params, ...otherProps } = nextPageProps;
+    const pageProps = {
+      ...otherProps,
+      params: await params,
     } as unknown as ResolvedPageProps<PageProps>;
 
     const variables =
       options.buildVariables?.({
-        ...resolvedPageProps,
+        ...pageProps,
         fallbackLocale,
       }) || ({} as TVariables);
 

@@ -10,8 +10,7 @@ type Props = {
   onNavigate: () => void;
 };
 
-// A dropdown's content on desktop: its link columns on the left half, the two featured tiles on
-// the right. NavBar's PopoverPanel places it under the header and unrolls it.
+// A dropdown's desktop panel: link columns on the left half, the two featured tiles on the right
 export default function MegaMenuPanel({
   category,
   generalInterface,
@@ -29,8 +28,7 @@ export default function MegaMenuPanel({
             >
               {column.label}
             </p>
-            {/* 36px full-width rows; -mx-2 px-2 leaves room for the focus ring, and leading-5
-                keeps a wrapped name reading as one item */}
+            {/* -mx-2 px-2 leaves room for the focus ring */}
             <ul
               aria-labelledby={`${category.id}-${column.id}-heading`}
               className="mt-2.5 -mb-1.5"

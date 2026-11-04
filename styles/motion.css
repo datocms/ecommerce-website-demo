@@ -1,0 +1,217 @@
+/* Motion utilities. Only translate, scale, opacity, filter and clip-path animate. Reduced motion
+   turns everything off; without JS, scroll timelines or sibling-index() content just shows.
+   --delay, --rise and --enter-blur inherit, so a stagger's parent can set them. */
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    translate: 0 var(--rise);
+    filter: blur(var(--enter-blur));
+  }
+}
+/* On mount, for what is on screen as it appears. --delay holds it back. */
+@utility enter {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: enter var(--dur-enter) var(--ease-out) var(--delay, 0ms) backwards;
+  }
+}
+/* The first eight children in turn, --stagger apart (later ones are below the fold and stay
+   still). Without sibling-index() they arrive together, at --delay. */
+@utility enter-stagger {
+  @media (prefers-reduced-motion: no-preference) {
+    & > :nth-child(-n + 8) {
+      animation: enter var(--dur-enter) var(--ease-out) var(--delay, 0ms) backwards;
+    }
+    @supports (animation-delay: calc(sibling-index() * 1ms)) {
+      & > :nth-child(-n + 8) {
+        animation-delay: calc(var(--delay, 0ms) + (sibling-index() - 1) * var(--stagger));
+      }
+    }
+  }
+}
+/* Inside UI that opens on demand (menus, sheets, drawers, disclosures) or content swapped in
+   place (the stores pager): a shorter, softer enter. Add [--rise:0px] where it slides sideways
+   or replaces content in place. */
+@utility quick {
+  --dur-enter: 320ms;
+  --stagger: 30ms;
+  --enter-blur: 2px;
+  --rise: -0.375rem;
+  --delay: 0ms;
+}
+
+/* No filter, so nothing keeps a layer once in place. View transitions reuse it for pages and
+   results. */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 var(--rise);
+  }
+}
+/* Scroll-driven: finishes within the element's first 8rem in view, so jumps and re-renders land
+   on finished content. view(0px) ignores html's scroll-padding. Keep it off a page's last 8rem. */
+@utility reveal {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: var(--motion, reveal) auto var(--ease-out) both;
+      animation-timeline: view(0px);
+      animation-range: entry 0% entry var(--reveal-end, 8rem);
+    }
+  }
+}
+/* A row (rail, columns) rises as one while its items fade in left to right. On a rail put it on
+   the scroller; a multi-row grid takes reveal per item instead. */
+@utility reveal-stagger {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      view-timeline: --row;
+      view-timeline-inset: 0px;
+      animation: reveal auto var(--ease-out) both;
+      animation-timeline: --row;
+      animation-range: entry 0% entry 8rem;
+      & > * {
+        --rise: 0px;
+        animation: reveal auto var(--ease-out) both;
+        animation-timeline: --row;
+        /* The first is a fallback: browsers without sibling-index() drop the second, and the
+           items fade in together */
+        animation-range: entry 0% entry 8rem;
+        animation-range: entry calc(min(sibling-index() - 1, 3) * 0.75rem) entry
+          calc(8rem + min(sibling-index() - 1, 3) * 0.75rem);
+      }
+    }
+  }
+}
+
+/* A line of display type rising out of its own line: the translate and the clip's bottom edge
+   travel together, so the mask stays 0.2em under the line (Geist's descenders) */
+@keyframes rise {
+  from {
+    translate: 0 calc(100% + 0.3em);
+    clip-path: inset(-0.3em -0.5em calc(100% + 0.1em) -0.5em);
+  }
+  to {
+    clip-path: inset(-0.3em -0.5em -0.2em -0.5em);
+  }
+}
+/* With reveal: a line of display type rises out of its own line, done once fully in view */
+@utility mask {
+  --motion: rise;
+  --reveal-end: 100%;
+}
+/* One word of a page title (Motion/Rise.tsx sets --i). From the sixth word on they rise
+   together. */
+@utility rise {
+  display: inline-block;
+  max-width: 100%;
+  @media (prefers-reduced-motion: no-preference) {
+    animation: rise var(--dur-rise) var(--ease-out) backwards;
+    animation-delay: calc(var(--delay, 0ms) + min(var(--i, 0), 5) * var(--stagger));
+  }
+}
+
+@keyframes settle {
+  from {
+    scale: 1.04;
+  }
+}
+/* On a photo well (MEDIA): its first child, the photo, comes to rest. Scale only, so an LCP photo
+   is never hidden. */
+@utility settle {
+  @media (prefers-reduced-motion: no-preference) {
+    & > :first-child {
+      animation: settle var(--dur-settle) var(--ease-out) backwards;
+    }
+  }
+}
+
+/* animate-pop's keyframes (tokens.css). The pop utility below is a transition and does not use
+   them. */
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.7;
+  }
+}
+/* Popovers and dialog panels. Works with [hidden], Headless UI's data-closed and plain mounts
+   (@starting-style). --pop-y: -0.5rem drops it from above instead. */
+@utility pop {
+  transition:
+    opacity var(--dur-pop) var(--ease-out),
+    translate var(--dur-pop) var(--ease-out),
+    scale var(--dur-pop) var(--ease-out),
+    display var(--dur-pop) allow-discrete;
+  &:is([hidden], [data-closed]) {
+    opacity: 0;
+    translate: 0 var(--pop-y, 0.5rem);
+    scale: 0.97;
+  }
+  &:is([hidden], [data-leave]) {
+    transition-duration: var(--dur-quick);
+  }
+  @starting-style {
+    &:not([hidden]) {
+      opacity: 0;
+      translate: 0 var(--pop-y, 0.5rem);
+      scale: 0.97;
+    }
+  }
+}
+/* The mega menu: unrolls on open, fades on close. Switching menus swaps in place without a second
+   unroll. */
+@utility wipe {
+  transition:
+    clip-path var(--dur-sheet) var(--ease-drawer),
+    opacity var(--dur-quick) var(--ease-out);
+  &[data-enter] {
+    clip-path: inset(0);
+  }
+  &[data-enter][data-closed] {
+    clip-path: inset(0 0 100% 0);
+  }
+  :where(:has(.wipe[data-leave])) &[data-enter][data-closed] {
+    clip-path: inset(0);
+  }
+  &[data-leave][data-closed] {
+    opacity: 0;
+  }
+}
+/* Draws an ::after bar (placed with after:* classes) from the left. Show it with
+   after:scale-x-100 under a state variant. */
+@utility bar-draw {
+  &::after {
+    scale: 0 1;
+    transform-origin: left;
+    transition: scale var(--dur-pop) var(--ease-out);
+  }
+}
+/* One-off controls outside the btn/chip family: color, fill and dim fade, plus the press */
+@utility press {
+  transition-property: color, background-color, border-color, opacity, scale;
+  transition-duration:
+    var(--dur-quick), var(--dur-quick), var(--dur-quick), var(--dur-quick), var(--dur-press);
+  transition-timing-function:
+    var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-spring);
+}
+/* Listing results dim while any [data-pending] element is on the page; the delay keeps fast
+   navigations from flickering */
+@utility pending-dim {
+  transition: opacity var(--dur-pop) var(--ease-out);
+  :where(:root:has([data-pending])) & {
+    opacity: 0.45;
+    transition-delay: 120ms;
+  }
+}
+
+/* Controls sink while held (--press per control) and spring back on release. Unlayered, so the
+   80ms press-in beats each control's own transition. */
+@media (prefers-reduced-motion: no-preference) {
+  :is(.btn, .btn-line, .icon-btn, .rail-btn, .checkbox, .press, :is(a, button, label).chip):active:not(
+      :disabled,
+      [aria-disabled='true']
+    ) {
+    scale: var(--press, 0.97);
+    transition-duration: 80ms;
+    transition-timing-function: var(--ease-out);
+  }
+}

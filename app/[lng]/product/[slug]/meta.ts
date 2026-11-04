@@ -3,7 +3,7 @@ import {
   ProductInfoSectionFragment,
   ProductMaterialFragment,
 } from '@/components/ProductDetail/Blocks/ProductInfoSection/fragments';
-import { QuestionSectionFragment } from '@/components/ProductDetail/Blocks/QuestionsSection/fragments';
+import { QuestionsSectionFragment } from '@/components/ProductDetail/Blocks/QuestionsSection/fragments';
 import { ProductPageLabelsFragment } from '@/components/ProductDetail/fragments';
 import {
   graphql,
@@ -66,7 +66,7 @@ export const query = graphql(
               __typename
             }
             ...ProductInfoSectionFragment
-            ...QuestionSectionFragment
+            ...QuestionsSectionFragment
           }
         }
         id
@@ -113,11 +113,12 @@ export const query = graphql(
   [
     ProductMaterialFragment,
     ProductInfoSectionFragment,
-    QuestionSectionFragment,
+    QuestionsSectionFragment,
     ResponsiveImageFragment,
     ProductPageLabelsFragment,
   ],
 );
 
 export type Query = ResultOf<typeof query>;
+export type Product = NonNullable<Query['product']>;
 export type Variables = VariablesOf<typeof query>;

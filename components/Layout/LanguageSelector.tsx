@@ -38,9 +38,7 @@ type Props = {
 };
 
 const PLACEMENT = {
-  // Header: the 40px trigger is centred in the 72px bar, so mt-4 puts the list's top edge on
-  // the header's bottom border, where the mega menu opens too, and --pop-y drops it from there.
-  // Each placement scales from the corner nearest its trigger (origin-*).
+  // mt-4 puts the list's top on the header's bottom border, where the mega menu opens
   'below-end': 'top-full right-0 mt-4 origin-top-right [--pop-y:-0.5rem]',
   'above-start': 'bottom-full left-0 mb-2 origin-bottom-left',
   // A trigger on the left edge on phones, on the right edge from md
@@ -48,8 +46,8 @@ const PLACEMENT = {
     'bottom-full left-0 mb-2 origin-bottom-left md:right-0 md:left-auto md:origin-bottom-right',
 };
 
-// Hands its children the current query string. On prerendered pages Next.js leaves whatever
-// reads it to the browser, up to the nearest Suspense boundary, so only this goes in one.
+// Hands its children the current query string. On prerendered pages Next.js defers
+// useSearchParams to the browser up to the nearest Suspense boundary, so only this reads it.
 function WithQueryString({
   children,
 }: {
@@ -57,6 +55,48 @@ function WithQueryString({
 }) {
   const queryString = useSearchParams().toString();
   return children(queryString);
+}
+
+// Product slugs are localized: ask /api/product-slug-map for this product's slug in every locale
+function useProductSlugsByLocale(
+  locale: SiteLocale,
+  productSlug: string | null,
+) {
+  const [slugs, setSlugs] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setSlugs({});
+
+    if (!productSlug) {
+      return;
+    }
+
+    // abort() cancels an in-flight request; ignore drops a late response
+    const controller = new AbortController();
+    let ignore = false;
+
+    fetch(
+      `/api/product-slug-map?locale=${encodeURIComponent(
+        locale,
+      )}&slug=${encodeURIComponent(productSlug)}`,
+      { signal: controller.signal },
+    )
+      .then((response) => (response.ok ? response.json() : { slugs: {} }))
+      .then((data) => {
+        if (!ignore) {
+          setSlugs(data?.slugs || {});
+        }
+      })
+      // Aborted or no map: the links keep each locale's plain path
+      .catch(() => {});
+
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
+  }, [locale, productSlug]);
+
+  return slugs;
 }
 
 export default function LanguageSelector({
@@ -71,7 +111,6 @@ export default function LanguageSelector({
 }: Props) {
   const listId = useId();
   const [isOpen, setIsOpen] = useState(false);
-  const [productSlugs, setProductSlugs] = useState<Record<string, string>>({});
   const selectorRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
@@ -83,40 +122,10 @@ export default function LanguageSelector({
     pathSegments[1] === 'product' ? pathSegments[2] : null;
 
   const pathString = pathSegments.slice(1).join('/');
-
-  useEffect(() => {
-    setProductSlugs({});
-
-    if (!currentProductSlug) {
-      return;
-    }
-
-    // abort() cancels a request still in flight; ignore drops a response that was already read
-    // when the product changed
-    const controller = new AbortController();
-    let ignore = false;
-
-    fetch(
-      `/api/product-slug-map?locale=${encodeURIComponent(
-        currentLocale,
-      )}&slug=${encodeURIComponent(currentProductSlug)}`,
-      { signal: controller.signal },
-    )
-      .then((response) => (response.ok ? response.json() : { slugs: {} }))
-      .then((data) => {
-        if (!ignore) {
-          setProductSlugs(data?.slugs || {});
-        }
-      })
-      // Aborted, or no map: the links keep each locale's plain path (productSlugs was reset
-      // above)
-      .catch(() => {});
-
-    return () => {
-      ignore = true;
-      controller.abort();
-    };
-  }, [currentLocale, currentProductSlug]);
+  const productSlugs = useProductSlugsByLocale(
+    currentLocale,
+    currentProductSlug,
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -161,8 +170,7 @@ export default function LanguageSelector({
     return queryString ? `${href}?${queryString}` : href;
   };
 
-  // A white popover with an ink edge (like the draft-mode one) on every surface: the edge
-  // stays visible over the footer's white wordmark, and the ring is reset to ink
+  // Ink border and ink focus ring, so the list reads on every surface, the footer's included
   const localeList = (queryString: string) => (
     <ul
       id={listId}
@@ -191,9 +199,7 @@ export default function LanguageSelector({
               <span lang={bcp47}>
                 {getLangNameFromCode(locale)?.native || locale}
               </span>
-              {/* The check keeps its slot on every row, so the symbols line up. The symbol dims
-                  the list's ink rather than using text-mute, which surface-ink (the footer) turns
-                  white on this white list. */}
+              {/* opacity-60, not text-mute: surface-ink (the footer) turns text-mute white */}
               <span className="flex items-center gap-3">
                 {symbol && (
                   <span className="font-normal opacity-60">{symbol}</span>
@@ -250,8 +256,7 @@ export default function LanguageSelector({
         )}
       </button>
 
-      {/* Only the list reads the query string, so the trigger is always in the server HTML.
-          Until the browser has the query, the same list on the plain paths stands in. */}
+      {/* Until the browser has the query string, the fallback links to the plain paths */}
       <Suspense fallback={localeList('')}>
         <WithQueryString>{localeList}</WithQueryString>
       </Suspense>

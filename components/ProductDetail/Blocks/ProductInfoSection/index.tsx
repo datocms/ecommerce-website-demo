@@ -1,8 +1,8 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import type { ComponentPropsWithoutRef } from 'react';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import type { BlockBoundaryProps } from '@/components/DatoStructuredText';
 import {
   type ProductPageLabels,
   ProductPageLabelsFragment,
@@ -18,8 +18,7 @@ type Props = {
   material: FragmentOf<typeof ProductMaterialFragment> | null | undefined;
   labels: ProductPageLabels;
   lng: string;
-  // rest carries data-datocms-content-link-boundary, which DatoStructuredText adds to every block
-} & Omit<ComponentPropsWithoutRef<'section'>, 'children'>;
+} & BlockBoundaryProps;
 
 export default function ProductInfoSection({
   fragment,
@@ -55,9 +54,9 @@ export default function ProductInfoSection({
     { key: 'occasions', label: occasionsLabel, value: occasions },
   ];
 
-  // Specs on a mist well beside the material photo, both the same height so the row tiles.
-  // Without a material the specs run the full width, four across from lg. At lg the photo starts
-  // on the buy box's line (column 7 plus 48px) and the specs grow by the same 48px to meet it.
+  // Specs beside the material photo. The photo's lg:ml-12 mirrors BUY_BOX_COLUMN's lg:pl-12, so it
+  // starts on the buy box's line, and the specs' lg:-mr-12 meets it; without a material they run
+  // full width
   return (
     <section {...rest} className="grid gap-3 lg:grid-cols-12 lg:gap-4">
       <dl
@@ -92,8 +91,6 @@ export default function ProductInfoSection({
               className={IMG_ZOOM}
             />
           )}
-          {/* The material name and More share one white label on the photo, so nothing hangs
-              under it and the row stays one clean edge */}
           <span className="absolute bottom-3 left-3 z-10 inline-flex min-h-11 max-w-[calc(100%-1.5rem)] items-center gap-3 bg-white px-4 py-2 text-sm font-semibold">
             <span className="min-w-0 wrap-break-word">{name}</span>
             {more && (

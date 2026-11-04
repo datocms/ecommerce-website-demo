@@ -8,16 +8,16 @@ import {
 } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { type ComponentPropsWithoutRef, useState } from 'react';
+import { SCRIM } from './styles';
 
-// Shared with the bag's inline notice (Header/Cart.tsx)
 export const DEMO_NOTICE_TITLE = 'This is a DatoCMS Demo';
 export const DEMO_NOTICE_TEXT =
   'To use the cart and enable purchases, an integration with Shopify or Commerce Layer is necessary.';
 
 type Props = Omit<ComponentPropsWithoutRef<'button'>, 'type' | 'onClick'>;
 
-// A storefront action the demo can't perform (add to cart, buy now, wishlist, checkout). The
-// button keeps its look and opens a notice that a commerce integration would handle it.
+// A storefront action the demo can't perform: the button keeps its look and opens a notice that
+// a commerce integration would handle it
 export default function DemoActionButton({ children, ...rest }: Props) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
@@ -28,10 +28,7 @@ export default function DemoActionButton({ children, ...rest }: Props) {
         {children}
       </button>
       <Dialog open={open} onClose={close} className="relative z-50">
-        <DialogBackdrop
-          transition
-          className="fixed inset-0 bg-ink/30 transition-opacity duration-(--dur-sheet) ease-out data-closed:opacity-0 data-leave:duration-(--dur-pop)"
-        />
+        <DialogBackdrop transition className={SCRIM} />
         <div className="fixed inset-0 grid place-items-center overflow-y-auto p-4 sm:p-8">
           <DialogPanel
             transition

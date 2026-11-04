@@ -1,16 +1,13 @@
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 
-// For .filter(): keeps the uploads that have a responsive image and types it as present
-export const hasImage = <T extends { responsiveImage?: unknown }>(
-  item: T,
-): item is T & { responsiveImage: NonNullable<T['responsiveImage']> } =>
-  Boolean(item.responsiveImage);
+export type Photo = {
+  id: string;
+  responsiveImage: FragmentOf<typeof ResponsiveImageFragment>;
+};
 
-// Cover-cropped photo frames per breakpoint, widest first: [media query, width, unit, aspect
-// ratio]. coverSizes() widens the request when a photo is cropped by height. From lg the display
-// frames are 600px tall and the material photos stretch to the copy, so each ratio is the
-// narrowest one in its range.
+// Each photo's frame per breakpoint, widest first. From lg the display frames are 600px tall and
+// the material photos stretch to the copy, so each ratio is the narrowest one in its range
 export type Frame = [
   media: string,
   width: number,

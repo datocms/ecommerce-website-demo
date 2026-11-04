@@ -11,7 +11,6 @@ const STAR =
 const FILLED = 'fill-ink';
 const EMPTY = 'fill-none stroke-mute';
 
-// Five 16px stars
 export default function StarRating({ value, decorative = false }: Props) {
   const filled = Math.round(value);
   const a11y = decorative

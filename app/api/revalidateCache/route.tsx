@@ -3,7 +3,7 @@
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function POST(request: NextRequest) {
   // The token is sent by the webhook as a request header (see /api/post-install)
   const token = request.headers.get('authorization')?.replace(/^Bearer /, '');
 
@@ -12,8 +12,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    // Every published CDA request is tagged "datocms" (lib/datocms/queryDatoCMS.ts); draft
-    // requests are never cached. "max" serves the stale page while it regenerates.
+    // Every published query is tagged "datocms" (lib/datocms/queryDatoCMS.ts); "max" serves the
+    // stale page while it regenerates
     revalidateTag('datocms', 'max');
   } catch (error) {
     console.error(error);

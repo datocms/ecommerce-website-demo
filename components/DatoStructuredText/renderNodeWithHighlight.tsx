@@ -1,7 +1,6 @@
 import { createElement, type ReactNode } from 'react';
 
-// Default renderNode: the CMS highlight mark renders as <mark>, padded so the marker wraps cleanly
-// across lines
+// Default renderNode: pads the highlight mark so the marker wraps cleanly across lines
 export function renderNodeWithHighlight(
   tag: string,
   props: { key?: string } | null,

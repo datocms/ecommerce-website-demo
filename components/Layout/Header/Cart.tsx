@@ -57,7 +57,6 @@ export default function Cart({ open, onClose, currencySymbol }: Props) {
         </div>
       </div>
 
-      {/* Centred in the free space, so the sheet doesn't end on a void */}
       <div className="my-auto flex flex-col items-center py-12 text-center">
         <span className="grid size-20 place-items-center bg-mist">
           <ShoppingBagIcon aria-hidden="true" className="size-7" />

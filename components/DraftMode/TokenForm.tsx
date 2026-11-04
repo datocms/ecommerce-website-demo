@@ -58,8 +58,6 @@ export default function TokenForm({
 
   return (
     <form
-      // Headless UI's <Transition> hands the form its ref and data-closed/-enter/-leave
-      // (pop in global.css)
       {...transitionProps}
       id={TOKEN_FORM_ID}
       aria-labelledby={`${id}-title`}

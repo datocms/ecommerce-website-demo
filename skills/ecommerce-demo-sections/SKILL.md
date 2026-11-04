@@ -35,7 +35,7 @@ Homepage sections follow this chain:
 5. `app/[lng]/home/Content.tsx` switches on `section.__typename` and renders the component.
 6. gql.tada infers the types from the query and fragments, so there is no generation step.
 
-Existing section examples: Hero, DividerSection, CollectionCardShowcase, MaterialShowcase, Testimonials. NewArrivals renders the newest products rather than a CMS block, and consecutive CollectionCardShowcase blocks are grouped before the __typename switch in `app/[lng]/home/Content.tsx`.
+Existing section examples: Hero, DividerSection, CollectionCardShowcase, MaterialShowcase, Testimonials. NewArrivals renders the newest products rather than a CMS block, and consecutive CollectionCardShowcase blocks are grouped by `groupCollectionCardShowcases()` (`app/[lng]/home/showcaseGroups.ts`) before the __typename switch in `app/[lng]/home/Content.tsx`.
 
 ## Workflow for a new homepage section
 

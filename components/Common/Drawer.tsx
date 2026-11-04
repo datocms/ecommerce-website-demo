@@ -8,6 +8,7 @@ import {
 } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { ReactNode } from 'react';
+import { SCRIM } from './styles';
 
 type Props = {
   open: boolean;
@@ -16,13 +17,11 @@ type Props = {
   title: ReactNode;
   footer?: ReactNode;
   children: ReactNode;
-  closeLabel?: string;
+  closeLabel: string;
 };
 
-// A full-height white panel from the viewport edge over a flat ink scrim: the whole screen on
-// phones, 460px from there. Content and footer pad by --inset (20px, 32px from sm). The panel
-// slides in on --ease-drawer. Its contents arrive in the quick register: the body staggers its
-// direct children 60ms in, and the footer follows at 120ms.
+// A full-height side panel, up to 460px wide, with a title bar, a scrolling body that staggers its
+// direct children in, and an optional footer
 export default function Drawer({
   open,
   onClose,
@@ -30,22 +29,22 @@ export default function Drawer({
   title,
   footer,
   children,
-  closeLabel = 'Close',
+  closeLabel,
 }: Props) {
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
       <DialogBackdrop
         transition
-        // sheet-scrim and sheet are named during a view transition (global.css), so a drawer
-        // closing over a navigation keeps sliding out on top
+        // Named during view transitions (view-transitions.css), so a drawer closing over a
+        // navigation stays on top
         data-chrome="sheet-scrim"
-        className="fixed inset-0 bg-ink/30 transition-opacity duration-(--dur-sheet) ease-out data-closed:opacity-0 data-leave:duration-(--dur-pop)"
+        className={SCRIM}
       />
       <DialogPanel
         transition
         data-chrome="sheet"
-        // [--rise:0px]: the panel travels sideways, so its contents only sharpen in place (see
-        // quick in global.css)
+        // [--rise:0px]: the panel slides sideways, so its contents only fade in place (see quick
+        // in motion.css)
         className={[
           'quick fixed inset-y-0 flex w-full max-w-[28.75rem] flex-col overflow-hidden bg-white transition duration-(--dur-sheet) ease-drawer data-leave:duration-(--dur-pop) [--rise:0px]',
           side === 'left'

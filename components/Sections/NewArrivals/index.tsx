@@ -21,9 +21,8 @@ type Props = {
 
 const ID = 'new-arrivals';
 
-// The latest products as a rail that runs off the right edge, with the title, a catalog link
-// and the arrows above it and a progress track under it. Not a CMS block: home/meta.ts fetches
-// the 8 newest products for it and home/Content.tsx decides where it goes.
+// Not a CMS block: home/meta.ts fetches the newest products and home/Content.tsx decides where
+// the section goes.
 export default function NewArrivals({
   products,
   lng,
@@ -54,7 +53,6 @@ export default function NewArrivals({
           aside={controls}
         />
       ) : (
-        // Without a title there is no heading to label the section, only the link and arrows
         <div className="shell mb-8 flex items-center justify-end gap-6 lg:mb-12">
           {action && (
             <Link href={action.href} className="group tlink">

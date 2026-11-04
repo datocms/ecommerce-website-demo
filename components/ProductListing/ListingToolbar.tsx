@@ -11,6 +11,7 @@ import {
   useTransition,
 } from 'react';
 import Drawer from '@/components/Common/Drawer';
+import AppliedCount from './AppliedCount';
 import { PendingQueryProvider } from './PendingQuery';
 
 type Props = {
@@ -18,7 +19,6 @@ type Props = {
   lng: string;
   /** Filter groups that narrow the listing, shown as a count on the trigger */
   activeFilterCount?: number;
-  /** Sort tabs, shown in the toolbar */
   sort?: ReactNode;
   searchChip?: ReactNode;
   /** The toolbar follows a filter header instead of the page header */
@@ -48,10 +48,8 @@ export default function ListingToolbar({
     if (query !== currentQuery) scrollBackQueryRef.current = query;
   };
 
-  // From lg the toolbar sticks, so sort and filters can change far down the list.
-  // The new results then start from the top, right under the toolbar; at the top
-  // of the page nothing moves. It waits for the drawer to close, whose scroll lock
-  // would otherwise put the old position back on iOS
+  // From lg the toolbar sticks: after a sort or filter change, scroll the new results back under
+  // it. Wait for the drawer to close, whose scroll lock restores the old position on iOS
   useLayoutEffect(() => {
     if (open || scrollBackQueryRef.current !== currentQuery) return;
     scrollBackQueryRef.current = null;
@@ -63,9 +61,7 @@ export default function ListingToolbar({
 
   return (
     <PendingQueryProvider onPush={scrollBackWhenQueryLoads}>
-      {/* A hairline bar that sticks under the header from lg. Right under the header it
-          shares the header's hairline; after a filter header it draws its own, which
-          tucks under the header's while stuck. data-chrome keeps it above a results swap */}
+      {/* Sticks under the header from lg; data-chrome keeps it above the results swap */}
       <div
         ref={toolbarRef}
         data-chrome="toolbar"
@@ -82,15 +78,7 @@ export default function ListingToolbar({
             <AdjustmentsHorizontalIcon aria-hidden="true" />
             Filters
             {activeFilterCount > 0 && (
-              // Re-keyed by the count, so it pops again when the count changes
-              <span
-                key={activeFilterCount}
-                className="tag-dark min-h-6 animate-pop px-1.5"
-              >
-                <span className="sr-only"> (</span>
-                {activeFilterCount}
-                <span className="sr-only"> applied)</span>
-              </span>
+              <AppliedCount count={activeFilterCount} />
             )}
           </button>
           {sort && (
@@ -99,15 +87,12 @@ export default function ListingToolbar({
                 aria-hidden="true"
                 className="hidden h-6 w-px bg-line lg:block"
               />
-              {/* Phones and tablets: a row of its own under a hairline, edge to edge.
-                  From lg it sits between Filters and the count at its full width */}
               <div className="order-last -mx-(--gutter) w-[calc(100%+2*var(--gutter))] border-t border-line lg:order-none lg:mx-0 lg:w-auto lg:min-w-0 lg:border-t-0">
                 {sort}
               </div>
             </>
           )}
-          {/* A long search chip truncates before the sort tabs give way: below lg on
-              the Filters row, from lg beside the tabs */}
+          {/* From lg this group shrinks first, so a long search chip truncates before the sort tabs do */}
           <div className="ml-auto flex min-w-0 items-center justify-end gap-4 max-lg:flex-1 max-lg:basis-0 lg:shrink-[999]">
             {searchChip}
             <p
@@ -136,9 +121,8 @@ export default function ListingToolbar({
             </p>
             <Link
               href={`/${lng}/products`}
-              // Pushed in a transition of its own, so the results stay dim (pending-dim)
-              // until they land, after the drawer has closed and taken this link with it.
-              // Like the drawer's toggles, it updates the grid without the swap
+              // setOpen(false) unmounts this link, so a LinkPending inside it would vanish early: a
+              // transition of its own keeps the results dimmed until they land ("filter" skips the swap)
               onNavigate={(event) => {
                 event.preventDefault();
                 scrollBackWhenQueryLoads('');

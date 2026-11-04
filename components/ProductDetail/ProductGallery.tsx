@@ -2,13 +2,13 @@
 
 import { type UIEvent, useEffect, useRef, useState } from 'react';
 import { RSCImage } from 'react-datocms/rsc-image';
-import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
+import type { Product } from '@/app/[lng]/product/[slug]/meta';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import { readFragment } from '@/lib/datocms/graphql';
 
 type Props = {
-  images: NonNullable<ProductQuery['product']>['productImages'];
+  images: Product['productImages'];
   productName: string;
   /** The sale label to show on the lead photo, when the product is on sale */
   saleTag?: string | null;
@@ -22,7 +22,7 @@ export default function ProductGallery({
   // First photo in view: phones show one at a time, tablets two
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // The gallery is a tab stop only while it scrolls (not once the photos stack from lg)
+  // A tab stop only while it scrolls (useScrollerTabStop does the same for rails, by id)
   const galleryRef = useRef<HTMLElement>(null);
   const [galleryScrolls, setGalleryScrolls] = useState(true);
   useEffect(() => {
@@ -48,9 +48,8 @@ export default function ProductGallery({
     setCurrentSlide(Math.min(Math.max(slide, 0), images.length - 1));
   };
 
-  // Phones swipe one photo at a time and tablets two, edge to edge. From lg they stack beside the
-  // buy box; three or more keep the lead photo full width and pair the rest (a last odd one spans
-  // the row too), so a long gallery doesn't turn into a column of huge photos
+  // From lg, three or more photos: the lead spans the row and the rest pair up (an odd last one
+  // spans it too)
   const paired = images.length >= 3;
   const spansRow = (index: number) =>
     !paired ||
@@ -73,16 +72,15 @@ export default function ProductGallery({
         {images.map((image, index) => (
           <div
             key={image.id}
-            // The lead photo's well: the product card's photo lands on its first child, and the
-            // sale tag fades in over it (the "product" view transition in global.css)
+            // The product card's photo flies onto this well ("product" view transition,
+            // view-transitions.css)
             data-morph={index === 0 ? 'pdp' : undefined}
             className={`relative aspect-[4/5] w-full shrink-0 snap-start overflow-hidden bg-mist lg:w-auto ${images.length > 1 ? 'sm:w-[calc(50%-0.125rem)]' : ''} ${paired && spansRow(index) ? 'lg:col-span-2' : ''}`}
           >
             {image.responsiveImage &&
               (index === 0 ? (
-                // A plain <img> with no onLoad, which React waits for (up to 500ms) before it
-                // starts the "product" view transition. DatoImage's onLoad opts out of that wait,
-                // and the card's photo would fly into an empty well while this one downloads.
+                // RSCImage, not DatoImage: React waits for a plain <img> before the "product"
+                // view transition, and DatoImage's onLoad opts out of that wait
                 <RSCImage
                   data={readFragment(
                     ResponsiveImageFragment,
@@ -106,7 +104,6 @@ export default function ProductGallery({
                   sizes={sizesFor(index)}
                 />
               ))}
-            {/* While the photo bleeds, the tag sits on the text's gutter */}
             {index === 0 && saleTag && (
               <span className="tag-dark absolute top-(--gutter) left-(--gutter) z-10 lg:top-4 lg:left-4">
                 {saleTag}
@@ -115,8 +112,7 @@ export default function ProductGallery({
           </div>
         ))}
       </section>
-      {/* The scroller runs edge to edge on phones, so its focus ring is drawn inside it: ink
-          with a white line inside, visible on light and dark photo edges alike */}
+      {/* Focus ring drawn inside the edge-to-edge scroller */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-10 hidden border-4 border-white outline-2 -outline-offset-2 outline-ink peer-focus-visible:block"

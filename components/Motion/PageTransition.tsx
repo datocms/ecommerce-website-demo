@@ -4,14 +4,9 @@ type Props = {
   children: ReactNode;
 };
 
-// Wraps a page's content. generateWrapper applies it to every route that uses it, the [lng] layout
-// included; product/[slug] and products skip generateWrapper and apply it themselves.
-// - A route change: the old page drops out and the new one comes in under the still chrome (.fade
-//   in global.css).
-// - A locale switch: it remounts the [lng] layout, so the whole page crossfades, because the
-//   layout's display:contents root is not captured.
-// - Updates (search params, router.refresh(), draft toggles, RealTime): nothing plays
-//   (default="none").
+// Fades the page on a route change (.fade in view-transitions.css); a locale switch remounts the
+// [lng] layout, so the whole page crossfades. Updates (search params, router.refresh(), draft
+// toggle, RealTime data) don't animate.
 export default function PageTransition({ children }: Props) {
   return (
     <ViewTransition enter="fade" exit="fade" default="none">

@@ -1,4 +1,3 @@
-import { stripStega } from '@datocms/content-link';
 import { notFound } from 'next/navigation';
 import BuyBox from '@/components/ProductDetail/BuyBox';
 import { ProductPageLabelsFragment } from '@/components/ProductDetail/fragments';
@@ -8,6 +7,7 @@ import RelatedProducts from '@/components/ProductDetail/RelatedProducts';
 import Reviews from '@/components/ProductDetail/Reviews';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { readFragment } from '@/lib/datocms/graphql';
+import { isOnSale } from '@/lib/isOnSale';
 import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
@@ -18,7 +18,7 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
 
   const { lng } = params;
   const labels = data.generalInterface;
-  const isOnSale = stripStega(product.sale) === 'on_sale';
+  const onSale = isOnSale(product.sale);
   const { sale } = readFragment(ProductPageLabelsFragment, labels) ?? {};
 
   return (
@@ -27,14 +27,9 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
         <ProductGallery
           images={product.productImages}
           productName={product.name}
-          saleTag={isOnSale ? sale : undefined}
+          saleTag={onSale ? sale : undefined}
         />
-        <BuyBox
-          product={product}
-          labels={labels}
-          lng={lng}
-          isOnSale={isOnSale}
-        />
+        <BuyBox product={product} labels={labels} lng={lng} isOnSale={onSale} />
       </div>
       <ProductDescription product={product} labels={labels} lng={lng} />
       <RelatedProducts

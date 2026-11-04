@@ -1,0 +1,113 @@
+/* React <ViewTransition>. fade: pages (Motion/PageTransition.tsx); swap: catalog results
+   replaced in place; product: a card's photo flying to the product page. Shell chrome holds
+   still. */
+
+/* Clicks reach the page underneath while a transition runs */
+::view-transition {
+  pointer-events: none;
+}
+/* The root (whatever no transition names, such as the page background) gets a short crossfade */
+::view-transition-group(root) {
+  animation-duration: var(--dur-pop);
+}
+/* The old page drops out fast and the new one comes in just after it. Chrome present on only
+   one side (:only-child), such as the catalog toolbar, fades like the page. */
+@keyframes leave {
+  to {
+    opacity: 0;
+  }
+}
+::view-transition-old(.fade),
+::view-transition-old(.swap),
+::view-transition-old(.chrome):only-child {
+  display: block;
+  animation: leave var(--dur-quick) var(--ease-out) both;
+}
+::view-transition-new(.fade),
+::view-transition-new(.chrome):only-child {
+  --rise: 0px;
+}
+::view-transition-new(.fade),
+::view-transition-new(.swap),
+::view-transition-new(.chrome):only-child {
+  animation: reveal var(--dur-pop) var(--ease-out) 60ms both;
+}
+/* Shell chrome ([data-chrome], #cookie-notice) is named only while a transition runs, so pages
+   pass under it. A permanent name would create a stacking context that puts Headless UI dialogs
+   under the sticky header. */
+:root:active-view-transition {
+  & :is([data-chrome], #cookie-notice) {
+    view-transition-class: chrome;
+  }
+  & [data-chrome='strip'] {
+    view-transition-name: strip;
+  }
+  & [data-chrome='header'] {
+    view-transition-name: site-header;
+  }
+  & [data-chrome='scrim'] {
+    view-transition-name: mega-scrim;
+  }
+  & [data-chrome='toolbar'] {
+    view-transition-name: catalog-toolbar;
+  }
+  & [data-chrome='dock'] {
+    view-transition-name: draft-dock;
+  }
+  & #cookie-notice {
+    view-transition-name: cookie-notice;
+  }
+  & [data-chrome='sheet'] {
+    view-transition-name: sheet;
+  }
+  & [data-chrome='sheet-scrim'] {
+    view-transition-name: sheet-scrim;
+  }
+}
+::view-transition-group(.chrome) {
+  z-index: 2;
+  animation: none;
+}
+::view-transition-old(.chrome) {
+  display: none;
+}
+::view-transition-new(.chrome) {
+  animation: none;
+}
+/* ProductCard links carry the "product" type. Only the followed card's photo is named: the
+   focused card (a click focuses the link, and Chrome clears :hover before capturing), or else the
+   hovered one. A product page linking to another sets its own photo aside. */
+:root:active-view-transition-type(product) {
+  & a:focus [data-morph='card'] > :first-child,
+  &:not(:has(a:focus [data-morph='card'])) a:hover [data-morph='card'] > :first-child,
+  & [data-morph='pdp'] > :first-child {
+    view-transition-name: product;
+  }
+  & [data-morph='pdp'] > .tag-dark {
+    view-transition-name: product-tag;
+    view-transition-class: fade;
+  }
+  &:has(a:is(:focus, :hover) [data-morph='card']) [data-morph='pdp'] > * {
+    view-transition-name: none;
+  }
+}
+::view-transition-group(product-tag) {
+  z-index: 1;
+}
+::view-transition-group(product) {
+  z-index: 1;
+  animation-duration: var(--dur-sheet);
+  animation-timing-function: var(--ease-drawer);
+}
+/* Filter changes from the drawer update the grid at once. The open drawer counts too: an
+   unprefetched query's render can commit first and take the "filter" type with it. */
+:root:is(
+    :active-view-transition-type(filter),
+    :active-view-transition:has([data-filter-drawer])
+  ) {
+  &::view-transition-group(*),
+  &::view-transition-old(*),
+  &::view-transition-new(*) {
+    animation: none;
+  }
+}

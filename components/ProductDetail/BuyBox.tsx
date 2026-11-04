@@ -4,7 +4,7 @@ import { stripStega } from '@datocms/content-link';
 import { CheckIcon, HeartIcon, TruckIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
-import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
+import type { Product } from '@/app/[lng]/product/[slug]/meta';
 import DemoActionButton from '@/components/Common/DemoActionButton';
 import Price from '@/components/ProductCard/Price';
 import { contrast, hexToRgb, WHITE } from '@/lib/color';
@@ -13,7 +13,6 @@ import { type ProductPageLabels, ProductPageLabelsFragment } from './fragments';
 import StarRating from './StarRating';
 import { BUY_BOX_COLUMN } from './styles';
 
-type Product = NonNullable<ProductQuery['product']>;
 type Variation = Product['productVariations'][number];
 
 type Props = {
@@ -33,6 +32,103 @@ const firstAvailableSize = (variation?: Variation) => {
   const available = sizesOf(variation);
   return SIZE_ORDER.find((size) => available.includes(size)) ?? available[0];
 };
+
+function ColorOptions({
+  label,
+  variations,
+  selectedId,
+  onSelect,
+}: {
+  label: string | null | undefined;
+  variations: Variation[];
+  selectedId: string | undefined;
+  onSelect: (variation: Variation) => void;
+}) {
+  return (
+    <div>
+      <p id="pdp-color-label" className="text-sm font-semibold">
+        {label}
+      </p>
+      <fieldset
+        aria-labelledby="pdp-color-label"
+        className="mt-3 flex min-w-0 flex-wrap gap-2"
+      >
+        {variations.map((variation) => {
+          const hex = stripStega(variation.color.hex);
+          const rgb = hexToRgb(hex);
+          const isLightSwatch = rgb ? contrast(rgb, WHITE) < 3 : false;
+          const selected = variation.id === selectedId;
+          return (
+            // Selected: 2px ink frame plus a tick, distinct from the focus ring
+            <button
+              key={variation.id}
+              type="button"
+              aria-label={`${label ?? 'Color'}: ${hex}`}
+              aria-pressed={selected}
+              onClick={() => onSelect(variation)}
+              className="press grid size-12 place-items-center border border-line hover:border-ink aria-pressed:border-2 aria-pressed:border-ink"
+            >
+              <span
+                style={{ backgroundColor: hex }}
+                className={`grid size-9 place-items-center forced-color-adjust-none ${isLightSwatch ? 'border border-line-strong text-ink' : 'text-white'}`}
+              >
+                {selected && (
+                  <CheckIcon
+                    aria-hidden="true"
+                    className="size-[1.125rem] animate-pop stroke-[2.25]"
+                  />
+                )}
+              </span>
+            </button>
+          );
+        })}
+      </fieldset>
+    </div>
+  );
+}
+
+function SizeOptions({
+  label,
+  availableSizes,
+  selected,
+  onSelect,
+}: {
+  label: string | null | undefined;
+  availableSizes: string[];
+  selected: string | undefined;
+  onSelect: (size: string) => void;
+}) {
+  return (
+    <div className="mt-6 md:mt-0 lg:mt-6">
+      <p id="pdp-size-label" className="text-sm font-semibold">
+        {label}{' '}
+        <span className="ml-1 font-medium text-mute tabular-nums">
+          {selected?.toUpperCase()}
+        </span>
+      </p>
+      <fieldset
+        aria-labelledby="pdp-size-label"
+        className="mt-3 grid min-w-0 grid-cols-5 gap-2"
+      >
+        {SIZE_ORDER.map((sizeOption) => {
+          const available = availableSizes.includes(sizeOption);
+          return (
+            <button
+              key={sizeOption}
+              type="button"
+              disabled={!available}
+              aria-pressed={available ? selected === sizeOption : undefined}
+              onClick={() => onSelect(sizeOption)}
+              className="chip h-12 px-0 text-base font-semibold tabular-nums"
+            >
+              {sizeOption.toUpperCase()}
+            </button>
+          );
+        })}
+      </fieldset>
+    </div>
+  );
+}
 
 export default function BuyBox({ product, labels, lng, isOnSale }: Props) {
   const variations = product.productVariations;
@@ -96,8 +192,7 @@ export default function BuyBox({ product, labels, lng, isOnSale }: Props) {
       >
         {product.brand.name}
       </Link>
-      {/* 44px between lg and xl, where the buy box is narrowest; pretty keeps compound names
-          whole where balance would split them at their hyphen */}
+      {/* text-pretty, not balance: balance splits compound names at the hyphen */}
       <h1 className="title-section mt-3 text-pretty lg:max-xl:text-[2.75rem]">
         {product.name}
       </h1>
@@ -125,78 +220,19 @@ export default function BuyBox({ product, labels, lng, isOnSale }: Props) {
         )}
       </div>
 
-      {/* Tablets: color and size side by side, then the two actions side by side */}
       <div className="mt-8 border-t border-line pt-6 md:grid md:grid-cols-2 md:gap-x-10 lg:block">
-        <div>
-          <p id="pdp-color-label" className="text-sm font-semibold">
-            {color}
-          </p>
-          <fieldset
-            aria-labelledby="pdp-color-label"
-            className="mt-3 flex min-w-0 flex-wrap gap-2"
-          >
-            {variations.map((variation) => {
-              const hex = stripStega(variation.color.hex);
-              const rgb = hexToRgb(hex);
-              const light = rgb ? contrast(rgb, WHITE) < 3 : false;
-              const selected = variation.id === selectedVariation?.id;
-              return (
-                // Selected: a 2px ink frame and a tick, so it reads apart from the outer focus ring
-                <button
-                  key={variation.id}
-                  type="button"
-                  aria-label={`${color ?? 'Color'}: ${hex}`}
-                  aria-pressed={selected}
-                  onClick={() => selectVariation(variation)}
-                  className="press grid size-12 place-items-center border border-line hover:border-ink aria-pressed:border-2 aria-pressed:border-ink"
-                >
-                  <span
-                    style={{ backgroundColor: hex }}
-                    className={`grid size-9 place-items-center forced-color-adjust-none ${light ? 'border border-line-strong text-ink' : 'text-white'}`}
-                  >
-                    {selected && (
-                      <CheckIcon
-                        aria-hidden="true"
-                        className="size-[1.125rem] animate-pop stroke-[2.25]"
-                      />
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </fieldset>
-        </div>
-
-        <div className="mt-6 md:mt-0 lg:mt-6">
-          <p id="pdp-size-label" className="text-sm font-semibold">
-            {size}{' '}
-            <span className="ml-1 font-medium text-mute tabular-nums">
-              {selectedSize?.toUpperCase()}
-            </span>
-          </p>
-          <fieldset
-            aria-labelledby="pdp-size-label"
-            className="mt-3 grid min-w-0 grid-cols-5 gap-2"
-          >
-            {SIZE_ORDER.map((sizeOption) => {
-              const available = availableSizes.includes(sizeOption);
-              return (
-                <button
-                  key={sizeOption}
-                  type="button"
-                  disabled={!available}
-                  aria-pressed={
-                    available ? selectedSize === sizeOption : undefined
-                  }
-                  onClick={() => setSelectedSize(sizeOption)}
-                  className="chip h-12 px-0 text-base font-semibold tabular-nums"
-                >
-                  {sizeOption.toUpperCase()}
-                </button>
-              );
-            })}
-          </fieldset>
-        </div>
+        <ColorOptions
+          label={color}
+          variations={variations}
+          selectedId={selectedVariation?.id}
+          onSelect={selectVariation}
+        />
+        <SizeOptions
+          label={size}
+          availableSizes={availableSizes}
+          selected={selectedSize}
+          onSelect={setSelectedSize}
+        />
       </div>
 
       <div className="mt-8 grid gap-2 md:grid-cols-2 lg:grid-cols-1">

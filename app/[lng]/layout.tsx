@@ -15,10 +15,8 @@ const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
   fallbackLocale: [fallbackLocale],
 });
 
-// Site-wide defaults: the favicons, and the title and description from the DatoCMS global SEO
-// settings for routes without SEO tags of their own, such as the catalog. Next.js merges each
-// page's generateMetadata over these key by key, so a page's own tags win, and it adds the
-// viewport tag itself.
+// Site-wide defaults (favicons, and the fallback title and description from the DatoCMS global SEO
+// settings); each page's generateMetadata overrides them key by key
 export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
   {
     query,

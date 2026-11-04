@@ -1,7 +1,7 @@
 // Called by the Web Previews plugin (installed by /api/post-install) to list preview links for a record
 
 import type { NextRequest } from 'next/server';
-import { localizedString } from '@/lib/datocms/localizedString';
+import { recordToWebsiteRoute } from '@/lib/datocms/recordToWebsiteRoute';
 import type { SiteLocale } from '@/lib/i18n';
 import { getSiteUrl } from '@/lib/siteUrl';
 
@@ -15,37 +15,7 @@ type PreviewLinksRequest = {
   locale: SiteLocale;
 };
 
-const generatePreviewUrl = ({
-  item,
-  itemType,
-  locale,
-}: PreviewLinksRequest) => {
-  // Every record-backed route; /api/seoAnalysis maps the subset that gets SEO analysis
-  switch (itemType.attributes.api_key) {
-    case 'home':
-      return `/${locale}/home`;
-    case 'showcase':
-      return `/${locale}/showcase`;
-    case 'store':
-      return `/${locale}/stores`;
-    case 'product': {
-      const slug = localizedString(item.attributes.slug, locale);
-      return slug ? `/${locale}/product/${slug}` : undefined;
-    }
-    case 'legal_page': {
-      const slug = localizedString(item.attributes.slug, locale);
-      return slug ? `/${locale}/legal/${slug}` : undefined;
-    }
-    case 'brand':
-      return `/${locale}/products?brands=${item.id}`;
-    case 'material':
-      return `/${locale}/products?materials=${item.id}`;
-    case 'collection':
-      return `/${locale}/products?collections=${item.id}`;
-  }
-};
-
-const corsHeaders = {
+const responseHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
@@ -55,7 +25,7 @@ const corsHeaders = {
 export async function OPTIONS() {
   return new Response('ok', {
     status: 200,
-    headers: corsHeaders,
+    headers: responseHeaders,
   });
 }
 
@@ -66,13 +36,17 @@ export async function POST(request: NextRequest) {
   if (!token || token !== process.env.DRAFT_SECRET_TOKEN)
     return new Response('Invalid token', { status: 401 });
 
-  const body: PreviewLinksRequest = await request.json();
-  const path = generatePreviewUrl(body);
+  const { item, itemType, locale }: PreviewLinksRequest = await request.json();
+  const path = recordToWebsiteRoute(
+    { id: item.id, slug: item.attributes.slug },
+    itemType.attributes.api_key,
+    locale,
+  );
 
   if (!path) {
     return new Response(JSON.stringify({ previewLinks: [] }), {
       status: 200,
-      headers: corsHeaders,
+      headers: responseHeaders,
     });
   }
 
@@ -81,7 +55,7 @@ export async function POST(request: NextRequest) {
   const previewLinks = [];
 
   // Records with unpublished changes ('updated') get both links
-  if (body.item.meta.status !== 'published') {
+  if (item.meta.status !== 'published') {
     previewLinks.push({
       label: 'Draft version',
       // Opened by a browser, where we cannot set headers
@@ -89,7 +63,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  if (body.item.meta.status !== 'draft') {
+  if (item.meta.status !== 'draft') {
     previewLinks.push({
       label: 'Published version',
       url: `${baseUrl}/api/draft/disable?redirect=${path}`,
@@ -98,6 +72,6 @@ export async function POST(request: NextRequest) {
 
   return new Response(JSON.stringify({ previewLinks }), {
     status: 200,
-    headers: corsHeaders,
+    headers: responseHeaders,
   });
 }

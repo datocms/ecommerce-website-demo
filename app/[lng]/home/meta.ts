@@ -22,9 +22,8 @@ export const query = graphql(
         shopNow
         newArrivals
       }
-      # Only for the collection card showcases (see Content.tsx): their title is the header
-      # dropdown column that lists their collections, and their link reuses the header's
-      # products link label
+      # For the collection card showcases: their group title and catalog link come from the
+      # header menu (see showcaseGroups.ts)
       layout(locale: $locale, fallbackLocales: $fallbackLocale) {
         menu {
           __typename

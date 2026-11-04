@@ -29,6 +29,7 @@ async function getCachedLocales(): Promise<SiteLocale[]> {
 function getPreferredLocale(request: Request, locales: SiteLocale[]): string {
   // The first locale in the project settings is the fallback
   const fallbackLng = locales[0];
+  // SiteLocale enum values use '_' (pt_BR) where Accept-Language uses '-' (pt-BR)
   const headers = new Headers(request.headers);
   const acceptLanguage = headers.get('accept-language');
   if (acceptLanguage) {

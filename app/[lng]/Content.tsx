@@ -11,8 +11,7 @@ const Content: ContentPage<PageProps, Query> = ({
   ...globalPageProps
 }) => {
   const lang = globalPageProps.params.lng.replaceAll('_', '-');
-  // <html> is rendered by the root layout, outside [lng]: this wrapper carries lang in the
-  // server HTML, and DocumentLang syncs <html lang> after hydration.
+  // Carries lang in the server HTML; DocumentLang syncs <html lang> on the client
   return (
     <div lang={lang} className="contents">
       <DocumentLang lang={lang} />

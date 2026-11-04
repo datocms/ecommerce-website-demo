@@ -2,18 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useScrollerTabStop } from './RailFocus';
+import { watchScroller } from './watchScroller';
 
 type Props = {
   /** id of the horizontal scroller the track follows */
   railId: string;
-  /** Also manage the rail's tab stop (useScrollerTabStop), for a rail of non-focusable items */
+  /** Also makes the rail a tab stop only while it scrolls (for rails of non-focusable items) */
   tabStop?: boolean;
   className?: string;
 };
 
-// A 2px track under a rail with a thumb sized to the visible share of the rail and moved with
-// its scroll position. It takes the surface color (ink on white, white on black bands) and
-// hides itself while everything fits. Decorative: the rail itself is the scrollable control.
+// Decorative scroll track under a rail; hidden while everything fits
 export default function RailProgress({ railId, tabStop, className }: Props) {
   useScrollerTabStop(railId, Boolean(tabStop));
   const thumbRef = useRef<HTMLSpanElement>(null);
@@ -33,14 +32,7 @@ export default function RailProgress({ railId, tabStop, className }: Props) {
       thumb.style.translate = `${((progress * (1 - visible)) / visible) * 100}% 0`;
       setScrollable(max > 1);
     };
-    update();
-    rail.addEventListener('scroll', update, { passive: true });
-    const observer = new ResizeObserver(update);
-    observer.observe(rail);
-    return () => {
-      rail.removeEventListener('scroll', update);
-      observer.disconnect();
-    };
+    return watchScroller(rail, update);
   }, [railId]);
 
   return (

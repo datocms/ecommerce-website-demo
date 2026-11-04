@@ -1,0 +1,102 @@
+/* Form fields */
+
+/* Square field on light surfaces */
+@utility input-field {
+  display: block;
+  width: 100%;
+  min-height: 3.25rem;
+  padding-inline: 1rem;
+  appearance: none;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 0;
+  background-color: var(--color-white);
+  color: var(--color-ink);
+  font-size: var(--text-input);
+  line-height: var(--text-input--line-height);
+  transition:
+    border-color 150ms var(--ease-out),
+    box-shadow 150ms var(--ease-out);
+  &::placeholder {
+    color: var(--color-mute);
+    opacity: 1;
+  }
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-ink-2);
+    }
+  }
+  &:focus-visible {
+    border-color: var(--color-ink);
+    outline: 2px solid transparent;
+    box-shadow: inset 0 0 0 1px var(--color-ink);
+  }
+  &[aria-invalid='true'] {
+    border-color: var(--color-sale);
+  }
+  /* One clean 2px error edge, not a red line around the ink focus line */
+  &[aria-invalid='true']:focus-visible {
+    box-shadow: inset 0 0 0 1px var(--color-sale);
+  }
+}
+/* Field that takes its surface's text color: the newsletter field on black */
+@utility input-line {
+  display: block;
+  width: 100%;
+  min-height: 3.25rem;
+  padding-inline: 1.25rem;
+  appearance: none;
+  border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
+  border-radius: 0;
+  background-color: transparent;
+  color: inherit;
+  font-size: var(--text-input);
+  line-height: var(--text-input--line-height);
+  transition:
+    border-color 150ms var(--ease-out),
+    box-shadow 150ms var(--ease-out);
+  &::placeholder {
+    color: color-mix(in oklab, currentColor 60%, transparent);
+    opacity: 1;
+  }
+  &:focus-visible {
+    border-color: currentColor;
+    outline: 2px solid transparent;
+    box-shadow: inset 0 0 0 1px currentColor;
+  }
+}
+@utility checkbox {
+  appearance: none;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  border: 1.5px solid var(--color-line-strong);
+  border-radius: 0;
+  background-color: var(--color-white);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 0.875rem;
+  --press: 0.9;
+  transition:
+    background-color 100ms var(--ease-out),
+    border-color 100ms var(--ease-out),
+    scale var(--dur-press) var(--ease-spring);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-ink);
+    }
+  }
+  &:checked {
+    border-color: var(--color-ink);
+    background-color: var(--color-ink);
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M3.5 8.5l3 3 6-7' stroke='%23ffffff' stroke-width='2' stroke-linecap='square'/%3e%3c/svg%3e");
+  }
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring, var(--color-ink));
+    outline-offset: 2px;
+  }
+  @media (forced-colors: active) {
+    appearance: auto;
+    background-image: none;
+  }
+}

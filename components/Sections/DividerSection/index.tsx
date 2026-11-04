@@ -1,6 +1,5 @@
 import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
@@ -17,9 +16,6 @@ type Props = {
   image?: FragmentOf<typeof ResponsiveImageFragment> | null;
 };
 
-// A short statement: pre-title, title, lead and the CMS button. With the hero's second photo it
-// is a full-width band, half photo and half mist panel edge to edge (photo on top on phones);
-// without one it is a plain text block on the grid.
 export default function DividerSection({
   fragment,
   globalPageProps,
@@ -41,7 +37,7 @@ export default function DividerSection({
       </h2>
       {subtitle && (
         <DatoStructuredText
-          data={subtitle as CdaStructuredTextValue}
+          data={subtitle}
           className="mt-5 text-base leading-[1.6] text-pretty text-ink-2 lg:text-lg"
         />
       )}
@@ -81,7 +77,6 @@ export default function DividerSection({
           sizes="(min-width: 768px) 50vw, 100vw"
         />
       </div>
-      {/* The text keeps the page gutter on the outer edge and centres in the panel's height */}
       <div className="flex items-center bg-mist px-(--gutter) py-14 md:px-12 md:py-16 lg:px-20 xl:px-28">
         {text}
       </div>

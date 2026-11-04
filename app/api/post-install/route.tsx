@@ -29,8 +29,7 @@ async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
             '/api/draft/preview-links',
             baseUrl,
           ).toString(),
-          // The secret travels in a header: an URL ends up in logs, proxies and
-          // in the plugin settings, where every collaborator can read it
+          // A header keeps the token out of request URLs, which end up in logs and proxies
           customHeaders: [
             {
               name: 'Authorization',
@@ -51,9 +50,6 @@ async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
     },
   });
 }
-
-// The SEO/Readability Analysis plugin is not installed automatically. To enable it, point its
-// htmlGeneratorUrl at /api/seoAnalysis and send `Authorization: Bearer ${SEO_SECRET_TOKEN}`.
 
 async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
   await client.webhooks.create({
@@ -88,16 +84,13 @@ async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
   });
 }
 
-/**
- * The DatoCMS API token arrives in the request body, so without this check the
- * endpoint would happily write our secret tokens into any project a caller
- * names, and the caller could then read them back from their own project.
- */
-async function isSameProject(client: Client, ourApiToken: string) {
+// The API token comes from the request body: without this check a caller could have our secret
+// tokens written into their own project
+async function isSameProject(callerClient: Client, ourApiToken: string) {
   const ourClient = buildClient({ apiToken: ourApiToken });
 
   const [callerProject, ourProject] = await Promise.all([
-    client.site.find(),
+    callerClient.site.find(),
     ourClient.site.find(),
   ]);
 

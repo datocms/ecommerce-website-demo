@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { ContentLink as DatoContentLink } from 'react-datocms/content-link';
+import { ContentLink as ReactDatocmsContentLink } from 'react-datocms/content-link';
 
 /**
  * Visual-editing overlay (draft mode only): click content to open it in DatoCMS.
@@ -12,7 +12,7 @@ export default function ContentLink() {
   const pathname = usePathname();
 
   return (
-    <DatoContentLink
+    <ReactDatocmsContentLink
       onNavigateTo={(path) => router.push(path)}
       currentPath={pathname}
     />

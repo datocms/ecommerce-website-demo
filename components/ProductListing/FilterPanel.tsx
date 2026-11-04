@@ -7,9 +7,10 @@ import {
 } from '@headlessui/react';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
+import AppliedCount from './AppliedCount';
 import {
   FilterOptionsFragment,
-  type ListingLabels,
+  type ProductListingLabels,
   ProductListingLabelsFragment,
 } from './fragments';
 import { usePendingQuery } from './PendingQuery';
@@ -17,7 +18,7 @@ import { SortChips } from './SortTabs';
 
 type Props = {
   filterOptions: FragmentOf<typeof FilterOptionsFragment> | null | undefined;
-  labels: ListingLabels;
+  labels: ProductListingLabels;
   selectedCollections: string[];
   selectedBrands: string[];
   selectedMaterials: string[];
@@ -45,8 +46,11 @@ export default function FilterPanel({
       ? (pendingParams.get(key) ?? '').split('|').filter(Boolean)
       : selectedFromProps[key];
 
-  const { BrandRecord, MaterialRecord, CollectionRecord } =
-    readFragment(ProductListingLabelsFragment, labels) ?? {};
+  const {
+    CollectionRecord: collectionLabel,
+    MaterialRecord: materialLabel,
+    BrandRecord: brandLabel,
+  } = readFragment(ProductListingLabelsFragment, labels) ?? {};
 
   const { allCollections, allBrands, allMaterials } =
     readFragment(FilterOptionsFragment, filterOptions) ?? {};
@@ -56,9 +60,9 @@ export default function FilterPanel({
     name: string | null | undefined;
     options: { id: string; name: string }[] | undefined;
   }[] = [
-    { id: 'collections', name: CollectionRecord, options: allCollections },
-    { id: 'materials', name: MaterialRecord, options: allMaterials },
-    { id: 'brands', name: BrandRecord, options: allBrands },
+    { id: 'collections', name: collectionLabel, options: allCollections },
+    { id: 'materials', name: materialLabel, options: allMaterials },
+    { id: 'brands', name: brandLabel, options: allBrands },
   ];
 
   function toggleOption(key: FilterKey, id: string) {
@@ -92,7 +96,8 @@ export default function FilterPanel({
   const anyNarrowed = groups.some((group) => group.narrowed);
 
   return (
-    // While it is open, the grid behind it updates at once (data-filter-drawer in global.css)
+    // While it is open, the grid behind it updates at once (data-filter-drawer in
+    // view-transitions.css)
     <div data-filter-drawer>
       <SortChips labels={labels} />
 
@@ -111,17 +116,7 @@ export default function FilterPanel({
                   <DisclosureButton className="group flex min-h-16 w-full items-center justify-between gap-4 py-2 text-left">
                     <span className="title-item flex items-center gap-3">
                       {group.name}
-                      {narrowed && (
-                        // Re-keyed by the count, so it pops again when the count changes
-                        <span
-                          key={checked}
-                          className="tag-dark min-h-6 animate-pop px-1.5"
-                        >
-                          <span className="sr-only"> (</span>
-                          {checked}
-                          <span className="sr-only"> applied)</span>
-                        </span>
-                      )}
+                      {narrowed && <AppliedCount count={checked} />}
                     </span>
                     <span
                       aria-hidden="true"

@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
+import { watchScroller } from './watchScroller';
 
-// Keyboard focus inside a horizontal scroller scrolls it just enough to show the focused item
-// (the scroller's child that holds focus) whole. Browsers leave a partly visible element where
-// it is and center a hidden one, and the rails pause snapping while focus is inside, so without
-// this a focused tile can stay mostly behind the rail's edge.
+// Scrolls a keyboard-focused item fully into view: browsers leave a partly visible one where it
+// is, and the rails pause snapping while focused
 export function useRevealFocus(railId: string) {
   useEffect(() => {
     const rail = document.getElementById(railId);
@@ -28,8 +27,7 @@ export function useRevealFocus(railId: string) {
       while (item.parentElement && item.parentElement !== rail) {
         item = item.parentElement;
       }
-      // The browser has already scrolled but not yet reported it; replace that with the
-      // smallest scroll from where the rail was
+      // Replace the browser's unreported focus scroll with the smallest one
       const from = lastScrollLeft;
       requestAnimationFrame(() => {
         if (rail.scrollWidth <= rail.clientWidth) return;
@@ -56,24 +54,16 @@ export function useRevealFocus(railId: string) {
   }, [railId]);
 }
 
-// For a scroller of non-focusable items that renders tabIndex={0}: keeps it a tab stop only while
-// it scrolls, so one that fits (a grid from lg) is not an extra stop. Off while `enabled` is false.
+// For a scroller of non-focusable items that renders tabIndex={0}: a tab stop only while it
+// scrolls, so one that fits is not an extra stop
 export function useScrollerTabStop(railId: string, enabled = true) {
   useEffect(() => {
     if (!enabled) return;
     const rail = document.getElementById(railId);
     if (!rail) return;
-    const update = () => {
+    return watchScroller(rail, () => {
       rail.tabIndex = rail.scrollWidth - rail.clientWidth > 1 ? 0 : -1;
-    };
-    update();
-    rail.addEventListener('scroll', update, { passive: true });
-    const observer = new ResizeObserver(update);
-    observer.observe(rail);
-    return () => {
-      rail.removeEventListener('scroll', update);
-      observer.disconnect();
-    };
+    });
   }, [railId, enabled]);
 }
 

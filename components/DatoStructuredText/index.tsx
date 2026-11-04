@@ -6,6 +6,11 @@ import {
 } from 'react-datocms/structured-text';
 import { renderNodeWithHighlight } from './renderNodeWithHighlight';
 
+/** Added by DatoStructuredText to each block it renders: spread it on the block's root element */
+export type BlockBoundaryProps = {
+  'data-datocms-content-link-boundary'?: boolean;
+};
+
 // Visual editing: the wrapper groups the whole field into one clickable overlay; each embedded
 // block or inline record is a boundary, so clicking it opens that record instead.
 function addBoundaryAttribute(

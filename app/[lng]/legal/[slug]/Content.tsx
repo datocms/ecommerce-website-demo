@@ -67,8 +67,7 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
       )}
       <article
         lang={params.lng}
-        // The document's h1 is the page title: it gets the title-statement size instead of
-        // prose-dato's h1 size, and the page-title arrival (enter)
+        // The document's h1 is the page title, so it takes the page-title size and arrival
         className={`prose-dato [&_h1]:title-statement [&_h1]:enter ${sections.length > 0 ? 'lg:col-span-8 lg:col-start-5' : 'lg:col-span-full'}`}
       >
         <DatoStructuredText

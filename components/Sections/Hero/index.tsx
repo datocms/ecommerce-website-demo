@@ -1,9 +1,9 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import SocialLink from '@/components/Common/SocialLink';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import Rise from '@/components/Motion/Rise';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
@@ -19,10 +19,51 @@ type Props = {
   withAdditionalImage?: boolean;
 };
 
-// One signature photo running to the right edge (edge to edge on phones, on top), the title,
-// line and button beside it, and the featured collections and socials as one quiet line under
-// a hairline. The hero's second photo belongs to the first divider (home Content); without
-// one it tiles beside the first photo here, so the field never goes missing.
+// justify-self-stretch: otherwise the capped tablet height narrows the photo instead of cropping it
+const PHOTO_COLUMN =
+  '-mx-(--gutter) aspect-[4/5] max-h-[62svh] justify-self-stretch lg:order-2 lg:col-span-7 lg:mx-0 lg:aspect-auto lg:max-h-none lg:bleed-r';
+
+function HeroPhotos({
+  image,
+  additionalImage,
+}: {
+  image: FragmentOf<typeof ResponsiveImageFragment> | null;
+  additionalImage: FragmentOf<typeof ResponsiveImageFragment> | null;
+}) {
+  const mainPhoto = image && (
+    <DatoImage
+      fragment={image}
+      layout="fill"
+      objectFit="cover"
+      objectPosition="50% 8%"
+      sizes={
+        additionalImage
+          ? '(min-width: 1024px) 41vw, 67vw'
+          : '(min-width: 1024px) 62vw, 100vw'
+      }
+      priority
+    />
+  );
+
+  if (!additionalImage) {
+    return <div className={`${MEDIA} settle ${PHOTO_COLUMN}`}>{mainPhoto}</div>;
+  }
+
+  return (
+    <div className={`grid grid-cols-[2fr_1fr] gap-3 lg:gap-4 ${PHOTO_COLUMN}`}>
+      <div className={`${MEDIA} settle h-full`}>{mainPhoto}</div>
+      <div className={`${MEDIA} settle h-full`}>
+        <DatoImage
+          fragment={additionalImage}
+          layout="fill"
+          objectFit="cover"
+          sizes="(min-width: 1024px) 21vw, 33vw"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function Hero({
   fragment,
   globalPageProps,
@@ -42,63 +83,27 @@ export default function Hero({
   const { lng } = globalPageProps.params;
   const titleId = `${id}-title`;
   const hasLinksRow = featuredCollections.length > 0 || socials.length > 0;
-  const additionalPhoto = withAdditionalImage
-    ? additionalImage.responsiveImage
-    : null;
-  const mainPhoto = heroImage.responsiveImage && (
-    <DatoImage
-      fragment={heroImage.responsiveImage}
-      layout="fill"
-      objectFit="cover"
-      objectPosition="50% 8%"
-      sizes={
-        additionalPhoto
-          ? '(min-width: 1024px) 41vw, 67vw'
-          : '(min-width: 1024px) 62vw, 100vw'
-      }
-      priority
-    />
-  );
 
   return (
     <section aria-labelledby={titleId}>
-      {/* From lg the row is --hero-h tall (set on the page wrapper) and the photo fills it;
-          min-h rather than h lets a long localized title grow the row */}
+      {/* min-h, not h: a long localized title can grow the row past --hero-h */}
       <div className="shell grid lg:min-h-(--hero-h) lg:grid-cols-12 lg:gap-4">
-        {/* justify-self-stretch: a grid item with an aspect ratio otherwise shrinks to it, so a
-            capped height (tablets) would narrow the photo instead of cropping it */}
-        <div
-          // settle goes on the photo's own well: this element for one photo, each of the pair's
-          // wells for two
-          className={`${additionalPhoto ? 'grid grid-cols-[2fr_1fr] gap-3 lg:gap-4' : `${MEDIA} settle`} -mx-(--gutter) aspect-[4/5] max-h-[62svh] justify-self-stretch lg:order-2 lg:col-span-7 lg:mx-0 lg:aspect-auto lg:max-h-none lg:bleed-r`}
-        >
-          {additionalPhoto ? (
-            <>
-              <div className={`${MEDIA} settle h-full`}>{mainPhoto}</div>
-              <div className={`${MEDIA} settle h-full`}>
-                <DatoImage
-                  fragment={additionalPhoto}
-                  layout="fill"
-                  objectFit="cover"
-                  sizes="(min-width: 1024px) 21vw, 33vw"
-                />
-              </div>
-            </>
-          ) : (
-            mainPhoto
-          )}
-        </div>
+        <HeroPhotos
+          image={heroImage.responsiveImage}
+          additionalImage={
+            withAdditionalImage ? additionalImage.responsiveImage : null
+          }
+        />
 
-        {/* The title may use the whole column (Finden Sie / Ihren Stil stays on two lines); the
-            rest keeps its distance from the photo */}
         <div className="flex flex-col justify-center pt-8 lg:order-1 lg:col-span-5 lg:py-12">
           <h1 id={titleId} className="title-hero">
             <Rise>{heroTitle}</Rise>
           </h1>
+          {/* Right padding only below the title, which may use the whole column */}
           <div className="enter-stagger lg:pr-10 xl:pr-14 [--delay:200ms]">
             {heroSubtitle && (
               <DatoStructuredText
-                data={heroSubtitle as CdaStructuredTextValue}
+                data={heroSubtitle}
                 className="mt-5 max-w-[29.375rem] text-base leading-[1.6] text-ink-2 lg:mt-8 lg:text-lg lg:text-pretty"
               />
             )}

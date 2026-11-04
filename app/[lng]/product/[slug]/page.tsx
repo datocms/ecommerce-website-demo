@@ -1,7 +1,7 @@
 import { draftMode } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { toNextMetadata } from 'react-datocms/seo';
-import PageTransition from '@/components/Motion/PageTransition';
+import ContentOrRealTime from '@/components/WithRealTimeUpdates/ContentOrRealTime';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import { graphql } from '@/lib/datocms/graphql';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
@@ -59,9 +59,6 @@ const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
   slug: params.slug,
 });
 
-// Unlike other routes this page doesn't use generateWrapper: a slug from another locale must
-// redirect to this locale's slug before anything renders. So Page also does generateWrapper's other
-// jobs itself: the draft switch, and PageTransition around both branches.
 async function getProductPageData({
   params,
   fallbackLocale,
@@ -121,10 +118,10 @@ async function getProductPageData({
   };
 }
 
-export async function generateMetadata(pageProps: PageProps) {
+export async function generateMetadata(nextPageProps: PageProps) {
   const fallbackLocale = await getFallbackLocale();
   const { isEnabled: isDraft } = await draftMode();
-  const params = await pageProps.params;
+  const params = await nextPageProps.params;
   const { data } = await getProductPageData({
     params,
     fallbackLocale,
@@ -134,6 +131,7 @@ export async function generateMetadata(pageProps: PageProps) {
   return data.product?.seo ? toNextMetadata(data.product.seo) : {};
 }
 
+// Not generateWrapper: getProductPageData may redirect to this locale's slug before rendering
 export default async function Page(nextPageProps: PageProps) {
   const fallbackLocale = await getFallbackLocale();
   const { isEnabled: isDraft } = await draftMode();
@@ -145,21 +143,15 @@ export default async function Page(nextPageProps: PageProps) {
     isDraft,
   });
 
-  // Around both branches, as in generateWrapper: a draft toggle is an update, not a new page
   return (
-    <PageTransition>
-      {isDraft ? (
-        <RealTime
-          token={process.env.DATOCMS_DRAFT_CONTENT_CDA_TOKEN!}
-          baseEditingUrl={process.env.DATOCMS_BASE_EDITING_URL!}
-          query={query}
-          variables={variables}
-          initialData={data}
-          pageProps={pageProps}
-        />
-      ) : (
-        <Content {...pageProps} data={data} />
-      )}
-    </PageTransition>
+    <ContentOrRealTime
+      isDraft={isDraft}
+      query={query}
+      variables={variables}
+      data={data}
+      pageProps={pageProps}
+      contentComponent={Content}
+      realtimeComponent={RealTime}
+    />
   );
 }

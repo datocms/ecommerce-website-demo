@@ -3,7 +3,7 @@
 import { isEmptyDocument } from 'datocms-structured-text-utils';
 import { useEffect, useState } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
-import { useCookieNoticeOpen } from '@/components/Layout/CookieNotice';
+import { useCookieNoticeDismissed } from '@/components/Layout/CookieNotice';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import NavBar from './NavBar';
 import NotificationStrip from './NotificationStrip';
@@ -14,11 +14,11 @@ type Props = {
   globalPageProps: ResolvedGlobalPageProps;
 };
 
-// Kept outside React so a dismissal survives the [lng] layout remounting on a locale switch;
-// a full reload shows it again
+// Outside React, so a dismissal survives the [lng] layout remounting on a locale switch
 const dismissed = { strip: false, popup: false };
 
 export default function Header({ data, globalPageProps }: Props) {
+  const { lng } = globalPageProps.params;
   const notification = data.layout?.notification;
   const popup = data.layout?.popup;
 
@@ -26,9 +26,10 @@ export default function Header({ data, globalPageProps }: Props) {
     !dismissed.strip && !isEmptyDocument(notification),
   );
 
-  // The cookie bar itself is rendered by the footer, right after it
-  const cookieNoticeOpen = useCookieNoticeOpen();
-  const cookieNoticeVisible = cookieNoticeOpen && !!data.layout?.cookieNotice;
+  // The cookie bar itself is rendered by the footer
+  const cookieNoticeDismissed = useCookieNoticeDismissed();
+  const cookieNoticeVisible =
+    !!data.layout?.cookieNotice && !cookieNoticeDismissed;
 
   // The popup opens 600ms after the cookie notice is gone (or after load when there is none)
   const [popupState, setPopupState] = useState<'waiting' | 'open' | 'closed'>(
@@ -47,22 +48,20 @@ export default function Header({ data, globalPageProps }: Props) {
       {showStrip && notification && (
         <NotificationStrip
           notification={notification}
-          globalPageProps={globalPageProps}
+          lng={lng}
           onDismiss={() => {
             dismissed.strip = true;
             setShowStrip(false);
           }}
         />
       )}
-      {/* Not in a Suspense boundary: React may stream a boundary's content after the page,
-          which would leave the bar out of the server HTML and push the page down when it
-          arrives. The parts that read the query string have tight boundaries of their own,
-          in NavBar and LanguageSelector. */}
+      {/* No Suspense boundary, so the bar is in the server HTML; NavBar and LanguageSelector
+          wrap their useSearchParams parts themselves */}
       <NavBar globalPageProps={globalPageProps} data={data} />
 
       {popup && (
         <PopupDialog
-          globalPageProps={globalPageProps}
+          lng={lng}
           open={popupState === 'open'}
           onClose={() => {
             dismissed.popup = true;

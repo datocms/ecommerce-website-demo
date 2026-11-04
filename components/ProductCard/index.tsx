@@ -6,13 +6,8 @@ import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import type { FragmentOf } from '@/lib/datocms/graphql';
 import Price from './Price';
 
-// Plain props, so any query can feed the card. Four do, each mapped to props at its call site
-// (route paths are under app/[lng]/):
-// - productsQuery (products/meta.ts), in products/page.tsx
-// - ProductRailFragment (components/Sections/NewArrivals/fragments.ts), in ProductRail.tsx there
-// - showcase.newProducts (showcase/meta.ts), in showcase/Content.tsx
-// - product.relatedProducts (product/[slug]/meta.ts), in ProductDetail/RelatedProducts.tsx
-// A new card field goes into all four queries and call sites.
+// Plain props, so any product query can feed the card. README "Where data and components live"
+// lists the four queries that do: a new card field goes into each of them.
 type Props = {
   href: string;
   name: string;
@@ -22,19 +17,21 @@ type Props = {
   hoverImage?: FragmentOf<typeof ResponsiveImageFragment> | null;
   price: number;
   salePrice?: number | null;
-  /** Caller compares with stripStega(product.sale) === 'on_sale' */
   onSale: boolean;
   currencySymbol: string;
   saleLabel?: string | null;
   sizes: string;
   priority?: boolean;
   titleAs?: 'h2' | 'h3' | 'p';
-  /** md: 16px name (grids, rails); lg: 18px name, 20px from lg, and 18px price (the showcase's
-   * new-products grid) */
+  /** lg: the larger card of the showcase's new-products grid */
   size?: 'md' | 'lg';
 } & Omit<ComponentPropsWithoutRef<typeof Link>, 'href' | 'children'>;
 
-// No box: a 4:5 photo on mist, then name, brand and price on the page itself
+/**
+ * In a grid the card spans 4 subgrid rows, so names, brands and prices line up: space the rows
+ * with --card-row-gap, not row-gap. In a flex rail, wrap each card in a
+ * grid-rows-[auto_auto_1fr_auto] element: Chrome collapses subgrid rows without a grid parent.
+ */
 export default function ProductCard({
   href,
   name,
@@ -56,17 +53,12 @@ export default function ProductCard({
   return (
     <Link
       {...rest}
+      // Content Link: the whole card opens the product record
+      data-datocms-content-link-group
       href={href}
-      // The "product" view transition: this card's photo flies to the product page's lead
-      // photo (global.css)
+      // "product" view transition: this photo flies to the product page (view-transitions.css)
       transitionTypes={['product']}
       className={[
-        // In a grid parent the card spans 4 shared rows, so name, brand and price
-        // line up across a row even when a name wraps. A parent row-gap would leak
-        // into those rows, so grids space card rows with --card-row-gap instead.
-        // Outside a grid (a flex rail) wrap each card in a grid-rows-[auto_auto_1fr_auto]
-        // element: with no parent grid, Chrome collapses the subgrid rows. The brand row
-        // takes the slack there, so prices line up across the rail.
         'group relative row-span-4 mb-(--card-row-gap) grid grid-rows-subgrid content-start gap-y-0 outline-offset-4 focus-visible:z-10',
         className,
       ]
@@ -74,8 +66,7 @@ export default function ProductCard({
         .join(' ')}
     >
       <div
-        // global.css names this well's first child, the photo layer, as the flying photo: keep it
-        // first (the hover photo and the Sale tag come after it and leave with the old page)
+        // view-transitions.css flies this well's first child: keep the photo layer first
         data-morph="card"
         className="relative aspect-[4/5] overflow-hidden bg-mist"
       >
@@ -109,8 +100,7 @@ export default function ProductCard({
           </span>
         )}
       </div>
-      {/* Greedy wrap: the base h1-h3 balance (and pretty) move the break to the hyphen of a
-          compound such as Funnel-Neck. Three lines leave room for long localized names. */}
+      {/* text-wrap: the base heading balance splits compounds like Funnel-Neck at the hyphen */}
       <Title
         className={`line-clamp-3 pt-4 leading-snug font-semibold text-wrap text-ink ${size === 'lg' ? 'text-lg tracking-[-0.02em] lg:text-xl' : 'text-base'}`}
       >

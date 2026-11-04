@@ -18,10 +18,30 @@ export const ProductListingLabelsFragment = graphql(/* GraphQL */ `
   }
 `);
 
-export type ListingLabels =
+export type ProductListingLabels =
   | FragmentOf<typeof ProductListingLabelsFragment>
   | null
   | undefined;
+
+// FilterDetail: the catalog header for a lone collection, brand or material
+export const FilterDetailFragment = graphql(
+  /* GraphQL */ `
+    fragment FilterDetailFragment on FilterDetailRecord {
+      image {
+        responsiveImage {
+          ...ResponsiveImageFragment
+        }
+      }
+      subtitle {
+        value
+      }
+      description {
+        value
+      }
+    }
+  `,
+  [ResponsiveImageFragment],
+);
 
 // Every collection, brand and material, for the filters and the FilterDetail header.
 // A fragment on Query: the operation that spreads it must declare $locale and
@@ -38,17 +58,7 @@ export const FilterOptionsFragment = graphql(
         __typename
         name
         details {
-          image {
-            responsiveImage {
-              ...ResponsiveImageFragment
-            }
-          }
-          subtitle {
-            value
-          }
-          description {
-            value
-          }
+          ...FilterDetailFragment
         }
       }
       allBrands(first: 100, locale: $locale, fallbackLocales: $fallbackLocale) {
@@ -56,17 +66,7 @@ export const FilterOptionsFragment = graphql(
         __typename
         name
         details {
-          image {
-            responsiveImage {
-              ...ResponsiveImageFragment
-            }
-          }
-          subtitle {
-            value
-          }
-          description {
-            value
-          }
+          ...FilterDetailFragment
         }
       }
       allMaterials(
@@ -78,20 +78,10 @@ export const FilterOptionsFragment = graphql(
         __typename
         name
         details {
-          image {
-            responsiveImage {
-              ...ResponsiveImageFragment
-            }
-          }
-          subtitle {
-            value
-          }
-          description {
-            value
-          }
+          ...FilterDetailFragment
         }
       }
     }
   `,
-  [ResponsiveImageFragment],
+  [FilterDetailFragment],
 );

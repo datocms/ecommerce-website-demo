@@ -5,8 +5,7 @@ import { MEDIA } from '@/components/Common/styles';
 import DocumentLang from '@/components/Layout/DocumentLang';
 import Rise from '@/components/Motion/Rise';
 
-// No header or footer here (it renders outside [lng]): the photo runs to the viewport's edges
-// and, on phones, takes whatever height the text leaves
+// Outside [lng], so no header or footer; the photo runs to the viewport's edges
 export default function NotFound() {
   return (
     <main className="grid min-h-svh grid-rows-[minmax(17.5rem,1fr)_auto] lg:grid-cols-12 lg:grid-rows-1">
@@ -26,8 +25,7 @@ export default function NotFound() {
         />
       </div>
 
-      {/* Below sm the full-width button would end under the draft toggle (fixed, 16px + 48px off
-          the bottom), so the column leaves that corner free */}
+      {/* pb-20 below sm keeps the full-width button clear of the fixed draft toggle */}
       <div className="flex flex-col px-(--gutter) pt-10 pb-20 sm:pb-12 lg:col-span-6 lg:justify-center lg:py-16 lg:pr-14 xl:col-span-5">
         <p className="-ml-[0.025em] text-[8.25rem] leading-[0.8] font-semibold tracking-[-0.06em] tabular-nums sm:text-[10.5rem] lg:text-[12.5rem] xl:text-[16rem]">
           <Rise>404</Rise>

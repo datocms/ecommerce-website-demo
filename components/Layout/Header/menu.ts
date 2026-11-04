@@ -11,18 +11,16 @@ export type FeaturedItem =
   | DropdownMenu['newArrival']
   | DropdownMenu['trending'];
 
-// The catalog filtered by a menu record: `brand` → ?brands=<id>,
-// `material` → ?materials=<id>…
+// The catalog filtered by a menu record: `brand` → ?brands=<id>, `material` → ?materials=<id>
 export const productsHref = (
   lng: string,
   item: { _modelApiKey: string; id: string },
 ) => `/${lng}/products?${item._modelApiKey}s=${item.id}`;
 
-export const linkHref = (lng: string, link: LinkItem) =>
+// A CMS page link. Its slug is a text field (not a slug field), so draft values carry Content
+// Link stega characters, which must stay out of the URL
+export const linkHref = (lng: string, link: { slug: string | null }) =>
   `/${lng}/${stripStega(link.slug)}`;
 
-// The catalog searched by product name (the search sheet's and the mobile menu's field)
-export const productSearchHref = (
-  lng: string,
-  query: FormDataEntryValue | null,
-) => `/${lng}/products?productName=${encodeURIComponent(String(query ?? ''))}`;
+export const productSearchHref = (lng: string, query: string) =>
+  `/${lng}/products?productName=${encodeURIComponent(query)}`;

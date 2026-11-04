@@ -8,6 +8,7 @@ description: >-
   new lookbook page", "create /[lng]/campaign/[slug]", "map this model in
   preview-links", or "SEO analysis does not know this page route". Covers the
   starter's meta.ts, page.tsx, Content.tsx, RealTime.tsx,
+  lib/datocms/recordToWebsiteRoute.ts (the record-to-path map),
   app/api/draft/preview-links/route.tsx, and app/api/seoAnalysis/route.tsx
   when the request is about a page route. Do not use for homepage sections,
   product listing filters, product detail rendering, product sale price or card
@@ -37,13 +38,13 @@ Record-backed pages use this route folder shape under `app/[lng]/...`:
 - `RealTime.tsx` (a `"use client"` file made with `generateRealtimeComponent`) re-renders `Content.tsx` from a live draft subscription.
 - Optional `staticParamsQuery` in `page.tsx` for slug-backed collection routes.
 
-A `page.tsx` that does not use `generateWrapper` wraps what it renders in `<PageTransition>` (`components/Motion/PageTransition.tsx`), as `products/` and `product/[slug]/` do. Without it, navigating to the page skips the page fade.
+A `page.tsx` that runs its query itself but has a `RealTime.tsx`, like `product/[slug]/`, renders through `ContentOrRealTime` (`components/WithRealTimeUpdates/ContentOrRealTime.tsx`), which does the draft switch and the page fade as `generateWrapper` does. A page with no `RealTime.tsx`, like `products/`, wraps what it renders in `<PageTransition>` (`components/Motion/PageTransition.tsx`) itself. Without it, navigating to the page skips the page fade.
 
 Existing examples:
 
 - singleton route: `app/[lng]/showcase/`.
 - collection route: `app/[lng]/legal/[slug]/`.
-- product route: `app/[lng]/product/[slug]/` (its page.tsx resolves localized slugs and redirects before rendering, so it does not use generateWrapper).
+- product route: `app/[lng]/product/[slug]/` (its page.tsx resolves localized slugs and redirects before rendering, so it runs its query itself and renders through `ContentOrRealTime` instead of `generateWrapper`).
 - catalog route: `app/[lng]/products/` keeps its queries in `meta.ts` but has no `RealTime.tsx`: its page.tsx runs them per request because they depend on search params.
 
 ## Workflow for a new record-backed page route
@@ -58,8 +59,8 @@ Existing examples:
 8. Add a `staticParamsQuery` and `generateStaticParams` to `page.tsx` for slug-backed collection routes.
 9. Add `Content.tsx` and `RealTime.tsx` using the existing wrapper/realtime pattern.
 10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
-11. Update `app/api/draft/preview-links/route.tsx` so the model API key maps to the route URL.
-12. Update `app/api/seoAnalysis/route.tsx` when the model should support SEO/readability analysis.
+11. Map the model API key to the route path in `lib/datocms/recordToWebsiteRoute.ts`, which `app/api/draft/preview-links/route.tsx` and `app/api/seoAnalysis/route.tsx` share.
+12. Add the model API key to `SEO_ANALYZED_MODELS` in `app/api/seoAnalysis/route.tsx` when the page should support SEO/readability analysis.
 13. Verify published route, draft preview link, metadata, and localized static params.
 
 ## Preview mapping rules

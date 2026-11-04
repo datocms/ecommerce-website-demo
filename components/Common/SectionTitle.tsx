@@ -13,8 +13,6 @@ type Props = {
   className?: string;
 };
 
-// Section heading on the left; an optional text link and controls (rail arrows) bottom-aligned
-// on the right.
 export default function SectionTitle({
   title,
   id,

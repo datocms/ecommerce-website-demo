@@ -1,3 +1,5 @@
+'use client';
+
 import { stripStega } from '@datocms/content-link';
 import { useEffect, useRef } from 'react';
 

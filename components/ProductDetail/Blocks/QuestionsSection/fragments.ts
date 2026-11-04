@@ -1,7 +1,7 @@
 import { graphql } from '@/lib/datocms/graphql';
 
-export const QuestionSectionFragment = graphql(/* GraphQL */ `
-  fragment QuestionSectionFragment on FeaturedQuestionsSectionRecord {
+export const QuestionsSectionFragment = graphql(/* GraphQL */ `
+  fragment QuestionsSectionFragment on FeaturedQuestionsSectionRecord {
     questions {
       id
       question

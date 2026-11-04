@@ -6,9 +6,9 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { useRouter, useSearchParams } from 'next/navigation';
-import type { FormEvent } from 'react';
-import { productSearchHref } from './menu';
+import { useSearchParams } from 'next/navigation';
+import { SCRIM } from '@/components/Common/styles';
+import { useProductSearch } from './useProductSearch';
 
 type Props = {
   lng: string;
@@ -16,7 +16,7 @@ type Props = {
   onClose: () => void;
   placeholder: string;
   /** Height the sheet covers at least: the strip and header above the page */
-  minHeight?: number;
+  minHeight: number;
 };
 
 export default function SearchDialog({
@@ -26,19 +26,8 @@ export default function SearchDialog({
   placeholder,
   minHeight,
 }: Props) {
-  const router = useRouter();
+  const submitSearch = useProductSearch(lng, onClose);
   const searchParams = useSearchParams();
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    router.push(
-      productSearchHref(
-        lng,
-        new FormData(event.currentTarget).get('productName'),
-      ),
-    );
-    onClose();
-  };
 
   return (
     <Dialog
@@ -47,12 +36,7 @@ export default function SearchDialog({
       aria-label="Search"
       className="relative z-50"
     >
-      <DialogBackdrop
-        transition
-        data-chrome="sheet-scrim"
-        className="fixed inset-0 bg-ink/30 transition-opacity duration-(--dur-sheet) ease-out data-closed:opacity-0 data-leave:duration-(--dur-pop)"
-      />
-      {/* A white sheet hanging from the top edge */}
+      <DialogBackdrop transition data-chrome="sheet-scrim" className={SCRIM} />
       <DialogPanel
         transition
         data-chrome="sheet"
@@ -63,9 +47,8 @@ export default function SearchDialog({
           style={{ minHeight }}
         >
           <search className="min-w-0 flex-1">
-            {/* The 2px rule is the field: ink while it has focus */}
             <form
-              onSubmit={handleSubmit}
+              onSubmit={submitSearch}
               className="flex items-center gap-3 border-b-2 border-line-strong pb-2 transition-colors duration-150 has-[input:focus]:border-ink lg:gap-4"
             >
               <MagnifyingGlassIcon
@@ -84,8 +67,7 @@ export default function SearchDialog({
                 data-autofocus
                 defaultValue={searchParams.get('productName') ?? ''}
                 placeholder={placeholder}
-                // 17px under 360px, so every locale's placeholder still fits whole beside the
-                // two buttons at 320
+                // Smaller under 360px, so the longest locale's placeholder fits at 320px
                 className="h-12 min-w-0 flex-1 bg-transparent text-xl font-medium tracking-[-0.02em] text-ink outline-none placeholder:text-mute max-[22.5rem]:text-md sm:h-16 sm:text-2xl lg:text-[2rem] [&::-webkit-search-cancel-button]:appearance-none"
               />
               <button

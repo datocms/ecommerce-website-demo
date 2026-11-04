@@ -2,9 +2,10 @@
 
 import { cookies, draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
+import type { NextRequest } from 'next/server';
 import { isSafeRedirectUrl } from '@/lib/isSafeRedirectUrl';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const { searchParams } = requestUrl;
 
@@ -18,8 +19,7 @@ export async function GET(request: Request) {
   if (!isSafeRedirectUrl(url, requestUrl))
     return new Response('Redirect must point to this site', { status: 422 });
 
-  // Reissued as SameSite=None; Secure so the cleared cookie survives the redirect inside the
-  // DatoCMS iframe
+  // DatoCMS shows the site in an iframe: reissue the cleared cookie as SameSite=None; Secure
   const cookieStore = await cookies();
   const cookie = cookieStore.get('__prerender_bypass')!;
   cookieStore.set({

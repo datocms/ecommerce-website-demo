@@ -15,13 +15,11 @@ type FeatureTileProps = {
   onNavigate: () => void;
   /** The other tile's name, so both captions lay out the same */
   partnerName?: string;
-  /** The mega menu shows "Shop now" beside the name; the mobile menu only the name */
   compact?: boolean;
 };
 
-// Trending / New: a 4:3 photo (or a brand logo on mist) with its tag, the name under it.
-// In the mega menu the pair shares two subgrid rows: when the link columns run longer, both
-// photos grow together to end with them, and a caption that wraps keeps both photos equal.
+// One featured record: a 4:3 photo (or a brand's logo) with its tag, the name below. In the mega
+// menu the pair shares subgrid rows, so both photos stay the same height.
 function FeatureTile({
   item,
   href,
@@ -75,11 +73,9 @@ function FeatureTile({
       {compact ? (
         <span className="mt-2.5 text-sm font-semibold">{item.name}</span>
       ) : (
-        // CMS names are never truncated: when a name and a long shopNow label don't share
-        // the row, the label moves under the name
         <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-          {/* The partner's name shares this cell, invisible, so the pair's longer name sizes
-              both: the two labels stay beside their names, or both move under them */}
+          {/* The partner tile's name sits invisibly in the same cell, so both captions wrap the
+              same way */}
           <span className="grid min-w-0 text-base font-semibold text-pretty">
             <span className="col-start-1 row-start-1">{item.name}</span>
             {partnerName && (
@@ -112,11 +108,11 @@ type Props = {
   lng: string;
   sizes: string;
   onNavigate: () => void;
-  /** The mobile menu's tiles: the name only, no "Shop now" */
+  /** The mobile menu's variant: the name only, no "Shop now" */
   compact?: boolean;
 };
 
-// A dropdown's two featured records, as tiles: in the mega menu and in the mobile menu
+// A dropdown's two featured records as tiles
 export default function FeatureTiles({
   category,
   generalInterface,
@@ -135,8 +131,7 @@ export default function FeatureTiles({
     { slot: 'new', item: category.newArrival, tag: generalInterface?.new },
   ];
 
-  // A fragment: the tiles must stay direct children of the caller's grid (the mega menu
-  // staggers them)
+  // A fragment, so the tiles stay direct children of the caller's grid
   return (
     <>
       {slots.map(({ slot, item, tag }, index) => (

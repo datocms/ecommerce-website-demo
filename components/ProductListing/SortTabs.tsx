@@ -3,14 +3,17 @@
 import { ArrowsUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef } from 'react';
 import { readFragment } from '@/lib/datocms/graphql';
-import { type ListingLabels, ProductListingLabelsFragment } from './fragments';
+import {
+  type ProductListingLabels,
+  ProductListingLabelsFragment,
+} from './fragments';
 import { usePendingQuery } from './PendingQuery';
 
 type Props = {
-  labels: ListingLabels;
+  labels: ProductListingLabels;
 };
 
-function getSortOptions(labels: ListingLabels) {
+function getSortOptions(labels: ProductListingLabels) {
   const { newArrivals, mostPopular, topRated, price, sales } =
     readFragment(ProductListingLabelsFragment, labels) ?? {};
 
@@ -23,10 +26,10 @@ function getSortOptions(labels: ListingLabels) {
   ];
 }
 
-/** The sort tabs of the listing toolbar: the header nav's ink bar, on the toolbar's hairline */
+/** Sort tabs in the listing toolbar */
 export default function SortTabs({ labels }: Props) {
   const { pendingParams, pushQueryParam } = usePendingQuery();
-  const current = pendingParams.get('orderBy');
+  const currentSort = pendingParams.get('orderBy');
   const sortOptions = getSortOptions(labels);
 
   // Where the row scrolls, bring the selected tab into view without moving the page
@@ -34,14 +37,15 @@ export default function SortTabs({ labels }: Props) {
   useEffect(() => {
     const row = scrollerRef.current;
     const tab =
-      current && row?.querySelector(`button[value="${CSS.escape(current)}"]`);
+      currentSort &&
+      row?.querySelector(`button[value="${CSS.escape(currentSort)}"]`);
     if (!row || !tab) return;
     const rowBox = row.getBoundingClientRect();
     const tabBox = tab.getBoundingClientRect();
     if (tabBox.left < rowBox.left || tabBox.right > rowBox.right)
       row.scrollLeft +=
         tabBox.left + tabBox.width / 2 - (rowBox.left + rowBox.width / 2);
-  }, [current]);
+  }, [currentSort]);
 
   return (
     // One pixel taller than its row, so the bars cover the toolbar's bottom hairline
@@ -61,7 +65,7 @@ export default function SortTabs({ labels }: Props) {
           key={sortOption.value}
           type="button"
           value={sortOption.value}
-          aria-pressed={current === sortOption.value}
+          aria-pressed={currentSort === sortOption.value}
           onClick={() => pushQueryParam('orderBy', sortOption.value)}
           className="bar-draw relative inline-flex shrink-0 items-center px-2 text-sm font-medium whitespace-nowrap text-ink-2 transition-colors duration-150 outline-offset-[-2px] after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:bg-ink hover:text-ink hover:after:scale-x-100 aria-pressed:text-ink aria-pressed:after:scale-x-100"
         >

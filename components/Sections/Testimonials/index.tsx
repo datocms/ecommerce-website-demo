@@ -1,4 +1,3 @@
-import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
 import { StructuredText } from 'react-datocms/structured-text';
 import RailControls from '@/components/Rail/RailControls';
 import RailProgress from '@/components/Rail/RailProgress';
@@ -10,7 +9,7 @@ type Props = {
 };
 
 // Up to three quotes side by side from lg, split by hairlines; more wrap onto another row
-const COLUMNS = [
+const COLUMN_LAYOUTS = [
   { grid: '', item: '' },
   { grid: 'lg:grid-cols-1', item: 'lg:border-l-0 lg:pl-0' },
   { grid: 'lg:grid-cols-2', item: 'lg:odd:border-l-0 lg:odd:pl-0' },
@@ -20,8 +19,6 @@ const COLUMNS = [
   },
 ];
 
-// Black band of big white quotes. Below lg the quotes are a snap rail with a progress track (and
-// arrows from sm, for mouse users); from lg a grid whose authors line up along the bottom.
 export default function Testimonials({ fragment }: Props) {
   const { id, title, testimonial } = readFragment(
     TestimonialSectionFragment,
@@ -29,7 +26,7 @@ export default function Testimonials({ fragment }: Props) {
   );
   const titleId = `${id}-title`;
   const railId = `${id}-rail`;
-  const columns = COLUMNS[Math.min(testimonial.length, 3)];
+  const layout = COLUMN_LAYOUTS[Math.min(testimonial.length, 3)];
 
   return (
     <section
@@ -45,25 +42,24 @@ export default function Testimonials({ fragment }: Props) {
         </div>
         <ul
           id={railId}
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: the quotes are not focusable, so the scroller takes focus for keyboard scrolling (RailProgress's tabStop, via useScrollerTabStop, drops it while nothing scrolls)
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: the quotes aren't focusable, so the scroller is the tab stop (RailProgress tabStop removes it when nothing scrolls)
           tabIndex={0}
           aria-labelledby={titleId}
-          className={`no-scrollbar -mx-(--gutter) flex snap-x snap-mandatory scroll-px-(--gutter) gap-6 overflow-x-auto px-(--gutter) focus-visible:-outline-offset-2 lg:mx-0 lg:grid lg:gap-x-10 lg:gap-y-16 lg:overflow-visible lg:px-0 ${columns.grid}`}
+          className={`no-scrollbar -mx-(--gutter) flex snap-x snap-mandatory scroll-px-(--gutter) gap-6 overflow-x-auto px-(--gutter) focus-visible:-outline-offset-2 lg:mx-0 lg:grid lg:gap-x-10 lg:gap-y-16 lg:overflow-visible lg:px-0 ${layout.grid}`}
         >
           {testimonial.map((item) => (
             <li
               key={item.id}
-              className={`flex w-[86%] max-w-[30rem] shrink-0 snap-start border-l border-line pl-6 sm:w-[60%] lg:w-auto lg:max-w-none lg:pl-10 ${columns.item}`}
+              className={`flex w-[86%] max-w-[30rem] shrink-0 snap-start border-l border-line pl-6 sm:w-[60%] lg:w-auto lg:max-w-none lg:pl-10 ${layout.item}`}
             >
               <figure
                 data-datocms-content-link-group
                 className="flex w-full flex-col justify-between"
               >
-                {/* One pair of quotes in the page language around the whole testimonial */}
+                {/* Not DatoStructuredText: its wrapper <div> would break the [&>p] selectors
+                    that put page-language quote marks around the whole testimonial */}
                 <blockquote className="text-[1.3125rem] leading-[1.32] font-medium tracking-[-0.02em] text-pretty xl:text-[1.625rem] [&>p+p]:mt-[0.75em] [&>p:first-child]:before:content-[open-quote] [&>p:last-child]:after:content-[close-quote]">
-                  <StructuredText
-                    data={item.testimonial as CdaStructuredTextValue}
-                  />
+                  <StructuredText data={item.testimonial} />
                 </blockquote>
                 <figcaption className="mt-10 text-sm font-medium text-mute">
                   {item.author}

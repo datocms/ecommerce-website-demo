@@ -1,12 +1,11 @@
-import type { CdaStructuredTextValue } from 'datocms-structured-text-utils';
-import type { Query as ProductQuery } from '@/app/[lng]/product/[slug]/meta';
+import type { Product } from '@/app/[lng]/product/[slug]/meta';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import { readFragment } from '@/lib/datocms/graphql';
 import { type ProductPageLabels, ProductPageLabelsFragment } from './fragments';
 import StarRating from './StarRating';
 
 type Props = {
-  product: NonNullable<ProductQuery['product']>;
+  product: Product;
   labels: ProductPageLabels;
   lng: string;
 };
@@ -27,8 +26,6 @@ export default function Reviews({ product, labels, lng }: Props) {
   });
   const featuredReviews = product.featuredReviews ?? [];
 
-  // A compact summary bar (score, stars, count and the button on one ruled line), then the
-  // reviews in columns like the testimonials
   return (
     <section id="reviews" className="shell pt-(--section-gap)">
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-6 border-b border-line pb-8">
@@ -71,7 +68,7 @@ export default function Reviews({ product, labels, lng }: Props) {
                   </time>
                 </div>
                 <DatoStructuredText
-                  data={review.review as CdaStructuredTextValue}
+                  data={review.review}
                   className="mt-4 text-lg leading-[1.45] font-medium tracking-[-0.01em] text-pretty [&_p+p]:mt-3"
                 />
                 <p className="mt-5 text-sm font-semibold">

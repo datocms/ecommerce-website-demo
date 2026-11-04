@@ -39,8 +39,6 @@ export default function Price({
             <span className="sr-only">{SR_SALE}: </span>
             {formatPrice(currencySymbol, salePrice)}
           </span>
-          {/* Regular weight and smaller: 15px beside a 16px card price, 18px beside the
-              product page's 24px */}
           <s
             className={`font-normal text-mute ${size === 'lg' ? 'text-[0.75em]' : 'text-[0.9375em]'}`}
           >

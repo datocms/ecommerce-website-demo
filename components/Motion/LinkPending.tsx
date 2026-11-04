@@ -2,9 +2,8 @@
 
 import { useLinkStatus } from 'next/link';
 
-// Inside a <Link>: flags the document while that navigation is on its way, so listing results
-// dim (pending-dim) and a nav link keeps its bar (has-data-pending:). Prefetched destinations
-// skip the pending phase, so nothing flickers.
+// Inside a <Link>: a hidden data-pending marker while that navigation loads, for CSS
+// (has-data-pending:, pending-dim)
 export default function LinkPending() {
   const { pending } = useLinkStatus();
   return pending ? <span data-pending hidden /> : null;

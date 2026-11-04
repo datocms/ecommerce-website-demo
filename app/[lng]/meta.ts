@@ -6,8 +6,7 @@ import {
 } from '@/lib/datocms/graphql';
 import type { GlobalPageProps } from '@/lib/globalPageProps';
 
-// The layout's children (the current page) reach Content through pageProps, also in draft mode
-// where RealTime renders it.
+// children (the current page) travels in pageProps, so RealTime renders it in draft mode too
 export type PageProps = GlobalPageProps & {
   children: React.ReactNode;
 };

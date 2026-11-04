@@ -9,9 +9,8 @@ type Props = {
   sections: Section[];
 };
 
-// The index follows the reader: the current section is the last one whose heading has passed a
-// line a quarter of the way down the screen, the one an index link just parked under the header,
-// or the last one in view once the page can't scroll any further. It only shows from lg
+// From lg, marks the section being read: the last heading past a line a quarter down the screen,
+// the one an index link just parked under the header, or the last one in view at the page's end
 export default function SectionIndex({ label, sections }: Props) {
   const [active, setActive] = useState(0);
   // Joined so the effect only re-runs when the set of ids changes

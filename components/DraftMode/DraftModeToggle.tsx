@@ -3,13 +3,40 @@
 import { Transition } from '@headlessui/react';
 import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import SuccessToast from './SuccessToast';
 import TokenForm, { TOKEN_FORM_ID } from './TokenForm';
 
 type Props = {
   isDraft: boolean;
 };
+
+// Keeps a CSS variable on <html> at the element's width (0 while it is hidden)
+function useWidthAsCssVariable(
+  ref: RefObject<HTMLElement | null>,
+  name: string,
+) {
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const root = document.documentElement;
+    const observer = new ResizeObserver(() => {
+      root.style.setProperty(name, `${element.offsetWidth}px`);
+    });
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty(name);
+    };
+  }, [ref, name]);
+}
 
 // Fixed bottom-right button: turns Next.js draft mode on (after asking for the token) or off
 export default function DraftModeToggle({ isDraft }: Props) {
@@ -19,21 +46,8 @@ export default function DraftModeToggle({ isDraft }: Props) {
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [isLeavingDraft, startLeavingDraft] = useTransition();
 
-  // Publishes the toggle's width, so the footer's legal bar keeps its own controls
-  // clear of it (0 while the toggle steps aside for the cookie notice)
-  useEffect(() => {
-    const toggle = toggleRef.current;
-    if (!toggle) return;
-    const root = document.documentElement;
-    const observer = new ResizeObserver(() => {
-      root.style.setProperty('--draft-toggle-w', `${toggle.offsetWidth}px`);
-    });
-    observer.observe(toggle);
-    return () => {
-      observer.disconnect();
-      root.style.removeProperty('--draft-toggle-w');
-    };
-  }, []);
+  // Read by the footer's legal bar to keep its controls clear of the toggle
+  useWidthAsCssVariable(toggleRef, '--draft-toggle-w');
 
   function handleToggleClick() {
     if (!isDraft) {
@@ -48,23 +62,23 @@ export default function DraftModeToggle({ isDraft }: Props) {
     });
   }
 
-  const closeTokenForm = () => {
+  function closeTokenForm() {
     setTokenFormOpen(false);
     toggleRef.current?.focus();
-  };
+  }
 
-  const handleAuthenticated = () => {
+  function handleAuthenticated() {
     router.refresh();
     closeTokenForm();
     setShowSuccessToast(true);
-  };
+  }
 
   const dismissToast = useCallback(() => setShowSuccessToast(false), []);
 
   return (
     <>
-      {/* On the gutter line, 16px off the bottom edge: at the page end it comes to rest centred
-          in the footer's legal bar. It steps aside while the cookie notice is open. */}
+      {/* 48px tall, 16px off the bottom: at the page end it sits centred in the footer's 80px
+          legal bar. Hidden while the cookie notice is open */}
       <div
         data-chrome="dock"
         className="fixed right-(--gutter) bottom-4 z-40 [body:has(#cookie-notice)_&]:hidden"
@@ -79,8 +93,7 @@ export default function DraftModeToggle({ isDraft }: Props) {
           aria-expanded={!isDraft ? tokenFormOpen : undefined}
           aria-controls={!isDraft ? TOKEN_FORM_ID : undefined}
           aria-busy={isLeavingDraft || undefined}
-          // White with an ink edge, so it reads on the white page and on the black footer;
-          // the focus ring is drawn inside it for the same reason
+          // Inset focus ring: the toggle sits over both the white page and the black footer
           className="press inline-flex h-12 items-center justify-center gap-2.5 border border-ink bg-white px-5 text-sm font-semibold whitespace-nowrap text-ink hover:bg-mist focus-visible:outline-offset-[-5px] aria-busy:opacity-45 max-sm:w-12 max-sm:px-0"
         >
           {isDraft ? (

@@ -11,18 +11,26 @@ export type BuildVariablesFn<
   },
 ) => TVariables;
 
-export type RealtimeUpdatesPage<
+export type RealtimeUpdatesProps<
   PageProps extends GlobalPageProps,
   TResult = unknown,
   TVariables = Record<string, unknown>,
-> = (props: {
+> = {
   initialData: TResult;
   pageProps: ResolvedPageProps<PageProps>;
   variables: TVariables;
   query: TadaDocumentNode<TResult, TVariables>;
   token: string;
   baseEditingUrl: string;
-}) => React.ReactNode;
+};
+
+export type RealtimeUpdatesPage<
+  PageProps extends GlobalPageProps,
+  TResult = unknown,
+  TVariables = Record<string, unknown>,
+> = (
+  props: RealtimeUpdatesProps<PageProps, TResult, TVariables>,
+) => React.ReactNode;
 
 export type ContentPage<
   PageProps extends GlobalPageProps,

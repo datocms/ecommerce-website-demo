@@ -1,0 +1,19 @@
+/* Unlayered rules: they win over every utility */
+
+/* High-contrast mode: keep selected states visible over utilities like aria-pressed:bg-ink */
+@media (forced-colors: active) {
+  [aria-pressed='true'],
+  [aria-current]:not([aria-current='false']),
+  [aria-selected='true'] {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    border-color: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* Draft mode: @datocms/content-link marks elements whose text carries invisible stega
+   characters. Letter-spacing applies to each of them and spreads the text, so it is reset. */
+[data-datocms-contains-stega] {
+  letter-spacing: 0 !important;
+}

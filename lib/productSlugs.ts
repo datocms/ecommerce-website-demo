@@ -1,5 +1,4 @@
-// Cross-locale product slugs: the product page redirects a slug from another locale to its own,
-// and /api/product-slug-map gives the language selector each locale's slug.
+// Product slugs are localized, so a URL can carry another locale's slug
 
 import { graphql } from '@/lib/datocms/graphql';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
@@ -27,8 +26,8 @@ type ProductSlugMap = Partial<Record<SiteLocale, string>>;
 /** Collects a product's slug per locale from its _allSlugLocales entries. */
 export function buildProductSlugMap(
   entries: readonly SlugLocaleEntry[] | null | undefined,
-  currentLocale?: SiteLocale,
-  currentSlug?: string | null,
+  queriedLocale?: SiteLocale,
+  queriedSlug?: string | null,
 ): ProductSlugMap {
   const slugs: ProductSlugMap = {};
 
@@ -38,9 +37,9 @@ export function buildProductSlugMap(
     }
   }
 
-  // product.slug has fallbacks applied, so it fills a locale that has no slug of its own
-  if (currentLocale && currentSlug) {
-    slugs[currentLocale] = currentSlug;
+  // The queried slug has fallbacks applied, so it fills a locale with no slug of its own
+  if (queriedLocale && queriedSlug) {
+    slugs[queriedLocale] = queriedSlug;
   }
 
   return slugs;

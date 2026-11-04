@@ -5,9 +5,8 @@ type Props = {
   children: ReactNode;
 };
 
-// A page title set word by word: each word rises out of its own line (the rise utility in
-// global.css). Callers put `enter-stagger [--delay:200ms]` on the block under the title, as the
-// hero, showcase and 404 do.
+// Splits a plain-text title into words that rise in one by one (the rise utility in motion.css).
+// The block under the title takes enter-stagger [--delay:200ms] to follow it, as in the Hero.
 export default function Rise({ children }: Props) {
   // Elements, and draft-mode text carrying stega, render untouched: visual editing keeps one
   // click target and live updates never replay the arrival
@@ -17,8 +16,8 @@ export default function Rise({ children }: Props) {
   return (
     children
       .trim()
-      // Only plain spaces split (a no-break space keeps its words together), and real spaces go
-      // back between the spans, so the heading's accessible name and copied text are unchanged
+      // Split on plain spaces only (no-break spaces hold) and put real spaces back, so the
+      // accessible name and copied text are unchanged
       .split(/ +/)
       .map((word, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a title's words keep their order

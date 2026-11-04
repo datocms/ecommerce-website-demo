@@ -1,15 +1,10 @@
 import { ArrowRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import {
-  isLink,
-  type Record,
-  type StructuredText,
-} from 'datocms-structured-text-utils';
+import { isLink } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import { createElement, type ReactNode } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import DatoStructuredText from '@/components/DatoStructuredText';
-import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 
 type LayoutNotification = NonNullable<
   NonNullable<LayoutQuery['layout']>['notification']
@@ -18,7 +13,7 @@ type LayoutNotification = NonNullable<
 type Props = {
   notification: LayoutNotification;
   onDismiss: () => void;
-  globalPageProps: ResolvedGlobalPageProps;
+  lng: string;
 };
 
 // The grey marker would be lost on black: marks render as semibold instead
@@ -37,23 +32,22 @@ const renderMarkAsSemibold = (
 
 export default function NotificationStrip({
   notification,
-  globalPageProps,
+  lng,
   onDismiss,
 }: Props) {
   return (
     <div data-chrome="strip" className="surface-ink">
       <div className="shell relative flex min-h-10 items-center justify-center py-2.5 text-center">
-        {/* px-10 keeps the centred message clear of the dismiss button */}
+        {/* px-10 keeps the message clear of the dismiss button */}
         <DatoStructuredText
-          // No balancing: the nowrap link drops to the second line as a whole
           className="min-w-0 px-10 text-xs"
-          data={notification.value as StructuredText<Record, Record>}
+          data={notification}
           renderNode={renderMarkAsSemibold}
           customNodeRules={[
             renderNodeRule(isLink, ({ node, children, key }) => {
               return (
                 <Link
-                  href={`/${globalPageProps.params.lng}${node.url}`}
+                  href={`/${lng}${node.url}`}
                   className="group inline-flex items-center gap-1 font-semibold whitespace-nowrap underline-offset-4 hover:underline"
                   key={key}
                 >
@@ -67,8 +61,7 @@ export default function NotificationStrip({
             }),
           ]}
         />
-        {/* Placed like the header's bag button below it (7px into the gutter): the X sits
-            over the bag glyph */}
+        {/* Lined up with the header's bag icon below */}
         <button
           type="button"
           aria-label="Dismiss announcement"

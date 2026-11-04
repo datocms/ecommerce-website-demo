@@ -1,8 +1,5 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import {
-  type CdaStructuredTextValue,
-  hasChildren,
-} from 'datocms-structured-text-utils';
+import { hasChildren } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import { Fragment } from 'react';
 import { renderNodeRule, StructuredText } from 'react-datocms/structured-text';
@@ -13,17 +10,17 @@ import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { MaterialShowcaseFragment } from './fragments';
 
+type Props = {
+  fragment: FragmentOf<typeof MaterialShowcaseFragment>;
+  globalPageProps: ResolvedGlobalPageProps;
+};
+
 // Every node with children (paragraphs, headings, lists, links) unwraps to its content
 const INLINE_ONLY = [
   renderNodeRule(hasChildren, ({ children, key }) => (
     <Fragment key={key}>{children}</Fragment>
   )),
 ];
-
-type Props = {
-  fragment: FragmentOf<typeof MaterialShowcaseFragment>;
-  globalPageProps: ResolvedGlobalPageProps;
-};
 
 const GRID_COLUMNS = {
   2: 'sm:grid-cols-2',
@@ -37,8 +34,13 @@ const SIZES = {
   4: '(min-width: 1440px) 340px, (min-width: 1024px) 24vw, (min-width: 640px) 48vw, 100vw',
 } as const;
 
-// Title and copy on top, then a grid of material photo links (2, 3 or 4 columns), each with its
-// name and subtitle.
+// Four columns only when the count fills rows of four but not rows of three (4, 8, 16…)
+function columnCount(materials: number): 2 | 3 | 4 {
+  if (materials <= 2) return 2;
+  if (materials % 4 === 0 && materials % 3 !== 0) return 4;
+  return 3;
+}
+
 export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
   const { id, title, description, subDescription, materials } = readFragment(
     MaterialShowcaseFragment,
@@ -46,13 +48,7 @@ export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
   );
   const { lng } = globalPageProps.params;
   const titleId = `${id}-title`;
-  // Four columns only when the count fills rows of four but not rows of three (4, 8, 16…)
-  const columns =
-    materials.length <= 2
-      ? 2
-      : materials.length % 4 === 0 && materials.length % 3 !== 0
-        ? 4
-        : 3;
+  const columns = columnCount(materials.length);
 
   return (
     <section aria-labelledby={titleId} className="shell pt-(--section-gap)">
@@ -62,13 +58,13 @@ export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
         </h2>
         {description && (
           <DatoStructuredText
-            data={description as CdaStructuredTextValue}
+            data={description}
             className="mt-5 text-lg leading-[1.5] text-pretty"
           />
         )}
         {subDescription && (
           <DatoStructuredText
-            data={subDescription as CdaStructuredTextValue}
+            data={subDescription}
             className="mt-3 text-base leading-[1.65] text-pretty text-ink-2"
           />
         )}
@@ -105,10 +101,10 @@ export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
                 </h3>
                 {material.details.subtitle && (
                   <p className="mt-1.5 max-w-[26rem] text-sm text-pretty text-mute">
-                    {/* The listing header renders the whole subtitle; here it is inline marks
-                        only, inside this one line of the card's link */}
+                    {/* Not DatoStructuredText: its wrapper <div> can't go inside a <p>, and
+                        INLINE_ONLY keeps the subtitle inline */}
                     <StructuredText
-                      data={material.details.subtitle as CdaStructuredTextValue}
+                      data={material.details.subtitle}
                       customNodeRules={INLINE_ONLY}
                     />
                   </p>

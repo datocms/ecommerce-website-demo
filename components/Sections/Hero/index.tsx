@@ -19,9 +19,10 @@ type Props = {
   withAdditionalImage?: boolean;
 };
 
-// justify-self-stretch: otherwise the capped tablet height narrows the photo instead of cropping it
+// Heights, not an aspect ratio with a max height: WebKit sizes a capped ratio box from its height
+// and leaves a gap beside it. Phones keep the photo short so the headline shows on the first screen.
 const PHOTO_COLUMN =
-  '-mx-(--gutter) aspect-[4/5] max-h-[62svh] justify-self-stretch lg:order-2 lg:col-span-7 lg:mx-0 lg:aspect-auto lg:max-h-none lg:bleed-r';
+  '-mx-(--gutter) h-[min(110vw,50svh)] md:h-[min(125vw,62svh)] lg:order-2 lg:col-span-7 lg:mx-0 lg:h-auto lg:bleed-r';
 
 function HeroPhotos({
   image,

@@ -4,16 +4,14 @@ import { stripStega } from '@datocms/content-link';
 import { ArrowUpRightIcon } from '@heroicons/react/24/outline';
 import { type MouseEvent, useRef, useState } from 'react';
 import { StructuredText } from 'react-datocms/structured-text';
-import { MEDIA, PAGE_VARS } from '@/components/Common/styles';
-import DatoImage from '@/components/DatoImage';
-import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
+import { PAGE_VARS } from '@/components/Common/styles';
 import DatoStructuredText from '@/components/DatoStructuredText';
+import Rise from '@/components/Motion/Rise';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
-import { readFragment } from '@/lib/datocms/graphql';
-import { heroImageSizes } from './imageSizes';
 import type { PageProps, Query } from './meta';
 import StoreList from './StoreList';
 import StorePager from './StorePager';
+import StorePhotos from './StorePhotos';
 
 type Store = Query['allStores'][number];
 
@@ -54,6 +52,9 @@ function StoreHeightCopy({
 
 const Content: ContentPage<PageProps, Query> = ({ data }) => {
   const [currentStore, setCurrentStore] = useState(0);
+  // The first store arrives like any page title; later ones swap in place, quicker
+  const [hasSwitched, setHasSwitched] = useState(false);
+  const [upcomingStore, setUpcomingStore] = useState<number | null>(null);
   const heroRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -63,15 +64,10 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
 
   if (!store) return null;
 
-  const image = store.storeImage?.responsiveImage;
   const findOnMaps = data.generalInterface?.findOnMaps;
 
-  const { width, height } = image
-    ? readFragment(ResponsiveImageFragment, image)
-    : { width: 1, height: 1 };
-  const ratio = width / height;
-
   const step = (by: number) => {
+    setHasSwitched(true);
     setCurrentStore(
       (currentStore) =>
         (currentStore + by + allStores.length) % allStores.length,
@@ -81,6 +77,7 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
   // Moves focus (and the view, if needed) to the store's name. From lg it skips that while the
   // name, or for a click enough of the text, is in view, so the list stays under the pointer
   const showStore = (index: number, event: MouseEvent) => {
+    setHasSwitched(true);
     setCurrentStore(index);
     const heading = headingRef.current;
     const text = textRef.current;
@@ -113,20 +110,12 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
         ref={heroRef}
         className="shell grid lg:min-h-(--hero-h) lg:grid-cols-12 lg:gap-4"
       >
-        <div
-          className={`${MEDIA} -mx-(--gutter) aspect-[4/3] lg:order-last lg:col-span-6 lg:mx-0 lg:aspect-auto lg:bleed-r 2xl:col-span-7`}
-        >
-          {image && (
-            <DatoImage
-              key={store.id}
-              fragment={image}
-              layout="fill"
-              objectFit="cover"
-              sizes={heroImageSizes(ratio)}
-              priority
-            />
-          )}
-        </div>
+        <StorePhotos
+          stores={allStores}
+          current={currentStore}
+          upcoming={upcomingStore}
+          className="-mx-(--gutter) aspect-[4/3] lg:order-last lg:col-span-6 lg:mx-0 lg:aspect-auto lg:bleed-r 2xl:col-span-7"
+        />
 
         <div
           ref={textRef}
@@ -143,8 +132,10 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
               column keeps the tallest height and the pager never jumps */}
           <div className="grid grow max-md:mt-8">
             {/* Parts are keyed by store, so they replay enter on a switch; the h1 isn't, so it
-                keeps focus */}
-            <div className="quick col-start-1 row-start-1 [--rise:0px]">
+                keeps focus. On arrival they follow the title's rise, as on the home Hero */}
+            <div
+              className={`col-start-1 row-start-1 ${hasSwitched ? 'quick [--rise:0px]' : '[--delay:200ms]'}`}
+            >
               <p key={`${store.id}-country`} className="eyebrow enter">
                 {store.country}
               </p>
@@ -154,9 +145,15 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
                 // 2xl:-mr-8 lets the longest name run into the padding and stay on one line
                 className="title-display mt-4 focus:outline-hidden 2xl:-mr-8"
               >
-                <span key={store.id} className="enter block">
-                  {store.storeName}
-                </span>
+                {hasSwitched ? (
+                  <span key={store.id} className="enter block">
+                    {store.storeName}
+                  </span>
+                ) : (
+                  <span className="block">
+                    <Rise>{store.storeName}</Rise>
+                  </span>
+                )}
               </h1>
               <DatoStructuredText
                 key={`${store.id}-text`}
@@ -198,6 +195,7 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
         stores={allStores}
         current={currentStore}
         onSelect={showStore}
+        onPreload={setUpcomingStore}
       />
     </div>
   );

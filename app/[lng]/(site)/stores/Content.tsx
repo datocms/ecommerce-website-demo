@@ -66,6 +66,15 @@ function measureVisibility(heading: HTMLElement, text: HTMLElement) {
   return { inView, textShown };
 }
 
+// Whether at least half of the element is in view below the sticky header
+function isMostlyInView(element: HTMLElement) {
+  const headerOffset = getScrollPaddingTop();
+  const { top, bottom, height } = element.getBoundingClientRect();
+  const shown =
+    Math.min(bottom, window.innerHeight) - Math.max(top, headerOffset);
+  return shown >= height / 2;
+}
+
 const Content: ContentPage<PageProps, Query> = ({ data }) => {
   const [currentStore, setCurrentStore] = useState(0);
   // The first store arrives like any page title; later ones swap in place, quicker
@@ -74,6 +83,7 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
   const heroRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const mapRef = useRef<HTMLElement>(null);
 
   const allStores = data.allStores;
   const store = allStores[currentStore];
@@ -96,7 +106,8 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
   };
 
   // Moves focus (and the view, if needed) to the store's name. From lg it skips that while the
-  // name, or for a click enough of the text, is in view, so the list stays under the pointer
+  // name is in view, or for a click while enough of the text or of the map is, so the list stays
+  // under the pointer
   const showStore = (index: number, event: MouseEvent) => {
     setHasSwitched(true);
     setCurrentStore(index);
@@ -104,10 +115,11 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
     const text = textRef.current;
     if (!heading || !text) return;
     const { inView, textShown } = measureVisibility(heading, text);
+    const mapShown = mapRef.current ? isMostlyInView(mapRef.current) : false;
     if (
       window.matchMedia(LG_MEDIA_QUERY).matches &&
       // event.detail is 0 when the button is activated from the keyboard
-      (inView || (event.detail > 0 && textShown))
+      (inView || (event.detail > 0 && (textShown || mapShown)))
     ) {
       return;
     }
@@ -208,14 +220,8 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
         </div>
       </section>
 
-      <StoreList
-        stores={allStores}
-        current={currentStore}
-        onSelect={showStore}
-        onPreload={setUpcomingStore}
-      />
-
       <StoreMap
+        ref={mapRef}
         stores={allStores}
         current={currentStore}
         onSelect={(index) => {
@@ -225,6 +231,13 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
         label={data.generalInterface?.stores}
         findOnMaps={findOnMaps}
         mapsHref={mapsHref}
+      />
+
+      <StoreList
+        stores={allStores}
+        current={currentStore}
+        onSelect={showStore}
+        onPreload={setUpcomingStore}
       />
     </div>
   );

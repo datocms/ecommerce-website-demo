@@ -3,10 +3,11 @@
 import 'leaflet/dist/leaflet.css';
 import { ArrowUpRightIcon } from '@heroicons/react/24/outline';
 import type { Map as LeafletMap, Marker } from 'leaflet';
-import { useEffect, useRef } from 'react';
+import { type Ref, useEffect, useRef } from 'react';
 import type { Query } from './meta';
 
 type Props = {
+  ref?: Ref<HTMLElement>;
   stores: Query['allStores'];
   /** Zero-based index of the store on show */
   current: number;
@@ -29,9 +30,10 @@ const TILE_ATTRIBUTION =
 const REGION_ZOOM = 5;
 const CITY_ZOOM = 12;
 // Leaflet loads when the map is within this distance of the viewport
-const LOAD_MARGIN = '200px';
+const LOAD_MARGIN = '100px';
 
 export default function StoreMap({
+  ref,
   stores,
   current,
   onSelect,
@@ -131,7 +133,7 @@ export default function StoreMap({
   const store = stores[current];
 
   return (
-    <section aria-label={label} className="shell pt-16 lg:pt-24">
+    <section ref={ref} aria-label={label} className="shell pt-16 lg:pt-24">
       <div className="relative">
         <div
           ref={containerRef}

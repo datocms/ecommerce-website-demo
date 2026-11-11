@@ -21,11 +21,12 @@ import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import LanguageSelector from '@/components/Layout/LanguageSelector';
 import LinkPending from '@/components/Motion/LinkPending';
 import { type ResultOf, readFragment } from '@/lib/datocms/graphql';
+import { linkHref } from '@/lib/datocms/linkHref';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import Cart from './Cart';
 import MegaMenuPanel from './MegaMenuPanel';
 import MobileMenu from './MobileMenu';
-import { type DropdownMenu, type LinkItem, linkHref } from './menu';
+import type { DropdownMenu, LinkItem } from './menu';
 import SearchDialog from './SearchDialog';
 
 type Props = {
@@ -41,7 +42,8 @@ const NAV_ITEM =
 const BAR_ICON = 'icon-btn size-10 [&>svg]:size-5.5';
 
 type NavLinkProps = {
-  href: string;
+  /** null when the link item has no target: the label renders as plain text */
+  href: string | null;
   current: boolean;
   children: ReactNode;
 };
@@ -49,14 +51,18 @@ type NavLinkProps = {
 function NavLink({ href, current, children }: NavLinkProps) {
   return (
     <li>
-      <Link
-        href={href}
-        aria-current={current ? 'page' : undefined}
-        className={NAV_ITEM}
-      >
-        {children}
-        <LinkPending />
-      </Link>
+      {href ? (
+        <Link
+          href={href}
+          aria-current={current ? 'page' : undefined}
+          className={NAV_ITEM}
+        >
+          {children}
+          <LinkPending />
+        </Link>
+      ) : (
+        <span className={NAV_ITEM}>{children}</span>
+      )}
     </li>
   );
 }

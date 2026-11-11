@@ -9,6 +9,7 @@ import {
   type ResultOf,
   type VariablesOf,
 } from '@/lib/datocms/graphql';
+import { LinkRecordFragment } from '@/lib/datocms/linkHref';
 import type { GlobalPageProps } from '@/lib/globalPageProps';
 
 export type PageProps = GlobalPageProps;
@@ -42,7 +43,10 @@ export const query = graphql(
           ... on LinkItemRecord {
             id
             label
-            slug
+            page
+            record {
+              ...LinkRecordFragment
+            }
           }
         }
       }
@@ -81,6 +85,7 @@ export const query = graphql(
     CollectionCardShowcaseFragment,
     MaterialShowcaseFragment,
     ProductRailFragment,
+    LinkRecordFragment,
   ],
 );
 

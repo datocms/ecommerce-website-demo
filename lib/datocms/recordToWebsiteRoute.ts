@@ -1,7 +1,8 @@
 import { productPath } from '@/lib/productPath';
 import { localizedString } from './localizedString';
 
-// The site path of a CMA record (its slug may be localized), or null when its model has no page
+// The site path of a record, or null when its model has no page. Takes a CMA record (its slug may
+// be localized) or a queried one (see linkHref.ts).
 export function recordToWebsiteRoute(
   record: { id: string; slug?: unknown },
   itemTypeApiKey: string,

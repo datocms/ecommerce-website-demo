@@ -1,7 +1,6 @@
 import type { Product } from '@/app/[lng]/product/[slug]/meta';
 import ProductCard from '@/components/ProductCard';
 import { readFragment } from '@/lib/datocms/graphql';
-import { isOnSale } from '@/lib/isOnSale';
 import { productPath } from '@/lib/productPath';
 import { type ProductPageLabels, ProductPageLabelsFragment } from './fragments';
 
@@ -41,7 +40,7 @@ export default function RelatedProducts({ products, labels, lng }: Props) {
                 hoverImage={product.productImages[1]?.responsiveImage}
                 price={product.price}
                 salePrice={product.salePrice}
-                onSale={isOnSale(product.sale)}
+                onSale={product.onSale}
                 currencySymbol={currencySymbol ?? ''}
                 saleLabel={sale}
                 sizes={`(min-width: 1440px) ${fourUp ? '330px' : '445px'}, (min-width: 1280px) ${fourUp ? '24vw' : '32vw'}, (min-width: 768px) 32vw, (min-width: 640px) 40vw, 72vw`}

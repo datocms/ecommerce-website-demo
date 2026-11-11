@@ -76,7 +76,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const slug = localizedString(item.slug, locale);
+    // Home and Showcase have no slug field: the last segment of their route stands in
+    const slug =
+      localizedString(item.slug, locale) ?? permalink.split('/').pop();
     const baseUrl = getSiteUrl();
 
     const response = await fetch(new URL(permalink, baseUrl).toString());

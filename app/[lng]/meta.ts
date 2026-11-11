@@ -4,6 +4,7 @@ import {
   type ResultOf,
   type VariablesOf,
 } from '@/lib/datocms/graphql';
+import { LinkRecordFragment } from '@/lib/datocms/linkHref';
 import type { GlobalPageProps } from '@/lib/globalPageProps';
 
 // children (the current page) travels in pageProps, so RealTime renders it in draft mode too
@@ -38,9 +39,7 @@ export const query = graphql(
             url
           }
         }
-        footerSubtitle {
-          value
-        }
+        footerSubtitle
         footerTitle
         footerLogo {
           responsiveImage {
@@ -53,7 +52,10 @@ export const query = graphql(
           footerItem {
             id
             label
-            slug
+            page
+            record {
+              ...LinkRecordFragment
+            }
           }
         }
         cookieNotice {
@@ -69,7 +71,7 @@ export const query = graphql(
             }
           }
         }
-        mainColor {
+        accentColor {
           red
           blue
           green
@@ -82,7 +84,10 @@ export const query = graphql(
           dismissButtonLabel
           button {
             label
-            slug
+            page
+            record {
+              ...LinkRecordFragment
+            }
           }
           popupImage {
             responsiveImage {
@@ -97,6 +102,14 @@ export const query = graphql(
         }
         notification {
           value
+          # The records its itemLink nodes point to
+          links {
+            ... on RecordInterface {
+              id
+              __typename
+            }
+            ...LinkRecordFragment
+          }
         }
         menu {
           __typename
@@ -134,11 +147,9 @@ export const query = graphql(
                 id
                 name
                 _modelApiKey
-                details {
-                  image {
-                    responsiveImage {
-                      ...ResponsiveImageFragment
-                    }
+                image {
+                  responsiveImage {
+                    ...ResponsiveImageFragment
                   }
                 }
               }
@@ -146,11 +157,9 @@ export const query = graphql(
                 id
                 name
                 _modelApiKey
-                details {
-                  image {
-                    responsiveImage {
-                      ...ResponsiveImageFragment
-                    }
+                image {
+                  responsiveImage {
+                    ...ResponsiveImageFragment
                   }
                 }
               }
@@ -158,11 +167,9 @@ export const query = graphql(
                 id
                 name
                 _modelApiKey
-                details {
-                  image {
-                    responsiveImage {
-                      ...ResponsiveImageFragment
-                    }
+                image {
+                  responsiveImage {
+                    ...ResponsiveImageFragment
                   }
                 }
               }
@@ -172,11 +179,9 @@ export const query = graphql(
                 id
                 name
                 _modelApiKey
-                details {
-                  image {
-                    responsiveImage {
-                      ...ResponsiveImageFragment
-                    }
+                image {
+                  responsiveImage {
+                    ...ResponsiveImageFragment
                   }
                 }
               }
@@ -184,11 +189,9 @@ export const query = graphql(
                 id
                 name
                 _modelApiKey
-                details {
-                  image {
-                    responsiveImage {
-                      ...ResponsiveImageFragment
-                    }
+                image {
+                  responsiveImage {
+                    ...ResponsiveImageFragment
                   }
                 }
               }
@@ -196,11 +199,9 @@ export const query = graphql(
                 id
                 name
                 _modelApiKey
-                details {
-                  image {
-                    responsiveImage {
-                      ...ResponsiveImageFragment
-                    }
+                image {
+                  responsiveImage {
+                    ...ResponsiveImageFragment
                   }
                 }
               }
@@ -210,7 +211,10 @@ export const query = graphql(
           ... on LinkItemRecord {
             id
             label
-            slug
+            page
+            record {
+              ...LinkRecordFragment
+            }
           }
         }
       }
@@ -233,7 +237,7 @@ export const query = graphql(
       }
     }
   `,
-  [ResponsiveImageFragment],
+  [ResponsiveImageFragment, LinkRecordFragment],
 );
 
 export type Query = ResultOf<typeof query>;

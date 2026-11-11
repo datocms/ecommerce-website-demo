@@ -30,6 +30,8 @@ Before schema or content operations:
 - Product detail route: `app/[lng]/product/[slug]/`.
 - Product detail query: `query` in `app/[lng]/product/[slug]/meta.ts`.
 - Listing filters use collections, brands, and materials.
+- Collections, brands, and materials carry their own `subtitle` (plain text), `description` (Structured Text), and `image`. `FilterOptionsFragment` in `components/ProductListing/fragments.ts` selects them, and a lone selected record gets the `FilterDetail` header.
+- A product is on sale when its `onSale` boolean is true; `salePrice` is set only while it is.
 - URL query params include `page`, `orderBy`, `productName`, `collections`, `brands`, and `materials`.
 - Pagination is listing behavior: preserve active query params and reset or clamp stale `page` values after filter/sort changes.
 - Header category links are built from layout menu records and use `_modelApiKey` plus record ids.
@@ -44,7 +46,7 @@ Before schema or content operations:
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
 2. Add the field to all four queries that feed `ProductCard`: `productsQuery` in `app/[lng]/products/meta.ts`, `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts`, `showcase.newProducts` in `app/[lng]/showcase/meta.ts` and `product.relatedProducts` in `app/[lng]/product/[slug]/meta.ts`.
-3. Add an optional prop to `ProductCard` (`components/ProductCard/index.tsx`) and pass it from each call site (`app/[lng]/products/page.tsx`, `components/Sections/NewArrivals/ProductRail.tsx`, `app/[lng]/showcase/NewProducts.tsx`, `components/ProductDetail/RelatedProducts.tsx`), preserving the existing sale logic (`isOnSale()`) and links (`productPath()`).
+3. Add an optional prop to `ProductCard` (`components/ProductCard/index.tsx`) and pass it from each call site (`app/[lng]/products/page.tsx`, `components/Sections/NewArrivals/ProductRail.tsx`, `app/[lng]/showcase/NewProducts.tsx`, `components/ProductDetail/RelatedProducts.tsx`), preserving the existing sale logic (the `onSale` boolean and `salePrice`) and links (`productPath()`).
 4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
 5. Verify pagination, filters, and search still work.
 
@@ -69,7 +71,7 @@ Before schema or content operations:
 
 1. Confirm the field is sortable in the GraphQL schema.
 2. Add the order value to the listing UI.
-3. Keep `orderBy` query param behavior stable.
+3. Keep `orderBy` query param behavior stable. The CMS `sale` page link (`linkHref()` in `lib/datocms/linkHref.ts`) points at `orderBy=onSale_DESC`: change the two together.
 4. Verify the `ProductModelOrderBy` enum values (typed from `schema.graphql`) and default ordering.
 
 ### Adjust header category dropdowns

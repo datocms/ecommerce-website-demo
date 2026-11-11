@@ -15,14 +15,10 @@ export const MaterialShowcaseFragment = graphql(
       materials {
         id
         name
-        details {
-          subtitle {
-            value
-          }
-          image {
-            responsiveImage {
-              ...ResponsiveImageFragment
-            }
+        subtitle
+        image {
+          responsiveImage {
+            ...ResponsiveImageFragment
           }
         }
       }

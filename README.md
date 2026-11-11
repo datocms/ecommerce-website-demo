@@ -94,16 +94,17 @@ app/
                             SEO analysis, post-install setup, product slug map
 components/
   Common/                   generic building blocks: demo action button, drawer, section
-                            title, social link, SVG icon, shared class recipes (styles.ts)
+                            title, social link, optional link (a CMS link that may have no
+                            target), SVG icon, shared class recipes (styles.ts)
   DatoImage/                DatoCMS responsive image and its ResponsiveImageFragment
   DatoStructuredText/       Structured Text renderer with visual-editing boundaries
   DraftMode/                draft-mode toggle, token form, success toast and the Content Link
                             overlay
   Layout/                   site shell: Header/, Footer/, cookie notice, language selector,
                             accent color, <html lang> sync
-    Header/                 nav bar, mega menu (MegaMenuPanel, links from Layout.menu via
-                            menu.ts), mobile menu, search, cart, notification strip and the
-                            CMS popup
+    Header/                 nav bar, mega menu (MegaMenuPanel, category links from
+                            Layout.menu via menu.ts), mobile menu, search, cart, notification
+                            strip and the CMS popup
   Motion/                   PageTransition (page fades), Rise (word-by-word titles) and
                             LinkPending (marks a link whose page is loading)
   ProductCard/              the product card shared by every product list, and Price.tsx
@@ -118,12 +119,13 @@ components/
   WithRealTimeUpdates/      generateWrapper() and ContentOrRealTime, which render a route from
                             published content or live draft content
 lib/
-  datocms/                  gql.tada setup, generated schema types and queryDatoCMS(); for CMA
-                            records, localizedString() (field values) and recordToWebsiteRoute()
-                            (a record's page, for Web Previews and SEO analysis)
+  datocms/                  gql.tada setup, generated schema types and queryDatoCMS();
+                            linkHref() (the href of a CMS link); for CMA records,
+                            localizedString() (field values) and recordToWebsiteRoute() (a
+                            record's page, for Web Previews, SEO analysis and linkHref())
   i18n.ts                   site locales, read from DatoCMS
-  ...                       small helpers: route prop types, product slugs and paths, sale
-                            status, price formatting, color contrast, redirect checks, site URL
+  ...                       small helpers: route prop types, product slugs and paths, price
+                            formatting, color contrast, redirect checks, site URL
 styles/
   global.css                the entry file: Tailwind and its @source folders, then the files
                             below in this order
@@ -164,7 +166,7 @@ Two routes differ from this pattern:
 
 Editors reach draft mode in two ways. The Web Previews plugin, which `/api/post-install` installs, asks `/api/draft/preview-links` for a record's links (`recordToWebsiteRoute()` in `lib/datocms/` maps the record to its page) and opens `/api/draft/enable?token=…`. The toggle at the bottom right of every page (`components/DraftMode/DraftModeToggle.tsx`, mounted in `app/layout.tsx`) asks for `DRAFT_SECRET_TOKEN` and calls the same route. `/api/draft/enable` and `/api/draft/disable` switch Next.js draft mode on and off.
 
-In draft mode `queryDatoCMS()` uses the draft token, skips the cache and asks for Content Link metadata. `ContentOrRealTime` renders `RealTime.tsx`, and `app/layout.tsx` mounts the `ContentLink` overlay, so clicking a piece of text opens its record in DatoCMS. Draft strings carry invisible stega characters for that overlay, so the code calls `stripStega()` before it uses a text value as a URL, a comparison key or an attribute; `isOnSale()` (`lib/isOnSale.ts`) does it for the sale status. Slug fields never carry stega, so product links (`productPath()` in `lib/productPath.ts`) use the slug as is.
+In draft mode `queryDatoCMS()` uses the draft token, skips the cache and asks for Content Link metadata. `ContentOrRealTime` renders `RealTime.tsx`, and `app/layout.tsx` mounts the `ContentLink` overlay, so clicking a piece of text opens its record in DatoCMS. Draft strings carry invisible stega characters for that overlay, so the code calls `stripStega()` before it uses a text value as a URL, a comparison key or an attribute; `linkHref()` (`lib/datocms/linkHref.ts`) does it for a link's `page`. Slug fields never carry stega, so product links (`productPath()` in `lib/productPath.ts`) use the slug as is.
 
 ### Locales
 
@@ -177,6 +179,18 @@ Reusable CMS blocks keep their GraphQL fragment in a `fragments.ts` next to the 
 Labels from the General Interface record that a whole feature folder uses sit in that folder's `fragments.ts`, next to the type of the components' `labels` prop (`ProductListingLabels` in `ProductListing/fragments.ts`, `ProductPageLabels` in `ProductDetail/fragments.ts`).
 
 Route-specific UI, such as the site shell in `components/Layout/` and the product page in `components/ProductDetail/`, types its props from the route's `Query` instead. `ProductCard` takes plain props, so any query can feed it. Four queries select its fields today, and each has a call site that maps them to props: `productsQuery` in `app/[lng]/products/meta.ts` (`products/page.tsx`), `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts` (`NewArrivals/ProductRail.tsx`), `showcase.newProducts` in `app/[lng]/showcase/meta.ts` (`showcase/NewProducts.tsx`) and `product.relatedProducts` in `app/[lng]/product/[slug]/meta.ts` (`ProductDetail/RelatedProducts.tsx`). A new card field goes into all four.
+
+Every link an editor sets in the CMS has the same shape. The Simple Button, Link Item and Footer Item blocks carry a `label`, a `record` (a collection, brand, material, product or legal page) and a `page` (`products`, `sale`, `showcase` or `stores`), which counts only when there is no record. Their queries select `page` and `record { ...LinkRecordFragment }`, and `linkHref()` in `lib/datocms/linkHref.ts` builds the href, always under the current locale:
+
+| Link | Href |
+| --- | --- |
+| collection, brand or material | `/<locale>/products?collections=<id>` (or `brands=`, `materials=`) |
+| product | `/<locale>/product/<slug>` |
+| legal page | `/<locale>/legal/<slug>` |
+| page `products`, `showcase`, `stores` | `/<locale>/products`, `/<locale>/showcase`, `/<locale>/stores` |
+| page `sale` | `/<locale>/products?orderBy=onSale_DESC` (products on sale first) |
+
+A link with neither a record nor a page has no href, and `OptionalLink` (`components/Common/`) renders its label as plain text. Record links inside the notification strip's Structured Text go through the same mapping (`recordHref()`), which is `recordToWebsiteRoute()` applied to a queried record.
 
 Feature areas with several components get a folder in `components/` (`ProductDetail/`, `ProductListing/`), even when one route uses them. Pieces split out of a single route's `Content.tsx`, and small helpers for one route, sit next to that route, like `legal/[slug]/SectionIndex.tsx`, the `showcase/` sections or `home/showcaseGroups.ts`.
 

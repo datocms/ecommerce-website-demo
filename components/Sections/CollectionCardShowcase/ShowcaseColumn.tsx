@@ -1,6 +1,6 @@
-import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import OptionalLink from '@/components/Common/OptionalLink';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import DatoStructuredText from '@/components/DatoStructuredText';
@@ -9,6 +9,7 @@ import {
   type ResultOf,
   readFragment,
 } from '@/lib/datocms/graphql';
+import { linkHref } from '@/lib/datocms/linkHref';
 import { CollectionCardShowcaseFragment } from './fragments';
 
 type Props = {
@@ -28,11 +29,11 @@ function EmptyRow() {
 
 function LeadCollection({
   collection,
-  pretitle,
+  preTitle,
   lng,
 }: {
   collection: Collection;
-  pretitle: string | null;
+  preTitle: string | null;
   lng: string;
 }) {
   return (
@@ -41,9 +42,9 @@ function LeadCollection({
       className={`group block ${MEDIA} aspect-[4/5] outline-offset-4`}
       data-datocms-content-link-group
     >
-      {collection.details.image.responsiveImage && (
+      {collection.image.responsiveImage && (
         <DatoImage
-          fragment={collection.details.image.responsiveImage}
+          fragment={collection.image.responsiveImage}
           className={IMG_ZOOM}
           layout="fill"
           objectFit="cover"
@@ -51,16 +52,16 @@ function LeadCollection({
           sizes="(min-width: 1440px) 310px, (min-width: 1024px) 22vw, (min-width: 640px) 44vw, 80vw"
         />
       )}
-      {/* Its own Content Link target: the pretitle belongs to the showcase block, not the collection.
+      {/* Its own Content Link target: the preTitle belongs to the showcase block, not the collection.
           A long one wraps into one tag per line (box-decoration-clone); top-3.5 offsets the 28px
           tag on its 24px line so it sits 12px in like the other tags */}
-      {pretitle && (
+      {preTitle && (
         <span className="absolute top-3.5 left-3 max-w-[calc(100%-1.5rem)] text-xs leading-6 text-balance">
           <span
             className="tag inline box-decoration-clone py-1.25 leading-6 whitespace-normal"
             data-datocms-content-link-boundary
           >
-            {pretitle}
+            {preTitle}
           </span>
         </span>
       )}
@@ -93,9 +94,9 @@ function MoreCollections({
             data-datocms-content-link-group
           >
             <div className={`${MEDIA} aspect-[4/5]`}>
-              {item.details.image.responsiveImage && (
+              {item.image.responsiveImage && (
                 <DatoImage
-                  fragment={item.details.image.responsiveImage}
+                  fragment={item.image.responsiveImage}
                   className={IMG_ZOOM}
                   layout="fill"
                   objectFit="cover"
@@ -115,12 +116,15 @@ function MoreCollections({
 }
 
 export default function ShowcaseColumn({ fragment, lng, className }: Props) {
-  const { id, pretitle, title, description, button, collection } = readFragment(
-    CollectionCardShowcaseFragment,
-    fragment,
-  );
+  const {
+    id,
+    preTitle,
+    title,
+    description,
+    button: cta,
+    collection,
+  } = readFragment(CollectionCardShowcaseFragment, fragment);
   const [lead, ...rest] = collection;
-  const cta = button[0];
   const titleId = `${id}-title`;
 
   return (
@@ -129,7 +133,7 @@ export default function ShowcaseColumn({ fragment, lng, className }: Props) {
       className={`row-span-4 grid snap-start grid-rows-subgrid ${className}`}
     >
       {lead ? (
-        <LeadCollection collection={lead} pretitle={pretitle} lng={lng} />
+        <LeadCollection collection={lead} preTitle={preTitle} lng={lng} />
       ) : (
         <EmptyRow />
       )}
@@ -146,13 +150,10 @@ export default function ShowcaseColumn({ fragment, lng, className }: Props) {
       </div>
       {cta ? (
         <div className="mt-4">
-          <Link
-            href={`/${lng}/${stripStega(cta.slug ?? '')}`}
-            className="tlink"
-          >
+          <OptionalLink href={linkHref(lng, cta)} className="tlink">
             {cta.label}
             <ArrowRightIcon aria-hidden="true" className="stroke-2" />
-          </Link>
+          </OptionalLink>
         </div>
       ) : (
         <EmptyRow />

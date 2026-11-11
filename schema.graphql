@@ -12,6 +12,18 @@ type BooleanTypeNonNullMultiLocaleField {
   value: BooleanType!
 }
 
+type BrandModelDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type BrandModelDescriptionFieldNonNullMultiLocaleField {
+  locale: SiteLocale
+  value: BrandModelDescriptionField!
+}
+
 input BrandModelFilter {
   _createdAt: CreatedAtFilter
   id: ItemIdFilter
@@ -23,8 +35,11 @@ input BrandModelFilter {
   _updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   _locales: LocalesFilter
+  description: StructuredTextFilter
+  image: FileFilter
   name: StringFilter
   slug: SlugFilter
+  subtitle: StringFilter
   website: StringFilter
   OR: [BrandModelFilter]
   AND: [BrandModelFilter]
@@ -51,19 +66,27 @@ enum BrandModelOrderBy {
   _isValid_DESC
   name_ASC
   name_DESC
+  subtitle_ASC
+  subtitle_DESC
   website_ASC
   website_DESC
 }
 
 """Record of type 🏷️ Brand (brand)"""
 type BrandRecord implements RecordInterface {
-  _allDetailsLocales(
+  _allDescriptionLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [FilterDetailRecordNonNullMultiLocaleField!]
+  ): [BrandModelDescriptionFieldNonNullMultiLocaleField!]
   _allNameLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allSubtitleLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
@@ -88,7 +111,7 @@ type BrandRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  details(
+  description(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -96,8 +119,9 @@ type BrandRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): FilterDetailRecord!
+  ): BrandModelDescriptionField!
   id: ItemId!
+  image: ImageFileField!
   name(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -108,6 +132,15 @@ type BrandRecord implements RecordInterface {
     fallbackLocales: [SiteLocale!]
   ): String!
   slug: String!
+  subtitle(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   website: String!
 }
 
@@ -140,17 +173,29 @@ type CollectionCardShowcaseSectionRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  button: [SimpleButtonRecord!]!
+  button: SimpleButtonRecord
   collection: [CollectionRecord!]!
   description: CollectionCardShowcaseSectionModelDescriptionField
-  direction: String
+  direction: String!
   id: ItemId!
-  pretitle: String
+  preTitle: String
   title: String
 }
 
 type CollectionMetadata {
   count: IntType!
+}
+
+type CollectionModelDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type CollectionModelDescriptionFieldNonNullMultiLocaleField {
+  locale: SiteLocale
+  value: CollectionModelDescriptionField!
 }
 
 input CollectionModelFilter {
@@ -164,8 +209,11 @@ input CollectionModelFilter {
   _updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   _locales: LocalesFilter
+  description: StructuredTextFilter
+  image: FileFilter
   name: StringFilter
   slug: SlugFilter
+  subtitle: StringFilter
   OR: [CollectionModelFilter]
   AND: [CollectionModelFilter]
 }
@@ -191,17 +239,25 @@ enum CollectionModelOrderBy {
   _isValid_DESC
   name_ASC
   name_DESC
+  subtitle_ASC
+  subtitle_DESC
 }
 
 """Record of type 👜 Collection (collection)"""
 type CollectionRecord implements RecordInterface {
-  _allDetailsLocales(
+  _allDescriptionLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [FilterDetailRecordNonNullMultiLocaleField!]
+  ): [CollectionModelDescriptionFieldNonNullMultiLocaleField!]
   _allNameLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allSubtitleLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
@@ -226,7 +282,7 @@ type CollectionRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  details(
+  description(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -234,8 +290,9 @@ type CollectionRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): FilterDetailRecord!
+  ): CollectionModelDescriptionField!
   id: ItemId!
+  image: ImageFileField!
   name(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -246,6 +303,15 @@ type CollectionRecord implements RecordInterface {
     fallbackLocales: [SiteLocale!]
   ): String!
   slug: String!
+  subtitle(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
 }
 
 enum ColorBucketType {
@@ -393,7 +459,7 @@ type DividerSectionRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  button: [SimpleButtonRecord!]!
+  button: SimpleButtonRecord
   id: ItemId!
   preTitle: String
   subtitle: DividerSectionModelSubtitleField
@@ -497,7 +563,7 @@ type FeaturedReviewModelReviewField {
   value: JsonField!
 }
 
-"""Block of type ⭐ ️ Featured Review (featured_review)"""
+"""Block of type ⭐ Featured Review (featured_review)"""
 type FeaturedReviewRecord implements RecordInterface {
   _createdAt: DateTime!
 
@@ -751,51 +817,6 @@ input FileFilter {
   exists: BooleanType
 }
 
-type FilterDetailModelDescriptionField {
-  blocks: [String!]!
-  inlineBlocks: [String!]!
-  links: [String!]!
-  value: JsonField!
-}
-
-type FilterDetailModelSubtitleField {
-  blocks: [String!]!
-  inlineBlocks: [String!]!
-  links: [String!]!
-  value: JsonField!
-}
-
-"""Block of type 🏷️ Filter Detail (filter_detail)"""
-type FilterDetailRecord implements RecordInterface {
-  _createdAt: DateTime!
-
-  """Editing URL"""
-  _editingUrl: String
-  _firstPublishedAt: DateTime!
-  _isValid: BooleanType!
-  _modelApiKey: String!
-  _publicationScheduledAt: DateTime
-  _publishedAt: DateTime!
-
-  """Generates SEO and Social card meta tags to be used in your frontend"""
-  _seoMetaTags(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-  ): [Tag!]!
-  _status: ItemStatus!
-  _unpublishingScheduledAt: DateTime
-  _updatedAt: DateTime!
-  description: FilterDetailModelDescriptionField!
-  id: ItemId!
-  image: FileField!
-  subtitle: FilterDetailModelSubtitleField!
-}
-
-type FilterDetailRecordNonNullMultiLocaleField {
-  locale: SiteLocale
-  value: FilterDetailRecord!
-}
-
 """Specifies how to filter Floating-point fields"""
 input FloatFilter {
   """
@@ -873,6 +894,8 @@ type FooterColumnRecordListListNonNullMultiLocaleField {
   value: [FooterColumnRecord!]!
 }
 
+union FooterItemModelRecordField = BrandRecord | CollectionRecord | LegalPageRecord | MaterialRecord | ProductRecord
+
 """Block of type ➡️ Footer Item (footer_item)"""
 type FooterItemRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -894,8 +917,9 @@ type FooterItemRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   id: ItemId!
-  label: String
-  slug: String
+  label: String!
+  page: String
+  record: FooterItemModelRecordField
 }
 
 """Specifies how to filter Multiple files/images field"""
@@ -928,13 +952,13 @@ input GalleryFilter {
 
 """Record of type 🌐 General Interface (general_interface)"""
 type GeneralInterfaceRecord implements RecordInterface {
-  _allBrandLocales(
+  _allBrandsLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
-  _allCollectionLocales(
+  _allCollectionsLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
@@ -1144,7 +1168,7 @@ type GeneralInterfaceRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  brand(
+  brands(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -1153,7 +1177,7 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
-  collection(
+  collections(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -1530,7 +1554,6 @@ type HomeRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   id: ItemId!
-  label: String!
   sections(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1549,7 +1572,6 @@ type HomeRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): SeoField
-  slug: String!
 }
 
 type ImageFileField implements FileFieldInterface {
@@ -3715,18 +3737,6 @@ input LatLonNearFilter {
   radius: FloatType!
 }
 
-type LayoutModelFooterSubtitleField {
-  blocks: [String!]!
-  inlineBlocks: [String!]!
-  links: [String!]!
-  value: JsonField!
-}
-
-type LayoutModelFooterSubtitleFieldMultiLocaleField {
-  locale: SiteLocale
-  value: LayoutModelFooterSubtitleField
-}
-
 union LayoutModelMenuField = DropdownMenuRecord | LinkItemRecord
 
 type LayoutModelMenuFieldListListNonNullMultiLocaleField {
@@ -3737,7 +3747,7 @@ type LayoutModelMenuFieldListListNonNullMultiLocaleField {
 type LayoutModelNotificationField {
   blocks: [String!]!
   inlineBlocks: [String!]!
-  links: [String!]!
+  links: [LayoutModelNotificationLinksField!]!
   value: JsonField!
 }
 
@@ -3745,6 +3755,8 @@ type LayoutModelNotificationFieldMultiLocaleField {
   locale: SiteLocale
   value: LayoutModelNotificationField
 }
+
+union LayoutModelNotificationLinksField = BrandRecord | CollectionRecord | LegalPageRecord | MaterialRecord | ProductRecord
 
 """Record of type 🧩 Layout (layout)"""
 type LayoutRecord implements RecordInterface {
@@ -3771,7 +3783,7 @@ type LayoutRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [LayoutModelFooterSubtitleFieldMultiLocaleField!]
+  ): [StringMultiLocaleField!]
   _allMenuLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -3809,6 +3821,7 @@ type LayoutRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
+  accentColor: ColorField!
   cookieNotice(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -3845,11 +3858,10 @@ type LayoutRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): LayoutModelFooterSubtitleField
+  ): String
   footerTitle: String
   id: ItemId!
   logo: ImageFileField!
-  mainColor: ColorField!
   menu(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -4012,6 +4024,8 @@ input LinkFilter {
   exists: BooleanType
 }
 
+union LinkItemModelRecordField = BrandRecord | CollectionRecord | LegalPageRecord | MaterialRecord | ProductRecord
+
 """Block of type 🔗 Link Item (link_item)"""
 type LinkItemRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -4034,7 +4048,8 @@ type LinkItemRecord implements RecordInterface {
   _updatedAt: DateTime!
   id: ItemId!
   label: String!
-  slug: String
+  page: String
+  record: LinkItemModelRecordField
 }
 
 """Specifies how to filter Multiple-links fields"""
@@ -4079,6 +4094,18 @@ input LocalesFilter {
   notIn: [SiteLocale!]
 }
 
+type MaterialModelDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type MaterialModelDescriptionFieldNonNullMultiLocaleField {
+  locale: SiteLocale
+  value: MaterialModelDescriptionField!
+}
+
 input MaterialModelFilter {
   _createdAt: CreatedAtFilter
   id: ItemIdFilter
@@ -4090,8 +4117,11 @@ input MaterialModelFilter {
   _updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   _locales: LocalesFilter
+  description: StructuredTextFilter
+  image: FileFilter
   name: StringFilter
   slug: SlugFilter
+  subtitle: StringFilter
   OR: [MaterialModelFilter]
   AND: [MaterialModelFilter]
 }
@@ -4117,17 +4147,25 @@ enum MaterialModelOrderBy {
   _isValid_DESC
   name_ASC
   name_DESC
+  subtitle_ASC
+  subtitle_DESC
 }
 
 """Record of type 🧶 Material (material)"""
 type MaterialRecord implements RecordInterface {
-  _allDetailsLocales(
+  _allDescriptionLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [FilterDetailRecordNonNullMultiLocaleField!]
+  ): [MaterialModelDescriptionFieldNonNullMultiLocaleField!]
   _allNameLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allSubtitleLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
@@ -4152,7 +4190,7 @@ type MaterialRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  details(
+  description(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -4160,8 +4198,9 @@ type MaterialRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): FilterDetailRecord!
+  ): MaterialModelDescriptionField!
   id: ItemId!
+  image: ImageFileField!
   name(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -4172,6 +4211,15 @@ type MaterialRecord implements RecordInterface {
     fallbackLocales: [SiteLocale!]
   ): String!
   slug: String!
+  subtitle(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
 }
 
 type MaterialShowcaseSectionModelDescriptionField {
@@ -4271,7 +4319,7 @@ type PopupRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  button: [SimpleButtonRecord!]!
+  button: SimpleButtonRecord
   dismissButtonLabel: String
   id: ItemId!
   popupImage: FileField
@@ -4306,8 +4354,8 @@ type ProductFeatureSectionRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
+  fabric: String!
   id: ItemId!
-  material: String!
   occasions: String!
   style: String!
   weather: String!
@@ -4344,12 +4392,12 @@ input ProductModelFilter {
   material: LinkFilter
   name: StringFilter
   numberOfReviews: IntegerFilter
+  onSale: BooleanFilter
   price: FloatFilter
   productImages: GalleryFilter
   productVariations: ProductModelProductVariationsFieldFilter
   relatedProducts: LinksFilter
   reviewAverage: FloatFilter
-  sale: StringFilter
   salePrice: FloatFilter
   seoMeta: SeoFilter
   slug: SlugFilter
@@ -4380,12 +4428,12 @@ enum ProductModelOrderBy {
   name_DESC
   numberOfReviews_ASC
   numberOfReviews_DESC
+  onSale_ASC
+  onSale_DESC
   price_ASC
   price_DESC
   reviewAverage_ASC
   reviewAverage_DESC
-  sale_ASC
-  sale_DESC
   salePrice_ASC
   salePrice_DESC
 }
@@ -4541,6 +4589,7 @@ type ProductRecord implements RecordInterface {
     fallbackLocales: [SiteLocale!]
   ): String!
   numberOfReviews: IntType!
+  onSale: BooleanType!
   price(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -4554,7 +4603,6 @@ type ProductRecord implements RecordInterface {
   productVariations: [ProductVariationRecord!]!
   relatedProducts: [ProductRecord!]!
   reviewAverage: FloatType!
-  sale: String!
   salePrice(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -5091,18 +5139,18 @@ type ShowcaseModelMaterialsDescriptionFieldMultiLocaleField {
 
 """Record of type ✨ Showcase (showcase)"""
 type ShowcaseRecord implements RecordInterface {
-  _allCollectionsCtaLocales(
+  _allCollectionsCtaLabelLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [SimpleButtonRecordListListNonNullMultiLocaleField!]
+  ): [StringMultiLocaleField!]
   _allCtaLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [SimpleButtonRecordListListNonNullMultiLocaleField!]
+  ): [SimpleButtonRecordMultiLocaleField!]
   _allDescriptionLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -5159,7 +5207,7 @@ type ShowcaseRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   collections: [CollectionRecord!]!
-  collectionsCta(
+  collectionsCtaLabel(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -5167,7 +5215,7 @@ type ShowcaseRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [SimpleButtonRecord!]!
+  ): String
   cta(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -5176,7 +5224,7 @@ type ShowcaseRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [SimpleButtonRecord!]!
+  ): SimpleButtonRecord
   description(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -5226,7 +5274,6 @@ type ShowcaseRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): SeoField
-  slug: String
   title(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -5237,6 +5284,8 @@ type ShowcaseRecord implements RecordInterface {
     fallbackLocales: [SiteLocale!]
   ): String
 }
+
+union SimpleButtonModelRecordField = BrandRecord | CollectionRecord | LegalPageRecord | MaterialRecord | ProductRecord
 
 """Block of type 🔘 Simple Button (simple_button)"""
 type SimpleButtonRecord implements RecordInterface {
@@ -5259,13 +5308,14 @@ type SimpleButtonRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   id: ItemId!
-  label: String
-  slug: String
+  label: String!
+  page: String
+  record: SimpleButtonModelRecordField
 }
 
-type SimpleButtonRecordListListNonNullMultiLocaleField {
+type SimpleButtonRecordMultiLocaleField {
   locale: SiteLocale
-  value: [SimpleButtonRecord!]!
+  value: SimpleButtonRecord
 }
 
 type Site {
@@ -5332,7 +5382,7 @@ type SocialMediaIconRecord implements RecordInterface {
   _updatedAt: DateTime!
   icon: FileField!
   id: ItemId!
-  name: String
+  name: String!
   url: String!
 }
 
@@ -5405,9 +5455,9 @@ type StoreModelStoreDescriptionField {
   value: JsonField!
 }
 
-type StoreModelStoreDescriptionFieldMultiLocaleField {
+type StoreModelStoreDescriptionFieldNonNullMultiLocaleField {
   locale: SiteLocale
-  value: StoreModelStoreDescriptionField
+  value: StoreModelStoreDescriptionField!
 }
 
 """Record of type 🏪 Store (store)"""
@@ -5417,7 +5467,7 @@ type StoreRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [StringMultiLocaleField!]
+  ): [StringNonNullMultiLocaleField!]
   _allSeoMetaLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -5429,7 +5479,7 @@ type StoreRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [StoreModelStoreDescriptionFieldMultiLocaleField!]
+  ): [StoreModelStoreDescriptionFieldNonNullMultiLocaleField!]
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -5457,7 +5507,7 @@ type StoreRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): String
+  ): String!
   id: ItemId!
   seoMeta(
     """The locale to use to fetch the field's content"""
@@ -5477,10 +5527,10 @@ type StoreRecord implements RecordInterface {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): StoreModelStoreDescriptionField
-  storeImage: FileField
+  ): StoreModelStoreDescriptionField!
+  storeImage: ImageFileField!
   storeLocation: LatLonField
-  storeName: String
+  storeName: String!
 }
 
 """Specifies how to filter Single-line string fields"""
@@ -5572,7 +5622,7 @@ type TestimonialModelTestimonialField {
   value: JsonField!
 }
 
-"""Block of type ⭐ ️ Testimonial (testimonial)"""
+"""Block of type ⭐ Testimonial (testimonial)"""
 type TestimonialRecord implements RecordInterface {
   _createdAt: DateTime!
 

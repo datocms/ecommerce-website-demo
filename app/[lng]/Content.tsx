@@ -22,11 +22,11 @@ const Content: ContentPage<PageProps, Query> = ({
         Skip to content
       </a>
       <Header data={data} globalPageProps={globalPageProps} />
-      {data.layout?.mainColor && (
+      {data.layout?.accentColor && (
         <CustomColor
-          r={data.layout.mainColor.red}
-          g={data.layout.mainColor.green}
-          b={data.layout.mainColor.blue}
+          r={data.layout.accentColor.red}
+          g={data.layout.accentColor.green}
+          b={data.layout.accentColor.blue}
         />
       )}
       <main id="main" className="flex-1">

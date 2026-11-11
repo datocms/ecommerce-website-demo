@@ -1,7 +1,8 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 
-// The showcase's call to action, with its href already built from the CMS slug
-export type Cta = { label: string | null; href: string };
+// The showcase's call to action, with its href already built from the CMS link (null when the
+// link has no target)
+export type Cta = { label: string | null; href: string | null };
 
 // The label can wrap in some locales: the word joiner keeps the arrow on its last word, and the
 // tighter leading keeps two lines inside the button

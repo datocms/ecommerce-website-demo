@@ -36,11 +36,13 @@ Before schema or content operations:
 - Header components: `components/Layout/Header/**` (NavBar, MobileMenu, MegaMenuPanel, FeatureTiles, SearchDialog, Cart, NotificationStrip, PopupDialog; menu hrefs in `menu.ts`, search submit in `useProductSearch.ts`).
 - Footer component: `components/Layout/Footer/index.tsx` (newsletter row in `NewsletterSignup.tsx`, wordmark in `Wordmark.tsx`).
 - Shared by header and footer: `components/Layout/LanguageSelector.tsx`, `components/Layout/CookieNotice.tsx`.
-- Accent color component: `components/Layout/CustomColor.tsx`.
+- Accent color component: `components/Layout/CustomColor.tsx`, fed by `Layout.accentColor`.
 - Shared DatoCMS records: `Layout` and shell-related `General Interface` fields.
 - `Layout.menu` drives header navigation, link items, dropdown menus, dropdown columns, and category-style menu links.
 - `Layout.footerColumns`, `Layout.socialMediaLinks`, footer logo/title/subtitle, and copyright fields drive the footer.
 - `Layout.popup`, `Layout.cookieNotice`, and `Layout.notification` drive site-wide overlays and top messaging.
+- CMS links share one shape: Link Item (menu), Footer Item, and Simple Button (the popup's single `button`) blocks carry `label`, `record` (a collection, brand, material, product, or legal page), and `page` (`products`, `sale`, `showcase`, or `stores`, used only without a record). Queries select `page` and `record { ...LinkRecordFragment }`; `linkHref()` in `lib/datocms/linkHref.ts` builds the locale-prefixed href and returns null when neither is set, which `OptionalLink` (`components/Common/OptionalLink.tsx`) renders as plain text.
+- `Layout.notification` is Structured Text that can link records (`itemLink` nodes): its query selects `links { ...LinkRecordFragment }`, and `NotificationStrip.tsx` renders them with `recordHref()` from the same file.
 - `General Interface` drives shared labels such as search placeholder, newsletter footer labels, currency symbol, and header dropdown labels.
 - Shell elements that stay on screen across pages (the strip, header, mega-menu scrim, sheets and draft dock) carry `data-chrome`, and `styles/view-transitions.css` names each one, so pages pass under them during navigation. The cookie bar is matched by its `id="cookie-notice"` instead, so keep that id. A new fixed or sticky shell element needs both the attribute and a name in `styles/view-transitions.css`.
 
@@ -68,19 +70,20 @@ Before schema or content operations:
 1. Inspect `Layout.menu` and its linked records before assuming menu item types.
 2. Preserve existing dropdown/link behavior unless the user asks for a structural change.
 3. Keep category links in the form `/<locale>/products?<modelApiKey>s=<recordId>` unless changing product listing parsing too.
-4. Verify desktop and mobile menus.
+4. Build link item hrefs with `linkHref()`; a new `page` option needs a case in `lib/datocms/linkHref.ts`.
+5. Verify desktop and mobile menus.
 
 ### Adjust footer
 
 1. Inspect `Layout.footerColumns`, `Layout.socialMediaLinks`, footer logo, title, subtitle, and copyright fields.
 2. Preserve existing footer column order unless the user requests a reorder.
-3. Keep footer item links locale-aware.
+3. Keep footer item links locale-aware: build them with `linkHref()`.
 4. Verify newsletter footer behavior through `General Interface.displayNewsletterFooter` when relevant.
 
 ### Adjust popup, cookie notice, or notification strip
 
 1. Inspect the relevant `Layout` field and nested block shape.
-2. Preserve dismiss button, image, and button-link behavior unless the user asks otherwise.
+2. Preserve dismiss button, image, and button-link behavior unless the user asks otherwise. Keep `links` in the notification query, or its record links fail to render.
 3. Confirm whether the user wants to update content, rendering, or both.
 4. Verify the component still handles an absent block or empty notification safely.
 

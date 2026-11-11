@@ -1,24 +1,26 @@
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import { graphql } from '@/lib/datocms/graphql';
+import { LinkRecordFragment } from '@/lib/datocms/linkHref';
 
 export const CollectionCardShowcaseFragment = graphql(
   /* GraphQL */ `
     fragment CollectionCardShowcaseFragment on CollectionCardShowcaseSectionRecord {
       id
       title
-      pretitle
+      preTitle
       button {
         label
-        slug
+        page
+        record {
+          ...LinkRecordFragment
+        }
       }
       collection {
         id
         name
-        details {
-          image {
-            responsiveImage {
-              ...ResponsiveImageFragment
-            }
+        image {
+          responsiveImage {
+            ...ResponsiveImageFragment
           }
         }
       }
@@ -27,5 +29,5 @@ export const CollectionCardShowcaseFragment = graphql(
       }
     }
   `,
-  [ResponsiveImageFragment],
+  [ResponsiveImageFragment, LinkRecordFragment],
 );

@@ -16,7 +16,6 @@ import SortTabs from '@/components/ProductListing/SortTabs';
 import { readFragment } from '@/lib/datocms/graphql';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
 import { getFallbackLocale, type SiteLocale } from '@/lib/i18n';
-import { isOnSale } from '@/lib/isOnSale';
 import { productPath } from '@/lib/productPath';
 import {
   filterOptionsQuery,
@@ -134,8 +133,7 @@ export default async function Page({ params, searchParams }: PageProps) {
           key={headerFilter.id}
           lng={lng}
           eyebrow={filterLabel}
-          name={headerFilter.name}
-          details={headerFilter.details}
+          record={headerFilter}
           logo={headerFilter.__typename === 'BrandRecord'}
         />
       ) : (
@@ -187,7 +185,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                   hoverImage={product.productImages[1]?.responsiveImage}
                   price={product.price}
                   salePrice={product.salePrice}
-                  onSale={isOnSale(product.sale)}
+                  onSale={product.onSale}
                   currencySymbol={labels?.currencySymbol ?? ''}
                   saleLabel={labels?.sale}
                   sizes="(min-width: 1440px) 330px, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 46vw"

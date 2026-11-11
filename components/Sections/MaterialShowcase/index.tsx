@@ -1,8 +1,5 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import { hasChildren } from 'datocms-structured-text-utils';
 import Link from 'next/link';
-import { Fragment } from 'react';
-import { renderNodeRule, StructuredText } from 'react-datocms/structured-text';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import DatoStructuredText from '@/components/DatoStructuredText';
@@ -14,13 +11,6 @@ type Props = {
   fragment: FragmentOf<typeof MaterialShowcaseFragment>;
   globalPageProps: ResolvedGlobalPageProps;
 };
-
-// Every node with children (paragraphs, headings, lists, links) unwraps to its content
-const INLINE_ONLY = [
-  renderNodeRule(hasChildren, ({ children, key }) => (
-    <Fragment key={key}>{children}</Fragment>
-  )),
-];
 
 const GRID_COLUMNS = {
   2: 'sm:grid-cols-2',
@@ -82,9 +72,9 @@ export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
                 data-datocms-content-link-group
               >
                 <div className={`${MEDIA} aspect-[4/3]`}>
-                  {material.details.image.responsiveImage && (
+                  {material.image.responsiveImage && (
                     <DatoImage
-                      fragment={material.details.image.responsiveImage}
+                      fragment={material.image.responsiveImage}
                       className={IMG_ZOOM}
                       layout="fill"
                       objectFit="cover"
@@ -99,14 +89,9 @@ export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
                     className="size-[1.125rem] shrink-0 stroke-2 transition-transform duration-200 group-hover:translate-x-1"
                   />
                 </h3>
-                {material.details.subtitle && (
+                {material.subtitle && (
                   <p className="mt-1.5 max-w-[26rem] text-sm text-pretty text-mute">
-                    {/* Not DatoStructuredText: its wrapper <div> can't go inside a <p>, and
-                        INLINE_ONLY keeps the subtitle inline */}
-                    <StructuredText
-                      data={material.details.subtitle}
-                      customNodeRules={INLINE_ONLY}
-                    />
+                    {material.subtitle}
                   </p>
                 )}
               </Link>

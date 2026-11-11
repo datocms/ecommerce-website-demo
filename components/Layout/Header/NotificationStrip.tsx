@@ -5,6 +5,7 @@ import { createElement, type ReactNode } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import DatoStructuredText from '@/components/DatoStructuredText';
+import { recordHref } from '@/lib/datocms/linkHref';
 
 type LayoutNotification = NonNullable<
   NonNullable<LayoutQuery['layout']>['notification']
@@ -30,6 +31,31 @@ const renderMarkAsSemibold = (
     createElement(tag, props, ...children)
   );
 
+// A link in the message: a typed path (`link` node) or a record (`itemLink` node). A record
+// with no page renders as plain text.
+function StripLink({
+  href,
+  children,
+}: {
+  href: string | null;
+  children: ReactNode;
+}) {
+  if (!href) return <>{children}</>;
+
+  return (
+    <Link
+      href={href}
+      className="group inline-flex items-center gap-1 font-semibold whitespace-nowrap underline-offset-4 hover:underline"
+    >
+      {children}
+      <ArrowRightIcon
+        aria-hidden="true"
+        className="size-3.5 shrink-0 stroke-2 transition-transform duration-200 group-hover:translate-x-0.75"
+      />
+    </Link>
+  );
+}
+
 export default function NotificationStrip({
   notification,
   lng,
@@ -44,22 +70,15 @@ export default function NotificationStrip({
           data={notification}
           renderNode={renderMarkAsSemibold}
           customNodeRules={[
-            renderNodeRule(isLink, ({ node, children, key }) => {
-              return (
-                <Link
-                  href={`/${lng}${node.url}`}
-                  className="group inline-flex items-center gap-1 font-semibold whitespace-nowrap underline-offset-4 hover:underline"
-                  key={key}
-                >
-                  {children}
-                  <ArrowRightIcon
-                    aria-hidden="true"
-                    className="size-3.5 shrink-0 stroke-2 transition-transform duration-200 group-hover:translate-x-0.75"
-                  />
-                </Link>
-              );
-            }),
+            renderNodeRule(isLink, ({ node, children, key }) => (
+              <StripLink key={key} href={`/${lng}${node.url}`}>
+                {children}
+              </StripLink>
+            )),
           ]}
+          renderLinkToRecord={({ record, children }) => (
+            <StripLink href={recordHref(lng, record)}>{children}</StripLink>
+          )}
         />
         {/* Lined up with the header's bag icon below */}
         <button

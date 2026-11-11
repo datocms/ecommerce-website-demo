@@ -4,12 +4,13 @@ import { stripStega } from '@datocms/content-link';
 import Link from 'next/link';
 import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import OptionalLink from '@/components/Common/OptionalLink';
 import SocialLink from '@/components/Common/SocialLink';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
-import DatoStructuredText from '@/components/DatoStructuredText';
 import CookieNotice from '@/components/Layout/CookieNotice';
 import LanguageSelector from '@/components/Layout/LanguageSelector';
 import { readFragment } from '@/lib/datocms/graphql';
+import { linkHref } from '@/lib/datocms/linkHref';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import NewsletterSignup from './NewsletterSignup';
 import Wordmark from './Wordmark';
@@ -83,10 +84,9 @@ export default function Footer({ data, globalPageProps }: Props) {
               </Link>
             )}
             {data.layout?.footerSubtitle && (
-              <DatoStructuredText
-                data={data.layout.footerSubtitle}
-                className="mt-6 max-w-[18.75rem] text-md text-pretty text-mute first:mt-0"
-              />
+              <p className="mt-6 max-w-[18.75rem] text-md text-pretty text-mute first:mt-0">
+                {data.layout.footerSubtitle}
+              </p>
             )}
             {socials.length > 0 && (
               // -ml-3: the first glyph sits on the content edge
@@ -110,12 +110,12 @@ export default function Footer({ data, globalPageProps }: Props) {
                   <ul className="mt-5 space-y-3.5">
                     {column.footerItem.map((item) => (
                       <li key={item.id}>
-                        <Link
-                          href={`/${lng}/${stripStega(item.slug)}`}
+                        <OptionalLink
+                          href={linkHref(lng, item)}
                           className="text-sm hyphens-auto wrap-break-word text-mute transition-colors duration-150 hover:text-white md:hyphens-manual"
                         >
                           {item.label}
-                        </Link>
+                        </OptionalLink>
                       </li>
                     ))}
                   </ul>

@@ -1,6 +1,6 @@
-import { stripStega } from '@datocms/content-link';
 import { notFound } from 'next/navigation';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
+import { linkHref } from '@/lib/datocms/linkHref';
 import CollectionLinks from './CollectionLinks';
 import Intro from './Intro';
 import Materials from './Materials';
@@ -20,12 +20,9 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
   }
 
   const { lng } = params;
-  const [ctaButton] = showcase.cta;
-  const cta = ctaButton && {
-    label: ctaButton.label,
-    href: `/${lng}/${stripStega(ctaButton.slug)}`,
-  };
-  const [collectionsCta] = showcase.collectionsCta;
+  const cta = showcase.cta
+    ? { label: showcase.cta.label, href: linkHref(lng, showcase.cta) }
+    : undefined;
 
   return (
     <>
@@ -35,12 +32,12 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
         cta={cta}
         photos={showcase.displays.filter(hasImage)}
       />
-      {collectionsCta && showcase.collections.length > 0 && (
+      {showcase.collections.length > 0 && (
         <CollectionLinks
           lng={lng}
-          label={generalInterface?.collection}
+          label={generalInterface?.collections}
           collections={showcase.collections}
-          cta={collectionsCta}
+          ctaLabel={showcase.collectionsCtaLabel}
         />
       )}
       {showcase.newProducts.length > 0 && (

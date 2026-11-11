@@ -22,7 +22,7 @@ function getSortOptions(labels: ProductListingLabels) {
     { label: mostPopular, value: 'numberOfReviews_DESC' },
     { label: topRated, value: 'reviewAverage_DESC' },
     { label: price, value: 'price_DESC' },
-    { label: sales, value: 'sale_DESC' },
+    { label: sales, value: 'onSale_DESC' },
   ];
 }
 

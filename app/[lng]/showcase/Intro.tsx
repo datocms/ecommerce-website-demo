@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import OptionalLink from '@/components/Common/OptionalLink';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import Rise from '@/components/Motion/Rise';
 import CtaLabel, { type Cta } from './CtaLabel';
@@ -33,12 +33,12 @@ export default function Intro({ title, description, cta, photos }: Props) {
               />
             )}
             {cta && (
-              <Link
+              <OptionalLink
                 href={cta.href}
                 className={`btn ${description ? 'mt-7' : ''}`}
               >
                 <CtaLabel label={cta.label} />
-              </Link>
+              </OptionalLink>
             )}
           </div>
         )}

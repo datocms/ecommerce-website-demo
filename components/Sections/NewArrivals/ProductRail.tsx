@@ -1,6 +1,5 @@
 import ProductCard from '@/components/ProductCard';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import { isOnSale } from '@/lib/isOnSale';
 import { productPath } from '@/lib/productPath';
 import { ProductRailFragment } from './fragments';
 
@@ -42,7 +41,7 @@ export default function ProductRail({
               hoverImage={product.productImages[1]?.responsiveImage}
               price={product.price}
               salePrice={product.salePrice}
-              onSale={isOnSale(product.sale)}
+              onSale={product.onSale}
               currencySymbol={currencySymbol}
               saleLabel={saleLabel}
               sizes="(min-width: 1440px) 310px, (min-width: 1024px) 22vw, (min-width: 640px) 40vw, 72vw"

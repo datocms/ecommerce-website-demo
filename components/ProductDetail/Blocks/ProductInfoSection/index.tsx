@@ -28,27 +28,25 @@ export default function ProductInfoSection({
   ...rest
 }: Props) {
   const {
-    materials: materialLabel,
+    material: materialLabel,
     style: styleLabel,
     weather: weatherLabel,
     occasions: occasionsLabel,
     more,
   } = readFragment(ProductPageLabelsFragment, labels) ?? {};
 
-  // The block's own spec values; materialSpec is free text, unlike the linked record below
-  const {
-    material: materialSpec,
-    style,
-    weather,
-    occasions,
-  } = readFragment(ProductInfoSectionFragment, fragment);
+  // The block's own spec values; fabric is free text, unlike the linked material record below
+  const { fabric, style, weather, occasions } = readFragment(
+    ProductInfoSectionFragment,
+    fragment,
+  );
 
   // The product's linked material record: its name, photo and listing link
   const materialRecord = readFragment(ProductMaterialFragment, material);
-  const { details, name, id } = materialRecord ?? {};
+  const { image, name, id } = materialRecord ?? {};
 
   const specs = [
-    { key: 'material', label: materialLabel, value: materialSpec },
+    { key: 'material', label: materialLabel, value: fabric },
     { key: 'style', label: styleLabel, value: style },
     { key: 'weather', label: weatherLabel, value: weather },
     { key: 'occasions', label: occasionsLabel, value: occasions },
@@ -82,9 +80,9 @@ export default function ProductInfoSection({
           href={`/${lng}/products?materials=${id}`}
           className={`group ${MEDIA} block aspect-[4/3] md:aspect-[16/9] lg:col-span-6 lg:ml-12 lg:aspect-auto xl:col-span-5 xl:ml-0`}
         >
-          {details?.image.responsiveImage && (
+          {image?.responsiveImage && (
             <DatoImage
-              fragment={details.image.responsiveImage}
+              fragment={image.responsiveImage}
               layout="fill"
               objectFit="cover"
               sizes="(min-width: 1440px) 560px, (min-width: 1280px) 40vw, (min-width: 1024px) 42vw, 100vw"

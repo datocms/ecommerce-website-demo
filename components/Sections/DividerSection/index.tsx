@@ -1,11 +1,11 @@
-import { stripStega } from '@datocms/content-link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
+import OptionalLink from '@/components/Common/OptionalLink';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
+import { linkHref } from '@/lib/datocms/linkHref';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { DividerSectionFragment } from './fragments';
 
@@ -21,12 +21,14 @@ export default function DividerSection({
   globalPageProps,
   image,
 }: Props) {
-  const { id, preTitle, subtitle, title, button } = readFragment(
-    DividerSectionFragment,
-    fragment,
-  );
+  const {
+    id,
+    preTitle,
+    subtitle,
+    title,
+    button: cta,
+  } = readFragment(DividerSectionFragment, fragment);
   const { lng } = globalPageProps.params;
-  const cta = button[0];
   const titleId = `${id}-title`;
 
   const text = (
@@ -42,13 +44,13 @@ export default function DividerSection({
         />
       )}
       {cta && (
-        <Link
-          href={`/${lng}/${stripStega(cta.slug ?? '')}`}
+        <OptionalLink
+          href={linkHref(lng, cta)}
           className="btn mt-8 w-full sm:w-auto"
         >
           {cta.label}
           <ArrowRightIcon aria-hidden="true" className="stroke-2" />
-        </Link>
+        </OptionalLink>
       )}
     </div>
   );

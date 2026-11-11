@@ -5,13 +5,13 @@ import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import { fitTitleStyle } from './fitTitle';
-import { FilterDetailFragment } from './fragments';
+import type { FilterRecord } from './fragments';
 
 type Props = {
   lng: string;
-  name: string;
   eyebrow: string | null | undefined;
-  details: FragmentOf<typeof FilterDetailFragment>;
+  /** The lone selected collection, brand or material */
+  record: FilterRecord;
   /** The image is a logo: shown whole on mist, never cropped */
   logo?: boolean;
 };
@@ -72,16 +72,16 @@ function FilterDetailImage({
 
 export default function FilterDetail({
   lng,
-  name,
   eyebrow,
-  details,
+  record,
   logo = false,
 }: Props) {
   const {
+    name,
     image: { responsiveImage: image },
     subtitle,
     description,
-  } = readFragment(FilterDetailFragment, details);
+  } = record;
 
   return (
     // With a photo, phones and tablets open edge to edge under the header
@@ -103,10 +103,9 @@ export default function FilterDetail({
             </span>
           </h1>
           {subtitle && (
-            <DatoStructuredText
-              data={subtitle}
-              className="mt-5 max-w-[30em] text-xl leading-[1.42] text-pretty text-ink-2 xl:text-2xl [&>p+p]:mt-3"
-            />
+            <p className="mt-5 max-w-[30em] text-xl leading-[1.42] text-pretty text-ink-2 xl:text-2xl">
+              {subtitle}
+            </p>
           )}
           {description && (
             <DatoStructuredText

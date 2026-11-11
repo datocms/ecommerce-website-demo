@@ -52,7 +52,7 @@ export const productsQuery = graphql(
       ) {
         id
         slug
-        sale
+        onSale
         salePrice
         productImages {
           responsiveImage {

@@ -37,7 +37,7 @@ export const query = graphql(
         }
         name
         price
-        sale
+        onSale
         salePrice
         slug
         _allSlugLocales {
@@ -91,7 +91,7 @@ export const query = graphql(
           id
           name
           price
-          sale
+          onSale
           salePrice
           slug
           brand {

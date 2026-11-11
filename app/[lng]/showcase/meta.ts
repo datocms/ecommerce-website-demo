@@ -4,6 +4,7 @@ import {
   type ResultOf,
   type VariablesOf,
 } from '@/lib/datocms/graphql';
+import { LinkRecordFragment } from '@/lib/datocms/linkHref';
 import type { GlobalPageProps } from '@/lib/globalPageProps';
 
 export type PageProps = GlobalPageProps;
@@ -14,7 +15,7 @@ export const query = graphql(
       generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
         currencySymbol
         sale
-        collection
+        collections
         shopNow
       }
       showcase(locale: $locale, fallbackLocales: $fallbackLocale) {
@@ -28,7 +29,7 @@ export const query = graphql(
         newProducts {
           id
           slug
-          sale
+          onSale
           salePrice
           name
           brand {
@@ -63,27 +64,25 @@ export const query = graphql(
         }
         cta {
           label
-          slug
+          page
+          record {
+            ...LinkRecordFragment
+          }
         }
         collections {
           name
           id
-          details {
-            image {
-              responsiveImage {
-                ...ResponsiveImageFragment
-              }
+          image {
+            responsiveImage {
+              ...ResponsiveImageFragment
             }
           }
         }
-        collectionsCta {
-          label
-          slug
-        }
+        collectionsCtaLabel
       }
     }
   `,
-  [ResponsiveImageFragment],
+  [ResponsiveImageFragment, LinkRecordFragment],
 );
 
 export type Query = ResultOf<typeof query>;

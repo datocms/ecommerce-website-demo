@@ -30,7 +30,7 @@ function FeatureTile({
   partnerName,
   compact = false,
 }: FeatureTileProps) {
-  const image = item.details.image.responsiveImage;
+  const image = item.image.responsiveImage;
   const brand = item._modelApiKey === 'brand';
 
   return (

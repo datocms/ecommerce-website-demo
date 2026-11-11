@@ -16,7 +16,7 @@ export const ProductPageLabelsFragment = graphql(/* GraphQL */ `
     priceUndertext
     occasions
     more
-    materials
+    material
     color
   }
 `);

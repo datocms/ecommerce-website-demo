@@ -14,16 +14,13 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import Drawer from '@/components/Common/Drawer';
+import OptionalLink from '@/components/Common/OptionalLink';
 import SocialLink from '@/components/Common/SocialLink';
 import LanguageSelector from '@/components/Layout/LanguageSelector';
+import { linkHref } from '@/lib/datocms/linkHref';
 import type { SiteLocale } from '@/lib/i18n';
 import FeatureTiles from './FeatureTiles';
-import {
-  type DropdownMenu,
-  type LinkItem,
-  linkHref,
-  productsHref,
-} from './menu';
+import { type DropdownMenu, type LinkItem, productsHref } from './menu';
 import { useProductSearch } from './useProductSearch';
 
 type Props = {
@@ -150,7 +147,7 @@ export default function MobileMenu({
           <ul>
             {links.map((link) => (
               <li key={link.id}>
-                <Link
+                <OptionalLink
                   href={linkHref(lng, link)}
                   onClick={onClose}
                   aria-current={isCurrent(link) ? 'page' : undefined}
@@ -164,7 +161,7 @@ export default function MobileMenu({
                     aria-hidden="true"
                     className="size-5 shrink-0 stroke-2"
                   />
-                </Link>
+                </OptionalLink>
               </li>
             ))}
           </ul>

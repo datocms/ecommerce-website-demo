@@ -8,7 +8,7 @@ export const ProductRailFragment = graphql(
       name
       slug
       price
-      sale
+      onSale
       salePrice
       brand {
         name

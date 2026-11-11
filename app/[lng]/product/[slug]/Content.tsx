@@ -7,7 +7,6 @@ import RelatedProducts from '@/components/ProductDetail/RelatedProducts';
 import Reviews from '@/components/ProductDetail/Reviews';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
 import { readFragment } from '@/lib/datocms/graphql';
-import { isOnSale } from '@/lib/isOnSale';
 import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
@@ -18,7 +17,7 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
 
   const { lng } = params;
   const labels = data.generalInterface;
-  const onSale = isOnSale(product.sale);
+  const { onSale } = product;
   const { sale } = readFragment(ProductPageLabelsFragment, labels) ?? {};
 
   return (

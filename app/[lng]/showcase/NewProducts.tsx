@@ -1,7 +1,6 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
+import OptionalLink from '@/components/Common/OptionalLink';
 import ProductCard from '@/components/ProductCard';
-import { isOnSale } from '@/lib/isOnSale';
 import { productPath } from '@/lib/productPath';
 import CtaLabel, { type Cta } from './CtaLabel';
 import type { Showcase } from './meta';
@@ -38,12 +37,12 @@ export default function NewProducts({
               {title}
             </h2>
             {cta && !endTile && (
-              <Link
+              <OptionalLink
                 href={cta.href}
                 className="btn mt-8 hidden max-w-full lg:inline-flex"
               >
                 <CtaLabel label={cta.label} />
-              </Link>
+              </OptionalLink>
             )}
           </div>
         </div>
@@ -60,7 +59,7 @@ export default function NewProducts({
               hoverImage={product.productImages[1]?.responsiveImage}
               price={product.price}
               salePrice={product.salePrice}
-              onSale={isOnSale(product.sale)}
+              onSale={product.onSale}
               currencySymbol={currencySymbol}
               saleLabel={saleLabel}
               sizes="(min-width: 1440px) 443px, (min-width: 1024px) 31vw, 46vw"
@@ -71,7 +70,7 @@ export default function NewProducts({
           {/* Only the square is the link, so its focus ring wraps what shows */}
           {endTile && cta && (
             <div className="reveal row-span-4 mb-(--card-row-gap)">
-              <Link
+              <OptionalLink
                 href={cta.href}
                 className="group flex aspect-[4/5] items-center justify-center bg-mist p-6 text-center outline-offset-4"
               >
@@ -79,17 +78,17 @@ export default function NewProducts({
                   {cta.label}
                   <ArrowRightIcon aria-hidden="true" className="stroke-2" />
                 </span>
-              </Link>
+              </OptionalLink>
             </div>
           )}
         </div>
         {cta && !endTile && (
-          <Link
+          <OptionalLink
             href={cta.href}
             className="btn-line w-full max-sm:[--btn-px:1rem] sm:w-auto sm:justify-self-start lg:hidden"
           >
             <CtaLabel label={cta.label} />
-          </Link>
+          </OptionalLink>
         )}
       </div>
     </section>

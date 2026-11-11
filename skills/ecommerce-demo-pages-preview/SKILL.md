@@ -59,14 +59,14 @@ Existing examples:
 8. Add a `staticParamsQuery` and `generateStaticParams` to `page.tsx` for slug-backed collection routes.
 9. Add `Content.tsx` and `RealTime.tsx` using the existing wrapper/realtime pattern.
 10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
-11. Map the model API key to the route path in `lib/datocms/recordToWebsiteRoute.ts`, which `app/api/draft/preview-links/route.tsx` and `app/api/seoAnalysis/route.tsx` share.
+11. Map the model API key to the route path in `lib/datocms/recordToWebsiteRoute.ts`, which `app/api/draft/preview-links/route.tsx`, `app/api/seoAnalysis/route.tsx`, and `lib/datocms/linkHref.ts` (the hrefs of CMS links) share. If editors should be able to link the new model from link blocks or the notification strip, allow it in those `record` and link validators, and select its slug in `LinkRecordFragment` (`lib/datocms/linkHref.ts`) when the route needs one.
 12. Add the model API key to `SEO_ANALYZED_MODELS` in `app/api/seoAnalysis/route.tsx` when the page should support SEO/readability analysis.
 13. Verify published route, draft preview link, metadata, and localized static params.
 
 ## Preview mapping rules
 
 - Return no preview link for unknown model API keys instead of throwing.
-- Use the record slug only after confirming the field exists.
+- Use the record slug only after confirming the field exists (Home and Showcase have none).
 - Keep draft and published preview link behavior aligned with the existing route handler.
 - Preserve locale in generated preview URLs.
 

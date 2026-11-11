@@ -7,11 +7,11 @@ import {
   DialogTitle,
 } from '@headlessui/react';
 import { ArrowRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import OptionalLink from '@/components/Common/OptionalLink';
 import { MEDIA, SCRIM } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
-import { linkHref } from './menu';
+import { linkHref } from '@/lib/datocms/linkHref';
 
 type Popup = NonNullable<NonNullable<LayoutQuery['layout']>['popup']>;
 
@@ -23,7 +23,7 @@ type Props = {
 };
 
 export default function PopupDialog({ open, onClose, popup, lng }: Props) {
-  const button = popup.button[0];
+  const { button } = popup;
 
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
@@ -70,14 +70,14 @@ export default function PopupDialog({ open, onClose, popup, lng }: Props) {
               </p>
             )}
             {button && (
-              <Link
+              <OptionalLink
                 onClick={onClose}
                 className="btn mt-8 w-full"
                 href={linkHref(lng, button)}
               >
                 {button.label}
                 <ArrowRightIcon aria-hidden="true" className="stroke-2" />
-              </Link>
+              </OptionalLink>
             )}
             {(popup.dismissButtonLabel || popup.underText) && (
               <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">

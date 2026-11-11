@@ -27,6 +27,7 @@ export const query = graphql(/* GraphQL */ `
         content
         tag
       }
+      title
       content {
         value
       }

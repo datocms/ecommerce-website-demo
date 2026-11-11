@@ -1,4 +1,5 @@
 import type { Product } from '@/app/[lng]/product/[slug]/meta';
+import DemoActionButton from '@/components/Common/DemoActionButton';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import { readFragment } from '@/lib/datocms/graphql';
 import { type ProductPageLabels, ProductPageLabelsFragment } from './fragments';
@@ -43,9 +44,9 @@ export default function Reviews({ product, labels, lng }: Props) {
           </div>
         </div>
         {reviewButton && (
-          <button type="button" className="btn-line w-full sm:w-auto">
+          <DemoActionButton className="btn-line w-full sm:w-auto">
             {reviewButton}
-          </button>
+          </DemoActionButton>
         )}
       </div>
 

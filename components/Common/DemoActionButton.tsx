@@ -12,7 +12,7 @@ import { SCRIM } from './styles';
 
 export const DEMO_NOTICE_TITLE = 'This is a DatoCMS Demo';
 export const DEMO_NOTICE_TEXT =
-  'To use the cart and enable purchases, an integration with Shopify or Commerce Layer is necessary.';
+  'To use the cart, enable purchases or collect reviews, an integration with a tool like Shopify or Commerce Layer is necessary.';
 
 type Props = Omit<ComponentPropsWithoutRef<'button'>, 'type' | 'onClick'>;
 

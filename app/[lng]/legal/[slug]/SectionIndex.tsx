@@ -6,7 +6,7 @@ import { getScrollPaddingTop, LG_MEDIA_QUERY } from '@/lib/scrollPadding';
 export type Section = { id: string; title: string };
 
 type Props = {
-  label?: string;
+  label: string;
   sections: Section[];
 };
 

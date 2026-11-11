@@ -22,20 +22,16 @@ export const slugify = (text: string) =>
     .replace(/[^\p{L}\p{N}]+/gu, '-')
     .replace(/^-|-$/g, '');
 
-/** h2s become anchored entries in the section index; the h1 labels the index */
+/** h2s become anchored entries in the section index */
 export function indexSections(value: Document): {
-  pageTitle?: string;
   sections: Section[];
   anchorIds: Map<Node, string>;
 } {
   const anchorIds = new Map<Node, string>();
   const sections: Section[] = [];
-  let pageTitle: string | undefined;
   for (const node of value.document.children) {
-    if (!isHeading(node)) continue;
+    if (!isHeading(node) || node.level !== 2) continue;
     const title = stripStega(textOf(node)).trim();
-    if (node.level === 1) pageTitle ??= title || undefined;
-    if (node.level !== 2) continue;
     const slug = slugify(title) || `section-${sections.length + 1}`;
     let id = slug;
     for (let n = 2; sections.some((section) => section.id === id); n++) {
@@ -44,5 +40,5 @@ export function indexSections(value: Document): {
     anchorIds.set(node, id);
     sections.push({ id, title });
   }
-  return { pageTitle, sections, anchorIds };
+  return { sections, anchorIds };
 }

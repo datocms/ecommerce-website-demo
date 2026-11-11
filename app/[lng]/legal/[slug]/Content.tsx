@@ -1,3 +1,4 @@
+import { stripStega } from '@datocms/content-link';
 import { type Document, isHeading } from 'datocms-structured-text-utils';
 import { notFound } from 'next/navigation';
 import { renderNodeRule } from 'react-datocms/structured-text';
@@ -13,19 +14,21 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
     notFound();
   }
 
-  const value = data.legalPage.content.value as Document;
-  const { pageTitle, sections, anchorIds } = indexSections(value);
+  const { title, content } = data.legalPage;
+  const value = content.value as Document;
+  const { sections, anchorIds } = indexSections(value);
 
   return (
     <div className="shell grid pt-(--page-top) lg:grid-cols-12 lg:gap-x-4">
       {sections.length > 0 && (
-        <SectionIndex label={pageTitle} sections={sections} />
+        <SectionIndex label={stripStega(title)} sections={sections} />
       )}
       <article
         lang={toLanguageTag(params.lng)}
-        // The document's h1 is the page title, so it takes the page-title size and arrival
+        // The h1 takes the page-title size and arrival
         className={`prose-dato [&_h1]:title-statement [&_h1]:enter ${sections.length > 0 ? 'lg:col-span-8 lg:col-start-5' : 'lg:col-span-full'}`}
       >
+        <h1>{title}</h1>
         <DatoStructuredText
           data={value}
           customNodeRules={[

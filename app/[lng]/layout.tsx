@@ -22,6 +22,12 @@ type Props = GlobalPageProps & {
   children: React.ReactNode;
 };
 
+// Prerenders every page that has no other dynamic segment, once per locale
+export async function generateStaticParams() {
+  const locales = await getAvailableLocales();
+  return locales.map((lng) => ({ lng }));
+}
+
 // Makes the canonical, hreflang and share-image URLs absolute
 export function generateMetadata(): Metadata {
   return { metadataBase: new URL(getSiteUrl()) };

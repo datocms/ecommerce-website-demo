@@ -3,19 +3,23 @@ import { isLink } from 'datocms-structured-text-utils';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import { markRenderer } from '@/components/DatoStructuredText/markRenderer';
 import { recordHref } from '@/lib/datocms/linkHref';
+import { hideWhenDismissed } from '@/lib/dismissedAnnouncement';
 
 type LayoutNotification = NonNullable<
   NonNullable<LayoutQuery['layout']>['notification']
 >;
 
 type Props = {
+  /** Fingerprint of the message, which a dismissal is remembered by */
+  id: string;
   notification: LayoutNotification;
   onDismiss: () => void;
   lng: string;
+  dismissLabel: string | undefined;
 };
 
 // The grey marker would be lost on black: marks render as semibold instead
@@ -51,12 +55,16 @@ function StripLink({
 }
 
 export default function NotificationStrip({
+  id,
   notification,
   lng,
   onDismiss,
+  dismissLabel,
 }: Props) {
   return (
     <div data-chrome="strip" className="surface-ink">
+      {/* Hidden before hydration when it was dismissed on an earlier visit */}
+      <style>{hideWhenDismissed(id, '[data-chrome="strip"]')}</style>
       <div className="shell relative flex min-h-10 items-center justify-center py-2.5 text-center">
         {/* px-10 keeps the message clear of the dismiss button */}
         <DatoStructuredText
@@ -77,7 +85,7 @@ export default function NotificationStrip({
         {/* Lined up with the header's bag icon below */}
         <button
           type="button"
-          aria-label="Dismiss announcement"
+          aria-label={dismissLabel}
           className="icon-btn absolute top-1/2 right-[calc(var(--gutter)-0.4375rem)] size-10 -translate-y-1/2 focus-visible:outline-offset-[-2px] [&>svg]:size-4 [&>svg]:stroke-2"
           onClick={onDismiss}
         >

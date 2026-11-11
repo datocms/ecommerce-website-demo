@@ -1,4 +1,4 @@
-import type { Product } from '@/app/[lng]/product/[slug]/meta';
+import type { Product } from '@/app/[lng]/(site)/product/[slug]/meta';
 
 export type Variation = Product['productVariations'][number];
 

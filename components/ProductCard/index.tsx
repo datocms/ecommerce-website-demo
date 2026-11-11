@@ -21,6 +21,9 @@ type Props = {
   onSale: boolean;
   currencySymbol: string;
   saleLabel?: string | null;
+  /** Spoken before the prices (see Price) */
+  salePriceLabel?: string;
+  originalPriceLabel?: string;
   sizes: string;
   priority?: boolean;
   titleAs?: 'h2' | 'h3' | 'p';
@@ -44,6 +47,8 @@ export default function ProductCard({
   onSale,
   currencySymbol,
   saleLabel,
+  salePriceLabel,
+  originalPriceLabel,
   sizes,
   priority = false,
   titleAs: Title = 'h3',
@@ -115,6 +120,8 @@ export default function ProductCard({
         salePrice={salePrice}
         onSale={onSale}
         currencySymbol={currencySymbol}
+        salePriceLabel={salePriceLabel}
+        originalPriceLabel={originalPriceLabel}
         size={size === 'lg' ? 'md' : 'sm'}
         className="pt-2.5 text-ink"
       />

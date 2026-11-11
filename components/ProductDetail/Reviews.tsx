@@ -1,4 +1,4 @@
-import type { Product } from '@/app/[lng]/product/[slug]/meta';
+import type { Product } from '@/app/[lng]/(site)/product/[slug]/meta';
 import DemoActionButton from '@/components/Common/DemoActionButton';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import { readFragment } from '@/lib/datocms/graphql';
@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default function Reviews({ product, labels, lng }: Props) {
-  const { reviewButton, reviews } =
+  const { reviewButton, reviews, outOfFive } =
     readFragment(ProductPageLabelsFragment, labels) ?? {};
 
   const average = product.reviewAverage;
@@ -33,7 +33,7 @@ export default function Reviews({ product, labels, lng }: Props) {
         <div className="flex items-end gap-5">
           <p className="reveal mask text-[4rem] leading-[0.8] font-semibold tracking-[-0.05em] tabular-nums lg:text-[5rem]">
             {formattedAverage}
-            <span className="sr-only"> out of 5</span>
+            <span className="sr-only"> {outOfFive}</span>
           </p>
           <div className="pb-0.5">
             <StarRating value={average} decorative />
@@ -60,7 +60,10 @@ export default function Reviews({ product, labels, lng }: Props) {
             return (
               <li key={review.id} className="flex flex-col lg:pr-10">
                 <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                  <StarRating value={review.reviewScore} />
+                  <StarRating
+                    value={review.reviewScore}
+                    outOfFive={outOfFive}
+                  />
                   <time
                     dateTime={review.reviewDate}
                     className="text-sm text-mute"

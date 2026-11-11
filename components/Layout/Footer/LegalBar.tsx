@@ -1,4 +1,4 @@
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import LanguageSelector from '@/components/Layout/LanguageSelector';
 
 type GeneralInterface = LayoutQuery['generalInterface'];
@@ -10,6 +10,7 @@ type Props = {
   currencySymbols:
     | NonNullable<GeneralInterface>['_allCurrencySymbolLocales']
     | undefined;
+  languageLabel: string | undefined;
 };
 
 // --draft-toggle-w is published by DraftModeToggle
@@ -21,6 +22,7 @@ export default function LegalBar({
   locales,
   currencySymbol,
   currencySymbols,
+  languageLabel,
 }: Props) {
   return (
     // 80px tall from md, so the fixed draft toggle (48px, bottom-4) rests centred in it; the
@@ -35,6 +37,7 @@ export default function LegalBar({
           languages={locales}
           currencySymbol={currencySymbol}
           currencySymbols={currencySymbols}
+          label={languageLabel}
           placement="above-start-md-end"
           chevron
           className="-mx-2.5 min-h-11 px-2.5 text-ink-2 hover:text-white aria-expanded:text-white [&>svg:first-child]:size-4"

@@ -1,4 +1,4 @@
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import { productsPath } from '@/lib/routes';
 
 type MenuItem = NonNullable<LayoutQuery['layout']>['menu'][number];

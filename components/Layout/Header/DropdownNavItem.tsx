@@ -1,6 +1,6 @@
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import MegaMenuPanel from './MegaMenuPanel';
 import type { DropdownMenu } from './menu';
 import { NAV_ITEM } from './styles';

@@ -1,7 +1,11 @@
 'use client';
 
 import { ArrowsUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
-import type { ProductListingLabels } from './fragments';
+import { readFragment } from '@/lib/datocms/graphql';
+import {
+  type ProductListingLabels,
+  ProductListingLabelsFragment,
+} from './fragments';
 import { FILTER_TRANSITION_TYPES, usePendingQuery } from './PendingQuery';
 import { getSortOptions } from './sortOptions';
 
@@ -12,10 +16,11 @@ type Props = {
 export default function SortChips({ labels }: Props) {
   const { pendingParams, pushQueryParam } = usePendingQuery();
   const currentSort = pendingParams.get('orderBy');
+  const { sort } = readFragment(ProductListingLabelsFragment, labels) ?? {};
 
   return (
     <fieldset
-      aria-label="Sort"
+      aria-label={sort}
       className="flex min-w-0 flex-wrap items-center gap-2 pb-6"
     >
       <span

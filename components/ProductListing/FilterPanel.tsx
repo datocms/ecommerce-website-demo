@@ -43,6 +43,7 @@ export default function FilterPanel({
     CollectionRecord: collectionLabel,
     MaterialRecord: materialLabel,
     BrandRecord: brandLabel,
+    applied,
   } = readFragment(ProductListingLabelsFragment, labels) ?? {};
 
   const { allCollections, allBrands, allMaterials } = readFragment(
@@ -104,6 +105,7 @@ export default function FilterPanel({
           selectedIds={group.selectedIds}
           checked={group.checked}
           narrowed={group.narrowed}
+          applied={applied}
           defaultOpen={group.narrowed || (!anyNarrowed && index === 0)}
           onToggle={(optionId) => toggleOption(group.id, optionId)}
         />

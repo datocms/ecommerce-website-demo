@@ -10,6 +10,8 @@ type Props = {
   lng: string;
   currencySymbol: string;
   saleLabel?: string | null;
+  salePriceLabel?: string;
+  originalPriceLabel?: string;
 };
 
 // 4¼ cards from lg, so the next one is always in view. Each <li> is the 4-row grid ProductCard's
@@ -20,6 +22,8 @@ export default function ProductRail({
   lng,
   currencySymbol,
   saleLabel,
+  salePriceLabel,
+  originalPriceLabel,
 }: Props) {
   return (
     <ul
@@ -44,6 +48,8 @@ export default function ProductRail({
               onSale={product.onSale}
               currencySymbol={currencySymbol}
               saleLabel={saleLabel}
+              salePriceLabel={salePriceLabel}
+              originalPriceLabel={originalPriceLabel}
               sizes="(min-width: 1440px) 310px, (min-width: 1024px) 22vw, (min-width: 640px) 40vw, 72vw"
             />
           </li>

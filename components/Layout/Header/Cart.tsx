@@ -2,6 +2,7 @@ import {
   InformationCircleIcon,
   ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import DemoActionButton, {
   DEMO_NOTICE_TEXT,
   DEMO_NOTICE_TITLE,
@@ -12,34 +13,35 @@ import { formatPrice } from '@/lib/formatPrice';
 type Props = {
   open: boolean;
   onClose: () => void;
-  currencySymbol: string | null | undefined;
+  generalInterface: LayoutQuery['generalInterface'];
 };
 
-export default function Cart({ open, onClose, currencySymbol }: Props) {
+export default function Cart({ open, onClose, generalInterface }: Props) {
   return (
     <Drawer
       open={open}
       onClose={onClose}
       side="right"
-      closeLabel="Close bag"
+      closeLabel={generalInterface?.close}
       title={
         <>
-          Bag <span className="font-normal text-mute tabular-nums">(0)</span>
+          {generalInterface?.bag}{' '}
+          <span className="font-normal text-mute tabular-nums">(0)</span>
         </>
       }
       footer={
         <>
           <div className="flex justify-between text-md font-semibold">
-            <p>Subtotal</p>
+            <p>{generalInterface?.subtotal}</p>
             <p className="tabular-nums">
-              {formatPrice(currencySymbol ?? '', 0)}
+              {formatPrice(generalInterface?.currencySymbol ?? '', 0)}
             </p>
           </div>
           <p className="mt-1 text-sm text-mute">
-            Shipping and taxes calculated at checkout.
+            {generalInterface?.checkoutNote}
           </p>
           <DemoActionButton className="btn mt-5 w-full">
-            Checkout
+            {generalInterface?.checkout}
           </DemoActionButton>
         </>
       }
@@ -61,16 +63,16 @@ export default function Cart({ open, onClose, currencySymbol }: Props) {
         <span className="grid size-20 place-items-center bg-mist">
           <ShoppingBagIcon aria-hidden="true" className="size-7" />
         </span>
-        <p className="title-card mt-6">Your bag is empty</p>
+        <p className="title-card mt-6">{generalInterface?.bagEmptyTitle}</p>
         <p className="mt-2 max-w-[28ch] text-sm text-pretty text-mute">
-          Pieces you add to your bag will appear here.
+          {generalInterface?.bagEmptyText}
         </p>
         <button
           type="button"
           onClick={onClose}
           className="btn-line btn-sm mt-7"
         >
-          Continue shopping
+          {generalInterface?.continueShopping}
         </button>
       </div>
     </Drawer>

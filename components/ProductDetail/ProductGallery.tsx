@@ -2,7 +2,7 @@
 
 import { type UIEvent, useEffect, useRef, useState } from 'react';
 import { RSCImage } from 'react-datocms/rsc-image';
-import type { Product } from '@/app/[lng]/product/[slug]/meta';
+import type { Product } from '@/app/[lng]/(site)/product/[slug]/meta';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';

@@ -6,7 +6,7 @@ import {
 } from 'datocms-structured-text-utils';
 import { Fragment } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
-import type { Product } from '@/app/[lng]/product/[slug]/meta';
+import type { Product } from '@/app/[lng]/(site)/product/[slug]/meta';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import ProductInfoSection from './Blocks/ProductInfoSection';
 import QuestionsSection from './Blocks/QuestionsSection';

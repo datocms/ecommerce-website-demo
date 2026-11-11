@@ -9,7 +9,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { type ReactNode, Suspense, useRef, useState } from 'react';
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import OptionalLink from '@/components/Common/OptionalLink';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import LanguageSelector from '@/components/Layout/LanguageSelector';
@@ -91,7 +91,7 @@ export default function NavBar({ globalPageProps, data }: Props) {
       <Cart
         open={cartIsOpen}
         onClose={() => setCartIsOpen(false)}
-        currencySymbol={generalInterface?.currencySymbol}
+        generalInterface={generalInterface}
       />
 
       {/* SearchDialog reads useSearchParams, so it gets its own boundary */}
@@ -102,6 +102,8 @@ export default function NavBar({ globalPageProps, data }: Props) {
           onClose={() => setSearchIsOpen(false)}
           placeholder={searchPlaceholder}
           minHeight={searchMinHeight}
+          searchLabel={generalInterface?.search}
+          closeLabel={generalInterface?.close}
         />
       </Suspense>
 
@@ -127,13 +129,13 @@ export default function NavBar({ globalPageProps, data }: Props) {
       >
         {/* --nav-x: 6px to 14px over 1100-1280px, so long locales clear the logo; an open panel keeps the only underline */}
         <nav
-          aria-label="Main"
+          aria-label={generalInterface?.menu}
           className="shell grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-x-4 [--nav-x:clamp(0.375rem,calc((100vw_-_68.75rem)/22.5_+_0.375rem),0.875rem)] nav:h-18 [&:has([data-open])_[aria-current=page]:not(:hover)]:after:scale-x-0"
         >
           <div className="-ml-2.5 flex min-w-0 items-center justify-self-start nav:-ml-(--nav-x)">
             <button
               type="button"
-              aria-label="Menu"
+              aria-label={generalInterface?.menu}
               aria-haspopup="dialog"
               aria-expanded={menuIsOpen}
               onClick={() => setMenuIsOpen(true)}
@@ -187,7 +189,9 @@ export default function NavBar({ globalPageProps, data }: Props) {
               wordmark={wordmark}
               wordmarkClassName="max-[22.5rem]:sr-only"
             />
-            {!wordmark && <span className="sr-only">Home</span>}
+            {!wordmark && (
+              <span className="sr-only">{generalInterface?.home}</span>
+            )}
           </Link>
 
           <div className="-mr-2.5 flex min-w-0 items-center justify-self-end">
@@ -213,6 +217,7 @@ export default function NavBar({ globalPageProps, data }: Props) {
                 languages={data._site.locales}
                 currencySymbol={generalInterface?.currencySymbol}
                 currencySymbols={generalInterface?._allCurrencySymbolLocales}
+                label={generalInterface?.languageAndCurrency}
                 // Globe only until xl; screen readers always get the label
                 labelClassName="max-xl:sr-only"
                 className="h-10 px-2.5 text-sm hover:bg-mist aria-expanded:bg-mist max-xl:w-10 max-xl:justify-center max-xl:px-0 [&>svg]:size-5"
@@ -239,7 +244,7 @@ export default function NavBar({ globalPageProps, data }: Props) {
               <span className="tag-dark absolute top-0 -right-1.25 min-h-4.5 min-w-4.5 justify-center px-1 leading-4.5 tracking-normal">
                 0
               </span>
-              <span className="sr-only"> items in bag</span>
+              <span className="sr-only"> {generalInterface?.itemsInBag}</span>
             </button>
           </div>
         </nav>

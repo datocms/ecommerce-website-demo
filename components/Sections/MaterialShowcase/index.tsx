@@ -1,5 +1,7 @@
-import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { isList, isListItem } from 'datocms-structured-text-utils';
 import Link from 'next/link';
+import { renderNodeRule } from 'react-datocms/structured-text';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import DatoStructuredText from '@/components/DatoStructuredText';
@@ -24,6 +26,24 @@ const IMAGE_SIZES = {
   4: '(min-width: 1440px) 340px, (min-width: 1024px) 24vw, (min-width: 640px) 48vw, 100vw',
 } as const;
 
+// A list in the text reads as commitments: ticked rows split by hairlines
+const COMMITMENT_LIST_RULES = [
+  renderNodeRule(isList, ({ children, key }) => (
+    <ul key={key} className="mt-6 border-t border-line">
+      {children}
+    </ul>
+  )),
+  renderNodeRule(isListItem, ({ children, key }) => (
+    <li
+      key={key}
+      className="flex items-center gap-3 border-b border-line py-3.5 text-sm font-semibold text-ink"
+    >
+      <CheckIcon aria-hidden="true" className="size-4 shrink-0 stroke-2" />
+      {children}
+    </li>
+  )),
+];
+
 // Four columns only when the count fills rows of four but not rows of three (4, 8, 16…)
 function columnCount(materials: number): 2 | 3 | 4 {
   if (materials <= 2) return 2;
@@ -41,20 +61,23 @@ export default function MaterialShowcase({ fragment, lng }: Props) {
 
   return (
     <section aria-labelledby={titleId} className="shell pt-(--section-gap)">
-      <div className="max-w-[44rem]">
-        <h2 id={titleId} className="title-section">
-          {title}
-        </h2>
-        {description && (
-          <DatoStructuredText
-            data={description}
-            className="mt-5 text-lg leading-[1.5] text-pretty"
-          />
-        )}
+      <div className="grid gap-y-8 lg:grid-cols-12 lg:gap-x-4">
+        <div className="lg:col-span-6">
+          <h2 id={titleId} className="title-section">
+            {title}
+          </h2>
+          {description && (
+            <DatoStructuredText
+              data={description}
+              className="mt-5 max-w-[32rem] text-lg leading-[1.5] text-pretty"
+            />
+          )}
+        </div>
         {subDescription && (
           <DatoStructuredText
             data={subDescription}
-            className="mt-3 text-base leading-[1.65] text-pretty text-ink-2"
+            className="text-base leading-[1.65] text-pretty text-ink-2 lg:col-span-5 lg:col-start-8 lg:pt-3"
+            customNodeRules={COMMITMENT_LIST_RULES}
           />
         )}
       </div>

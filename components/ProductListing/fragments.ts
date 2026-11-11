@@ -11,6 +11,29 @@ export const ProductListingLabelsFragment = graphql(/* GraphQL */ `
     topRated
     price
     sales
+    salePrice
+    originalPrice
+    products
+    viewAllProducts
+    filters
+    applied
+    clearAll
+    clearSearch
+    sort
+    result
+    results
+    showing
+    of
+    pagination
+    previous
+    next
+    noResultsTitle
+    noResultsText
+    emptyPageTitle
+    emptyPageText
+    backToFirstPage
+    showResults
+    close
     # Aliased to each record's __typename, so a filter's label is labels[record.__typename]
     CollectionRecord: collections
     MaterialRecord: materials

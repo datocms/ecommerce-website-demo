@@ -1,5 +1,5 @@
 import { stripStega } from '@datocms/content-link';
-import { productsPath, showcasePath, storesPath } from '@/lib/routes';
+import { homePath, productsPath, showcasePath, storesPath } from '@/lib/routes';
 import { type FragmentOf, graphql, readFragment } from './graphql';
 import { recordToWebsiteRoute } from './recordToWebsiteRoute';
 
@@ -40,6 +40,8 @@ export function recordHref(lng: string, record: LinkRecord) {
 // out of the comparison
 function pageHref(lng: string, page: string | null) {
   switch (stripStega(page ?? '')) {
+    case 'home':
+      return homePath(lng);
     case 'products':
       return productsPath(lng);
     case 'sale':

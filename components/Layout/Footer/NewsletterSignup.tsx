@@ -1,26 +1,31 @@
 'use client';
 
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import { useState } from 'react';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
+import { DemoNotice } from '@/components/Common/DemoActionButton';
 
 type Props = {
   generalInterface: LayoutQuery['generalInterface'];
 };
 
+const NEWSLETTER_NOTICE =
+  'To collect newsletter sign-ups, an integration with an email tool like Mailchimp or Klaviyo is necessary.';
+
 // On the footer grid, so the form lines up with the link columns below
 export default function NewsletterSignup({ generalInterface }: Props) {
+  const [noticeOpen, setNoticeOpen] = useState(false);
+
   return (
-    <div className="shell grid gap-6 py-12 md:py-14 lg:grid-cols-12 lg:items-end lg:gap-4">
-      <div className="lg:col-span-4 xl:col-span-5">
-        {generalInterface?.newsletter && (
-          <p className="eyebrow text-mute">{generalInterface.newsletter}</p>
-        )}
-        <h2 className="title-card mt-2 text-balance first:mt-0">
-          {generalInterface?.subscribeToOurNewsletter}
-        </h2>
-      </div>
+    <div className="shell grid gap-4 py-8 lg:grid-cols-12 lg:items-center">
+      <h2 className="title-item text-balance lg:col-span-4 xl:col-span-5">
+        {generalInterface?.subscribeToOurNewsletter}
+      </h2>
       {/* Demo only: no newsletter provider is wired up */}
       <form
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={(event) => {
+          event.preventDefault();
+          setNoticeOpen(true);
+        }}
         className="flex lg:col-span-8 lg:col-start-5 xl:col-span-7 xl:col-start-6"
       >
         <label htmlFor="footer-newsletter-email" className="sr-only">
@@ -37,6 +42,11 @@ export default function NewsletterSignup({ generalInterface }: Props) {
           {generalInterface?.newsletterButton}
         </button>
       </form>
+      <DemoNotice
+        open={noticeOpen}
+        onClose={() => setNoticeOpen(false)}
+        text={NEWSLETTER_NOTICE}
+      />
     </div>
   );
 }

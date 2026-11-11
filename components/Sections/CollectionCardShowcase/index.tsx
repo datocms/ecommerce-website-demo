@@ -14,6 +14,9 @@ type Props = {
   title?: string | null;
   /** Navigation link to the whole catalog ("All products") */
   action?: { label: string; href: string };
+  /** General interface "Previous" and "Next" labels, for the rail buttons */
+  previousLabel?: string;
+  nextLabel?: string;
 };
 
 // Up to four columns side by side from lg; more wrap onto another row
@@ -37,6 +40,8 @@ export default function CollectionCardShowcase({
   id,
   title,
   action,
+  previousLabel,
+  nextLabel,
 }: Props) {
   const columns = Math.min(sections.length, 4);
   const titleId = `${id}-seasons-title`;
@@ -74,7 +79,13 @@ export default function CollectionCardShowcase({
         id={titleId}
         title={title}
         action={action}
-        aside={<RailControls railId={railId} />}
+        aside={
+          <RailControls
+            railId={railId}
+            previousLabel={previousLabel}
+            nextLabel={nextLabel}
+          />
+        }
         className="mb-8 lg:mb-12"
       />
       {grid}

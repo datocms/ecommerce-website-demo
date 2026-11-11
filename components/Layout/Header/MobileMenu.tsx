@@ -2,7 +2,7 @@
 
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import type { ReactNode } from 'react';
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import Drawer from '@/components/Common/Drawer';
 import OptionalLink from '@/components/Common/OptionalLink';
 import SocialLink from '@/components/Common/SocialLink';
@@ -49,7 +49,7 @@ export default function MobileMenu({
       open={open}
       onClose={onClose}
       side="left"
-      closeLabel="Close menu"
+      closeLabel={generalInterface?.close}
       title={title}
     >
       <MobileSearchForm
@@ -58,7 +58,7 @@ export default function MobileMenu({
         onDone={onClose}
       />
 
-      <nav aria-label="Main" className="mt-2">
+      <nav aria-label={generalInterface?.menu} className="mt-2">
         {categories.map((category, index) => (
           <MobileCategory
             key={category.id}
@@ -100,6 +100,7 @@ export default function MobileMenu({
           languages={locales}
           currencySymbol={generalInterface?.currencySymbol}
           currencySymbols={generalInterface?._allCurrencySymbolLocales}
+          label={generalInterface?.languageAndCurrency}
           placement="above-start"
           className="h-11 border border-line px-4 text-sm hover:border-ink aria-expanded:border-ink"
           onNavigate={onClose}

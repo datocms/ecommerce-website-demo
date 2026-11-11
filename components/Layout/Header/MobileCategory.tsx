@@ -7,7 +7,7 @@ import {
 } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import FeatureTiles from './FeatureTiles';
 import { type DropdownMenu, productsHref } from './menu';
 import { MENU_ROW } from './styles';

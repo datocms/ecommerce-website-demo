@@ -8,6 +8,9 @@ import { SCROLL_EPSILON, scrollRange, watchScroller } from './watchScroller';
 type Props = {
   /** id of the horizontal scroller the buttons drive */
   railId: string;
+  /** General interface "Previous" and "Next" labels */
+  previousLabel?: string;
+  nextLabel?: string;
 };
 
 // How far a press scrolls: every item that is fully in view, so the next press starts on the
@@ -30,7 +33,11 @@ function scrollDistance(rail: HTMLElement) {
  * Previous/next buttons for the scroller with id railId; hidden on phones and when everything
  * fits. Also reveals a partly hidden focused item.
  */
-export default function RailControls({ railId }: Props) {
+export default function RailControls({
+  railId,
+  previousLabel,
+  nextLabel,
+}: Props) {
   useRevealFocus(railId);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -65,7 +72,7 @@ export default function RailControls({ railId }: Props) {
     <div className="hidden items-center gap-2 sm:flex">
       <button
         type="button"
-        aria-label="Previous"
+        aria-label={previousLabel}
         aria-controls={railId}
         aria-disabled={atStart}
         onClick={() => !atStart && scroll(-1)}
@@ -75,7 +82,7 @@ export default function RailControls({ railId }: Props) {
       </button>
       <button
         type="button"
-        aria-label="Next"
+        aria-label={nextLabel}
         aria-controls={railId}
         aria-disabled={atEnd}
         onClick={() => !atEnd && scroll(1)}

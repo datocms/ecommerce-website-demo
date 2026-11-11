@@ -5,8 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type ReactNode, useState, useTransition } from 'react';
 import Drawer from '@/components/Common/Drawer';
+import { readFragment } from '@/lib/datocms/graphql';
 import { productsPath } from '@/lib/routes';
 import AppliedCount from './AppliedCount';
+import {
+  type ProductListingLabels,
+  ProductListingLabelsFragment,
+} from './fragments';
 import { FILTER_TRANSITION_TYPES, PendingQueryProvider } from './PendingQuery';
 import { useScrollBackUnderToolbar } from './useScrollBackUnderToolbar';
 
@@ -19,6 +24,7 @@ const BAR_WITHOUT_FILTER_DETAIL = 'lg:top-(--header-h)';
 type Props = {
   count: number;
   lng: string;
+  labels: ProductListingLabels;
   /** Filter groups that narrow the listing, shown as a count on the trigger */
   activeFilterCount?: number;
   sort: ReactNode;
@@ -31,6 +37,7 @@ type Props = {
 export default function ListingToolbar({
   count,
   lng,
+  labels,
   activeFilterCount = 0,
   sort,
   searchChip,
@@ -40,7 +47,9 @@ export default function ListingToolbar({
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [isClearing, startClearing] = useTransition();
-  const resultsLabel = `${count} ${count === 1 ? 'result' : 'results'}`;
+  const { filters, applied, clearAll, result, results, showResults, close } =
+    readFragment(ProductListingLabelsFragment, labels) ?? {};
+  const resultsLabel = `${count} ${count === 1 ? result : results}`;
 
   const { toolbarRef, resultsTopRef, scrollBackWhenQueryLoads } =
     useScrollBackUnderToolbar(open);
@@ -62,9 +71,9 @@ export default function ListingToolbar({
             className="press -ml-2 inline-flex h-14 shrink-0 items-center gap-2.5 px-2 text-sm font-semibold underline-offset-4 outline-offset-[-2px] hover:underline [&>svg]:size-5"
           >
             <AdjustmentsHorizontalIcon aria-hidden="true" />
-            Filters
+            {filters}
             {activeFilterCount > 0 && (
-              <AppliedCount count={activeFilterCount} />
+              <AppliedCount count={activeFilterCount} applied={applied} />
             )}
           </button>
           <span
@@ -94,8 +103,8 @@ export default function ListingToolbar({
         open={open}
         onClose={() => setOpen(false)}
         side="left"
-        title="Filters"
-        closeLabel="Close filters"
+        title={filters}
+        closeLabel={close}
         footer={
           <div className="flex items-center gap-6">
             <p role="status" className="sr-only">
@@ -118,14 +127,14 @@ export default function ListingToolbar({
               }}
               className="link-underline inline-flex min-h-11 shrink-0 items-center text-sm font-semibold"
             >
-              Clear all
+              {clearAll}
             </Link>
             <button
               type="button"
               onClick={() => setOpen(false)}
               className="btn flex-1 tabular-nums"
             >
-              Show {resultsLabel}
+              {showResults?.replace('{count}', String(count))}
             </button>
           </div>
         }

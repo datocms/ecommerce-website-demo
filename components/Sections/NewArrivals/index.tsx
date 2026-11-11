@@ -18,6 +18,13 @@ type Props = {
   shopNow?: string | null;
   currencySymbol?: string | null;
   saleLabel?: string | null;
+  /** General interface labels for the prices and the rail buttons */
+  labels?: {
+    salePrice?: string;
+    originalPrice?: string;
+    previous?: string;
+    next?: string;
+  } | null;
 };
 
 const SECTION_ID = 'new-arrivals';
@@ -30,6 +37,7 @@ export default function NewArrivals({
   shopNow,
   currencySymbol,
   saleLabel,
+  labels,
 }: Props) {
   if (products.length === 0) return null;
   const titleId = `${SECTION_ID}-title`;
@@ -37,7 +45,13 @@ export default function NewArrivals({
   const action = shopNow
     ? { label: shopNow, href: productsPath(lng) }
     : undefined;
-  const controls = <RailControls railId={railId} />;
+  const controls = (
+    <RailControls
+      railId={railId}
+      previousLabel={labels?.previous}
+      nextLabel={labels?.next}
+    />
+  );
 
   return (
     <section
@@ -69,6 +83,8 @@ export default function NewArrivals({
         lng={lng}
         currencySymbol={currencySymbol ?? ''}
         saleLabel={saleLabel}
+        salePriceLabel={labels?.salePrice}
+        originalPriceLabel={labels?.originalPrice}
       />
       <div className="shell">
         <RailProgress railId={railId} className="mt-10" />

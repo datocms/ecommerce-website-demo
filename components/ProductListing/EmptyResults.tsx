@@ -5,7 +5,12 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import LinkPending from '@/components/Motion/LinkPending';
+import { readFragment } from '@/lib/datocms/graphql';
 import { productsPath } from '@/lib/routes';
+import {
+  type ProductListingLabels,
+  ProductListingLabelsFragment,
+} from './fragments';
 
 type Props = {
   /** Products matching the filters, across all pages */
@@ -14,6 +19,7 @@ type Props = {
   lng: string;
   /** The current listing URL without ?page */
   firstPageHref: string;
+  labels: ProductListingLabels;
 };
 
 // Shown in place of the grid: either nothing matches, or the page number is past the last page
@@ -22,20 +28,29 @@ export default function EmptyResults({
   totalPages,
   lng,
   firstPageHref,
+  labels,
 }: Props) {
+  const {
+    noResultsTitle,
+    noResultsText,
+    viewAllProducts,
+    emptyPageTitle,
+    emptyPageText,
+    backToFirstPage,
+  } = readFragment(ProductListingLabelsFragment, labels) ?? {};
   const noMatches = count === 0;
   const { title, body, href, cta } = noMatches
     ? {
-        title: 'No products match these filters',
-        body: 'Try removing a filter or searching for something else.',
+        title: noResultsTitle,
+        body: noResultsText,
         href: productsPath(lng),
-        cta: 'View all products',
+        cta: viewAllProducts,
       }
     : {
-        title: 'This page is empty',
-        body: `These results end on page ${totalPages}.`,
+        title: emptyPageTitle,
+        body: emptyPageText?.replace('{page}', String(totalPages)),
         href: firstPageHref,
-        cta: 'Back to the first page',
+        cta: backToFirstPage,
       };
 
   return (

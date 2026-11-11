@@ -26,6 +26,8 @@ type Props = {
   /** Extra classes for the trigger (heights, paddings, borders) */
   className?: string;
   onNavigate?: () => void;
+  /** General interface "Language and currency" label, read out before the code */
+  label?: string;
 };
 
 export default function LanguageSelector({
@@ -37,6 +39,7 @@ export default function LanguageSelector({
   labelClassName,
   className,
   onNavigate,
+  label,
 }: Props) {
   const listId = useId();
   const [isOpen, setIsOpen] = useState(false);
@@ -85,7 +88,7 @@ export default function LanguageSelector({
       >
         <GlobeAltIcon aria-hidden="true" className="size-4.5 shrink-0" />
         <span className={labelClassName}>
-          <span className="sr-only">Language and currency: </span>
+          <span className="sr-only">{label}: </span>
           {currentLocale && toLanguageTag(currentLocale).toUpperCase()}
           {currencySymbol && (
             <>

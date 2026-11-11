@@ -17,6 +17,8 @@ type Props = {
   /** How many options are on; shown when the group narrows the listing */
   checked: number;
   narrowed: boolean;
+  /** General interface "applied" label */
+  applied: string | undefined;
   defaultOpen: boolean;
   onToggle: (optionId: string) => void;
 };
@@ -28,6 +30,7 @@ export default function FilterGroup({
   selectedIds,
   checked,
   narrowed,
+  applied,
   defaultOpen,
   onToggle,
 }: Props) {
@@ -43,7 +46,7 @@ export default function FilterGroup({
             <DisclosureButton className="group flex min-h-16 w-full items-center justify-between gap-4 py-2 text-left">
               <span className="title-item flex items-center gap-3">
                 {name}
-                {narrowed && <AppliedCount count={checked} />}
+                {narrowed && <AppliedCount count={checked} applied={applied} />}
               </span>
               <span
                 aria-hidden="true"

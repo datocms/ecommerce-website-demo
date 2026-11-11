@@ -2,7 +2,11 @@
 
 import { ArrowsUpDownIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef } from 'react';
-import type { ProductListingLabels } from './fragments';
+import { readFragment } from '@/lib/datocms/graphql';
+import {
+  type ProductListingLabels,
+  ProductListingLabelsFragment,
+} from './fragments';
 import { usePendingQuery } from './PendingQuery';
 import { getSortOptions } from './sortOptions';
 
@@ -14,6 +18,7 @@ export default function SortTabs({ labels }: Props) {
   const { pendingParams, pushQueryParam } = usePendingQuery();
   const currentSort = pendingParams.get('orderBy');
   const sortOptions = getSortOptions(labels);
+  const { sort } = readFragment(ProductListingLabelsFragment, labels) ?? {};
 
   // Where the row scrolls, bring the selected tab into view without moving the page
   const scrollerRef = useRef<HTMLFieldSetElement>(null);
@@ -34,7 +39,7 @@ export default function SortTabs({ labels }: Props) {
     // One pixel taller than its row, so the bars cover the toolbar's bottom hairline
     <fieldset
       ref={scrollerRef}
-      aria-label="Sort"
+      aria-label={sort}
       className="no-scrollbar -mb-px flex h-[calc(3rem+1px)] min-w-0 scroll-px-(--gutter) gap-2 overflow-x-auto px-(--gutter) lg:h-[calc(3.5rem+1px)] lg:gap-3 lg:px-0"
     >
       <span

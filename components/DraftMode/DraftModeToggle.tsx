@@ -78,11 +78,8 @@ export default function DraftModeToggle({ isDraft }: Props) {
   return (
     <>
       {/* 48px tall, 16px off the bottom: at the page end it sits centred in the footer's 80px
-          legal bar. Hidden while the cookie notice is open */}
-      <div
-        data-chrome="dock"
-        className="fixed right-(--gutter) bottom-4 z-40 [body:has(#cookie-notice)_&]:hidden"
-      >
+          legal bar */}
+      <div data-chrome="dock" className="fixed right-(--gutter) bottom-4 z-40">
         <button
           ref={toggleRef}
           type="button"

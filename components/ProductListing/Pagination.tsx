@@ -4,11 +4,17 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import LinkPending from '@/components/Motion/LinkPending';
+import { readFragment } from '@/lib/datocms/graphql';
+import {
+  type ProductListingLabels,
+  ProductListingLabelsFragment,
+} from './fragments';
 
 type Props = {
   totalCount: number;
   currentPage: number;
   pageSize: number;
+  labels: ProductListingLabels;
 };
 
 function PageArrow({
@@ -17,7 +23,7 @@ function PageArrow({
   Icon,
 }: {
   href: string | undefined;
-  label: string;
+  label: string | undefined;
   Icon: typeof ChevronLeftIcon;
 }) {
   if (!href)
@@ -38,9 +44,12 @@ export default function Pagination({
   totalCount,
   currentPage,
   pageSize,
+  labels,
 }: Props) {
   const searchParams = useSearchParams();
 
+  const { showing, of, result, results, pagination, previous, next } =
+    readFragment(ProductListingLabelsFragment, labels) ?? {};
   const totalPages = Math.ceil(totalCount / pageSize);
   const hasPrevious = currentPage > 1;
   const hasNext = currentPage < totalPages;
@@ -61,17 +70,17 @@ export default function Pagination({
     <div className="shell mt-12 flex flex-col-reverse items-center gap-5 sm:flex-row sm:justify-between lg:mt-16 lg:[&_a]:scroll-mt-[calc(3.5rem+1px)]">
       {/* A position, not a second counter: the toolbar already shows the total */}
       <p className="text-sm text-mute tabular-nums">
-        <span className="sr-only">Showing </span>
-        {firstProductIndex}–{lastProductIndex} of {totalCount}
+        <span className="sr-only">{showing} </span>
+        {firstProductIndex}–{lastProductIndex} {of} {totalCount}
         <span className="sr-only">
-          {totalCount === 1 ? ' result' : ' results'}
+          {` ${totalCount === 1 ? result : results}`}
         </span>
       </p>
       {/* Both arrows always render, so the numbers never shift between pages */}
-      <nav aria-label="Pagination" className="flex max-w-full items-center">
+      <nav aria-label={pagination} className="flex max-w-full items-center">
         <PageArrow
           href={hasPrevious ? pageHref(currentPage - 1) : undefined}
-          label="Previous page"
+          label={previous}
           Icon={ChevronLeftIcon}
         />
         {/* Many pages scroll here, so the rings sit inside the squares */}
@@ -92,7 +101,7 @@ export default function Pagination({
         </span>
         <PageArrow
           href={hasNext ? pageHref(currentPage + 1) : undefined}
-          label="Next page"
+          label={next}
           Icon={ChevronRightIcon}
         />
       </nav>

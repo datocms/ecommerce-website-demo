@@ -215,3 +215,21 @@
     transition-timing-function: var(--ease-out);
   }
 }
+
+/* A track holding its items twice drifts left by one copy, then starts over. It stops on hover,
+   on keyboard focus inside it and while data-paused is set. --marquee-duration is one loop. */
+@keyframes marquee {
+  to {
+    translate: -50% 0;
+  }
+}
+@utility marquee {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: marquee var(--marquee-duration, 60s) linear infinite;
+    &:hover,
+    &:focus-within,
+    &[data-paused] {
+      animation-play-state: paused;
+    }
+  }
+}

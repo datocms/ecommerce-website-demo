@@ -3,7 +3,7 @@
 import { HeartIcon, TruckIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useState } from 'react';
-import type { Product } from '@/app/[lng]/product/[slug]/meta';
+import type { Product } from '@/app/[lng]/(site)/product/[slug]/meta';
 import DemoActionButton from '@/components/Common/DemoActionButton';
 import Price from '@/components/ProductCard/Price';
 import { readFragment } from '@/lib/datocms/graphql';
@@ -44,6 +44,10 @@ export default function BuyBox({ product, labels, lng }: Props) {
     shippingText,
     primaryButton,
     secondaryButton,
+    salePrice,
+    originalPrice,
+    outOfFive,
+    addToWishlist,
   } = readFragment(ProductPageLabelsFragment, labels) ?? {};
 
   const selectedVariation =
@@ -77,7 +81,7 @@ export default function BuyBox({ product, labels, lng }: Props) {
         href="#reviews"
         className="group relative mt-4 flex min-h-6 w-fit items-center gap-2.5 text-sm after:absolute after:-inset-y-2.5 after:inset-x-0"
       >
-        <StarRating value={product.reviewAverage} />
+        <StarRating value={product.reviewAverage} outOfFive={outOfFive} />
         <span className="text-ink-2 underline decoration-line underline-offset-4 transition-colors group-hover:text-ink group-hover:decoration-ink">
           <span className="tabular-nums">{product.numberOfReviews}</span>{' '}
           {reviews}
@@ -90,6 +94,8 @@ export default function BuyBox({ product, labels, lng }: Props) {
           salePrice={product.salePrice}
           onSale={product.onSale}
           currencySymbol={currencySymbol ?? ''}
+          salePriceLabel={salePrice}
+          originalPriceLabel={originalPrice}
           size="lg"
         />
         {priceUndertext && (
@@ -118,7 +124,7 @@ export default function BuyBox({ product, labels, lng }: Props) {
             {primaryButton}
           </DemoActionButton>
           <DemoActionButton
-            aria-label="Add to wishlist"
+            aria-label={addToWishlist}
             className="icon-btn size-13 border border-line-strong hover:border-ink"
           >
             <HeartIcon aria-hidden="true" />

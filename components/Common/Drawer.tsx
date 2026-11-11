@@ -17,7 +17,7 @@ type Props = {
   title: ReactNode;
   footer?: ReactNode;
   children: ReactNode;
-  closeLabel: string;
+  closeLabel: string | undefined;
 };
 
 // A side panel up to 460px wide: title bar, scrolling body that staggers its children in, footer

@@ -17,6 +17,9 @@ type Props = {
   placeholder: string;
   /** Height the sheet covers at least: the strip and header above the page */
   minHeight: number;
+  /** General interface "Search" and "Close" labels */
+  searchLabel: string | undefined;
+  closeLabel: string | undefined;
 };
 
 export default function SearchDialog({
@@ -25,6 +28,8 @@ export default function SearchDialog({
   onClose,
   placeholder,
   minHeight,
+  searchLabel,
+  closeLabel,
 }: Props) {
   const submitSearch = useProductSearch(lng, onClose);
   const searchParams = useSearchParams();
@@ -33,7 +38,7 @@ export default function SearchDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      aria-label="Search"
+      aria-label={searchLabel}
       className="relative z-50"
     >
       <DialogBackdrop transition data-chrome="sheet-scrim" className={SCRIM} />
@@ -72,7 +77,7 @@ export default function SearchDialog({
               />
               <button
                 type="submit"
-                aria-label="Search"
+                aria-label={searchLabel}
                 className="btn btn-sm size-11 shrink-0 px-0 lg:size-13 lg:min-h-13 lg:[&>svg]:size-4.5"
               >
                 <ArrowRightIcon aria-hidden="true" className="stroke-2" />
@@ -82,7 +87,7 @@ export default function SearchDialog({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close search"
+            aria-label={closeLabel}
             // mb: centred on the field rather than on the field plus its rule
             className="icon-btn mb-2.5 lg:size-13 [&>svg]:size-6"
           >

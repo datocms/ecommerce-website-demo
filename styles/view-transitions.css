@@ -32,11 +32,11 @@
 ::view-transition-new(.chrome):only-child {
   animation: reveal var(--dur-pop) var(--ease-out) 60ms both;
 }
-/* Shell chrome ([data-chrome], #cookie-notice) is named only while a transition runs, so pages
+/* Shell chrome ([data-chrome]) is named only while a transition runs, so pages
    pass under it. A permanent name would create a stacking context that puts Headless UI dialogs
    under the sticky header. */
 :root:active-view-transition {
-  & :is([data-chrome], #cookie-notice) {
+  & [data-chrome] {
     view-transition-class: chrome;
   }
   & [data-chrome='strip'] {
@@ -53,9 +53,6 @@
   }
   & [data-chrome='dock'] {
     view-transition-name: draft-dock;
-  }
-  & #cookie-notice {
-    view-transition-name: cookie-notice;
   }
   & [data-chrome='sheet'] {
     view-transition-name: sheet;

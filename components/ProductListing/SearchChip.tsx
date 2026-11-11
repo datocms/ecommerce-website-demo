@@ -6,15 +6,21 @@ type Props = {
   query: string;
   /** The current listing URL without the search */
   clearHref: string;
+  /** General interface "Clear search" label */
+  clearSearchLabel: string | undefined;
 };
 
 // The active name search in the toolbar; following it clears the search. 36px tall with a 44px
 // hit area (::after); the magnifier hides where the row is tight
-export default function SearchChip({ query, clearHref }: Props) {
+export default function SearchChip({
+  query,
+  clearHref,
+  clearSearchLabel,
+}: Props) {
   return (
     <Link
       href={clearHref}
-      aria-label={`Clear search “${query}”`}
+      aria-label={`${clearSearchLabel} “${query}”`}
       className="relative inline-flex h-9 min-w-0 items-center gap-2 bg-mist pr-1 pl-3 text-sm font-medium press after:absolute after:inset-x-0 after:-inset-y-1 hover:bg-line"
     >
       <MagnifyingGlassIcon

@@ -1,6 +1,5 @@
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
-import CookieNotice from '@/components/Layout/CookieNotice';
 import { readFragment } from '@/lib/datocms/graphql';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import FooterBrand from './FooterBrand';
@@ -25,43 +24,37 @@ export default function Footer({ data, globalPageProps }: Props) {
   const showNewsletter = !!generalInterface?.displayNewsletterFooter;
   const columns = data.layout?.footerColumns ?? [];
   const socials = data.layout?.socialMediaLinks ?? [];
-  const cookieNotice = data.layout?.cookieNotice;
 
   return (
-    <>
-      <footer className="surface-ink mt-(--section-gap)">
-        {showNewsletter && (
-          <>
-            <NewsletterSignup generalInterface={generalInterface} />
-            <div className="shell">
-              <div className="h-px bg-line" />
-            </div>
-          </>
-        )}
+    <footer className="surface-ink mt-(--section-gap)">
+      {showNewsletter && (
+        <>
+          <NewsletterSignup generalInterface={generalInterface} />
+          <div className="shell">
+            <div className="h-px bg-line" />
+          </div>
+        </>
+      )}
 
-        <div
-          className={`shell grid gap-12 pb-16 lg:grid-cols-12 lg:gap-4 ${showNewsletter ? 'pt-12 md:pt-14' : 'pt-(--band-y)'}`}
-        >
-          <FooterBrand
-            lng={lng}
-            title={footerTitle}
-            logo={footerLogo}
-            subtitle={footerSubtitle}
-            socials={socials}
-          />
-          {columns.length > 0 && <FooterColumns lng={lng} columns={columns} />}
-        </div>
-
-        <LegalBar
-          copyrightText={copyrightText}
-          locales={data._site.locales}
-          currencySymbol={generalInterface?.currencySymbol}
-          currencySymbols={generalInterface?._allCurrencySymbolLocales}
+      <div className="shell grid gap-10 py-10 lg:grid-cols-12 lg:gap-4">
+        <FooterBrand
+          lng={lng}
+          title={footerTitle}
+          logo={footerLogo}
+          subtitle={footerSubtitle}
+          socials={socials}
+          homeLabel={generalInterface?.home}
         />
-      </footer>
+        {columns.length > 0 && <FooterColumns lng={lng} columns={columns} />}
+      </div>
 
-      {/* After the footer, so the sticky bar comes to rest under it */}
-      {cookieNotice && <CookieNotice cookieNotice={cookieNotice} />}
-    </>
+      <LegalBar
+        copyrightText={copyrightText}
+        locales={data._site.locales}
+        currencySymbol={generalInterface?.currencySymbol}
+        currencySymbols={generalInterface?._allCurrencySymbolLocales}
+        languageLabel={generalInterface?.languageAndCurrency}
+      />
+    </footer>
   );
 }

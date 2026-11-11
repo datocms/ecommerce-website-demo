@@ -1,77 +1,58 @@
 import { StructuredText } from 'react-datocms/structured-text';
-import RailControls from '@/components/Rail/RailControls';
-import RailProgress from '@/components/Rail/RailProgress';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import { TestimonialSectionFragment } from './fragments';
+import QuoteMarquee from './QuoteMarquee';
 
 type Props = {
   fragment: FragmentOf<typeof TestimonialSectionFragment>;
+  /** General interface "Pause" and "Play" labels */
+  pauseLabel: string | undefined;
+  playLabel: string | undefined;
 };
 
-const MAX_COLUMNS = 3;
-
-// Up to three quotes side by side from lg, split by hairlines; more wrap onto another row
-const COLUMN_LAYOUTS = [
-  { grid: '', item: '' },
-  { grid: 'lg:grid-cols-1', item: 'lg:border-l-0 lg:pl-0' },
-  { grid: 'lg:grid-cols-2', item: 'lg:odd:border-l-0 lg:odd:pl-0' },
-  {
-    grid: 'lg:grid-cols-3',
-    item: 'lg:[&:nth-child(3n+1)]:border-l-0 lg:[&:nth-child(3n+1)]:pl-0',
-  },
-];
-
-export default function Testimonials({ fragment }: Props) {
+export default function Testimonials({
+  fragment,
+  pauseLabel,
+  playLabel,
+}: Props) {
   const { id, title, testimonial } = readFragment(
     TestimonialSectionFragment,
     fragment,
   );
   const titleId = `${id}-title`;
-  const railId = `${id}-rail`;
-  const layout = COLUMN_LAYOUTS[Math.min(testimonial.length, MAX_COLUMNS)];
 
   return (
     <section
       aria-labelledby={titleId}
-      className="surface-ink py-(--band-y) mt-(--section-gap)"
+      className="surface-ink mt-(--section-gap) py-(--band-y)"
     >
-      <div className="shell">
-        <div className="mb-12 flex items-end justify-between gap-6 lg:mb-16">
+      <QuoteMarquee
+        heading={
           <h2 id={titleId} className="title-section">
             {title}
           </h2>
-          <RailControls railId={railId} />
-        </div>
-        <ul
-          id={railId}
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: the quotes aren't focusable, so the scroller is the tab stop (RailProgress tabStop removes it when nothing scrolls)
-          tabIndex={0}
-          aria-labelledby={titleId}
-          className={`no-scrollbar -mx-(--gutter) flex snap-x snap-mandatory scroll-px-(--gutter) gap-6 overflow-x-auto px-(--gutter) focus-visible:-outline-offset-2 lg:mx-0 lg:grid lg:gap-x-10 lg:gap-y-16 lg:overflow-visible lg:px-0 ${layout.grid}`}
-        >
-          {testimonial.map((item) => (
-            <li
-              key={item.id}
-              className={`flex w-[86%] max-w-[30rem] shrink-0 snap-start border-l border-line pl-6 sm:w-[60%] lg:w-auto lg:max-w-none lg:pl-10 ${layout.item}`}
+        }
+        pauseLabel={pauseLabel}
+        playLabel={playLabel}
+        quotes={testimonial.map((item) => ({
+          id: item.id,
+          content: (
+            <figure
+              data-datocms-content-link-group
+              className="flex w-full flex-col justify-between"
             >
-              <figure
-                data-datocms-content-link-group
-                className="flex w-full flex-col justify-between"
-              >
-                {/* Not DatoStructuredText: its wrapper <div> would break the [&>p] selectors
-                    that put page-language quote marks around the whole testimonial */}
-                <blockquote className="text-[1.3125rem] leading-[1.32] font-medium tracking-[-0.02em] text-pretty xl:text-[1.625rem] [&>p+p]:mt-[0.75em] [&>p:first-child]:before:content-[open-quote] [&>p:last-child]:after:content-[close-quote]">
-                  <StructuredText data={item.testimonial} />
-                </blockquote>
-                <figcaption className="mt-10 text-sm font-medium text-mute">
-                  {item.author}
-                </figcaption>
-              </figure>
-            </li>
-          ))}
-        </ul>
-        <RailProgress railId={railId} tabStop className="mt-10 lg:hidden" />
-      </div>
+              {/* Not DatoStructuredText: its wrapper <div> would break the [&>p] selectors
+                  that put page-language quote marks around the whole testimonial */}
+              <blockquote className="text-[1.3125rem] leading-[1.32] font-medium tracking-[-0.02em] text-pretty xl:text-[1.625rem] [&>p+p]:mt-[0.75em] [&>p:first-child]:before:content-[open-quote] [&>p:last-child]:after:content-[close-quote]">
+                <StructuredText data={item.testimonial} />
+              </blockquote>
+              <figcaption className="mt-10 text-sm font-medium text-mute">
+                {item.author}
+              </figcaption>
+            </figure>
+          ),
+        }))}
+      />
     </section>
   );
 }

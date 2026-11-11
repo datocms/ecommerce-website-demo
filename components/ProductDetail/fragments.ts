@@ -18,6 +18,10 @@ export const ProductPageLabelsFragment = graphql(/* GraphQL */ `
     more
     material
     color
+    salePrice
+    originalPrice
+    outOfFive
+    addToWishlist
   }
 `);
 

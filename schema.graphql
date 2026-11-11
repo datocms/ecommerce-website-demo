@@ -40,7 +40,6 @@ input BrandModelFilter {
   name: StringFilter
   slug: SlugFilter
   subtitle: StringFilter
-  website: StringFilter
   OR: [BrandModelFilter]
   AND: [BrandModelFilter]
 }
@@ -68,8 +67,6 @@ enum BrandModelOrderBy {
   name_DESC
   subtitle_ASC
   subtitle_DESC
-  website_ASC
-  website_DESC
 }
 
 """Record of type 🏷️ Brand (brand)"""
@@ -141,7 +138,6 @@ type BrandRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String!
-  website: String!
 }
 
 type CollectionCardShowcaseSectionModelDescriptionField {
@@ -344,46 +340,6 @@ input ColorFilter {
   Filter records with the specified field defined (i.e. with any value) or not
   """
   exists: BooleanType
-}
-
-type CookieNoticeModelSubheaderField {
-  blocks: [String!]!
-  inlineBlocks: [String!]!
-  links: [String!]!
-  value: JsonField!
-}
-
-"""Block of type 🍪 Cookie Notice (cookie_notice)"""
-type CookieNoticeRecord implements RecordInterface {
-  _createdAt: DateTime!
-
-  """Editing URL"""
-  _editingUrl: String
-  _firstPublishedAt: DateTime!
-  _isValid: BooleanType!
-  _modelApiKey: String!
-  _publicationScheduledAt: DateTime
-  _publishedAt: DateTime!
-
-  """Generates SEO and Social card meta tags to be used in your frontend"""
-  _seoMetaTags(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-  ): [Tag!]!
-  _status: ItemStatus!
-  _unpublishingScheduledAt: DateTime
-  _updatedAt: DateTime!
-  cookieNoticeImage: FileField
-  header: String
-  id: ItemId!
-  primaryButtonLabel: String
-  secondaryButtonLabel: String
-  subheader: CookieNoticeModelSubheaderField
-}
-
-type CookieNoticeRecordMultiLocaleField {
-  locale: SiteLocale
-  value: CookieNoticeRecord
 }
 
 """Specifies how to filter by creation datetime"""
@@ -952,12 +908,78 @@ input GalleryFilter {
 
 """Record of type 🌐 General Interface (general_interface)"""
 type GeneralInterfaceRecord implements RecordInterface {
+  _allAddToWishlistLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allAppliedLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allBackToFirstPageLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allBagEmptyTextLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allBagEmptyTitleLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allBagLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allBrandsLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allCheckoutLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allCheckoutNoteLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allClearAllLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allClearSearchLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allCloseLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allCollectionsLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -970,12 +992,30 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allContinueShoppingLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allCurrencyCodeLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allCurrencySymbolLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allDismissAnnouncementLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allDisplayNewsletterFooterLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -988,12 +1028,48 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allEmptyPageTextLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allEmptyPageTitleLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allFiltersLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allFindOnMapsLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allHomeLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allItemsInBagLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allLanguageAndCurrencyLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allMaterialLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -1006,6 +1082,12 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allMenuLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allMoreLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -1036,18 +1118,84 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
-  _allNewsletterLocales(
+  _allNextLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): [StringMultiLocaleField!]
+  ): [StringNonNullMultiLocaleField!]
+  _allNextStoreLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allNoResultsTextLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allNoResultsTitleLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allOccasionsLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allOfLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allOriginalPriceLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allOutOfFiveLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allPaginationLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allPauseLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allPlayLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allPreviousLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allPreviousStoreLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allPriceLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -1066,6 +1214,24 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allProductsLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allResultLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allResultsLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allReviewButtonLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -1084,12 +1250,24 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allSalePriceLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allSalesLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allSearchLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allSearchPlaceholderLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -1114,12 +1292,42 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allShowResultsLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allShowingLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allSizeLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allSkipToContentLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allSortLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
+  _allStoresLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allStyleLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -1132,6 +1340,12 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allSubtotalLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allTopRatedLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -1144,6 +1358,12 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [StringMultiLocaleField!]
+  _allViewAllProductsLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _allWeatherLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -1168,6 +1388,60 @@ type GeneralInterfaceRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
+  addToWishlist(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  applied(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  backToFirstPage(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  bag(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  bagEmptyText(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  bagEmptyTitle(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   brands(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1177,6 +1451,51 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  checkout(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  checkoutNote(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  clearAll(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  clearSearch(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  close(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   collections(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1195,6 +1514,24 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  continueShopping(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  currencyCode(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   currencySymbol(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1204,6 +1541,15 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  dismissAnnouncement(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   displayNewsletterFooter(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1222,6 +1568,33 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  emptyPageText(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  emptyPageTitle(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  filters(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   findOnMaps(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1231,7 +1604,34 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  home(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   id: ItemId!
+  itemsInBag(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  languageAndCurrency(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   material(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1250,6 +1650,15 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  menu(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   more(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1286,15 +1695,6 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
-  newsletter(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): String
   newsletterButton(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1304,6 +1704,42 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  next(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  nextStore(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  noResultsText(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  noResultsTitle(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   occasions(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1313,6 +1749,78 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  of(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  originalPrice(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  outOfFive(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  pagination(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  pause(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  play(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  previous(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  previousStore(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   price(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1340,6 +1848,33 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  products(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  result(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  results(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   reviewButton(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1367,6 +1902,15 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  salePrice(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   sales(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1376,6 +1920,15 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  search(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   searchPlaceholder(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1412,6 +1965,24 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  showResults(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  showing(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   size(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1421,6 +1992,33 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  skipToContent(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  sort(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  stores(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   style(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1439,6 +2037,15 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  subtotal(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   topRated(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -1457,6 +2064,15 @@ type GeneralInterfaceRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): String
+  viewAllProducts(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
   weather(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -3760,12 +4376,6 @@ union LayoutModelNotificationLinksField = BrandRecord | CollectionRecord | Legal
 
 """Record of type 🧩 Layout (layout)"""
 type LayoutRecord implements RecordInterface {
-  _allCookieNoticeLocales(
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): [CookieNoticeRecordMultiLocaleField!]
   _allCopyrightTextLocales(
     """
     If you want to fallback to a default translation when a translation has not been found
@@ -3796,12 +4406,6 @@ type LayoutRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): [LayoutModelNotificationFieldMultiLocaleField!]
-  _allPopupLocales(
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): [PopupRecordMultiLocaleField!]
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -3822,15 +4426,6 @@ type LayoutRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   accentColor: ColorField!
-  cookieNotice(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): CookieNoticeRecord
   copyrightText(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -3880,15 +4475,6 @@ type LayoutRecord implements RecordInterface {
     """
     fallbackLocales: [SiteLocale!]
   ): LayoutModelNotificationField
-  popup(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): PopupRecord
   socialMediaLinks: [SocialMediaIconRecord!]!
 }
 
@@ -4290,17 +4876,38 @@ enum MuxThumbnailRotation {
   ROTATE_270
 }
 
-"""Specifies how to filter by image orientation"""
-input OrientationFilter {
-  """Search uploads with the specified orientation"""
-  eq: UploadOrientation
-
-  """Exclude uploads with the specified orientation"""
-  neq: UploadOrientation
+type NotFoundPageModelDescriptionField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
 }
 
-"""Block of type 🗯️ Popup (popup)"""
-type PopupRecord implements RecordInterface {
+type NotFoundPageModelDescriptionFieldNonNullMultiLocaleField {
+  locale: SiteLocale
+  value: NotFoundPageModelDescriptionField!
+}
+
+"""Record of type 🚫 Not Found Page (not_found_page)"""
+type NotFoundPageRecord implements RecordInterface {
+  _allButtonLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [SimpleButtonRecordNonNullMultiLocaleField!]
+  _allDescriptionLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [NotFoundPageModelDescriptionFieldNonNullMultiLocaleField!]
+  _allTitleLocales(
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): [StringNonNullMultiLocaleField!]
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -4319,19 +4926,44 @@ type PopupRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  button: SimpleButtonRecord
-  dismissButtonLabel: String
+  button(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): SimpleButtonRecord!
+  description(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): NotFoundPageModelDescriptionField!
   id: ItemId!
-  popupImage: FileField
-  preTitle: String
-  subtitle: String
-  title: String!
-  underText: String
+  image: ImageFileField!
+  title(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
 }
 
-type PopupRecordMultiLocaleField {
-  locale: SiteLocale
-  value: PopupRecord
+"""Specifies how to filter by image orientation"""
+input OrientationFilter {
+  """Search uploads with the specified orientation"""
+  eq: UploadOrientation
+
+  """Exclude uploads with the specified orientation"""
+  neq: UploadOrientation
 }
 
 """Block of type ℹ️ Product Feature Section (product_feature_section)"""
@@ -4983,6 +5615,17 @@ type Query {
     orderBy: [MaterialModelOrderBy] = [_updatedAt_DESC]
   ): MaterialRecord
 
+  """Returns the single instance record"""
+  notFoundPage(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): NotFoundPageRecord
+
   """Returns a specific record"""
   product(
     """The locale to use to fetch the field's content"""
@@ -5316,6 +5959,11 @@ type SimpleButtonRecord implements RecordInterface {
 type SimpleButtonRecordMultiLocaleField {
   locale: SiteLocale
   value: SimpleButtonRecord
+}
+
+type SimpleButtonRecordNonNullMultiLocaleField {
+  locale: SiteLocale
+  value: SimpleButtonRecord!
 }
 
 type Site {

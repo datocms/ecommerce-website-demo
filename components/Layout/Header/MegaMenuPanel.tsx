@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
 import FeatureTiles from './FeatureTiles';
 import { type DropdownMenu, productsHref } from './menu';
 

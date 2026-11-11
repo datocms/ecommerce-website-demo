@@ -25,7 +25,7 @@
     font-size: clamp(4rem, 6.25vw, 5rem);
   }
 }
-/* Statement titles: popup, legal pages, 404 */
+/* Statement titles: legal pages, 404, error page */
 @utility title-statement {
   font-weight: 600;
   font-size: 2.75rem;

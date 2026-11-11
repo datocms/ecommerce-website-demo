@@ -2,6 +2,8 @@ type Props = {
   value: number;
   /** true when the numeric value is printed next to the stars */
   decorative?: boolean;
+  /** General interface "out of 5" label, spoken after the value */
+  outOfFive?: string;
 };
 
 const STAR =
@@ -11,11 +13,18 @@ const STAR =
 const FILLED = 'fill-ink';
 const EMPTY = 'fill-none stroke-mute';
 
-export default function StarRating({ value, decorative = false }: Props) {
+export default function StarRating({
+  value,
+  decorative = false,
+  outOfFive,
+}: Props) {
   const filled = Math.round(value);
   const a11y = decorative
     ? { 'aria-hidden': true as const }
-    : { role: 'img', 'aria-label': `${Math.round(value * 10) / 10} out of 5` };
+    : {
+        role: 'img',
+        'aria-label': `${Math.round(value * 10) / 10} ${outOfFive}`,
+      };
   return (
     <span {...a11y} className="inline-flex items-center gap-0.5">
       {[0, 1, 2, 3, 4].map((i) => (

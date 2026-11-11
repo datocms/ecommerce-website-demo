@@ -1,10 +1,6 @@
 import { cx } from '@/lib/classNames';
 import { formatPrice } from '@/lib/formatPrice';
 
-// Spoken before each price: screen readers do not announce the strikethrough
-const SR_SALE = 'Sale price';
-const SR_ORIGINAL = 'Original price';
-
 const SIZE_CLASSES = { sm: 'text-base', md: 'text-lg', lg: 'text-2xl' };
 
 type Props = {
@@ -12,6 +8,9 @@ type Props = {
   salePrice?: number | null;
   onSale: boolean;
   currencySymbol: string;
+  /** Spoken before each price: screen readers do not announce the strikethrough */
+  salePriceLabel?: string;
+  originalPriceLabel?: string;
   /** sm: cards, md: ProductCard size=lg, lg: product page */
   size?: 'sm' | 'md' | 'lg';
   className?: string;
@@ -22,6 +21,8 @@ export default function Price({
   salePrice,
   onSale,
   currencySymbol,
+  salePriceLabel,
+  originalPriceLabel,
   size = 'sm',
   className,
 }: Props) {
@@ -37,13 +38,13 @@ export default function Price({
       {showSale ? (
         <>
           <span className="text-sale">
-            <span className="sr-only">{SR_SALE}: </span>
+            <span className="sr-only">{salePriceLabel}: </span>
             {formatPrice(currencySymbol, salePrice)}
           </span>
           <s
             className={`font-normal text-mute ${size === 'lg' ? 'text-[0.75em]' : 'text-[0.9375em]'}`}
           >
-            <span className="sr-only">{SR_ORIGINAL}: </span>
+            <span className="sr-only">{originalPriceLabel}: </span>
             {formatPrice(currencySymbol, price)}
           </s>
         </>

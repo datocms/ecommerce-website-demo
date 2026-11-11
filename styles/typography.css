@@ -60,11 +60,3 @@
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
-/* Footer wordmark: a fallback size; the footer fits it to the content width */
-@utility giant {
-  font-weight: 600;
-  font-size: 18vw;
-  line-height: 0.82;
-  letter-spacing: -0.065em;
-  white-space: nowrap;
-}

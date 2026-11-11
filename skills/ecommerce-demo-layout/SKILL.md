@@ -34,7 +34,7 @@ Before schema or content operations:
 - Shared shell route query: `query` in `app/[lng]/meta.ts`.
 - Shared shell renderer: `app/[lng]/Content.tsx`.
 - Header components: `components/Layout/Header/**` (NavBar, MobileMenu, MegaMenuPanel, FeatureTiles, SearchDialog, Cart, NotificationStrip, PopupDialog; menu hrefs in `menu.ts`, search submit in `useProductSearch.ts`).
-- Footer component: `components/Layout/Footer/index.tsx` (newsletter row in `NewsletterSignup.tsx`, wordmark in `Wordmark.tsx`).
+- Footer component: `components/Layout/Footer/index.tsx` (newsletter row in `NewsletterSignup.tsx`).
 - Shared by header and footer: `components/Layout/LanguageSelector.tsx`, `components/Layout/CookieNotice.tsx`.
 - Accent color component: `components/Layout/CustomColor.tsx`, fed by `Layout.accentColor`.
 - Shared DatoCMS records: `Layout` and shell-related `General Interface` fields.

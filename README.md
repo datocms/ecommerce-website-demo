@@ -132,7 +132,7 @@ styles/
   tokens.css                Tailwind @theme tokens and the :root layout and motion variables
   base.css                  element defaults
   layout.css                shell, rails, black bands, logo
-  typography.css            display type (title-*, giant)
+  typography.css            display type (title-*)
   actions.css               buttons and text links
   labels.css                eyebrow, tags, chips
   forms.css                 form fields

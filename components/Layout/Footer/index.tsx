@@ -13,7 +13,6 @@ import { readFragment } from '@/lib/datocms/graphql';
 import { linkHref } from '@/lib/datocms/linkHref';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import NewsletterSignup from './NewsletterSignup';
-import Wordmark from './Wordmark';
 
 type Props = {
   data: LayoutQuery;
@@ -44,9 +43,7 @@ export default function Footer({ data, globalPageProps }: Props) {
 
   return (
     <>
-      {/* overflow-y-clip: the wordmark waiting below its line doesn't lengthen the page (x stays
-          visible for focus rings) */}
-      <footer className="surface-ink mt-(--section-gap) overflow-y-clip">
+      <footer className="surface-ink mt-(--section-gap)">
         {showNewsletter && (
           <>
             <NewsletterSignup generalInterface={generalInterface} />
@@ -124,12 +121,6 @@ export default function Footer({ data, globalPageProps }: Props) {
             </div>
           )}
         </div>
-
-        {footerTitle && (
-          <div className="shell overflow-x-clip">
-            <Wordmark text={footerTitle} />
-          </div>
-        )}
 
         {/* 80px tall from md, so the fixed draft toggle (48px, bottom-4) rests centred in it; the
             right padding keeps the content clear of it */}

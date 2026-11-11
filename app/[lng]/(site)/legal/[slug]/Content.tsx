@@ -1,4 +1,4 @@
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/content-link/stega';
 import { type Document, isHeading } from 'datocms-structured-text-utils';
 import { notFound } from 'next/navigation';
 import { renderNodeRule } from 'react-datocms/structured-text';

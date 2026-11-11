@@ -1,4 +1,4 @@
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/content-link/stega';
 import type { CSSProperties } from 'react';
 
 // Advance widths of the title face, in em, erring wide so a word always fits

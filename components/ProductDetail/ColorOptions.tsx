@@ -1,6 +1,6 @@
 'use client';
 
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/content-link/stega';
 import { CheckIcon } from '@heroicons/react/24/outline';
 import { isLightColor } from '@/lib/color';
 import type { Variation } from './sizes';

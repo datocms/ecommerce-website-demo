@@ -1,4 +1,4 @@
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/content-link/stega';
 import SvgRenderer from './SvgRenderer';
 
 type Props = {

@@ -1,4 +1,4 @@
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/content-link/stega';
 import type { Metadata } from 'next';
 import { type FragmentOf, graphql, readFragment } from '@/lib/datocms/graphql';
 

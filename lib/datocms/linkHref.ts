@@ -1,4 +1,4 @@
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/content-link/stega';
 import { homePath, productsPath, showcasePath, storesPath } from '@/lib/routes';
 import { type FragmentOf, graphql, readFragment } from './graphql';
 import { recordToWebsiteRoute } from './recordToWebsiteRoute';

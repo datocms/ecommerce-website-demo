@@ -1,6 +1,6 @@
 'use client';
 
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/content-link/stega';
 import { ArrowUpRightIcon } from '@heroicons/react/24/outline';
 import { type MouseEvent, useRef, useState } from 'react';
 import { StructuredText } from 'react-datocms/structured-text';

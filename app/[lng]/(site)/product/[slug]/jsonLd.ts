@@ -1,4 +1,4 @@
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/content-link/stega';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import { readFragment } from '@/lib/datocms/graphql';
 import { productPath } from '@/lib/routes';

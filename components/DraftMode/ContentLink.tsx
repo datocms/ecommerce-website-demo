@@ -1,7 +1,13 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
-import { ContentLink as ReactDatocmsContentLink } from 'react-datocms/content-link';
+
+// Fetched on first render, so only draft mode downloads the overlay
+const ReactDatocmsContentLink = dynamic(
+  () => import('react-datocms/content-link').then((mod) => mod.ContentLink),
+  { ssr: false },
+);
 
 /**
  * Visual-editing overlay (draft mode only): click content to open it in DatoCMS.

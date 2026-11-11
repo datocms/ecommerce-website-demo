@@ -1,5 +1,5 @@
 # synced_from_name: ecommerce-demo-sections
-# synced_from_description_sha256: afad20cdc905985171c95b1551459226f362b88cacee56413bf126547ff86293
+# synced_from_description_sha256: 508f7f9ce2f6133258c68b3856d37d701ded334f9bd6e7fc121f694f6bf448ce
 interface:
   display_name: "Ecommerce Demo Sections"
   short_description: "Add ecommerce demo home sections"

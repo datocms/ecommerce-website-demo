@@ -30,38 +30,41 @@ Before schema or content operations:
 
 ## Existing page pattern
 
-Record-backed pages use this route folder shape under `app/[lng]/...`:
+Record-backed pages use this route folder shape under `app/[lng]/(site)/...`:
 
 - `meta.ts` for the route data query (`graphql()` from `@/lib/datocms/graphql`), its inferred `Query`/`Variables` types, and page prop types.
 - `page.tsx` for variables, metadata, static params when needed, and `generateWrapper`.
 - `Content.tsx` renders the query result, in both modes.
 - `RealTime.tsx` (a `"use client"` file made with `generateRealtimeComponent`) re-renders `Content.tsx` from a live draft subscription.
+- Optional `alternatePath` option of `generateMetadataFn` (`components/WithRealTimeUpdates/generateMetadataFn.ts`) for the canonical and hreflang links (`lib/alternates.ts`).
 - Optional `staticParamsQuery` in `page.tsx` for slug-backed collection routes.
 
 A `page.tsx` that runs its query itself but has a `RealTime.tsx`, like `product/[slug]/`, renders through `ContentOrRealTime` (`components/WithRealTimeUpdates/ContentOrRealTime.tsx`), which does the draft switch and the page fade as `generateWrapper` does. A page with no `RealTime.tsx`, like `products/`, wraps what it renders in `<PageTransition>` (`components/Motion/PageTransition.tsx`) itself. Without it, navigating to the page skips the page fade.
 
 Existing examples:
 
-- singleton route: `app/[lng]/showcase/`.
-- collection route: `app/[lng]/legal/[slug]/`.
-- product route: `app/[lng]/product/[slug]/` (its page.tsx resolves localized slugs and redirects before rendering, so it runs its query itself and renders through `ContentOrRealTime` instead of `generateWrapper`).
-- catalog route: `app/[lng]/products/` keeps its queries in `meta.ts` but has no `RealTime.tsx`: its page.tsx runs them per request because they depend on search params.
+- singleton route: `app/[lng]/(site)/showcase/`.
+- collection route: `app/[lng]/(site)/legal/[slug]/`.
+- product route: `app/[lng]/(site)/product/[slug]/` (its page.tsx resolves localized slugs and redirects before rendering, so it runs its query itself and renders through `ContentOrRealTime` instead of `generateWrapper`).
+- 404 route: `app/[lng]/not-found.tsx` renders the Not Found Page singleton; `app/[lng]/[...rest]/page.tsx` sends unmatched paths there, and the locale comes from `lib/requestLocale.ts`. `app/[lng]/error.tsx` and `app/global-error.tsx` are English-only error pages.
+- catalog route: `app/[lng]/(site)/products/` keeps its queries in `meta.ts` but has no `RealTime.tsx`: its page.tsx runs them per request because they depend on search params.
 
 ## Workflow for a new record-backed page route
 
 1. Confirm this is a page route, not a homepage section or catalog filter.
 2. Inspect the target DatoCMS model through MCP.
 3. Reuse an existing model when appropriate. If a new model or fields are needed, route modeling to `datocms-content-modeling` and implementation to `datocms-cli`, `datocms-cma`, or MCP.
-4. Add a route folder under `app/[lng]/...` following the closest existing route pattern.
+4. Add a route folder under `app/[lng]/(site)/...` following the closest existing route pattern.
 5. Add `meta.ts` with the route `query` written with `graphql()`, including SEO fields when the model supports SEO metadata.
 6. Export `Query = ResultOf<typeof query>`, `Variables = VariablesOf<typeof query>`, and the page props from `meta.ts`.
-7. Add `page.tsx` using `generateWrapper`; add `generateMetadataFn` when SEO tags are available.
+7. Add `page.tsx` using `generateWrapper`; add `generateMetadataFn` when SEO tags are available, with `alternatePath` so the page gets canonical and hreflang links.
 8. Add a `staticParamsQuery` and `generateStaticParams` to `page.tsx` for slug-backed collection routes.
 9. Add `Content.tsx` and `RealTime.tsx` using the existing wrapper/realtime pattern.
 10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 11. Map the model API key to the route path in `lib/datocms/recordToWebsiteRoute.ts`, which `app/api/draft/preview-links/route.ts`, `app/api/seoAnalysis/route.ts`, and `lib/datocms/linkHref.ts` (the hrefs of CMS links) share. If editors should be able to link the new model from link blocks or the notification strip, allow it in those `record` and link validators, and select its slug in `LinkRecordFragment` (`lib/datocms/linkHref.ts`) when the route needs one.
 12. Add the model API key to `SEO_ANALYZED_MODELS` in `app/api/seoAnalysis/route.ts` when the page should support SEO/readability analysis.
-13. Verify published route, draft preview link, metadata, and localized static params.
+13. Add the route to `app/sitemap.ts` when it should be indexed (`app/robots.ts` serves robots.txt).
+14. Verify published route, draft preview link, metadata, and localized static params.
 
 ## Preview mapping rules
 

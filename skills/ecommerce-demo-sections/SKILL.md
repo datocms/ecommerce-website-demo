@@ -4,8 +4,8 @@ description: >-
   Use for homepage section work in the DatoCMS ecommerce website demo starter,
   especially requests like "add a new homepage section", "add a featured brands
   section", "show three featured brands on the homepage", or "add a homepage
-  block". Handles sections rendered through app/[lng]/home/Content.tsx,
-  app/[lng]/home/meta.ts, components/Sections/**/fragments.ts, and
+  block". Handles sections rendered through app/[lng]/(site)/home/Content.tsx,
+  app/[lng]/(site)/home/meta.ts, components/Sections/**/fragments.ts, and
   components/Sections/** React components. Also use when the section displays
   existing catalog data such as brands, materials, collections, or products.
   Do not use for product listing filters, product detail blocks, new page
@@ -31,13 +31,13 @@ Homepage sections follow this chain:
 1. A DatoCMS block record appears inside `home.sections`.
 2. The block has a `graphql()` fragment in `components/Sections/<SectionName>/fragments.ts`.
 3. The block has a React renderer in `components/Sections/<SectionName>/index.tsx`.
-4. The `query` in `app/[lng]/home/meta.ts` spreads the fragment inside `sections` and lists it in the `graphql()` dependencies array.
-5. `app/[lng]/home/Content.tsx` switches on `section.__typename` and renders the component.
+4. The `query` in `app/[lng]/(site)/home/meta.ts` spreads the fragment inside `sections` and lists it in the `graphql()` dependencies array.
+5. `app/[lng]/(site)/home/Content.tsx` switches on `section.__typename` and renders the component.
 6. gql.tada infers the types from the query and fragments, so there is no generation step.
 
 A section's `button` is a single Simple Button block (`label`, `record`, `page`). Its fragment selects `page` and `record { ...LinkRecordFragment }`, and the component builds the href with `linkHref()` from `lib/datocms/linkHref.ts` and renders it with `OptionalLink` (`components/Common/OptionalLink.tsx`), as DividerSection and CollectionCardShowcase do.
 
-Existing section examples: Hero, DividerSection, CollectionCardShowcase, MaterialShowcase, Testimonials. NewArrivals renders the newest products rather than a CMS block, and consecutive CollectionCardShowcase blocks are grouped by `groupCollectionCardShowcases()` (`app/[lng]/home/showcaseGroups.ts`) before the __typename switch in `app/[lng]/home/Content.tsx`.
+Existing section examples: Hero, DividerSection, CollectionCardShowcase, MaterialShowcase, Testimonials. Testimonials is a looping row (`components/Sections/Testimonials/QuoteMarquee.tsx`, the `marquee` utility in `styles/motion.css`) with a pause button and takes three or more quotes. MaterialShowcase renders a list inside its sub-description as ticked rows. NewArrivals renders the newest products rather than a CMS block, and consecutive CollectionCardShowcase blocks are grouped by `groupCollectionCardShowcases()` (`app/[lng]/(site)/home/showcaseGroups.ts`) before the __typename switch in `app/[lng]/(site)/home/Content.tsx`.
 
 ## Workflow for a new homepage section
 
@@ -57,8 +57,8 @@ Existing section examples: Hero, DividerSection, CollectionCardShowcase, Materia
    - If the Home record is currently published, publish the updated Home record after adding the section so published mode and draft preview both render it.
 6. Add the section fragment to `fragments.ts` beside the section component, listing the fragments it spreads (such as `ResponsiveImageFragment`) in its dependencies array.
 7. Add or update the React component under `components/Sections/` using this starter's existing component props pattern.
-8. Spread the fragment inside `sections` in `app/[lng]/home/meta.ts` and add it to the dependencies array.
-9. Add a `case` to the switch in `app/[lng]/home/Content.tsx` using the block's `__typename`.
+8. Spread the fragment inside `sections` in `app/[lng]/(site)/home/meta.ts` and add it to the dependencies array.
+9. Add a `case` to the switch in `app/[lng]/(site)/home/Content.tsx` using the block's `__typename`.
 10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 11. Verify published rendering and draft/live preview rendering.
 
@@ -67,11 +67,12 @@ Existing section examples: Hero, DividerSection, CollectionCardShowcase, Materia
 - Do not create generic block-modeling guidance here.
 - Do not handle product detail Structured Text blocks here; those belong to catalog work.
 - Do not create new page routes here; use `ecommerce-demo-pages-preview`.
+- New visible strings (a button label, a screen-reader text) go into the General Interface singleton and a labels fragment, not into the component.
 - Keep the existing default switch behavior: unknown section types should safely render nothing.
 
 ## Acceptance criteria
 
-- The section appears in the homepage `Query` type inferred from `app/[lng]/home/meta.ts`.
+- The section appears in the homepage `Query` type inferred from `app/[lng]/(site)/home/meta.ts`.
 - The existing Home singleton contains the new section block in `sections`.
 - If `sections` is localized, the section is present in each active locale unless scoped otherwise.
 - The section renders on the homepage in published mode.

@@ -25,10 +25,10 @@ Before schema or content operations:
 
 ## Existing catalog structure
 
-- Listing route: `app/[lng]/products/page.tsx`.
-- Listing queries: `productsQuery` and `filterOptionsQuery` in `app/[lng]/products/meta.ts` (page.tsx runs them per request).
-- Product detail route: `app/[lng]/product/[slug]/`.
-- Product detail query: `query` in `app/[lng]/product/[slug]/meta.ts`.
+- Listing route: `app/[lng]/(site)/products/page.tsx`.
+- Listing queries: `productsQuery` and `filterOptionsQuery` in `app/[lng]/(site)/products/meta.ts` (page.tsx runs them per request).
+- Product detail route: `app/[lng]/(site)/product/[slug]/`.
+- Product detail query: `query` in `app/[lng]/(site)/product/[slug]/meta.ts`.
 - Listing filters use collections, brands, and materials.
 - Collections, brands, and materials carry their own `subtitle` (plain text), `description` (Structured Text), and `image`. `FilterOptionsFragment` in `components/ProductListing/fragments.ts` selects them, and a lone selected record gets the `FilterDetail` header.
 - A product is on sale when its `onSale` boolean is true; `salePrice` is set only while it is.
@@ -38,6 +38,8 @@ Before schema or content operations:
 - Product variants provide colors and available sizes for the product detail UI.
 - Listing UI: `components/ProductListing/`
 - Product card and price: `components/ProductCard/`
+- Product page also emits schema.org Product JSON-LD (`app/[lng]/(site)/product/[slug]/jsonLd.ts`, priced in `generalInterface.currencyCode`); catalog and stores titles come from General Interface labels (`lib/datocms/pageMetadata.ts`).
+- Visible catalog strings (filters, results, empty states, pagination, screen-reader labels) are General Interface labels, not code: add a new one to the singleton and select it in the feature's `fragments.ts` (`ProductListingLabels`, `ProductPageLabels`).
 - Product page UI: `components/ProductDetail/` (labels fragment in `fragments.ts`, description blocks in `Blocks/<Block>/`)
 
 ## Common workflows
@@ -45,15 +47,15 @@ Before schema or content operations:
 ### Add or change a product field on listing cards
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
-2. Add the field to all four queries that feed `ProductCard`: `productsQuery` in `app/[lng]/products/meta.ts`, `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts`, `showcase.newProducts` in `app/[lng]/showcase/meta.ts` and `product.relatedProducts` in `app/[lng]/product/[slug]/meta.ts`.
-3. Add an optional prop to `ProductCard` (`components/ProductCard/index.tsx`) and pass it from each call site (`app/[lng]/products/page.tsx`, `components/Sections/NewArrivals/ProductRail.tsx`, `app/[lng]/showcase/NewProducts.tsx`, `components/ProductDetail/RelatedProducts.tsx`), preserving the existing sale logic (the `onSale` boolean and `salePrice`) and links (`productPath()`).
+2. Add the field to all four queries that feed `ProductCard`: `productsQuery` in `app/[lng]/(site)/products/meta.ts`, `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts`, `showcase.newProducts` in `app/[lng]/(site)/showcase/meta.ts` and `product.relatedProducts` in `app/[lng]/(site)/product/[slug]/meta.ts`.
+3. Add an optional prop to `ProductCard` (`components/ProductCard/index.tsx`) and pass it from each call site (`app/[lng]/(site)/products/page.tsx`, `components/Sections/NewArrivals/ProductRail.tsx`, `app/[lng]/(site)/showcase/NewProducts.tsx`, `components/ProductDetail/RelatedProducts.tsx`), preserving the existing sale logic (the `onSale` boolean and `salePrice`) and links (`productPath()`).
 4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 5. Verify pagination, filters, and search still work.
 
 ### Add or change a product field on product detail pages
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
-2. Add the field to the `query` in `app/[lng]/product/[slug]/meta.ts` or the relevant component fragment in its `fragments.ts`.
+2. Add the field to the `query` in `app/[lng]/(site)/product/[slug]/meta.ts` or the relevant component fragment in its `fragments.ts`.
 3. Render it in the product detail component or related block component.
 4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 5. Verify static params and draft preview still work.
@@ -78,7 +80,7 @@ Before schema or content operations:
 
 1. Inspect layout menu records and linked taxonomy records through MCP.
 2. Keep links in the form `/<locale>/products?<modelApiKey>s=<recordId>` unless changing the listing parser too.
-3. Hrefs come from `productsHref` in `components/Layout/Header/menu.ts`; columns render in `MegaMenuPanel.tsx` (desktop) and `MobileMenu.tsx`, the Trending/New tiles in `FeatureTiles.tsx`; the menu data is the `menu` selection in `app/[lng]/meta.ts`.
+3. Hrefs come from `productsHref` in `components/Layout/Header/menu.ts`; columns render in `MegaMenuPanel.tsx` (desktop) and `MobileMenu.tsx`, the Trending/New tiles in `FeatureTiles.tsx`; the menu data is the `menu` selection in `app/[lng]/(site)/meta.ts`.
 4. Verify mobile and desktop category menus.
 
 ## Guardrails

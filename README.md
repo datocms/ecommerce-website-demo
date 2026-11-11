@@ -78,18 +78,24 @@ Your store should be up and running on [http://localhost:3000](http://localhost:
 
 ```
 app/
-  layout.tsx                root <html>, font, draft-mode toggle and visual-editing overlay
-  not-found.tsx             404 page
   [lng]/                    every page lives under its locale (/en/..., /it/...)
-    layout.tsx, meta.ts,    the site shell (header and footer), built from the Layout record
-    Content.tsx, RealTime.tsx
-    home/                   home page, served at /<locale>/home (proxy.ts redirects / and
+    layout.tsx              root layout: <html lang>, font, draft-mode toggle and
+                            visual-editing overlay
+    (site)/                 route group for the site pages (not part of the URL)
+      layout.tsx, meta.ts,  the site shell (header and footer), built from the Layout record
+      Content.tsx, RealTime.tsx
+      home/                 home page, served at /<locale>/home (proxy.ts redirects / and
                             /<locale> there): CMS sections plus the newest products
-    products/               catalog with filters, sorting, search and pagination
-    product/[slug]/         product page
-    showcase/               lookbook: photos, collections, new products and materials
-    stores/                 store list with a pager
-    legal/[slug]/           legal pages with a section index
+      products/             catalog with filters, sorting, search and pagination
+      product/[slug]/       product page, with schema.org Product JSON-LD (jsonLd.ts)
+      showcase/             lookbook: photos, collections, new products and materials
+      stores/               store list with a pager, and the Leaflet map (StoreMap.tsx)
+      legal/[slug]/         legal pages with a section index
+    not-found.tsx           404 page, from the Not Found Page singleton
+    [...rest]/              sends any unmatched path to not-found.tsx
+    error.tsx               error page, in English
+  global-error.tsx          error page for failures in the root layout, in English
+  sitemap.ts, robots.ts     sitemap.xml and robots.txt
   api/                      draft mode, Web Previews links, cache revalidation,
                             SEO analysis, post-install setup, product slug map
 components/
@@ -100,11 +106,10 @@ components/
   DatoStructuredText/       Structured Text renderer with visual-editing boundaries
   DraftMode/                draft-mode toggle, token form, success toast and the Content Link
                             overlay
-  Layout/                   site shell: Header/, Footer/, cookie notice, language selector,
-                            accent color, <html lang> sync
+  Layout/                   site shell: Header/, Footer/, language selector, accent color
     Header/                 nav bar, mega menu (MegaMenuPanel, category links from
-                            Layout.menu via menu.ts), mobile menu, search, cart, notification
-                            strip and the CMS popup
+                            Layout.menu via menu.ts), mobile menu, search, cart and the
+                            notification strip (dismissal in announcement.ts)
   Motion/                   PageTransition (page fades), Rise (word-by-word titles) and
                             LinkPending (marks a link whose page is loading)
   ProductCard/              the product card shared by every product list, and Price.tsx
@@ -120,10 +125,14 @@ components/
                             published content or live draft content
 lib/
   datocms/                  gql.tada setup, generated schema types and queryDatoCMS();
-                            linkHref() (the href of a CMS link); for CMA records,
+                            linkHref() (the href of a CMS link); pageMetadata.ts (page
+                            titles and the global SEO fragment); for CMA records,
                             localizedString() (field values) and recordToWebsiteRoute() (a
                             record's page, for Web Previews, SEO analysis and linkHref())
   i18n.ts                   site locales, read from DatoCMS
+  requestLocale.ts          the request's locale, for not-found.tsx
+  alternates.ts             canonical and hreflang links
+  dismissedAnnouncement.ts  localStorage key and pre-paint script for the dismissed strip
   routes.ts                 the URL of every page (homePath(), productsPath(), productPath()…)
   ...                       small helpers: route prop types, product slugs, price formatting,
                             class names, color contrast, env and token checks, site URL
@@ -140,6 +149,7 @@ styles/
   prose.css                 prose-dato, for Structured Text output
   overrides.css             unlayered rules, including the Content Link stega reset
   motion.css                animation utilities
+  map.css                   the stores map (Leaflet)
   view-transitions.css      page, results and product-photo view transitions
 proxy.ts                    sends locale-less URLs to the visitor's language
 schema.graphql              DatoCMS schema, regenerated by `npm run generate-schema`
@@ -149,10 +159,10 @@ skills/                     agent skills that describe how to extend this starte
 
 ### How a page is rendered
 
-Most route folders under `app/[lng]/` contain the same four files:
+Most route folders under `app/[lng]/(site)/` contain the same four files:
 
 - `meta.ts` holds the page's GraphQL `query`, written with `graphql()` from `lib/datocms/graphql.ts`, and the `Query` and `Variables` types that gql.tada infers from it.
-- `page.tsx` builds the query variables and passes everything to `generateWrapper()`. It also exports `generateMetadata` for the SEO tags, which override the site-wide defaults from `app/[lng]/layout.tsx`: the favicons and the fallback title and description from the DatoCMS global SEO settings.
+- `page.tsx` builds the query variables and passes everything to `generateWrapper()`. It also exports `generateMetadata` for the SEO tags, which override the site-wide defaults from `lib/datocms/pageMetadata.ts`: the favicons and the fallback title and description from the DatoCMS global SEO settings. It also sets the canonical and hreflang links through the `alternatePath` option of `generateMetadataFn`, which uses `lib/alternates.ts`. `app/sitemap.ts` and `app/robots.ts` serve `sitemap.xml` and `robots.txt`, and the product page adds schema.org Product JSON-LD (`product/[slug]/jsonLd.ts`, priced in the General Interface `currencyCode`).
 - `Content.tsx` renders the query result.
 - `RealTime.tsx` wraps `Content.tsx` in a live subscription.
 
@@ -163,32 +173,36 @@ Two routes differ from this pattern:
 - `products/` depends on search params, so its `page.tsx` runs the queries from `meta.ts` on every request and wraps its output in `PageTransition` itself. There is no `RealTime.tsx`.
 - `product/[slug]/page.tsx` runs its query itself so it can first redirect to the product's slug in the current language, then renders through `ContentOrRealTime`.
 
+The 404 page, `app/[lng]/not-found.tsx`, renders the localized Not Found Page singleton from DatoCMS: a title, a Structured Text description, an image and a Simple Button. `app/[lng]/[...rest]/page.tsx` sends any unmatched path there. `not-found.tsx` receives no params, so it reads the locale from `lib/requestLocale.ts`, which the root layout fills. `app/[lng]/error.tsx` and `app/global-error.tsx` are plain English pages, because they show when the CMS cannot be reached.
+
+The stores page draws its map in `StoreMap.tsx`, a Leaflet map that loads only when it nears the viewport; its look is in `styles/map.css`. The tiles come from OpenStreetMap, set by the two constants at the top of `StoreMap.tsx` (tile URL and attribution). OpenStreetMap's tile servers are meant for light traffic, so a busy site should switch to another tile provider there.
+
 ### Draft mode and Visual Editing
 
-Editors reach draft mode in two ways. The Web Previews plugin, which `/api/post-install` installs, asks `/api/draft/preview-links` for a record's links (`recordToWebsiteRoute()` in `lib/datocms/` maps the record to its page) and opens `/api/draft/enable?token=…`. The toggle at the bottom right of every page (`components/DraftMode/DraftModeToggle.tsx`, mounted in `app/layout.tsx`) asks for `DRAFT_SECRET_TOKEN` and calls the same route. `/api/draft/enable` and `/api/draft/disable` switch Next.js draft mode on and off.
+Editors reach draft mode in two ways. The Web Previews plugin, which `/api/post-install` installs, asks `/api/draft/preview-links` for a record's links (`recordToWebsiteRoute()` in `lib/datocms/` maps the record to its page) and opens `/api/draft/enable?token=…`. The toggle at the bottom right of every page (`components/DraftMode/DraftModeToggle.tsx`, mounted in `app/[lng]/layout.tsx`) asks for `DRAFT_SECRET_TOKEN` and calls the same route. `/api/draft/enable` and `/api/draft/disable` switch Next.js draft mode on and off.
 
-In draft mode `queryDatoCMS()` uses the draft token, skips the cache and asks for Content Link metadata. `ContentOrRealTime` renders `RealTime.tsx`, and `app/layout.tsx` mounts the `ContentLink` overlay, so clicking a piece of text opens its record in DatoCMS. Draft strings carry invisible stega characters for that overlay, so the code calls `stripStega()` before it uses a text value as a URL, a comparison key or an attribute; `linkHref()` (`lib/datocms/linkHref.ts`) does it for a link's `page`. Slug fields never carry stega, so product links (`productPath()` in `lib/routes.ts`) use the slug as is.
+In draft mode `queryDatoCMS()` uses the draft token, skips the cache and asks for Content Link metadata. `ContentOrRealTime` renders `RealTime.tsx`, and `app/[lng]/layout.tsx` mounts the `ContentLink` overlay, so clicking a piece of text opens its record in DatoCMS. Draft strings carry invisible stega characters for that overlay, so the code calls `stripStega()` before it uses a text value as a URL, a comparison key or an attribute; `linkHref()` (`lib/datocms/linkHref.ts`) does it for a link's `page`. Slug fields never carry stega, so product links (`productPath()` in `lib/routes.ts`) use the slug as is.
 
 ### Locales
 
-The locales come from the DatoCMS project settings (`lib/i18n.ts`), and the first one is the fallback that route queries pass as `fallbackLocales`. Every page sits under `app/[lng]/`, and `proxy.ts` sends a URL without a locale to the visitor's best `Accept-Language` match, and a bare `/<locale>` to its home page. Content is localized in DatoCMS, and UI labels such as button text, filter names and the currency symbol come from the localized General Interface singleton. A few strings are still hard-coded in English: the skip link, the catalog's empty state and result count, "Clear all", the draft-mode UI and some screen-reader labels (in `Price.tsx` and `Pagination.tsx`, for example). Product slugs differ per locale: the product page redirects a slug from another locale to the current one (`lib/productSlugs.ts`), and the language selector asks `/api/product-slug-map` for the slug in the locale it switches to.
+The locales come from the DatoCMS project settings (`lib/i18n.ts`), and the first one is the fallback that route queries pass as `fallbackLocales`. Every page sits under `app/[lng]/`, and `proxy.ts` sends a URL without a locale to the visitor's best `Accept-Language` match, and a bare `/<locale>` to its home page. Content is localized in DatoCMS, and the interface labels (skip link, menu, search, bag texts, catalog filters, results, empty states and pagination, screen-reader labels, store pager, pause and play) and the currency symbol come from the localized General Interface singleton, so a new visible string goes there, not in the code. Four things stay in English on purpose: the demo notice (`components/Common/DemoActionButton.tsx`), the draft-mode UI (`components/DraftMode/`) and the two error pages, which show when the CMS cannot be reached. Product slugs differ per locale: the product page redirects a slug from another locale to the current one (`lib/productSlugs.ts`), and the language selector asks `/api/product-slug-map` for the slug in the locale it switches to.
 
 ### Where data and components live
 
-Reusable CMS blocks keep their GraphQL fragment in a `fragments.ts` next to the component: the home sections in `components/Sections/`, the product-description blocks in `components/ProductDetail/Blocks/`, and `DatoImage`. The route's `meta.ts` spreads the fragment into its query, and the component reads its data back with `readFragment()`. For example, `app/[lng]/home/meta.ts` spreads every section fragment inside `sections`, and `app/[lng]/home/Content.tsx` picks the component by `__typename`.
+Reusable CMS blocks keep their GraphQL fragment in a `fragments.ts` next to the component: the home sections in `components/Sections/`, the product-description blocks in `components/ProductDetail/Blocks/`, and `DatoImage`. The route's `meta.ts` spreads the fragment into its query, and the component reads its data back with `readFragment()`. For example, `app/[lng]/(site)/home/meta.ts` spreads every section fragment inside `sections`, and `app/[lng]/(site)/home/Content.tsx` picks the component by `__typename`.
 
 Labels from the General Interface record that a whole feature folder uses sit in that folder's `fragments.ts`, next to the type of the components' `labels` prop (`ProductListingLabels` in `ProductListing/fragments.ts`, `ProductPageLabels` in `ProductDetail/fragments.ts`).
 
-Route-specific UI, such as the site shell in `components/Layout/` and the product page in `components/ProductDetail/`, types its props from the route's `Query` instead. `ProductCard` takes plain props, so any query can feed it. Four queries select its fields today, and each has a call site that maps them to props: `productsQuery` in `app/[lng]/products/meta.ts` (`products/page.tsx`), `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts` (`NewArrivals/ProductRail.tsx`), `showcase.newProducts` in `app/[lng]/showcase/meta.ts` (`showcase/NewProducts.tsx`) and `product.relatedProducts` in `app/[lng]/product/[slug]/meta.ts` (`ProductDetail/RelatedProducts.tsx`). A new card field goes into all four.
+Route-specific UI, such as the site shell in `components/Layout/` and the product page in `components/ProductDetail/`, types its props from the route's `Query` instead. `ProductCard` takes plain props, so any query can feed it. Four queries select its fields today, and each has a call site that maps them to props: `productsQuery` in `app/[lng]/(site)/products/meta.ts` (`products/page.tsx`), `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts` (`NewArrivals/ProductRail.tsx`), `showcase.newProducts` in `app/[lng]/(site)/showcase/meta.ts` (`showcase/NewProducts.tsx`) and `product.relatedProducts` in `app/[lng]/(site)/product/[slug]/meta.ts` (`ProductDetail/RelatedProducts.tsx`). A new card field goes into all four.
 
-Every link an editor sets in the CMS has the same shape. The Simple Button, Link Item and Footer Item blocks carry a `label`, a `record` (a collection, brand, material, product or legal page) and a `page` (`products`, `sale`, `showcase` or `stores`), which counts only when there is no record. Their queries select `page` and `record { ...LinkRecordFragment }`, and `linkHref()` in `lib/datocms/linkHref.ts` builds the href, always under the current locale:
+Every link an editor sets in the CMS has the same shape. The Simple Button, Link Item and Footer Item blocks carry a `label`, a `record` (a collection, brand, material, product or legal page) and a `page` (`home`, `products`, `sale`, `showcase` or `stores`), which counts only when there is no record. Their queries select `page` and `record { ...LinkRecordFragment }`, and `linkHref()` in `lib/datocms/linkHref.ts` builds the href, always under the current locale:
 
 | Link | Href |
 | --- | --- |
 | collection, brand or material | `/<locale>/products?collections=<id>` (or `brands=`, `materials=`) |
 | product | `/<locale>/product/<slug>` |
 | legal page | `/<locale>/legal/<slug>` |
-| page `products`, `showcase`, `stores` | `/<locale>/products`, `/<locale>/showcase`, `/<locale>/stores` |
+| page `home`, `products`, `showcase`, `stores` | `/<locale>/home`, `/<locale>/products`, `/<locale>/showcase`, `/<locale>/stores` |
 | page `sale` | `/<locale>/products?orderBy=onSale_DESC` (products on sale first) |
 
 A link with neither a record nor a page has no href, and `OptionalLink` (`components/Common/`) renders its label as plain text. Record links inside the notification strip's Structured Text go through the same mapping (`recordHref()`), which is `recordToWebsiteRoute()` applied to a queried record.

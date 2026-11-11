@@ -1,5 +1,3 @@
-'use client';
-
 type Props = {
   r: number;
   g: number;

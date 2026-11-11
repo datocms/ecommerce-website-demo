@@ -1,4 +1,11 @@
-import { productPath } from '@/lib/productPath';
+import {
+  homePath,
+  legalPagePath,
+  productPath,
+  productsPath,
+  showcasePath,
+  storesPath,
+} from '@/lib/routes';
 import { localizedString } from './localizedString';
 
 // The site path of a record, or null when its model has no page. Takes a CMA record (its slug may
@@ -12,21 +19,21 @@ export function recordToWebsiteRoute(
 
   switch (itemTypeApiKey) {
     case 'home':
-      return `/${locale}/home`;
+      return homePath(locale);
     case 'showcase':
-      return `/${locale}/showcase`;
+      return showcasePath(locale);
     case 'store':
-      return `/${locale}/stores`;
+      return storesPath(locale);
     case 'product':
       return slug ? productPath(locale, slug) : null;
     case 'legal_page':
-      return slug ? `/${locale}/legal/${slug}` : null;
+      return slug ? legalPagePath(locale, slug) : null;
     case 'brand':
-      return `/${locale}/products?brands=${record.id}`;
+      return productsPath(locale, { brands: record.id });
     case 'material':
-      return `/${locale}/products?materials=${record.id}`;
+      return productsPath(locale, { materials: record.id });
     case 'collection':
-      return `/${locale}/products?collections=${record.id}`;
+      return productsPath(locale, { collections: record.id });
     default:
       return null;
   }

@@ -6,58 +6,44 @@ import { parseHTML } from 'linkedom';
 import type { NextRequest } from 'next/server';
 import { localizedString } from '@/lib/datocms/localizedString';
 import { recordToWebsiteRoute } from '@/lib/datocms/recordToWebsiteRoute';
+import { hasBearerToken } from '@/lib/hasBearerToken';
+import { requireEnv } from '@/lib/requireEnv';
 import { getSiteUrl } from '@/lib/siteUrl';
 
 // Models whose pages get SEO/readability analysis
 const SEO_ANALYZED_MODELS = ['home', 'showcase', 'store', 'product'];
 
-const responseHeaders = {
-  'Content-Type': 'text/html',
+const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET',
+  'Access-Control-Allow-Headers': 'Authorization',
 };
 
+const textResponse = (message: string, status: number) =>
+  new Response(message, { status, headers: corsHeaders });
+
 export async function OPTIONS() {
-  return new Response('ok', {
-    status: 200,
-    headers: responseHeaders,
-  });
+  return textResponse('ok', 200);
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+  if (!hasBearerToken(request, process.env.SEO_SECRET_TOKEN)) {
+    return textResponse('Invalid token', 401);
+  }
 
+  const { searchParams } = new URL(request.url);
   const itemId = searchParams.get('itemId');
-  const itemTypeId = searchParams.get('itemTypeId');
   const itemTypeApiKey = searchParams.get('itemTypeApiKey');
   const locale = searchParams.get('locale');
   const sandboxEnvironmentId = searchParams.get('sandboxEnvironmentId');
 
-  const token = request.headers.get('authorization')?.replace(/^Bearer /, '');
-
-  if (!token || token !== process.env.SEO_SECRET_TOKEN) {
-    return new Response('Invalid token', {
-      status: 401,
-      headers: responseHeaders,
-    });
-  }
-
-  if (
-    !itemId ||
-    !itemTypeApiKey ||
-    !itemTypeId ||
-    !locale ||
-    !sandboxEnvironmentId
-  ) {
-    return new Response('Missing required parameters!', {
-      status: 422,
-      headers: responseHeaders,
-    });
+  if (!itemId || !itemTypeApiKey || !locale || !sandboxEnvironmentId) {
+    return textResponse('Missing required parameters!', 422);
   }
 
   try {
     const client = buildClient({
-      apiToken: process.env.DATOCMS_CMA_TOKEN || '',
+      apiToken: requireEnv('DATOCMS_CMA_TOKEN'),
       environment: sandboxEnvironmentId,
     });
     const item = await client.items.find(itemId);
@@ -67,58 +53,39 @@ export async function GET(request: NextRequest) {
       : null;
 
     if (!permalink) {
-      return new Response(
+      return textResponse(
         `Don't know which route corresponds to record #${itemId} (model: ${itemTypeApiKey})!`,
-        {
-          status: 422,
-          headers: responseHeaders,
-        },
+        422,
       );
     }
 
-    // Home and Showcase have no slug field: the last segment of their route stands in
-    const slug =
-      localizedString(item.slug, locale) ?? permalink.split('/').pop();
-    const baseUrl = getSiteUrl();
+    const page = await fetch(new URL(permalink, getSiteUrl()));
+    if (!page.ok) return textResponse('Page not reachable', 422);
 
-    const response = await fetch(new URL(permalink, baseUrl).toString());
-    const body = await response.text();
+    const { document } = parseHTML(await page.text());
+    const body = document.querySelector('body');
+    if (!body) return textResponse('No content found', 422);
 
-    const { document } = parseHTML(body);
-
-    const contentEl = document.querySelector('body');
-    if (!contentEl) {
-      return new Response('No content found', {
-        status: 422,
-        headers: responseHeaders,
-      });
-    }
-    const pageContent = contentEl.innerHTML;
-    const pageTitle = document.querySelector('title')?.textContent;
-    const pageDescription = document
-      .querySelector('meta[name="description"]')
-      ?.getAttribute('content');
-
-    return new Response(
-      JSON.stringify({
+    return Response.json(
+      {
         // The server HTML has no <html lang>, so echo the requested locale
         locale,
-        slug,
+        // Home and Showcase have no slug field: the last segment of their route stands in
+        slug: localizedString(item.slug, locale) ?? permalink.split('/').pop(),
         permalink,
-        title: pageTitle,
-        description: pageDescription,
-        content: pageContent,
-      }),
-      { status: 200, headers: responseHeaders },
+        title: document.querySelector('title')?.textContent,
+        description: document
+          .querySelector('meta[name="description"]')
+          ?.getAttribute('content'),
+        content: body.innerHTML,
+      },
+      { headers: corsHeaders },
     );
   } catch (error) {
     // Never return the error: the DatoCMS client stores the failed request in
     // it, Authorization header and payload included
     console.error(error);
 
-    return new Response('Internal server error', {
-      status: 500,
-      headers: responseHeaders,
-    });
+    return textResponse('Internal server error', 500);
   }
 }

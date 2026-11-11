@@ -2,24 +2,26 @@
 
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  type ReactNode,
-  useLayoutEffect,
-  useRef,
-  useState,
-  useTransition,
-} from 'react';
+import { useRouter } from 'next/navigation';
+import { type ReactNode, useState, useTransition } from 'react';
 import Drawer from '@/components/Common/Drawer';
+import { productsPath } from '@/lib/routes';
 import AppliedCount from './AppliedCount';
-import { PendingQueryProvider } from './PendingQuery';
+import { FILTER_TRANSITION_TYPES, PendingQueryProvider } from './PendingQuery';
+import { useScrollBackUnderToolbar } from './useScrollBackUnderToolbar';
+
+const CLEARED_QUERY = '';
+
+const BAR_WITH_FILTER_DETAIL =
+  'mt-16 border-t lg:top-[calc(var(--header-h)-1px)] lg:mt-24';
+const BAR_WITHOUT_FILTER_DETAIL = 'lg:top-(--header-h)';
 
 type Props = {
   count: number;
   lng: string;
   /** Filter groups that narrow the listing, shown as a count on the trigger */
   activeFilterCount?: number;
-  sort?: ReactNode;
+  sort: ReactNode;
   searchChip?: ReactNode;
   /** The toolbar follows a filter header instead of the page header */
   hasFilterDetail?: boolean;
@@ -40,24 +42,8 @@ export default function ListingToolbar({
   const [isClearing, startClearing] = useTransition();
   const resultsLabel = `${count} ${count === 1 ? 'result' : 'results'}`;
 
-  const currentQuery = useSearchParams().toString();
-  const toolbarRef = useRef<HTMLDivElement>(null);
-  const resultsTopRef = useRef<HTMLDivElement>(null);
-  const scrollBackQueryRef = useRef<string | null>(null);
-  const scrollBackWhenQueryLoads = (query: string) => {
-    if (query !== currentQuery) scrollBackQueryRef.current = query;
-  };
-
-  // From lg the toolbar sticks: after a sort or filter change, scroll the new results back under
-  // it. Wait for the drawer to close, whose scroll lock restores the old position on iOS
-  useLayoutEffect(() => {
-    if (open || scrollBackQueryRef.current !== currentQuery) return;
-    scrollBackQueryRef.current = null;
-    const overlap =
-      (toolbarRef.current?.getBoundingClientRect().bottom ?? 0) -
-      (resultsTopRef.current?.getBoundingClientRect().top ?? 0);
-    if (overlap > 1) window.scrollBy({ top: -overlap, behavior: 'instant' });
-  }, [currentQuery, open]);
+  const { toolbarRef, resultsTopRef, scrollBackWhenQueryLoads } =
+    useScrollBackUnderToolbar(open);
 
   return (
     <PendingQueryProvider onPush={scrollBackWhenQueryLoads}>
@@ -65,7 +51,7 @@ export default function ListingToolbar({
       <div
         ref={toolbarRef}
         data-chrome="toolbar"
-        className={`border-b border-line bg-white lg:sticky lg:z-20 ${hasFilterDetail ? 'mt-16 border-t lg:top-[calc(var(--header-h)-1px)] lg:mt-24' : 'lg:top-(--header-h)'}`}
+        className={`border-b border-line bg-white lg:sticky lg:z-20 ${hasFilterDetail ? BAR_WITH_FILTER_DETAIL : BAR_WITHOUT_FILTER_DETAIL}`}
       >
         <div className="shell flex flex-wrap items-center gap-x-6 lg:flex-nowrap">
           <button
@@ -81,17 +67,13 @@ export default function ListingToolbar({
               <AppliedCount count={activeFilterCount} />
             )}
           </button>
-          {sort && (
-            <>
-              <span
-                aria-hidden="true"
-                className="hidden h-6 w-px bg-line lg:block"
-              />
-              <div className="order-last -mx-(--gutter) w-[calc(100%+2*var(--gutter))] border-t border-line lg:order-none lg:mx-0 lg:w-auto lg:min-w-0 lg:border-t-0">
-                {sort}
-              </div>
-            </>
-          )}
+          <span
+            aria-hidden="true"
+            className="hidden h-6 w-px bg-line lg:block"
+          />
+          <div className="order-last -mx-(--gutter) w-[calc(100%+2*var(--gutter))] border-t border-line lg:order-none lg:mx-0 lg:w-auto lg:min-w-0 lg:border-t-0">
+            {sort}
+          </div>
           {/* From lg this group shrinks first, so a long search chip truncates before the sort tabs do */}
           <div className="ml-auto flex min-w-0 items-center justify-end gap-4 max-lg:flex-1 max-lg:basis-0 lg:shrink-[999]">
             {searchChip}
@@ -120,17 +102,17 @@ export default function ListingToolbar({
               {resultsLabel}
             </p>
             <Link
-              href={`/${lng}/products`}
-              // setOpen(false) unmounts this link, so a LinkPending inside it would vanish early: a
-              // transition of its own keeps the results dimmed until they land ("filter" skips the swap)
+              href={productsPath(lng)}
+              // setOpen(false) unmounts this link, so its own transition keeps the results dimmed
+              // until they land
               onNavigate={(event) => {
                 event.preventDefault();
-                scrollBackWhenQueryLoads('');
+                scrollBackWhenQueryLoads(CLEARED_QUERY);
                 setOpen(false);
                 startClearing(() => {
-                  router.push(`/${lng}/products`, {
+                  router.push(productsPath(lng), {
                     scroll: false,
-                    transitionTypes: ['filter'],
+                    transitionTypes: FILTER_TRANSITION_TYPES,
                   });
                 });
               }}

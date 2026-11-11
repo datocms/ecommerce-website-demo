@@ -1,4 +1,5 @@
 import { stripStega } from '@datocms/content-link';
+import { productsPath, showcasePath, storesPath } from '@/lib/routes';
 import { type FragmentOf, graphql, readFragment } from './graphql';
 import { recordToWebsiteRoute } from './recordToWebsiteRoute';
 
@@ -40,14 +41,14 @@ export function recordHref(lng: string, record: LinkRecord) {
 function pageHref(lng: string, page: string | null) {
   switch (stripStega(page ?? '')) {
     case 'products':
-      return `/${lng}/products`;
+      return productsPath(lng);
     case 'sale':
       // The catalog, products on sale first
-      return `/${lng}/products?orderBy=onSale_DESC`;
+      return productsPath(lng, { orderBy: 'onSale_DESC' });
     case 'showcase':
-      return `/${lng}/showcase`;
+      return showcasePath(lng);
     case 'stores':
-      return `/${lng}/stores`;
+      return storesPath(lng);
     default:
       return null;
   }

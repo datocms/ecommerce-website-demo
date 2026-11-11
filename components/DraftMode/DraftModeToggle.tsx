@@ -90,8 +90,8 @@ export default function DraftModeToggle({ isDraft }: Props) {
           onKeyDown={(e) => {
             if (e.key === 'Escape' && tokenFormOpen) closeTokenForm();
           }}
-          aria-expanded={!isDraft ? tokenFormOpen : undefined}
-          aria-controls={!isDraft ? TOKEN_FORM_ID : undefined}
+          aria-expanded={isDraft ? undefined : tokenFormOpen}
+          aria-controls={isDraft ? undefined : TOKEN_FORM_ID}
           aria-busy={isLeavingDraft || undefined}
           // Inset focus ring: the toggle sits over both the white page and the black footer
           className="press inline-flex h-12 items-center justify-center gap-2.5 border border-ink bg-white px-5 text-sm font-semibold whitespace-nowrap text-ink hover:bg-mist focus-visible:outline-offset-[-5px] aria-busy:opacity-45 max-sm:w-12 max-sm:px-0"

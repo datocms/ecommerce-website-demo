@@ -1,7 +1,7 @@
 import type { Product } from '@/app/[lng]/product/[slug]/meta';
 import ProductCard from '@/components/ProductCard';
 import { readFragment } from '@/lib/datocms/graphql';
-import { productPath } from '@/lib/productPath';
+import { productPath } from '@/lib/routes';
 import { type ProductPageLabels, ProductPageLabelsFragment } from './fragments';
 
 type Props = {

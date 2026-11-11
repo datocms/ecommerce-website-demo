@@ -8,6 +8,7 @@ import {
   ProductPageLabelsFragment,
 } from '@/components/ProductDetail/fragments';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
+import { productsPath } from '@/lib/routes';
 import {
   ProductInfoSectionFragment,
   ProductMaterialFragment,
@@ -77,7 +78,7 @@ export default function ProductInfoSection({
 
       {id && (
         <Link
-          href={`/${lng}/products?materials=${id}`}
+          href={productsPath(lng, { materials: id })}
           className={`group ${MEDIA} block aspect-[4/3] md:aspect-[16/9] lg:col-span-6 lg:ml-12 lg:aspect-auto xl:col-span-5 xl:ml-0`}
         >
           {image?.responsiveImage && (

@@ -2,7 +2,7 @@
 
 import type { NextRequest } from 'next/server';
 import { recordToWebsiteRoute } from '@/lib/datocms/recordToWebsiteRoute';
-import type { SiteLocale } from '@/lib/i18n';
+import { hasBearerToken } from '@/lib/hasBearerToken';
 import { getSiteUrl } from '@/lib/siteUrl';
 
 type PreviewLinksRequest = {
@@ -12,29 +12,27 @@ type PreviewLinksRequest = {
     meta: { status: 'draft' | 'updated' | 'published' };
   };
   itemType: { attributes: { api_key: string } };
-  locale: SiteLocale;
+  locale: string;
 };
 
-const responseHeaders = {
+type PreviewLink = { label: string; url: string };
+
+const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Content-Type': 'application/json',
 };
 
 export async function OPTIONS() {
-  return new Response('ok', {
-    status: 200,
-    headers: responseHeaders,
-  });
+  return new Response('ok', { headers: corsHeaders });
 }
 
 export async function POST(request: NextRequest) {
-  // The token is sent by the plugin as a request header (see /api/post-install)
-  const token = request.headers.get('authorization')?.replace(/^Bearer /, '');
+  // The plugin sends the token as a request header (see /api/post-install)
+  const draftToken = process.env.DRAFT_SECRET_TOKEN;
 
-  if (!token || token !== process.env.DRAFT_SECRET_TOKEN)
-    return new Response('Invalid token', { status: 401 });
+  if (!hasBearerToken(request, draftToken))
+    return new Response('Invalid token', { status: 401, headers: corsHeaders });
 
   const { item, itemType, locale }: PreviewLinksRequest = await request.json();
   const path = recordToWebsiteRoute(
@@ -43,35 +41,24 @@ export async function POST(request: NextRequest) {
     locale,
   );
 
-  if (!path) {
-    return new Response(JSON.stringify({ previewLinks: [] }), {
-      status: 200,
-      headers: responseHeaders,
-    });
-  }
-
+  const previewLinks: PreviewLink[] = [];
   const baseUrl = getSiteUrl();
 
-  const previewLinks = [];
-
   // Records with unpublished changes ('updated') get both links
-  if (item.meta.status !== 'published') {
+  if (path && item.meta.status !== 'published') {
     previewLinks.push({
       label: 'Draft version',
       // Opened by a browser, where we cannot set headers
-      url: `${baseUrl}/api/draft/enable?token=${token}&redirect=${path}`,
+      url: `${baseUrl}/api/draft/enable?token=${draftToken}&redirect=${path}`,
     });
   }
 
-  if (item.meta.status !== 'draft') {
+  if (path && item.meta.status !== 'draft') {
     previewLinks.push({
       label: 'Published version',
       url: `${baseUrl}/api/draft/disable?redirect=${path}`,
     });
   }
 
-  return new Response(JSON.stringify({ previewLinks }), {
-    status: 200,
-    headers: responseHeaders,
-  });
+  return Response.json({ previewLinks }, { headers: corsHeaders });
 }

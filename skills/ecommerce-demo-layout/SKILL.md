@@ -33,9 +33,9 @@ Before schema or content operations:
 
 - Shared shell route query: `query` in `app/[lng]/meta.ts`.
 - Shared shell renderer: `app/[lng]/Content.tsx`.
-- Header components: `components/Layout/Header/**` (NavBar, MobileMenu, MegaMenuPanel, FeatureTiles, SearchDialog, Cart, NotificationStrip, PopupDialog; menu hrefs in `menu.ts`, search submit in `useProductSearch.ts`).
-- Footer component: `components/Layout/Footer/index.tsx` (newsletter row in `NewsletterSignup.tsx`).
-- Shared by header and footer: `components/Layout/LanguageSelector.tsx`, `components/Layout/CookieNotice.tsx`.
+- Header components: `components/Layout/Header/**` (NavBar, SiteLogo, DropdownNavItem, MegaMenuPanel, FeatureTiles, MobileMenu, MobileCategory, MobileSearchForm, SearchDialog, Cart, NotificationStrip, PopupDialog; menu hrefs in `menu.ts`, search submit in `useProductSearch.ts`).
+- Footer component: `components/Layout/Footer/index.tsx` (newsletter row in `NewsletterSignup.tsx`, logo and socials in `FooterBrand.tsx`, link columns in `FooterColumns.tsx`, copyright and language switch in `LegalBar.tsx`).
+- Shared by header and footer: `components/Layout/LanguageSelector/` (trigger in `index.tsx`, list in `LocaleList.tsx`), `components/Layout/CookieNotice.tsx`.
 - Accent color component: `components/Layout/CustomColor.tsx`, fed by `Layout.accentColor`.
 - Shared DatoCMS records: `Layout` and shell-related `General Interface` fields.
 - `Layout.menu` drives header navigation, link items, dropdown menus, dropdown columns, and category-style menu links.
@@ -62,7 +62,7 @@ Before schema or content operations:
 2. Inspect the live field shape through MCP before changing queries or components.
 3. Update the `query` in `app/[lng]/meta.ts` only when the shared query needs more data.
 4. Update the relevant shared component under `components/Layout/Header/**`, `components/Layout/Footer/**`, or the shared shell renderer.
-5. After query changes, run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
+5. After query changes, run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 6. Verify the shared surface on at least one homepage route and one non-homepage route when practical.
 
 ### Adjust navigation
@@ -103,5 +103,5 @@ Before schema or content operations:
 - Header, footer, popup, cookie notice, notification strip, newsletter footer, search, language selector, and accent color still render safely when their DatoCMS fields are absent or empty.
 - Desktop and mobile navigation still work after menu changes.
 - Footer links remain locale-aware.
-- `npx gql.tada check` and `npx tsc --noEmit` pass after query changes.
+- `npx gql.tada check` and `npm run typecheck` pass after query changes.
 - Build passes after code changes.

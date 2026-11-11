@@ -1,4 +1,5 @@
 import type { TadaDocumentNode } from 'gql.tada';
+import type { ReactNode } from 'react';
 import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
 import type { SiteLocale } from '@/lib/i18n';
 
@@ -28,9 +29,7 @@ export type RealtimeUpdatesPage<
   PageProps extends GlobalPageProps,
   TResult = unknown,
   TVariables = Record<string, unknown>,
-> = (
-  props: RealtimeUpdatesProps<PageProps, TResult, TVariables>,
-) => React.ReactNode;
+> = (props: RealtimeUpdatesProps<PageProps, TResult, TVariables>) => ReactNode;
 
 export type ContentPage<
   PageProps extends GlobalPageProps,
@@ -39,4 +38,4 @@ export type ContentPage<
   props: ResolvedPageProps<PageProps> & {
     data: TResult;
   },
-) => React.ReactNode;
+) => ReactNode;

@@ -1,9 +1,9 @@
 import type { TadaDocumentNode } from 'gql.tada';
 import { draftMode } from 'next/headers';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
-import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
-import { getFallbackLocale } from '@/lib/i18n';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
 import ContentOrRealTime from './ContentOrRealTime';
+import { resolveRoute } from './resolveRoute';
 import type {
   BuildVariablesFn,
   ContentPage,
@@ -22,26 +22,11 @@ export function generateWrapper<
   realtimeComponent: RealtimeUpdatesPage<PageProps, TResult, TVariables>;
 }) {
   return async function Page(nextPageProps: PageProps) {
-    const fallbackLocale = await getFallbackLocale();
     const { isEnabled: isDraft } = await draftMode();
-
-    // searchParams is dropped: no Content reads it, and it must not reach the RealTime client props
-    const {
-      params,
-      searchParams: _searchParams,
-      ...otherProps
-    } = nextPageProps as PageProps & { searchParams?: unknown };
-    const pageProps = {
-      ...otherProps,
-      params: await params,
-    } as unknown as ResolvedPageProps<PageProps>;
-
-    const variables =
-      options.buildVariables?.({
-        ...pageProps,
-        fallbackLocale,
-      }) || ({} as TVariables);
-
+    const { pageProps, variables } = await resolveRoute(
+      nextPageProps,
+      options.buildVariables,
+    );
     const data = await queryDatoCMS(options.query, variables, isDraft);
 
     return (

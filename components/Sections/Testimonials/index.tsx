@@ -8,6 +8,8 @@ type Props = {
   fragment: FragmentOf<typeof TestimonialSectionFragment>;
 };
 
+const MAX_COLUMNS = 3;
+
 // Up to three quotes side by side from lg, split by hairlines; more wrap onto another row
 const COLUMN_LAYOUTS = [
   { grid: '', item: '' },
@@ -26,7 +28,7 @@ export default function Testimonials({ fragment }: Props) {
   );
   const titleId = `${id}-title`;
   const railId = `${id}-rail`;
-  const layout = COLUMN_LAYOUTS[Math.min(testimonial.length, 3)];
+  const layout = COLUMN_LAYOUTS[Math.min(testimonial.length, MAX_COLUMNS)];
 
   return (
     <section

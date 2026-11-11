@@ -2,8 +2,8 @@
 
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
-import { useRevealFocus } from './RailFocus';
-import { watchScroller } from './watchScroller';
+import { useRevealFocus } from './useRevealFocus';
+import { SCROLL_EPSILON, scrollRange, watchScroller } from './watchScroller';
 
 type Props = {
   /** id of the horizontal scroller the buttons drive */
@@ -40,9 +40,8 @@ export default function RailControls({ railId }: Props) {
     if (!rail) return;
     const update = () => {
       const x = rail.scrollLeft;
-      const reachedEnd = x >= rail.scrollWidth - rail.clientWidth - 1;
-      rail.toggleAttribute('data-at-end', reachedEnd);
-      setAtStart(x <= 1);
+      const reachedEnd = x >= scrollRange(rail) - SCROLL_EPSILON;
+      setAtStart(x <= SCROLL_EPSILON);
       setAtEnd(reachedEnd);
     };
     return watchScroller(rail, update);

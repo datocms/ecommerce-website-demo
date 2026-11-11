@@ -3,7 +3,7 @@
 import { isEmptyDocument } from 'datocms-structured-text-utils';
 import { useEffect, useState } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
-import { useCookieNoticeDismissed } from '@/components/Layout/CookieNotice';
+import { useCookieNoticeDismissed } from '@/components/Layout/cookieNoticeStore';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import NavBar from './NavBar';
 import NotificationStrip from './NotificationStrip';
@@ -14,8 +14,10 @@ type Props = {
   globalPageProps: ResolvedGlobalPageProps;
 };
 
+const POPUP_DELAY_MS = 600;
+
 // Outside React, so a dismissal survives the [lng] layout remounting on a locale switch
-const dismissed = { strip: false, popup: false };
+const dismissedThisSession = { strip: false, popup: false };
 
 export default function Header({ data, globalPageProps }: Props) {
   const { lng } = globalPageProps.params;
@@ -23,7 +25,7 @@ export default function Header({ data, globalPageProps }: Props) {
   const popup = data.layout?.popup;
 
   const [showStrip, setShowStrip] = useState(
-    !dismissed.strip && !isEmptyDocument(notification),
+    !dismissedThisSession.strip && !isEmptyDocument(notification),
   );
 
   // The cookie bar itself is rendered by the footer
@@ -33,13 +35,16 @@ export default function Header({ data, globalPageProps }: Props) {
 
   // The popup opens 600ms after the cookie notice is gone (or after load when there is none)
   const [popupState, setPopupState] = useState<'waiting' | 'open' | 'closed'>(
-    dismissed.popup ? 'closed' : 'waiting',
+    dismissedThisSession.popup ? 'closed' : 'waiting',
   );
   const hasPopup = !!popup;
 
   useEffect(() => {
     if (!hasPopup || cookieNoticeVisible || popupState !== 'waiting') return;
-    const timer = window.setTimeout(() => setPopupState('open'), 600);
+    const timer = window.setTimeout(
+      () => setPopupState('open'),
+      POPUP_DELAY_MS,
+    );
     return () => window.clearTimeout(timer);
   }, [hasPopup, cookieNoticeVisible, popupState]);
 
@@ -50,7 +55,7 @@ export default function Header({ data, globalPageProps }: Props) {
           notification={notification}
           lng={lng}
           onDismiss={() => {
-            dismissed.strip = true;
+            dismissedThisSession.strip = true;
             setShowStrip(false);
           }}
         />
@@ -64,7 +69,7 @@ export default function Header({ data, globalPageProps }: Props) {
           lng={lng}
           open={popupState === 'open'}
           onClose={() => {
-            dismissed.popup = true;
+            dismissedThisSession.popup = true;
             setPopupState('closed');
           }}
           popup={popup}

@@ -2,12 +2,11 @@
 
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
+import { hasBearerToken } from '@/lib/hasBearerToken';
 
 export async function POST(request: NextRequest) {
-  // The token is sent by the webhook as a request header (see /api/post-install)
-  const token = request.headers.get('authorization')?.replace(/^Bearer /, '');
-
-  if (!token || token !== process.env.CACHE_INVALIDATION_SECRET_TOKEN) {
+  // The webhook sends the token as a request header (see /api/post-install)
+  if (!hasBearerToken(request, process.env.CACHE_INVALIDATION_SECRET_TOKEN)) {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 

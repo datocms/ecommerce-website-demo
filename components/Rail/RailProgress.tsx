@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useScrollerTabStop } from './RailFocus';
-import { watchScroller } from './watchScroller';
+import { cx } from '@/lib/classNames';
+import { useScrollerTabStop } from './useScrollerTabStop';
+import { SCROLL_EPSILON, scrollRange, watchScroller } from './watchScroller';
 
 type Props = {
   /** id of the horizontal scroller the track follows */
@@ -24,13 +25,13 @@ export default function RailProgress({ railId, tabStop, className }: Props) {
     if (!rail || !thumb) return;
     const update = () => {
       const { scrollLeft, scrollWidth, clientWidth } = rail;
-      const max = scrollWidth - clientWidth;
+      const max = scrollRange(rail);
       const visible = Math.min(1, clientWidth / scrollWidth);
       const progress = max > 0 ? Math.min(1, Math.max(0, scrollLeft / max)) : 0;
       thumb.style.width = `${visible * 100}%`;
       // translate is relative to the thumb, so convert the track offset to thumb widths
       thumb.style.translate = `${((progress * (1 - visible)) / visible) * 100}% 0`;
-      setScrollable(max > 1);
+      setScrollable(max > SCROLL_EPSILON);
     };
     return watchScroller(rail, update);
   }, [railId]);
@@ -38,13 +39,11 @@ export default function RailProgress({ railId, tabStop, className }: Props) {
   return (
     <div
       aria-hidden="true"
-      className={[
+      className={cx(
         'relative h-0.5 overflow-hidden bg-line',
-        scrollable ? '' : 'hidden',
+        !scrollable && 'hidden',
         className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
     >
       <span
         ref={thumbRef}

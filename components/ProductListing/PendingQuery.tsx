@@ -10,6 +10,9 @@ import {
   useTransition,
 } from 'react';
 
+/** Drawer changes pass this type: their grid updates behind the scrim, without the swap */
+export const FILTER_TRANSITION_TYPES = ['filter'];
+
 // Pending query: quick successive clicks build on each other instead of on the
 // URL of the navigation that hasn't landed yet
 function usePendingQueryState(onPush?: (query: string) => void) {

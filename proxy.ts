@@ -1,10 +1,16 @@
-// Next.js 16 Proxy (formerly middleware.ts): redirects URLs without a locale prefix to the
-// visitor's preferred locale, and a bare locale to its home page.
+// Redirects URLs without a locale prefix to the visitor's preferred locale, and a bare locale to
+// its home page.
 
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 import { type NextRequest, NextResponse } from 'next/server';
-import { getAvailableLocales, type SiteLocale } from '@/lib/i18n';
+import {
+  fallbackLocaleOf,
+  getAvailableLocales,
+  type SiteLocale,
+  toLanguageTag,
+} from '@/lib/i18n';
+import { homePath } from '@/lib/routes';
 
 // Next.js ignores fetch caching inside Proxy, so keep the locales in memory
 // for a minute instead of querying DatoCMS on every request.
@@ -27,24 +33,18 @@ async function getCachedLocales(): Promise<SiteLocale[]> {
 }
 
 function getPreferredLocale(request: Request, locales: SiteLocale[]): string {
-  // The first locale in the project settings is the fallback
-  const fallbackLng = locales[0];
-  // SiteLocale enum values use '_' (pt_BR) where Accept-Language uses '-' (pt-BR)
+  // SiteLocale values use '_' (pt_BR) where Accept-Language uses '-' (pt-BR)
   const headers = new Headers(request.headers);
   const acceptLanguage = headers.get('accept-language');
   if (acceptLanguage) {
-    headers.set('accept-language', acceptLanguage.replaceAll('_', '-'));
+    headers.set('accept-language', toLanguageTag(acceptLanguage));
   }
 
-  const reformattedLocales = locales.map((locale) =>
-    locale.replaceAll('_', '-'),
-  );
-  const headersObject = Object.fromEntries(headers.entries());
-  const languages = new Negotiator({ headers: headersObject }).languages(
-    reformattedLocales,
-  );
+  const preferredLanguages = new Negotiator({
+    headers: Object.fromEntries(headers.entries()),
+  }).languages(locales.map(toLanguageTag));
 
-  return match(languages, locales, fallbackLng);
+  return match(preferredLanguages, locales, fallbackLocaleOf(locales));
 }
 
 export default async function proxy(request: NextRequest) {
@@ -54,7 +54,7 @@ export default async function proxy(request: NextRequest) {
   // / -> /en/home, in the visitor's preferred locale
   if (pathname === '/') {
     const locale = getPreferredLocale(request, locales);
-    return NextResponse.redirect(new URL(`/${locale}/home`, request.url));
+    return NextResponse.redirect(new URL(homePath(locale), request.url));
   }
 
   // /en -> /en/home, keeping the query string: there is no page at a locale's root

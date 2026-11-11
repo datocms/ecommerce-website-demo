@@ -51,10 +51,10 @@ export const FRAMES: Record<
 };
 
 // A photo wider than its frame is cropped by height, so its source must be wider than the frame
-export const coverSizes = (frames: Frame[], imageRatio: number) =>
+export const coverSizes = (frames: Frame[], photoRatio: number) =>
   frames
     .map(([media, width, unit, ratio]) =>
-      `${media} ${Math.ceil(width * Math.max(1, imageRatio / ratio))}${unit}`.trim(),
+      `${media} ${Math.ceil(width * Math.max(1, photoRatio / ratio))}${unit}`.trim(),
     )
     .join(', ');
 

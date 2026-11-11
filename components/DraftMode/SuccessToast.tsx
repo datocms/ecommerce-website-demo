@@ -1,10 +1,12 @@
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { type RefObject, useEffect, useState } from 'react';
 
+const AUTO_DISMISS_MS = 5000;
+
 type Props = {
   open: boolean;
   onDismiss: () => void;
-  returnFocusRef?: RefObject<HTMLElement | null>;
+  returnFocusRef: RefObject<HTMLElement | null>;
 };
 
 export default function SuccessToast({
@@ -15,10 +17,10 @@ export default function SuccessToast({
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
 
-  // Auto-hide after 5s; the timer pauses while the toast is hovered or focused
+  // The auto-hide timer pauses while the toast is hovered or focused
   useEffect(() => {
     if (!open || hovered || focused) return;
-    const timeout = setTimeout(onDismiss, 5000);
+    const timeout = setTimeout(onDismiss, AUTO_DISMISS_MS);
     return () => clearTimeout(timeout);
   }, [open, hovered, focused, onDismiss]);
 
@@ -48,7 +50,7 @@ export default function SuccessToast({
               setHovered(false);
               setFocused(false);
               onDismiss();
-              returnFocusRef?.current?.focus();
+              returnFocusRef.current?.focus();
             }}
             className="icon-btn ml-auto size-10 [&>svg]:size-4.5 [&>svg]:stroke-2"
           >

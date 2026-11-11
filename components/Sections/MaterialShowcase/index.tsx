@@ -4,12 +4,12 @@ import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
+import { productsPath } from '@/lib/routes';
 import { MaterialShowcaseFragment } from './fragments';
 
 type Props = {
   fragment: FragmentOf<typeof MaterialShowcaseFragment>;
-  globalPageProps: ResolvedGlobalPageProps;
+  lng: string;
 };
 
 const GRID_COLUMNS = {
@@ -18,7 +18,7 @@ const GRID_COLUMNS = {
   4: 'sm:grid-cols-2 lg:grid-cols-4',
 } as const;
 
-const SIZES = {
+const IMAGE_SIZES = {
   2: '(min-width: 1440px) 680px, (min-width: 640px) 48vw, 100vw',
   3: '(min-width: 1440px) 450px, (min-width: 1024px) 32vw, (min-width: 640px) 48vw, 100vw',
   4: '(min-width: 1440px) 340px, (min-width: 1024px) 24vw, (min-width: 640px) 48vw, 100vw',
@@ -31,12 +31,11 @@ function columnCount(materials: number): 2 | 3 | 4 {
   return 3;
 }
 
-export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
+export default function MaterialShowcase({ fragment, lng }: Props) {
   const { id, title, description, subDescription, materials } = readFragment(
     MaterialShowcaseFragment,
     fragment,
   );
-  const { lng } = globalPageProps.params;
   const titleId = `${id}-title`;
   const columns = columnCount(materials.length);
 
@@ -67,7 +66,7 @@ export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
           {materials.map((material) => (
             <li key={material.id}>
               <Link
-                href={`/${lng}/products?materials=${material.id}`}
+                href={productsPath(lng, { materials: material.id })}
                 className="group flex flex-col outline-offset-4"
                 data-datocms-content-link-group
               >
@@ -78,7 +77,7 @@ export default function MaterialShowcase({ fragment, globalPageProps }: Props) {
                       className={IMG_ZOOM}
                       layout="fill"
                       objectFit="cover"
-                      sizes={SIZES[columns]}
+                      sizes={IMAGE_SIZES[columns]}
                     />
                   )}
                 </div>

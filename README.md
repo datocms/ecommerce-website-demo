@@ -54,7 +54,7 @@ and set `DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN`, `DATOCMS_DRAFT_CONTENT_CDA_TOKEN`
 
 Set `DATOCMS_BASE_EDITING_URL` to your project's admin URL (`https://<project>.admin.datocms.com`) so Visual Editing can open records.
 
-Then set the three secret tokens that guard the endpoints used for Web Previews, SEO Previews and cache invalidation. Generate a different, cryptographically-secure random string for each of them (`openssl rand -hex 32` is a good way to do it) — never reuse the same value across projects:
+Then set the site URL and the three secret tokens that guard the endpoints used for Web Previews, SEO Previews and cache invalidation. Generate a different, cryptographically-secure random string for each of them (`openssl rand -hex 32` is a good way to do it) — never reuse the same value across projects:
 
 ```
 URL=http://localhost:3000
@@ -124,8 +124,9 @@ lib/
                             localizedString() (field values) and recordToWebsiteRoute() (a
                             record's page, for Web Previews, SEO analysis and linkHref())
   i18n.ts                   site locales, read from DatoCMS
-  ...                       small helpers: route prop types, product slugs and paths, price
-                            formatting, color contrast, redirect checks, site URL
+  routes.ts                 the URL of every page (homePath(), productsPath(), productPath()…)
+  ...                       small helpers: route prop types, product slugs, price formatting,
+                            class names, color contrast, env and token checks, site URL
 styles/
   global.css                the entry file: Tailwind and its @source folders, then the files
                             below in this order
@@ -166,7 +167,7 @@ Two routes differ from this pattern:
 
 Editors reach draft mode in two ways. The Web Previews plugin, which `/api/post-install` installs, asks `/api/draft/preview-links` for a record's links (`recordToWebsiteRoute()` in `lib/datocms/` maps the record to its page) and opens `/api/draft/enable?token=…`. The toggle at the bottom right of every page (`components/DraftMode/DraftModeToggle.tsx`, mounted in `app/layout.tsx`) asks for `DRAFT_SECRET_TOKEN` and calls the same route. `/api/draft/enable` and `/api/draft/disable` switch Next.js draft mode on and off.
 
-In draft mode `queryDatoCMS()` uses the draft token, skips the cache and asks for Content Link metadata. `ContentOrRealTime` renders `RealTime.tsx`, and `app/layout.tsx` mounts the `ContentLink` overlay, so clicking a piece of text opens its record in DatoCMS. Draft strings carry invisible stega characters for that overlay, so the code calls `stripStega()` before it uses a text value as a URL, a comparison key or an attribute; `linkHref()` (`lib/datocms/linkHref.ts`) does it for a link's `page`. Slug fields never carry stega, so product links (`productPath()` in `lib/productPath.ts`) use the slug as is.
+In draft mode `queryDatoCMS()` uses the draft token, skips the cache and asks for Content Link metadata. `ContentOrRealTime` renders `RealTime.tsx`, and `app/layout.tsx` mounts the `ContentLink` overlay, so clicking a piece of text opens its record in DatoCMS. Draft strings carry invisible stega characters for that overlay, so the code calls `stripStega()` before it uses a text value as a URL, a comparison key or an attribute; `linkHref()` (`lib/datocms/linkHref.ts`) does it for a link's `page`. Slug fields never carry stega, so product links (`productPath()` in `lib/routes.ts`) use the slug as is.
 
 ### Locales
 
@@ -217,7 +218,7 @@ Executing this task will automatically update the `schema.graphql` and `lib/dato
 
 It is highly recommended to follow [these instructions](https://gql-tada.0no.co/get-started/installation#vscode-setup) for an optimal experience with Visual Studio Code, including features like diagnostics, auto-completions, and type hovers for GraphQL.
 
-Biome formats and lints the code (`npm run format`, `npm run lint`). The workspace settings make the Biome extension the default formatter.
+Biome formats and lints the code (`npm run format`, `npm run lint`), and `npm run typecheck` checks the types. The workspace settings make the Biome extension the default formatter.
 
 <!--datocms-autoinclude-footer start-->
 

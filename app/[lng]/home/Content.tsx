@@ -70,7 +70,7 @@ const Content: ContentPage<PageProps, Query> = ({
               <CollectionCardShowcase
                 id={group[0].id}
                 sections={group}
-                globalPageProps={globalPageProps}
+                lng={lng}
                 title={showcaseGroupTitle(menu, group)}
                 action={allProductsAction}
               />
@@ -84,7 +84,7 @@ const Content: ContentPage<PageProps, Query> = ({
             return (
               <Hero
                 fragment={group}
-                globalPageProps={globalPageProps}
+                lng={lng}
                 shopNow={generalInterface?.shopNow}
                 withAdditionalImage={!firstDivider}
                 key={group.id}
@@ -95,7 +95,7 @@ const Content: ContentPage<PageProps, Query> = ({
             return (
               <Fragment key={group.id}>
                 <DividerSection
-                  globalPageProps={globalPageProps}
+                  lng={lng}
                   fragment={group}
                   image={
                     group === firstDivider ? heroAdditionalImage : undefined
@@ -110,11 +110,7 @@ const Content: ContentPage<PageProps, Query> = ({
 
           case 'MaterialShowcaseSectionRecord':
             return (
-              <MaterialShowcase
-                globalPageProps={globalPageProps}
-                fragment={group}
-                key={group.id}
-              />
+              <MaterialShowcase lng={lng} fragment={group} key={group.id} />
             );
 
           default:

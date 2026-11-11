@@ -47,7 +47,7 @@ Before schema or content operations:
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
 2. Add the field to all four queries that feed `ProductCard`: `productsQuery` in `app/[lng]/products/meta.ts`, `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts`, `showcase.newProducts` in `app/[lng]/showcase/meta.ts` and `product.relatedProducts` in `app/[lng]/product/[slug]/meta.ts`.
 3. Add an optional prop to `ProductCard` (`components/ProductCard/index.tsx`) and pass it from each call site (`app/[lng]/products/page.tsx`, `components/Sections/NewArrivals/ProductRail.tsx`, `app/[lng]/showcase/NewProducts.tsx`, `components/ProductDetail/RelatedProducts.tsx`), preserving the existing sale logic (the `onSale` boolean and `salePrice`) and links (`productPath()`).
-4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
+4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 5. Verify pagination, filters, and search still work.
 
 ### Add or change a product field on product detail pages
@@ -55,7 +55,7 @@ Before schema or content operations:
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
 2. Add the field to the `query` in `app/[lng]/product/[slug]/meta.ts` or the relevant component fragment in its `fragments.ts`.
 3. Render it in the product detail component or related block component.
-4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
+4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 5. Verify static params and draft preview still work.
 
 ### Add or change filter behavior
@@ -64,8 +64,8 @@ Before schema or content operations:
 2. Route modeling decisions to `datocms-content-modeling` before changing schema.
 3. Update listing query variables and filter arguments.
 4. Update URL query param handling without breaking existing params.
-5. Update `FilterPanel` (`components/ProductListing/FilterPanel.tsx`; sort options in `SortTabs.tsx`) or the listing page UI. A control inside the filters drawer pushes its query with the "filter" transition type (`pushQueryParam` in `PendingQuery.tsx`), so the results update behind the scrim instead of swapping.
-6. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`. Verify pagination counts.
+5. Update `FilterPanel` (`components/ProductListing/FilterPanel.tsx`; sort options in `sortOptions.ts`) or the listing page UI. A control inside the filters drawer pushes its query with the "filter" transition type (`pushQueryParam` in `PendingQuery.tsx`), so the results update behind the scrim instead of swapping.
+6. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`. Verify pagination counts.
 
 ### Add or change sort behavior
 
@@ -95,4 +95,4 @@ Before schema or content operations:
 - Filter counts, pagination links, and pagination range text still work.
 - Check page 1, page 2 or last page, zero-result, and out-of-range `page` states when changing listing filters, sorting, or counts.
 - Product detail pages still generate static params.
-- `npx gql.tada check` and `npx tsc --noEmit` pass after query changes.
+- `npx gql.tada check` and `npm run typecheck` pass after query changes.

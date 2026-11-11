@@ -6,21 +6,16 @@ import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import { linkHref } from '@/lib/datocms/linkHref';
-import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { DividerSectionFragment } from './fragments';
 
 type Props = {
   fragment: FragmentOf<typeof DividerSectionFragment>;
-  globalPageProps: ResolvedGlobalPageProps;
+  lng: string;
   /** The hero's second photo, shown beside the first divider only */
   image?: FragmentOf<typeof ResponsiveImageFragment> | null;
 };
 
-export default function DividerSection({
-  fragment,
-  globalPageProps,
-  image,
-}: Props) {
+export default function DividerSection({ fragment, lng, image }: Props) {
   const {
     id,
     preTitle,
@@ -28,7 +23,6 @@ export default function DividerSection({
     title,
     button: cta,
   } = readFragment(DividerSectionFragment, fragment);
-  const { lng } = globalPageProps.params;
   const titleId = `${id}-title`;
 
   const text = (

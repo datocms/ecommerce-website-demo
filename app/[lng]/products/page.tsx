@@ -5,6 +5,7 @@ import ProductCard from '@/components/ProductCard';
 import EmptyResults from '@/components/ProductListing/EmptyResults';
 import FilterDetail from '@/components/ProductListing/FilterDetail';
 import FilterPanel from '@/components/ProductListing/FilterPanel';
+import { isNarrowed, splitIds } from '@/components/ProductListing/filterParams';
 import {
   FilterOptionsFragment,
   ProductListingLabelsFragment,
@@ -13,10 +14,11 @@ import ListingToolbar from '@/components/ProductListing/ListingToolbar';
 import Pagination from '@/components/ProductListing/Pagination';
 import SearchChip from '@/components/ProductListing/SearchChip';
 import SortTabs from '@/components/ProductListing/SortTabs';
+import { buildLocaleVariables } from '@/components/WithRealTimeUpdates/buildLocaleVariables';
 import { readFragment } from '@/lib/datocms/graphql';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
-import { getFallbackLocale, type SiteLocale } from '@/lib/i18n';
-import { productPath } from '@/lib/productPath';
+import { getFallbackLocale } from '@/lib/i18n';
+import { productPath, productsPath } from '@/lib/routes';
 import {
   filterOptionsQuery,
   PAGE_SIZE,
@@ -29,15 +31,12 @@ import {
 // and no RealTime view
 export const dynamic = 'force-dynamic';
 
+// The first row of cards loads eagerly
+const PRIORITY_CARD_COUNT = 4;
+
 // A missing param means every option; an empty one means none
 const selectedIds = (param: string | undefined, options: { id: string }[]) =>
-  param === undefined
-    ? options.map((option) => option.id)
-    : param.split('|').filter(Boolean);
-
-// As in FilterPanel: a group narrows the listing unless every option is on
-const isNarrowed = (selected: string[], options: { id: string }[]) =>
-  options.some((option) => !selected.includes(option.id));
+  param === undefined ? options.map((option) => option.id) : splitIds(param);
 
 export default async function Page({ params, searchParams }: PageProps) {
   const { lng } = await params;
@@ -55,10 +54,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   const filterOptions = await queryDatoCMS(
     filterOptionsQuery,
-    {
-      locale: lng as SiteLocale,
-      fallbackLocale: [fallbackLocale],
-    },
+    buildLocaleVariables({ params: { lng }, fallbackLocale }),
     isDraft,
   );
 
@@ -77,8 +73,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   const data = await queryDatoCMS(
     productsQuery,
     {
-      locale: lng as SiteLocale,
-      fallbackLocale: [fallbackLocale],
+      ...buildLocaleVariables({ params: { lng }, fallbackLocale }),
       first: PAGE_SIZE,
       skip: (pageNumber - 1) * PAGE_SIZE,
       orderBy: [orderBy],
@@ -92,14 +87,21 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   // A lone selected material, collection or brand (checked in that order) gets a FilterDetail
   // header
-  const headerFilter =
-    materials.length === 1
-      ? allMaterials.find((material) => material.id === materials[0])
-      : collections.length === 1
-        ? allCollections.find((collection) => collection.id === collections[0])
-        : brands.length === 1
-          ? allBrands.find((brand) => brand.id === brands[0])
-          : undefined;
+  const pickHeaderFilter = () => {
+    if (materials.length === 1) {
+      return allMaterials.find((material) => material.id === materials[0]);
+    }
+    if (collections.length === 1) {
+      return allCollections.find(
+        (collection) => collection.id === collections[0],
+      );
+    }
+    if (brands.length === 1) {
+      return allBrands.find((brand) => brand.id === brands[0]);
+    }
+    return undefined;
+  };
+  const headerFilter = pickHeaderFilter();
 
   const labels = readFragment(
     ProductListingLabelsFragment,
@@ -121,8 +123,7 @@ export default async function Page({ params, searchParams }: PageProps) {
     for (const [key, value] of Object.entries(resolvedSearchParams)) {
       if (!keys.includes(key) && value !== undefined) params.set(key, value);
     }
-    const query = params.toString();
-    return `/${lng}/products${query ? `?${query}` : ''}`;
+    return productsPath(lng, Object.fromEntries(params));
   };
 
   return (
@@ -189,7 +190,7 @@ export default async function Page({ params, searchParams }: PageProps) {
                   currencySymbol={labels?.currencySymbol ?? ''}
                   saleLabel={labels?.sale}
                   sizes="(min-width: 1440px) 330px, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 46vw"
-                  priority={!headerFilter && index < 4}
+                  priority={!headerFilter && index < PRIORITY_CARD_COUNT}
                   titleAs="h2"
                 />
               ))}

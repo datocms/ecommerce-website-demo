@@ -28,7 +28,7 @@ const Content: ContentPage<PageProps, Query> = ({ data, params }) => {
           productName={product.name}
           saleTag={onSale ? sale : undefined}
         />
-        <BuyBox product={product} labels={labels} lng={lng} isOnSale={onSale} />
+        <BuyBox product={product} labels={labels} lng={lng} />
       </div>
       <ProductDescription product={product} labels={labels} lng={lng} />
       <RelatedProducts

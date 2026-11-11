@@ -7,8 +7,8 @@ import {
   toNextMetadata,
 } from 'react-datocms/seo';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
-import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
-import { getFallbackLocale } from '@/lib/i18n';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
+import { resolveRoute } from './resolveRoute';
 import type { BuildVariablesFn } from './types';
 
 export function generateMetadataFn<
@@ -26,23 +26,12 @@ export function generateMetadataFn<
   return async function generateMetadata(
     nextPageProps: PageProps,
   ): Promise<Metadata> {
-    const fallbackLocale = await getFallbackLocale();
     const { isEnabled: isDraft } = await draftMode();
-
-    const { params, ...otherProps } = nextPageProps;
-    const pageProps = {
-      ...otherProps,
-      params: await params,
-    } as unknown as ResolvedPageProps<PageProps>;
-
-    const variables =
-      options.buildVariables?.({
-        ...pageProps,
-        fallbackLocale,
-      }) || ({} as TVariables);
-
+    const { variables } = await resolveRoute(
+      nextPageProps,
+      options.buildVariables,
+    );
     const data = await queryDatoCMS(options.query, variables, isDraft);
-
     const generated = options.generate(data);
 
     if (!generated) return {};

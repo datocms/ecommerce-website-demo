@@ -1,23 +1,14 @@
+import { buildLocaleVariables } from '@/components/WithRealTimeUpdates/buildLocaleVariables';
 import { generateMetadataFn } from '@/components/WithRealTimeUpdates/generateMetadataFn';
 import { generateWrapper } from '@/components/WithRealTimeUpdates/generateWrapper';
-import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
-import type { SiteLocale } from '@/lib/i18n';
 import Content from './Content';
 import { type PageProps, type Query, query, type Variables } from './meta';
 import RealTime from './RealTime';
 
-const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
-  params,
-  fallbackLocale,
-}) => ({
-  locale: params.lng as SiteLocale,
-  fallbackLocale: [fallbackLocale],
-});
-
 export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
   {
     query,
-    buildVariables,
+    buildVariables: buildLocaleVariables,
     // The stores page has no record of its own, so it uses the first store's SEO tags
     generate: (data) => data.allStores[0]?.seo,
   },
@@ -25,7 +16,7 @@ export const generateMetadata = generateMetadataFn<PageProps, Query, Variables>(
 
 const Page = generateWrapper<PageProps, Query, Variables>({
   query,
-  buildVariables,
+  buildVariables: buildLocaleVariables,
   contentComponent: Content,
   realtimeComponent: RealTime,
 });

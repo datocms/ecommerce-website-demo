@@ -18,8 +18,7 @@ export default function NotFound() {
           alt="A person stands behind a red-tinted, foggy surface with hands pressed against it, wearing a cap and jacket."
           fill
           priority
-          // From lg the 4:5 photo fills its column by height (80vh wide) on screens narrower than
-          // 8:5, or 48:35 at xl
+          // From lg the 4:5 photo is as wide as 80vh when the screen is narrower than 8:5 (48:35 at xl)
           sizes="(min-width: 1280px) and (max-aspect-ratio: 48/35) 80vh, (min-width: 1280px) 59vw, (min-width: 1024px) and (max-aspect-ratio: 8/5) 80vh, (min-width: 1024px) 50vw, 100vw"
           className="object-cover object-[50%_25%]"
         />

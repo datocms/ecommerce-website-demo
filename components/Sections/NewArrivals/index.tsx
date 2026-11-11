@@ -4,6 +4,7 @@ import SectionTitle from '@/components/Common/SectionTitle';
 import RailControls from '@/components/Rail/RailControls';
 import RailProgress from '@/components/Rail/RailProgress';
 import type { FragmentOf } from '@/lib/datocms/graphql';
+import { productsPath } from '@/lib/routes';
 import type { ProductRailFragment } from './fragments';
 import ProductRail from './ProductRail';
 
@@ -19,10 +20,9 @@ type Props = {
   saleLabel?: string | null;
 };
 
-const ID = 'new-arrivals';
+const SECTION_ID = 'new-arrivals';
 
-// Not a CMS block: home/meta.ts fetches the newest products and home/Content.tsx decides where
-// the section goes.
+// Not a CMS block: home/meta.ts fetches the products, home/Content.tsx decides the placement
 export default function NewArrivals({
   products,
   lng,
@@ -32,10 +32,10 @@ export default function NewArrivals({
   saleLabel,
 }: Props) {
   if (products.length === 0) return null;
-  const titleId = `${ID}-title`;
-  const railId = `${ID}-rail`;
+  const titleId = `${SECTION_ID}-title`;
+  const railId = `${SECTION_ID}-rail`;
   const action = shopNow
-    ? { label: shopNow, href: `/${lng}/products` }
+    ? { label: shopNow, href: productsPath(lng) }
     : undefined;
   const controls = <RailControls railId={railId} />;
 

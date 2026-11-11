@@ -23,10 +23,9 @@ export type ProductListingLabels =
   | null
   | undefined;
 
-// Every collection, brand and material, for the filters and the FilterDetail header (which
-// shows a lone one's subtitle, description and image).
-// A fragment on Query: the operation that spreads it must declare $locale and
-// $fallbackLocale.
+// Every collection, brand and material, for the filters and the FilterDetail header, which
+// shows a lone one's subtitle, description and image. It is a fragment on Query, so the
+// operation that spreads it must declare $locale and $fallbackLocale.
 export const FilterOptionsFragment = graphql(
   /* GraphQL */ `
     fragment FilterOptionsFragment on Query {

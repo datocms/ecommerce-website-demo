@@ -1,6 +1,7 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { cx } from '@/lib/classNames';
 
 type Props = {
   title: ReactNode;
@@ -22,12 +23,10 @@ export default function SectionTitle({
 }: Props) {
   return (
     <div
-      className={[
+      className={cx(
         'flex flex-wrap items-end justify-between gap-x-10 gap-y-6',
         className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
     >
       <div className="max-w-[51.25rem] min-w-0">
         <h2 id={id} className="title-section">

@@ -3,6 +3,7 @@ import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { IMG_ZOOM, MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
+import { productsPath } from '@/lib/routes';
 import type { Showcase } from './meta';
 
 type Props = {
@@ -34,7 +35,7 @@ export default function CollectionLinks({
             className="flex w-[78%] shrink-0 snap-start sm:w-[44%] md:w-auto"
           >
             <Link
-              href={`/${lng}/products?collections=${collection.id}`}
+              href={productsPath(lng, { collections: collection.id })}
               className="group flex flex-col w-full outline-offset-4"
               data-datocms-content-link-group
             >

@@ -1,6 +1,7 @@
 import { draftMode } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { toNextMetadata } from 'react-datocms/seo';
+import { buildLocaleVariables } from '@/components/WithRealTimeUpdates/buildLocaleVariables';
 import ContentOrRealTime from '@/components/WithRealTimeUpdates/ContentOrRealTime';
 import type { BuildVariablesFn } from '@/components/WithRealTimeUpdates/types';
 import { graphql } from '@/lib/datocms/graphql';
@@ -15,6 +16,7 @@ import {
   resolveProductSlug,
   slugForLocale,
 } from '@/lib/productSlugs';
+import { productPath } from '@/lib/routes';
 import Content from './Content';
 import { type PageProps, query, type Variables } from './meta';
 import RealTime from './RealTime';
@@ -54,39 +56,25 @@ const buildVariables: BuildVariablesFn<PageProps, Variables> = ({
   params,
   fallbackLocale,
 }) => ({
-  locale: params.lng as SiteLocale,
-  fallbackLocale: [fallbackLocale],
+  ...buildLocaleVariables({ params, fallbackLocale }),
   slug: params.slug,
 });
 
-async function getProductPageData({
-  params,
-  fallbackLocale,
-  isDraft,
-}: {
+type ProductPageContext = {
   params: Awaited<PageProps['params']>;
   fallbackLocale: SiteLocale;
   isDraft: boolean;
-}) {
+};
+
+// The slug in the URL matches no product in this locale: it may be another locale's slug, so
+// redirect to this locale's, or 404
+async function resolveFallbackProductPage({
+  params,
+  fallbackLocale,
+  isDraft,
+}: ProductPageContext) {
   const locale = params.lng as SiteLocale;
   const variables = buildVariables({ params, fallbackLocale });
-  const data = await queryDatoCMS(query, variables, isDraft);
-
-  if (data.product) {
-    const slugs = buildProductSlugMap(
-      data.product._allSlugLocales,
-      locale,
-      data.product.slug,
-    );
-    const localizedSlug = slugForLocale(slugs, locale, fallbackLocale);
-
-    if (localizedSlug && localizedSlug !== params.slug) {
-      redirect(`/${params.lng}/product/${localizedSlug}`);
-    }
-
-    return { data, variables };
-  }
-
   const resolved = await resolveProductSlug({
     slug: params.slug,
     locale,
@@ -99,7 +87,7 @@ async function getProductPageData({
   }
 
   if (resolved.localizedSlug !== params.slug) {
-    redirect(`/${params.lng}/product/${resolved.localizedSlug}`);
+    redirect(productPath(params.lng, resolved.localizedSlug));
   }
 
   const resolvedVariables = {
@@ -116,6 +104,30 @@ async function getProductPageData({
     data: resolvedData,
     variables: resolvedVariables,
   };
+}
+
+async function getProductPageData(context: ProductPageContext) {
+  const { params, fallbackLocale, isDraft } = context;
+  const locale = params.lng as SiteLocale;
+  const variables = buildVariables({ params, fallbackLocale });
+  const data = await queryDatoCMS(query, variables, isDraft);
+
+  if (!data.product) {
+    return resolveFallbackProductPage(context);
+  }
+
+  const slugs = buildProductSlugMap(
+    data.product._allSlugLocales,
+    locale,
+    data.product.slug,
+  );
+  const localizedSlug = slugForLocale(slugs, locale, fallbackLocale);
+
+  if (localizedSlug && localizedSlug !== params.slug) {
+    redirect(productPath(params.lng, localizedSlug));
+  }
+
+  return { data, variables };
 }
 
 export async function generateMetadata(nextPageProps: PageProps) {

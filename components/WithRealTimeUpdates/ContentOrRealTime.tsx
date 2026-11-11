@@ -1,6 +1,7 @@
 import type { TadaDocumentNode } from 'gql.tada';
 import PageTransition from '@/components/Motion/PageTransition';
 import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
+import { requireEnv } from '@/lib/requireEnv';
 import type { ContentPage, RealtimeUpdatesPage } from './types';
 
 type Props<PageProps extends GlobalPageProps, TResult, TVariables> = {
@@ -35,8 +36,8 @@ export default function ContentOrRealTime<
     <PageTransition>
       {isDraft ? (
         <RealTime
-          token={process.env.DATOCMS_DRAFT_CONTENT_CDA_TOKEN!}
-          baseEditingUrl={process.env.DATOCMS_BASE_EDITING_URL!}
+          token={requireEnv('DATOCMS_DRAFT_CONTENT_CDA_TOKEN')}
+          baseEditingUrl={requireEnv('DATOCMS_BASE_EDITING_URL')}
           query={query}
           variables={variables}
           initialData={data}

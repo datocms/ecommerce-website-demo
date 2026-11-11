@@ -59,7 +59,7 @@ Existing section examples: Hero, DividerSection, CollectionCardShowcase, Materia
 7. Add or update the React component under `components/Sections/` using this starter's existing component props pattern.
 8. Spread the fragment inside `sections` in `app/[lng]/home/meta.ts` and add it to the dependencies array.
 9. Add a `case` to the switch in `app/[lng]/home/Content.tsx` using the block's `__typename`.
-10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
+10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 11. Verify published rendering and draft/live preview rendering.
 
 ## Guardrails

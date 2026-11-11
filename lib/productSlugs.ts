@@ -1,8 +1,6 @@
-// Product slugs are localized, so a URL can carry another locale's slug
-
 import { graphql } from '@/lib/datocms/graphql';
 import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
-import type { SiteLocale } from './i18n';
+import type { SiteLocale } from '@/lib/i18n';
 
 const productSlugLookupQuery = graphql(/* GraphQL */ `
   query ProductSlugLookup {
@@ -58,7 +56,10 @@ export function slugForLocale(
   );
 }
 
-/** Finds the product with `slug` in any locale; returns its slugs and the one for `locale`. */
+/**
+ * Finds the product with `slug` in any locale (a URL can carry another locale's slug) and returns
+ * its slugs and the one for `locale`.
+ */
 export async function resolveProductSlug({
   slug,
   locale,

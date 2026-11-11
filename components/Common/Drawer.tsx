@@ -20,8 +20,7 @@ type Props = {
   closeLabel: string;
 };
 
-// A full-height side panel, up to 460px wide, with a title bar, a scrolling body that staggers its
-// direct children in, and an optional footer
+// A side panel up to 460px wide: title bar, scrolling body that staggers its children in, footer
 export default function Drawer({
   open,
   onClose,

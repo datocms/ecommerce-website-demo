@@ -2,13 +2,12 @@ import SectionTitle from '@/components/Common/SectionTitle';
 import RailControls from '@/components/Rail/RailControls';
 import RailFocus from '@/components/Rail/RailFocus';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
 import { CollectionCardShowcaseFragment } from './fragments';
 import ShowcaseColumn from './ShowcaseColumn';
 
 type Props = {
   sections: FragmentOf<typeof CollectionCardShowcaseFragment>[];
-  globalPageProps: ResolvedGlobalPageProps;
+  lng: string;
   /** Prefix for the heading and rail ids */
   id: string;
   /** Header dropdown column label ("Seasons"); without it the group has no heading */
@@ -26,21 +25,19 @@ const GRID_COLUMNS = [
   'lg:grid-cols-4',
 ];
 
-// Snap rail below lg, grid from lg. Columns share four subgrid rows so copy and links line up;
-// py-2/-my-2 leave room for focus rings, and snapping pauses during keyboard focus so
-// RailControls or RailFocus can scroll the focused column into view.
+// Snap rail below lg, grid from lg; columns share four subgrid rows. Snapping pauses during
+// keyboard focus so RailControls or RailFocus can scroll to the focused column.
 const RAIL_GRID =
   'no-scrollbar -mx-(--gutter) -my-2 grid auto-cols-[80%] grid-flow-col grid-rows-[repeat(4,auto)] gap-x-4 overflow-x-auto scroll-px-(--gutter) px-(--gutter) py-2 snap-x snap-mandatory has-focus-visible:snap-none sm:auto-cols-[44%] lg:mx-0 lg:my-0 lg:auto-cols-auto lg:grid-flow-row lg:gap-x-8 lg:overflow-visible lg:px-0 lg:py-0 xl:gap-x-10';
 
 // One column per block in a run of consecutive showcases (grouped by home/showcaseGroups.ts)
 export default function CollectionCardShowcase({
   sections,
-  globalPageProps,
+  lng,
   id,
   title,
   action,
 }: Props) {
-  const { lng } = globalPageProps.params;
   const columns = Math.min(sections.length, 4);
   const titleId = `${id}-seasons-title`;
   const railId = `${id}-seasons`;

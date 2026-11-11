@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import DatoStructuredText from '@/components/DatoStructuredText';
+import { productsPath } from '@/lib/routes';
 import { coverSizes, FRAMES, imageRatio, type Photo } from './imageSizes';
 import type { Showcase } from './meta';
 
@@ -60,7 +61,7 @@ export default function Materials({
               />
             )}
             {shopNow && (
-              <Link href={`/${lng}/products`} className="btn">
+              <Link href={productsPath(lng)} className="btn">
                 {shopNow}
                 <ArrowRightIcon aria-hidden="true" className="stroke-2" />
               </Link>

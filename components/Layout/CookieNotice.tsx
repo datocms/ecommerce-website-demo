@@ -1,38 +1,19 @@
 'use client';
 
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useState } from 'react';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import DatoStructuredText from '@/components/DatoStructuredText';
+import { cx } from '@/lib/classNames';
+import {
+  dismissCookieNotice,
+  useCookieNoticeDismissed,
+} from './cookieNoticeStore';
 
 type CookieNoticeContent = NonNullable<
   NonNullable<LayoutQuery['layout']>['cookieNotice']
 >;
-
-// Module-level so a dismissal survives the [lng] layout remounting on a locale switch. The
-// header reads it too: the popup waits for it.
-let dismissed = false;
-const listeners = new Set<() => void>();
-
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-};
-
-const dismiss = () => {
-  dismissed = true;
-  for (const listener of listeners) listener();
-};
-
-export const useCookieNoticeDismissed = () =>
-  useSyncExternalStore(
-    subscribe,
-    () => dismissed,
-    () => false,
-  );
 
 type Props = {
   cookieNotice: CookieNoticeContent;
@@ -54,7 +35,10 @@ export default function CookieNotice({ cookieNotice }: Props) {
     <section
       id="cookie-notice"
       aria-label={cookieNotice.header ?? undefined}
-      className={`${playArrival ? 'enter [--delay:600ms] ' : ''}sticky bottom-0 z-40 border-t border-ink bg-white`}
+      className={cx(
+        playArrival && 'enter [--delay:600ms]',
+        'sticky bottom-0 z-40 border-t border-ink bg-white',
+      )}
     >
       {/* Below lg the buttons go under the text, so it keeps its width */}
       <div className="shell flex flex-col gap-4 py-4 md:py-5 lg:flex-row lg:items-center lg:gap-8">
@@ -85,14 +69,14 @@ export default function CookieNotice({ cookieNotice }: Props) {
         <div className="flex flex-wrap gap-2 sm:grid sm:grid-cols-2 sm:self-end lg:shrink-0 lg:self-auto">
           <button
             type="button"
-            onClick={dismiss}
+            onClick={dismissCookieNotice}
             className="btn-line btn-sm min-w-fit flex-1"
           >
             {cookieNotice.secondaryButtonLabel}
           </button>
           <button
             type="button"
-            onClick={dismiss}
+            onClick={dismissCookieNotice}
             className="btn btn-sm min-w-fit flex-1 border border-transparent"
           >
             {cookieNotice.primaryButtonLabel}

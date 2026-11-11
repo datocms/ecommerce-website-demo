@@ -1,32 +1,15 @@
 'use client';
 
-import { ArrowsUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { ArrowsUpDownIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef } from 'react';
-import { readFragment } from '@/lib/datocms/graphql';
-import {
-  type ProductListingLabels,
-  ProductListingLabelsFragment,
-} from './fragments';
+import type { ProductListingLabels } from './fragments';
 import { usePendingQuery } from './PendingQuery';
+import { getSortOptions } from './sortOptions';
 
 type Props = {
   labels: ProductListingLabels;
 };
 
-function getSortOptions(labels: ProductListingLabels) {
-  const { newArrivals, mostPopular, topRated, price, sales } =
-    readFragment(ProductListingLabelsFragment, labels) ?? {};
-
-  return [
-    { label: newArrivals, value: '_publishedAt_DESC' },
-    { label: mostPopular, value: 'numberOfReviews_DESC' },
-    { label: topRated, value: 'reviewAverage_DESC' },
-    { label: price, value: 'price_DESC' },
-    { label: sales, value: 'onSale_DESC' },
-  ];
-}
-
-/** Sort tabs in the listing toolbar */
 export default function SortTabs({ labels }: Props) {
   const { pendingParams, pushQueryParam } = usePendingQuery();
   const currentSort = pendingParams.get('orderBy');
@@ -36,9 +19,9 @@ export default function SortTabs({ labels }: Props) {
   const scrollerRef = useRef<HTMLFieldSetElement>(null);
   useEffect(() => {
     const row = scrollerRef.current;
-    const tab =
-      currentSort &&
-      row?.querySelector(`button[value="${CSS.escape(currentSort)}"]`);
+    const tab = currentSort
+      ? row?.querySelector(`button[value="${CSS.escape(currentSort)}"]`)
+      : null;
     if (!row || !tab) return;
     const rowBox = row.getBoundingClientRect();
     const tabBox = tab.getBoundingClientRect();
@@ -72,45 +55,6 @@ export default function SortTabs({ labels }: Props) {
           {sortOption.label}
         </button>
       ))}
-    </fieldset>
-  );
-}
-
-/** The sort chips at the top of the filters drawer */
-export function SortChips({ labels }: Props) {
-  const { pendingParams, pushQueryParam } = usePendingQuery();
-  const currentSort = pendingParams.get('orderBy');
-
-  return (
-    <fieldset
-      aria-label="Sort"
-      className="flex min-w-0 flex-wrap items-center gap-2 pb-6"
-    >
-      <span
-        aria-hidden="true"
-        className="grid size-11 place-items-center text-mute [&>svg]:size-[1.125rem]"
-      >
-        <ArrowsUpDownIcon />
-      </span>
-      {getSortOptions(labels).map((sortOption) => {
-        const isSelected = currentSort === sortOption.value;
-        return (
-          <button
-            key={sortOption.value}
-            type="button"
-            aria-pressed={isSelected}
-            onClick={() =>
-              pushQueryParam('orderBy', sortOption.value, ['filter'])
-            }
-            className="chip shrink-0"
-          >
-            {isSelected && (
-              <CheckIcon aria-hidden="true" className="animate-pop stroke-2" />
-            )}
-            {sortOption.label}
-          </button>
-        );
-      })}
     </fieldset>
   );
 }

@@ -1,10 +1,11 @@
 import { ArrowRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { isLink } from 'datocms-structured-text-utils';
 import Link from 'next/link';
-import { createElement, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
 import DatoStructuredText from '@/components/DatoStructuredText';
+import { markRenderer } from '@/components/DatoStructuredText/markRenderer';
 import { recordHref } from '@/lib/datocms/linkHref';
 
 type LayoutNotification = NonNullable<
@@ -18,18 +19,11 @@ type Props = {
 };
 
 // The grey marker would be lost on black: marks render as semibold instead
-const renderMarkAsSemibold = (
-  tag: string,
-  props: { key?: string } | null,
-  ...children: ReactNode[]
-) =>
-  tag === 'mark' ? (
-    <span key={props?.key} className="font-semibold">
-      {children}
-    </span>
-  ) : (
-    createElement(tag, props, ...children)
-  );
+const renderMarkAsSemibold = markRenderer((key, children) => (
+  <span key={key} className="font-semibold">
+    {children}
+  </span>
+));
 
 // A link in the message: a typed path (`link` node) or a record (`itemLink` node). A record
 // with no page renders as plain text.

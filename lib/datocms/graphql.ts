@@ -1,13 +1,5 @@
-/*
- * We use gql.tada to automatically generate TypeScript types from the GraphQL
- * schema. This module customizes the default behavior of gql.tada to match the
- * DatoCMS schema of the project.
- *
- * Types come from ./graphql-env.d.ts: run `npm run generate-schema` after changing models in DatoCMS.
- *
- * For more information:
- * - https://gql-tada.0no.co/
- */
+// gql.tada setup: a typed graphql() for this project's DatoCMS schema. Types come from
+// ./graphql-env.d.ts; run `npm run generate-schema` after changing models in DatoCMS.
 
 import { initGraphQLTada } from 'gql.tada';
 import type { introspection } from './graphql-env.js';

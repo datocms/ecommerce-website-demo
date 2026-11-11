@@ -8,6 +8,7 @@ import { PAGE_VARS } from '@/components/Common/styles';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import Rise from '@/components/Motion/Rise';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
+import { getScrollPaddingTop, LG_MEDIA_QUERY } from '@/lib/scrollPadding';
 import type { PageProps, Query } from './meta';
 import StoreList from './StoreList';
 import StorePager from './StorePager';
@@ -50,6 +51,20 @@ function StoreHeightCopy({
   );
 }
 
+// Whether the store's name is fully in view, and whether at least a quarter of the visible area
+// below the sticky header is taken by its text
+function measureVisibility(heading: HTMLElement, text: HTMLElement) {
+  const headerOffset = getScrollPaddingTop();
+  const { top, bottom } = heading.getBoundingClientRect();
+  const inView = top >= headerOffset && bottom <= window.innerHeight;
+  const textBox = text.getBoundingClientRect();
+  const textShown =
+    Math.min(textBox.bottom, window.innerHeight) -
+      Math.max(textBox.top, headerOffset) >=
+    (window.innerHeight - headerOffset) / 4;
+  return { inView, textShown };
+}
+
 const Content: ContentPage<PageProps, Query> = ({ data }) => {
   const [currentStore, setCurrentStore] = useState(0);
   // The first store arrives like any page title; later ones swap in place, quicker
@@ -65,12 +80,15 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
   if (!store) return null;
 
   const findOnMaps = data.generalInterface?.findOnMaps;
+  const { storeLocation } = store;
+  const mapsHref = storeLocation
+    ? `https://www.google.com/maps/?q=${storeLocation.latitude},${storeLocation.longitude}`
+    : null;
 
   const step = (by: number) => {
     setHasSwitched(true);
     setCurrentStore(
-      (currentStore) =>
-        (currentStore + by + allStores.length) % allStores.length,
+      (index) => (index + by + allStores.length) % allStores.length,
     );
   };
 
@@ -82,19 +100,9 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
     const heading = headingRef.current;
     const text = textRef.current;
     if (!heading || !text) return;
-    const headerOffset =
-      Number.parseFloat(
-        getComputedStyle(document.documentElement).scrollPaddingTop,
-      ) || 0;
-    const { top, bottom } = heading.getBoundingClientRect();
-    const inView = top >= headerOffset && bottom <= window.innerHeight;
-    const textBox = text.getBoundingClientRect();
-    const textShown =
-      Math.min(textBox.bottom, window.innerHeight) -
-        Math.max(textBox.top, headerOffset) >=
-      (window.innerHeight - headerOffset) / 4;
+    const { inView, textShown } = measureVisibility(heading, text);
     if (
-      window.matchMedia('(min-width: 64rem)').matches && // lg
+      window.matchMedia(LG_MEDIA_QUERY).matches &&
       // event.detail is 0 when the button is activated from the keyboard
       (inView || (event.detail > 0 && textShown))
     ) {
@@ -160,16 +168,18 @@ const Content: ContentPage<PageProps, Query> = ({ data }) => {
                 data={store.storeDescription}
                 className={`${DESCRIPTION} enter`}
               />
-              <a
-                key={`${store.id}-map`}
-                href={`https://www.google.com/maps/?q=${store.storeLocation?.latitude},${store.storeLocation?.longitude}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${MAPS_LINK} enter`}
-              >
-                {findOnMaps}
-                <ArrowUpRightIcon aria-hidden="true" className="stroke-2" />
-              </a>
+              {mapsHref && (
+                <a
+                  key={`${store.id}-map`}
+                  href={mapsHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${MAPS_LINK} enter`}
+                >
+                  {findOnMaps}
+                  <ArrowUpRightIcon aria-hidden="true" className="stroke-2" />
+                </a>
+              )}
             </div>
             {allStores.map((item, index) =>
               index === currentStore ? null : (

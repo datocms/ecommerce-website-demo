@@ -1,5 +1,6 @@
 import { executeQuery } from '@datocms/cda-client';
 import type { TadaDocumentNode } from 'gql.tada';
+import { requireEnv } from '@/lib/requireEnv';
 
 /**
  * Runs a query against the Content Delivery API. Published reads are cached under the "datocms" tag
@@ -14,9 +15,11 @@ export async function queryDatoCMS<
   isDraft?: boolean,
 ): Promise<TResult> {
   return executeQuery(document, {
-    token: isDraft
-      ? process.env.DATOCMS_DRAFT_CONTENT_CDA_TOKEN!
-      : process.env.DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN!,
+    token: requireEnv(
+      isDraft
+        ? 'DATOCMS_DRAFT_CONTENT_CDA_TOKEN'
+        : 'DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN',
+    ),
     variables,
     includeDrafts: isDraft,
     // Same as X-Exclude-Invalid in `npm run generate-schema`, so results match the generated types
@@ -24,7 +27,7 @@ export async function queryDatoCMS<
     ...(isDraft
       ? {
           contentLink: 'v1',
-          baseEditingUrl: process.env.DATOCMS_BASE_EDITING_URL,
+          baseEditingUrl: requireEnv('DATOCMS_BASE_EDITING_URL'),
         }
       : {}),
     requestInitOptions: {

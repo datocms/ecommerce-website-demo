@@ -3,6 +3,7 @@ import DocumentLang from '@/components/Layout/DocumentLang';
 import Footer from '@/components/Layout/Footer';
 import Header from '@/components/Layout/Header';
 import type { ContentPage } from '@/components/WithRealTimeUpdates/types';
+import { toLanguageTag } from '@/lib/i18n';
 import type { PageProps, Query } from './meta';
 
 const Content: ContentPage<PageProps, Query> = ({
@@ -10,7 +11,7 @@ const Content: ContentPage<PageProps, Query> = ({
   children,
   ...globalPageProps
 }) => {
-  const lang = globalPageProps.params.lng.replaceAll('_', '-');
+  const lang = toLanguageTag(globalPageProps.params.lng);
   // Carries lang in the server HTML; DocumentLang syncs <html lang> on the client
   return (
     <div lang={lang} className="contents">

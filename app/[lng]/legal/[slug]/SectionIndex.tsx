@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getScrollPaddingTop, LG_MEDIA_QUERY } from '@/lib/scrollPadding';
 
 export type Section = { id: string; title: string };
 
@@ -17,14 +18,13 @@ export default function SectionIndex({ label, sections }: Props) {
   const ids = sections.map((section) => section.id).join(' ');
 
   useEffect(() => {
-    const lgQuery = window.matchMedia('(min-width: 64rem)'); // lg
+    const lgQuery = window.matchMedia(LG_MEDIA_QUERY);
     const headings = ids.split(' ').map((id) => document.getElementById(id));
     let frame = 0;
     const update = () => {
       frame = 0;
       const root = document.documentElement;
-      const offset =
-        Number.parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
+      const offset = getScrollPaddingTop();
       const line = offset + (window.innerHeight - offset) / 4;
       const atBottom =
         window.innerHeight + window.scrollY >= root.scrollHeight - 1;

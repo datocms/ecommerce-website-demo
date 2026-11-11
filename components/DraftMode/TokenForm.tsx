@@ -44,7 +44,7 @@ export default function TokenForm({
       const response = await fetch(
         `/api/draft/enable?token=${encodeURIComponent(inputValue)}`,
       );
-      if (response.status === 200) {
+      if (response.ok) {
         onSuccess();
         return;
       }

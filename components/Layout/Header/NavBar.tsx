@@ -1,43 +1,35 @@
 'use client';
 
-import {
-  Popover,
-  PopoverButton,
-  PopoverGroup,
-  PopoverPanel,
-} from '@headlessui/react';
+import { PopoverGroup } from '@headlessui/react';
 import {
   Bars2Icon,
-  ChevronDownIcon,
   MagnifyingGlassIcon,
   ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { type ReactNode, Suspense, useRef, useState } from 'react';
-import { RSCImage } from 'react-datocms/rsc-image';
 import type { Query as LayoutQuery } from '@/app/[lng]/meta';
+import OptionalLink from '@/components/Common/OptionalLink';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import LanguageSelector from '@/components/Layout/LanguageSelector';
 import LinkPending from '@/components/Motion/LinkPending';
-import { type ResultOf, readFragment } from '@/lib/datocms/graphql';
+import { readFragment } from '@/lib/datocms/graphql';
 import { linkHref } from '@/lib/datocms/linkHref';
 import type { ResolvedGlobalPageProps } from '@/lib/globalPageProps';
+import { homePath } from '@/lib/routes';
 import Cart from './Cart';
-import MegaMenuPanel from './MegaMenuPanel';
+import DropdownNavItem from './DropdownNavItem';
 import MobileMenu from './MobileMenu';
-import type { DropdownMenu, LinkItem } from './menu';
+import { type LinkItem, splitMenu } from './menu';
 import SearchDialog from './SearchDialog';
+import SiteLogo from './SiteLogo';
+import { NAV_ITEM } from './styles';
 
 type Props = {
   data: LayoutQuery;
   globalPageProps: ResolvedGlobalPageProps;
 };
-
-// Full-height bar item. Its ::after is the 2px underline, drawn on hover, while open, on the
-// current page and while its page loads (LinkPending's data-pending).
-const NAV_ITEM =
-  'bar-draw relative inline-flex h-18 items-center gap-1 px-(--nav-x) text-xs font-medium whitespace-nowrap after:absolute after:inset-x-(--nav-x) after:-bottom-px after:h-0.5 after:bg-ink hover:after:scale-x-100 focus-visible:outline-offset-[-2px] has-data-pending:after:scale-x-100 aria-[current=page]:after:scale-x-100 data-open:after:scale-x-100 xl:text-sm';
 
 const BAR_ICON = 'icon-btn size-10 [&>svg]:size-5.5';
 
@@ -51,49 +43,15 @@ type NavLinkProps = {
 function NavLink({ href, current, children }: NavLinkProps) {
   return (
     <li>
-      {href ? (
-        <Link
-          href={href}
-          aria-current={current ? 'page' : undefined}
-          className={NAV_ITEM}
-        >
-          {children}
-          <LinkPending />
-        </Link>
-      ) : (
-        <span className={NAV_ITEM}>{children}</span>
-      )}
+      <OptionalLink
+        href={href}
+        aria-current={current ? 'page' : undefined}
+        className={NAV_ITEM}
+      >
+        {children}
+        {!!href && <LinkPending />}
+      </OptionalLink>
     </li>
-  );
-}
-
-type SiteLogoProps = {
-  logo: ResultOf<typeof ResponsiveImageFragment> | null | undefined;
-  wordmark: string | null | undefined;
-  wordmarkClassName?: string;
-};
-
-function SiteLogo({ logo, wordmark, wordmarkClassName = '' }: SiteLogoProps) {
-  return (
-    <>
-      {logo && (
-        // RSCImage, not DatoImage: a bare <picture>, so the logo can be sized by its height
-        <RSCImage
-          data={wordmark ? { ...logo, alt: '' } : logo}
-          usePlaceholder={false}
-          sizes="30px"
-          imgClassName="logo-ink"
-          imgStyle={{ height: '1.875rem', width: 'auto' }}
-        />
-      )}
-      {wordmark && (
-        <span
-          className={`title-item tracking-[-0.03em] whitespace-nowrap ${wordmarkClassName}`}
-        >
-          {wordmark}
-        </span>
-      )}
-    </>
   );
 }
 
@@ -103,21 +61,11 @@ export default function NavBar({ globalPageProps, data }: Props) {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [searchIsOpen, setSearchIsOpen] = useState(false);
   const [searchMinHeight, setSearchMinHeight] = useState(0);
-  const headerRef = useRef<HTMLElement>(null);
   const [cartIsOpen, setCartIsOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   const menu = data.layout?.menu ?? [];
-  const links = menu.filter(
-    (item): item is LinkItem => item.__typename === 'LinkItemRecord',
-  );
-  const categories = menu.filter(
-    (item): item is DropdownMenu => item.__typename === 'DropdownMenuRecord',
-  );
-  // Dropdowns and the first link sit left of the logo, the other links right
-  const leftItems = menu.filter(
-    (item) => item.__typename === 'DropdownMenuRecord' || item === links[0],
-  );
-  const rightLinks = links.slice(1);
+  const { links, categories, leftItems, rightLinks } = splitMenu(menu);
 
   const generalInterface = data.generalInterface;
   const searchPlaceholder = generalInterface?.searchPlaceholder || 'Search';
@@ -125,8 +73,9 @@ export default function NavBar({ globalPageProps, data }: Props) {
 
   const isCurrent = (link: LinkItem) => pathname === linkHref(lng, link);
 
-  const logo = data.layout?.logo.responsiveImage;
-  const logoData = logo && readFragment(ResponsiveImageFragment, logo);
+  const logoFragment = data.layout?.logo.responsiveImage;
+  const logo =
+    logoFragment && readFragment(ResponsiveImageFragment, logoFragment);
   // The Layout model has no site-name field: footerTitle doubles as the header wordmark
   const wordmark = data.layout?.footerTitle;
 
@@ -159,7 +108,7 @@ export default function NavBar({ globalPageProps, data }: Props) {
       <MobileMenu
         open={menuIsOpen}
         onClose={() => setMenuIsOpen(false)}
-        title={<SiteLogo logo={logoData} wordmark={wordmark} />}
+        title={<SiteLogo logo={logo} wordmark={wordmark} />}
         lng={lng}
         categories={categories}
         links={links}
@@ -170,15 +119,13 @@ export default function NavBar({ globalPageProps, data }: Props) {
         locales={data._site.locales}
       />
 
-      {/* z-45: above the floating controls (z-40), so the mega menu's scrim dims them too.
-          Sticky also makes it the mega menu's containing block. */}
+      {/* z-45 clears the floating controls (z-40), so the scrim dims them; sticky anchors the mega menu */}
       <header
         ref={headerRef}
         data-chrome="header"
         className="peer sticky top-0 z-45 border-b border-line bg-white"
       >
-        {/* --nav-x grows from 6px to 14px between 1100px and 1280px, so the longest locale's
-            items clear the logo. While a panel is open, only its button keeps the underline. */}
+        {/* --nav-x: 6px to 14px over 1100-1280px, so long locales clear the logo; an open panel keeps the only underline */}
         <nav
           aria-label="Main"
           className="shell grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-x-4 [--nav-x:clamp(0.375rem,calc((100vw_-_68.75rem)/22.5_+_0.375rem),0.875rem)] nav:h-18 [&:has([data-open])_[aria-current=page]:not(:hover)]:after:scale-x-0"
@@ -218,49 +165,25 @@ export default function NavBar({ globalPageProps, data }: Props) {
                   );
                 }
 
-                const category = item;
                 return (
-                  <li key={category.id}>
-                    <Popover>
-                      {/* Headless focuses the button on click: keep the ring for keyboard focus only */}
-                      <PopoverButton
-                        className={`group ${NAV_ITEM} not-data-focus:outline-0`}
-                      >
-                        {category.label}
-                        <ChevronDownIcon
-                          aria-hidden="true"
-                          className="size-3.75 stroke-2 transition-transform duration-200 group-data-open:rotate-180"
-                        />
-                      </PopoverButton>
-
-                      <PopoverPanel
-                        transition
-                        className="wipe absolute inset-x-0 top-[calc(100%+1px)] border-b border-line bg-white"
-                      >
-                        {({ close }) => (
-                          <MegaMenuPanel
-                            category={category}
-                            generalInterface={generalInterface}
-                            lng={lng}
-                            // close() takes an element to refocus, so don't pass it the click event
-                            onNavigate={() => close()}
-                          />
-                        )}
-                      </PopoverPanel>
-                    </Popover>
-                  </li>
+                  <DropdownNavItem
+                    key={item.id}
+                    category={item}
+                    generalInterface={generalInterface}
+                    lng={lng}
+                  />
                 );
               })}
             </PopoverGroup>
           </div>
 
           <Link
-            href={`/${lng}/home`}
+            href={homePath(lng)}
             className="flex items-center gap-2.5 justify-self-center"
           >
             {/* Under 360px the mark alone clears the menu and search buttons */}
             <SiteLogo
-              logo={logoData}
+              logo={logo}
               wordmark={wordmark}
               wordmarkClassName="max-[22.5rem]:sr-only"
             />
@@ -322,8 +245,7 @@ export default function NavBar({ globalPageProps, data }: Props) {
         </nav>
       </header>
 
-      {/* Mega menu scrim: outside the sticky header so it covers the page; clicking it closes
-          the menu */}
+      {/* Mega menu scrim, outside the sticky header so it covers the page */}
       <div
         aria-hidden="true"
         data-chrome="scrim"

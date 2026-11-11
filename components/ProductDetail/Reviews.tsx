@@ -14,7 +14,7 @@ export default function Reviews({ product, labels, lng }: Props) {
   const { reviewButton, reviews } =
     readFragment(ProductPageLabelsFragment, labels) ?? {};
 
-  const average = product.reviewAverage ?? 0;
+  const average = product.reviewAverage;
   const formattedAverage = new Intl.NumberFormat(lng, {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -24,7 +24,7 @@ export default function Reviews({ product, labels, lng }: Props) {
     month: 'long',
     day: 'numeric',
   });
-  const featuredReviews = product.featuredReviews ?? [];
+  const featuredReviews = product.featuredReviews;
 
   return (
     <section id="reviews" className="shell pt-(--section-gap)">

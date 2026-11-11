@@ -1,6 +1,6 @@
 import ProductCard from '@/components/ProductCard';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
-import { productPath } from '@/lib/productPath';
+import { productPath } from '@/lib/routes';
 import { ProductRailFragment } from './fragments';
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
 };
 
 // 4¼ cards from lg, so the next one is always in view. Each <li> is the 4-row grid ProductCard's
-// subgrid needs; py-2/-my-2 leave room for the cards' focus rings.
+// subgrid needs.
 export default function ProductRail({
   id,
   products,

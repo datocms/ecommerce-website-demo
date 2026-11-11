@@ -3,6 +3,7 @@ import type { ComponentPropsWithoutRef } from 'react';
 import { IMG_ZOOM } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
+import { cx } from '@/lib/classNames';
 import type { FragmentOf } from '@/lib/datocms/graphql';
 import Price from './Price';
 
@@ -58,12 +59,10 @@ export default function ProductCard({
       href={href}
       // "product" view transition: this photo flies to the product page (view-transitions.css)
       transitionTypes={['product']}
-      className={[
+      className={cx(
         'group relative row-span-4 mb-(--card-row-gap) grid grid-rows-subgrid content-start gap-y-0 outline-offset-4 focus-visible:z-10',
         className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
     >
       <div
         // view-transitions.css flies this well's first child: keep the photo layer first

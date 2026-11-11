@@ -9,7 +9,7 @@ description: >-
   preview-links", or "SEO analysis does not know this page route". Covers the
   starter's meta.ts, page.tsx, Content.tsx, RealTime.tsx,
   lib/datocms/recordToWebsiteRoute.ts (the record-to-path map),
-  app/api/draft/preview-links/route.tsx, and app/api/seoAnalysis/route.tsx
+  app/api/draft/preview-links/route.ts, and app/api/seoAnalysis/route.ts
   when the request is about a page route. Do not use for homepage sections,
   product listing filters, product detail rendering, product sale price or card
   UI changes, generic DatoCMS frontend setup, or generic Next.js routing outside
@@ -58,9 +58,9 @@ Existing examples:
 7. Add `page.tsx` using `generateWrapper`; add `generateMetadataFn` when SEO tags are available.
 8. Add a `staticParamsQuery` and `generateStaticParams` to `page.tsx` for slug-backed collection routes.
 9. Add `Content.tsx` and `RealTime.tsx` using the existing wrapper/realtime pattern.
-10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npx tsc --noEmit`.
-11. Map the model API key to the route path in `lib/datocms/recordToWebsiteRoute.ts`, which `app/api/draft/preview-links/route.tsx`, `app/api/seoAnalysis/route.tsx`, and `lib/datocms/linkHref.ts` (the hrefs of CMS links) share. If editors should be able to link the new model from link blocks or the notification strip, allow it in those `record` and link validators, and select its slug in `LinkRecordFragment` (`lib/datocms/linkHref.ts`) when the route needs one.
-12. Add the model API key to `SEO_ANALYZED_MODELS` in `app/api/seoAnalysis/route.tsx` when the page should support SEO/readability analysis.
+10. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
+11. Map the model API key to the route path in `lib/datocms/recordToWebsiteRoute.ts`, which `app/api/draft/preview-links/route.ts`, `app/api/seoAnalysis/route.ts`, and `lib/datocms/linkHref.ts` (the hrefs of CMS links) share. If editors should be able to link the new model from link blocks or the notification strip, allow it in those `record` and link validators, and select its slug in `LinkRecordFragment` (`lib/datocms/linkHref.ts`) when the route needs one.
+12. Add the model API key to `SEO_ANALYZED_MODELS` in `app/api/seoAnalysis/route.ts` when the page should support SEO/readability analysis.
 13. Verify published route, draft preview link, metadata, and localized static params.
 
 ## Preview mapping rules

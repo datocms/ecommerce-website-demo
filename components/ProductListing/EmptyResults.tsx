@@ -5,6 +5,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import LinkPending from '@/components/Motion/LinkPending';
+import { productsPath } from '@/lib/routes';
 
 type Props = {
   /** Products matching the filters, across all pages */
@@ -27,7 +28,7 @@ export default function EmptyResults({
     ? {
         title: 'No products match these filters',
         body: 'Try removing a filter or searching for something else.',
-        href: `/${lng}/products`,
+        href: productsPath(lng),
         cta: 'View all products',
       }
     : {

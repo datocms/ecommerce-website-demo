@@ -1,15 +1,18 @@
+import { cx } from '@/lib/classNames';
 import { formatPrice } from '@/lib/formatPrice';
 
 // Spoken before each price: screen readers do not announce the strikethrough
 const SR_SALE = 'Sale price';
 const SR_ORIGINAL = 'Original price';
 
+const SIZE_CLASSES = { sm: 'text-base', md: 'text-lg', lg: 'text-2xl' };
+
 type Props = {
   price: number;
   salePrice?: number | null;
   onSale: boolean;
   currencySymbol: string;
-  /** sm: 16px (cards), md: 18px (ProductCard size=lg), lg: 24px (product page) */
+  /** sm: cards, md: ProductCard size=lg, lg: product page */
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 };
@@ -25,13 +28,11 @@ export default function Price({
   const showSale = onSale && salePrice != null;
   return (
     <p
-      className={[
+      className={cx(
         'flex flex-wrap items-baseline gap-x-2 font-semibold tabular-nums',
-        { sm: 'text-base', md: 'text-lg', lg: 'text-2xl' }[size],
+        SIZE_CLASSES[size],
         className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      )}
     >
       {showSale ? (
         <>

@@ -5,7 +5,43 @@ import { RSCImage } from 'react-datocms/rsc-image';
 import type { Product } from '@/app/[lng]/product/[slug]/meta';
 import DatoImage from '@/components/DatoImage';
 import { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
-import { readFragment } from '@/lib/datocms/graphql';
+import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
+
+function GalleryImage({
+  fragment,
+  isLead,
+  sizes,
+}: {
+  fragment: FragmentOf<typeof ResponsiveImageFragment>;
+  isLead: boolean;
+  sizes: string;
+}) {
+  // RSCImage, not DatoImage: React waits for a plain <img> before the "product"
+  // view transition, and DatoImage's onLoad opts out of that wait
+  if (isLead)
+    return (
+      <RSCImage
+        data={readFragment(ResponsiveImageFragment, fragment)}
+        pictureClassName="absolute inset-0"
+        imgStyle={{
+          width: '100%',
+          height: '100%',
+          maxWidth: 'none',
+          objectFit: 'cover',
+        }}
+        sizes={sizes}
+        priority
+      />
+    );
+  return (
+    <DatoImage
+      fragment={fragment}
+      layout="fill"
+      objectFit="cover"
+      sizes={sizes}
+    />
+  );
+}
 
 type Props = {
   images: Product['productImages'];
@@ -37,12 +73,12 @@ export default function ProductGallery({
 
   const handleGalleryScroll = (event: UIEvent<HTMLElement>) => {
     const { scrollLeft, children } = event.currentTarget;
-    const first = children[0] as HTMLElement | undefined;
-    const second = children[1] as HTMLElement | undefined;
-    if (!first) return;
-    const pitch = second
-      ? second.offsetLeft - first.offsetLeft
-      : first.clientWidth;
+    const [first, second] = children;
+    if (!(first instanceof HTMLElement)) return;
+    const pitch =
+      second instanceof HTMLElement
+        ? second.offsetLeft - first.offsetLeft
+        : first.clientWidth;
     if (!pitch) return;
     const slide = Math.round(scrollLeft / pitch);
     setCurrentSlide(Math.min(Math.max(slide, 0), images.length - 1));
@@ -77,33 +113,13 @@ export default function ProductGallery({
             data-morph={index === 0 ? 'pdp' : undefined}
             className={`relative aspect-[4/5] w-full shrink-0 snap-start overflow-hidden bg-mist lg:w-auto ${images.length > 1 ? 'sm:w-[calc(50%-0.125rem)]' : ''} ${paired && spansRow(index) ? 'lg:col-span-2' : ''}`}
           >
-            {image.responsiveImage &&
-              (index === 0 ? (
-                // RSCImage, not DatoImage: React waits for a plain <img> before the "product"
-                // view transition, and DatoImage's onLoad opts out of that wait
-                <RSCImage
-                  data={readFragment(
-                    ResponsiveImageFragment,
-                    image.responsiveImage,
-                  )}
-                  pictureClassName="absolute inset-0"
-                  imgStyle={{
-                    width: '100%',
-                    height: '100%',
-                    maxWidth: 'none',
-                    objectFit: 'cover',
-                  }}
-                  sizes={sizesFor(index)}
-                  priority
-                />
-              ) : (
-                <DatoImage
-                  fragment={image.responsiveImage}
-                  layout="fill"
-                  objectFit="cover"
-                  sizes={sizesFor(index)}
-                />
-              ))}
+            {image.responsiveImage && (
+              <GalleryImage
+                fragment={image.responsiveImage}
+                isLead={index === 0}
+                sizes={sizesFor(index)}
+              />
+            )}
             {index === 0 && saleTag && (
               <span className="tag-dark absolute top-(--gutter) left-(--gutter) z-10 lg:top-4 lg:left-4">
                 {saleTag}

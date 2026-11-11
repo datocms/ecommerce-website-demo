@@ -3,15 +3,15 @@ import {
   isList,
   isListItem,
   isRoot,
-  type Root,
 } from 'datocms-structured-text-utils';
-import { Fragment, isValidElement, type ReactNode } from 'react';
+import { Fragment } from 'react';
 import { renderNodeRule } from 'react-datocms/structured-text';
 import type { Product } from '@/app/[lng]/product/[slug]/meta';
 import DatoStructuredText from '@/components/DatoStructuredText';
 import ProductInfoSection from './Blocks/ProductInfoSection';
 import QuestionsSection from './Blocks/QuestionsSection';
 import type { ProductPageLabels } from './fragments';
+import { groupDescriptionNodes, type TextRow } from './groupDescription';
 import { BUY_BOX_COLUMN } from './styles';
 
 type Props = {
@@ -19,38 +19,6 @@ type Props = {
   labels: ProductPageLabels;
   lng: string;
 };
-
-type TextRow = { key: string; text: ReactNode[]; lists: ReactNode[] };
-type TextGroup = { key: string; rows: TextRow[] };
-
-// The renderer drops null children, so array positions don't match node.children; its
-// "t-<index>" keys do
-const nodeIndex = (child: ReactNode) =>
-  isValidElement(child) ? Number(String(child.key).split('-').pop()) : -1;
-
-// Text between blocks becomes one group: the copy as a lead on the left, care labels on the buy
-// box's line. Copy that follows a list starts a new row, so the source order is kept.
-function groupTextBetweenBlocks(node: Root, children: ReactNode[] | undefined) {
-  const parts: Array<{ block: ReactNode } | TextGroup> = [];
-  for (const child of children ?? []) {
-    const type = node.children[nodeIndex(child)]?.type;
-    if (type === 'block') {
-      parts.push({ block: child });
-      continue;
-    }
-    const last = parts.at(-1);
-    const group =
-      last && 'rows' in last ? last : { key: `text-${parts.length}`, rows: [] };
-    if (group !== last) parts.push(group);
-    let row = group.rows.at(-1);
-    if (!row || (type !== 'list' && row.lists.length > 0)) {
-      row = { key: `row-${group.rows.length}`, text: [], lists: [] };
-      group.rows.push(row);
-    }
-    (type === 'list' ? row.lists : row.text).push(child);
-  }
-  return parts;
-}
 
 function DescriptionText({ rows }: { rows: TextRow[] }) {
   return (
@@ -110,7 +78,7 @@ export default function ProductDescription({ product, labels, lng }: Props) {
         customNodeRules={[
           renderNodeRule(isRoot, ({ node, children, key }) => (
             <Fragment key={key}>
-              {groupTextBetweenBlocks(node, children).map((part) =>
+              {groupDescriptionNodes(node, children).map((part) =>
                 'block' in part ? (
                   part.block
                 ) : (
@@ -125,24 +93,20 @@ export default function ProductDescription({ product, labels, lng }: Props) {
               node.level === 1 ? 'h2' : (`h${node.level}` as const);
             return <Heading key={key}>{children}</Heading>;
           }),
-          renderNodeRule(isListItem, ({ children, key }) => {
-            return (
-              // A label, not a control: the decorative hairline instead of a control's boundary
-              <li
-                key={key}
-                className="chip min-h-10 border-line px-3.5 [&>p]:m-0"
-              >
-                {children}
-              </li>
-            );
-          }),
-          renderNodeRule(isList, ({ children, key }) => {
-            return (
-              <ul key={key} className="flex flex-wrap gap-2">
-                {children}
-              </ul>
-            );
-          }),
+          renderNodeRule(isListItem, ({ children, key }) => (
+            // A label, not a control: the decorative hairline instead of a control's boundary
+            <li
+              key={key}
+              className="chip min-h-10 border-line px-3.5 [&>p]:m-0"
+            >
+              {children}
+            </li>
+          )),
+          renderNodeRule(isList, ({ children, key }) => (
+            <ul key={key} className="flex flex-wrap gap-2">
+              {children}
+            </ul>
+          )),
         ]}
       />
     </div>

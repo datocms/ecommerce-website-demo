@@ -1,3 +1,5 @@
+'use client';
+
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 
 const pad = (value: number) => String(value).padStart(2, '0');

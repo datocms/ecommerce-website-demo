@@ -1,6 +1,7 @@
 import { CollectionCardShowcaseFragment } from '@/components/Sections/CollectionCardShowcase/fragments';
 import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
 import { linkHref } from '@/lib/datocms/linkHref';
+import { productsPath } from '@/lib/routes';
 import type { Query } from './meta';
 
 type Section = NonNullable<Query['home']>['sections'][number];
@@ -52,7 +53,7 @@ export function showcaseGroupTitle(
 
 // The group's link to the catalog, with the header's own label for it ("All products")
 export function catalogLinkAction(menu: Menu, lng: string) {
-  const href = `/${lng}/products`;
+  const href = productsPath(lng);
   const catalogLink = menu.find(
     (entry) =>
       entry.__typename === 'LinkItemRecord' && linkHref(lng, entry) === href,

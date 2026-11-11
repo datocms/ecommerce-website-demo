@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';

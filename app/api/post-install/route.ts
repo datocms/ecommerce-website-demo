@@ -3,6 +3,7 @@
 
 import { buildClient, type Client } from '@datocms/cma-client-node';
 import { NextResponse } from 'next/server';
+import { requireEnv } from '@/lib/requireEnv';
 import { getSiteUrl } from '@/lib/siteUrl';
 
 const corsHeaders = {
@@ -16,11 +17,11 @@ export async function OPTIONS() {
 }
 
 async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
-  const webPreviewsPlugin = await client.plugins.create({
+  const plugin = await client.plugins.create({
     package_name: 'datocms-plugin-web-previews',
   });
 
-  await client.plugins.update(webPreviewsPlugin, {
+  await client.plugins.update(plugin, {
     parameters: {
       frontends: [
         {
@@ -51,7 +52,7 @@ async function installWebPreviewsPlugin(client: Client, baseUrl: string) {
   });
 }
 
-async function createCacheInvalidationWebhook(client: Client, baseUrl: string) {
+async function createCacheRevalidationWebhook(client: Client, baseUrl: string) {
   await client.webhooks.create({
     name: '🔄 Cache Revalidation',
     url: new URL('/api/revalidateCache', baseUrl).toString(),
@@ -98,14 +99,21 @@ async function isSameProject(callerClient: Client, ourApiToken: string) {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const { datocmsApiToken }: { datocmsApiToken?: string } =
+    await request.json();
 
-  const client = buildClient({ apiToken: body.datocmsApiToken });
-
-  const baseUrl = getSiteUrl();
+  if (!datocmsApiToken) {
+    return NextResponse.json(
+      { success: false, error: 'Missing datocmsApiToken' },
+      { status: 422, headers: corsHeaders },
+    );
+  }
 
   try {
-    if (!(await isSameProject(client, process.env.DATOCMS_CMA_TOKEN!))) {
+    const client = buildClient({ apiToken: datocmsApiToken });
+    const baseUrl = getSiteUrl();
+
+    if (!(await isSameProject(client, requireEnv('DATOCMS_CMA_TOKEN')))) {
       return NextResponse.json(
         { success: false, error: 'Invalid token' },
         { status: 401, headers: corsHeaders },
@@ -114,7 +122,7 @@ export async function POST(request: Request) {
 
     await Promise.all([
       installWebPreviewsPlugin(client, baseUrl),
-      createCacheInvalidationWebhook(client, baseUrl),
+      createCacheRevalidationWebhook(client, baseUrl),
     ]);
 
     return NextResponse.json({ success: true }, { headers: corsHeaders });

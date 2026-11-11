@@ -19,7 +19,10 @@
       "description": "You'll need it to browse draft content from the website."
     },
     "CACHE_INVALIDATION_SECRET_TOKEN": {
-      "type": "secret"
+      "type": "secret",
+      "format": "readable",
+      "label": "Cache revalidation token",
+      "description": "Sent by the webhook that refreshes the site when content changes."
     },
     "DATOCMS_BASE_EDITING_URL": {
       "type": "datocmsProjectUrl"

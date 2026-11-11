@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome lint .",
+    "typecheck": "tsc --noEmit",
     "format": "biome check --write --diagnostic-level=error .",
     "generate-schema": "dotenv -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN\" && gql.tada generate-output'"
   },

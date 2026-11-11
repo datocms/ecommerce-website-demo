@@ -8,6 +8,7 @@
       "**/*.jsx",
       "**/*.json",
       "!.next",
+      "!.claude",
       "!next-env.d.ts",
       "!lib/datocms/graphql-env.d.ts"
     ],

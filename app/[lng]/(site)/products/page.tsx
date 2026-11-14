@@ -182,7 +182,6 @@ export default async function Page({ params, searchParams }: PageProps) {
           lng={lng}
           eyebrow={filterLabel}
           record={headerFilter}
-          logo={headerFilter.__typename === 'BrandRecord'}
         />
       ) : (
         <h1 className="sr-only">{labels?.products}</h1>

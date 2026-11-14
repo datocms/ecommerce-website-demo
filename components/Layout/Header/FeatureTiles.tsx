@@ -58,7 +58,7 @@ function Caption({ name, partnerName, shopNow, compact }: CaptionProps) {
   );
 }
 
-// One featured record: a 4:3 photo (or a brand's logo) with its tag, the name below. In the mega
+// One featured record: a 4:3 photo with its tag, the name below. In the mega
 // menu the pair shares subgrid rows, so both photos stay the same height.
 function FeatureTile({
   item,
@@ -71,7 +71,6 @@ function FeatureTile({
   compact = false,
 }: FeatureTileProps) {
   const image = item.image.responsiveImage;
-  const isBrand = item._modelApiKey === 'brand';
 
   return (
     <Link
@@ -83,31 +82,17 @@ function FeatureTile({
         // Stretched in the mega menu: w-full, or the ratio would size the width from the height
         className={`${MEDIA} block aspect-[4/3] ${compact ? '' : 'w-full self-stretch'}`}
       >
-        {image &&
-          (isBrand ? (
-            // Inset 19%, but never closer than 8px to the tag above
-            <span className="absolute inset-x-[19%] top-[max(19%,3rem)] bottom-[max(19%,0.75rem)]">
-              <DatoImage
-                fragment={image}
-                layout="fill"
-                objectFit="contain"
-                sizes={sizes}
-                usePlaceholder={false}
-                // Logos come on white: multiply drops the box onto the mist well
-                imgClassName="mix-blend-multiply"
-              />
-            </span>
-          ) : (
-            <DatoImage
-              fragment={image}
-              layout="fill"
-              objectFit="cover"
-              // Portraits keep their faces in the landscape crop
-              objectPosition="50% 20%"
-              sizes={sizes}
-              className={IMG_ZOOM}
-            />
-          ))}
+        {image && (
+          <DatoImage
+            fragment={image}
+            layout="fill"
+            objectFit="cover"
+            // Portraits keep their faces in the landscape crop
+            objectPosition="50% 20%"
+            sizes={sizes}
+            className={IMG_ZOOM}
+          />
+        )}
         {tag && <span className="tag absolute top-3 left-3">{tag}</span>}
       </span>
       <Caption

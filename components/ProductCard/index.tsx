@@ -1,9 +1,11 @@
+import { stripStega } from '@datocms/content-link/stega';
 import Link from 'next/link';
 import type { ComponentPropsWithoutRef } from 'react';
 import { IMG_ZOOM } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
 import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
 import { cx } from '@/lib/classNames';
+import { fieldEditUrl } from '@/lib/datocms/fieldEditUrl';
 import type { FragmentOf } from '@/lib/datocms/graphql';
 import Price from './Price';
 
@@ -59,8 +61,8 @@ export default function ProductCard({
   return (
     <Link
       {...rest}
-      // Content Link: the whole card opens the product record
-      data-datocms-content-link-group
+      // Content Link: image, name, brand and price each open their own field of the product. The
+      // name carries the stega the other three borrow their edit URL from (fieldEditUrl).
       href={href}
       // "product" view transition: this photo flies to the product page (view-transitions.css)
       transitionTypes={['product']}
@@ -72,6 +74,7 @@ export default function ProductCard({
       <div
         // view-transitions.css flies this well's first child: keep the photo layer first
         data-morph="card"
+        data-datocms-content-link-url={fieldEditUrl(name, 'product_images')}
         className="relative aspect-[4/5] overflow-hidden bg-mist"
       >
         <div className={`absolute inset-0 ${hoverImage ? '' : IMG_ZOOM}`}>
@@ -111,7 +114,13 @@ export default function ProductCard({
         {name}
       </Title>
       {brand ? (
-        <p className="pt-1 text-sm text-mute">{brand}</p>
+        // The brand's stega would open the Brand record: point at the product's brand field instead
+        <p
+          data-datocms-content-link-url={fieldEditUrl(name, 'brand')}
+          className="pt-1 text-sm text-mute"
+        >
+          {stripStega(brand)}
+        </p>
       ) : (
         <span aria-hidden="true" />
       )}
@@ -123,6 +132,10 @@ export default function ProductCard({
         salePriceLabel={salePriceLabel}
         originalPriceLabel={originalPriceLabel}
         size={size === 'lg' ? 'md' : 'sm'}
+        editUrls={{
+          price: fieldEditUrl(name, 'price.{locale}'),
+          salePrice: fieldEditUrl(name, 'sale_price.{locale}'),
+        }}
         className="pt-2.5 text-ink"
       />
     </Link>

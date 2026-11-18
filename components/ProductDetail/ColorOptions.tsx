@@ -10,11 +10,14 @@ export default function ColorOptions({
   variations,
   selectedId,
   onSelect,
+  editUrlFor,
 }: {
   label: string | null | undefined;
   variations: Variation[];
   selectedId: string | undefined;
   onSelect: (variation: Variation) => void;
+  /** Content Link target for the color of the variation at this index, draft mode only */
+  editUrlFor?: (index: number) => string | undefined;
 }) {
   return (
     <div>
@@ -25,7 +28,7 @@ export default function ColorOptions({
         aria-labelledby="pdp-color-label"
         className="mt-3 flex min-w-0 flex-wrap gap-2"
       >
-        {variations.map((variation) => {
+        {variations.map((variation, index) => {
           const hex = stripStega(variation.color.hex);
           const isLightSwatch = isLightColor(hex);
           const selected = variation.id === selectedId;
@@ -37,6 +40,7 @@ export default function ColorOptions({
               aria-label={`${label ?? 'Color'}: ${hex}`}
               aria-pressed={selected}
               onClick={() => onSelect(variation)}
+              data-datocms-content-link-url={editUrlFor?.(index)}
               className="press grid size-12 place-items-center border border-line hover:border-ink aria-pressed:border-2 aria-pressed:border-ink"
             >
               <span

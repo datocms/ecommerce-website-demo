@@ -6,6 +6,7 @@ import { useState } from 'react';
 import type { Product } from '@/app/[lng]/(site)/product/[slug]/meta';
 import DemoActionButton from '@/components/Common/DemoActionButton';
 import Price from '@/components/ProductCard/Price';
+import { fieldEditUrl } from '@/lib/datocms/fieldEditUrl';
 import { readFragment } from '@/lib/datocms/graphql';
 import { productsPath } from '@/lib/routes';
 import ColorOptions from './ColorOptions';
@@ -50,10 +51,15 @@ export default function BuyBox({ product, labels, lng }: Props) {
     addToWishlist,
   } = readFragment(ProductPageLabelsFragment, labels) ?? {};
 
-  const selectedVariation =
-    variations.find((variation) => variation.id === selectedVariationId) ??
-    variations[0];
+  const selectedIndex = Math.max(
+    0,
+    variations.findIndex((variation) => variation.id === selectedVariationId),
+  );
+  const selectedVariation = variations[selectedIndex];
   const availableSizes = sizesOf(selectedVariation);
+
+  // Content Link targets for values without stega (see fieldEditUrl): the name lends its edit URL
+  const editUrl = (fieldPath: string) => fieldEditUrl(product.name, fieldPath);
 
   const selectVariation = (variation: Variation) => {
     setSelectedVariationId(variation.id);
@@ -81,9 +87,19 @@ export default function BuyBox({ product, labels, lng }: Props) {
         href="#reviews"
         className="group relative mt-4 flex min-h-6 w-fit items-center gap-2.5 text-sm after:absolute after:-inset-y-2.5 after:inset-x-0"
       >
-        <StarRating value={product.reviewAverage} outOfFive={outOfFive} />
+        <span
+          data-datocms-content-link-url={editUrl('review_average')}
+          className="flex"
+        >
+          <StarRating value={product.reviewAverage} outOfFive={outOfFive} />
+        </span>
         <span className="text-ink-2 underline decoration-line underline-offset-4 transition-colors group-hover:text-ink group-hover:decoration-ink">
-          <span className="tabular-nums">{product.numberOfReviews}</span>{' '}
+          <span
+            data-datocms-content-link-url={editUrl('number_of_reviews')}
+            className="tabular-nums"
+          >
+            {product.numberOfReviews}
+          </span>{' '}
           {reviews}
         </span>
       </a>
@@ -97,6 +113,10 @@ export default function BuyBox({ product, labels, lng }: Props) {
           salePriceLabel={salePrice}
           originalPriceLabel={originalPrice}
           size="lg"
+          editUrls={{
+            price: editUrl('price.{locale}'),
+            salePrice: editUrl('sale_price.{locale}'),
+          }}
         />
         {priceUndertext && (
           <p className="mt-1 text-sm text-mute">{priceUndertext}</p>
@@ -109,12 +129,16 @@ export default function BuyBox({ product, labels, lng }: Props) {
           variations={variations}
           selectedId={selectedVariation?.id}
           onSelect={selectVariation}
+          editUrlFor={(index) => editUrl(`product_variations.${index}.color`)}
         />
         <SizeOptions
           label={size}
           availableSizes={availableSizes}
           selected={selectedSize}
           onSelect={setSelectedSize}
+          editUrl={editUrl(
+            `product_variations.${selectedIndex}.available_sizes`,
+          )}
         />
       </div>
 

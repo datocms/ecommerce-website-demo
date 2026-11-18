@@ -14,6 +14,8 @@ type Props = {
   /** sm: cards, md: ProductCard size=lg, lg: product page */
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  /** Content Link targets for each price (see fieldEditUrl), only set in draft mode */
+  editUrls?: { price?: string; salePrice?: string };
 };
 
 export default function Price({
@@ -25,6 +27,7 @@ export default function Price({
   originalPriceLabel,
   size = 'sm',
   className,
+  editUrls,
 }: Props) {
   const showSale = onSale && salePrice != null;
   return (
@@ -37,11 +40,15 @@ export default function Price({
     >
       {showSale ? (
         <>
-          <span className="text-sale">
+          <span
+            data-datocms-content-link-url={editUrls?.salePrice}
+            className="text-sale"
+          >
             <span className="sr-only">{salePriceLabel}: </span>
             {formatPrice(currencySymbol, salePrice)}
           </span>
           <s
+            data-datocms-content-link-url={editUrls?.price}
             className={`font-normal text-mute ${size === 'lg' ? 'text-[0.75em]' : 'text-[0.9375em]'}`}
           >
             <span className="sr-only">{originalPriceLabel}: </span>
@@ -49,7 +56,9 @@ export default function Price({
           </s>
         </>
       ) : (
-        <span>{formatPrice(currencySymbol, price)}</span>
+        <span data-datocms-content-link-url={editUrls?.price}>
+          {formatPrice(currencySymbol, price)}
+        </span>
       )}
     </p>
   );

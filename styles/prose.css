@@ -1,0 +1,126 @@
+/* prose-dato: long-form Structured Text output (DatoStructuredText). Only class-less elements
+   are styled: a custom renderer that sets a className opts that node out. Inside surface-ink,
+   --prose-body and --prose-strong turn it white. */
+@utility prose-dato {
+  font-size: var(--text-base);
+  line-height: 1.7;
+  color: var(--prose-body, var(--color-ink-2));
+  & :where(:is(p, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, hr):not([class])) {
+    max-width: 68ch;
+  }
+  & :where(p:not([class])) {
+    margin-block: 0 1em;
+    text-wrap: pretty;
+  }
+  & :where(li:not([class]) > p:not([class])) {
+    margin-block: 0;
+  }
+  & :where(:is(h1, h2, h3, h4, h5, h6):not([class])) {
+    color: var(--prose-strong, var(--color-ink));
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  & :where(h1:not([class])) {
+    font-size: 2.25rem;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    margin-block: 0 0.6em;
+  }
+  & :where(h2:not([class])) {
+    font-size: 1.625rem;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-block: 2em 0.5em;
+  }
+  & :where(h1:not([class]) + h2:not([class])) {
+    margin-top: 1.4em;
+  }
+  & :where(:is(h3, h4, h5, h6):not([class])) {
+    font-size: var(--text-lg);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    margin-block: 1.6em 0.5em;
+  }
+  & :where(ul:not([class])) {
+    display: grid;
+    gap: 0.5em;
+    padding-left: 0;
+    margin-block: 0 1em;
+  }
+  & :where(ul:not([class]) > li:not([class])) {
+    position: relative;
+    padding-left: 1.375rem;
+  }
+  & :where(ul:not([class]) > li:not([class]))::before {
+    content: '';
+    position: absolute;
+    top: 0.72em;
+    left: 0.25rem;
+    width: 0.375rem;
+    height: 0.375rem;
+    background-color: var(--prose-strong, var(--color-ink));
+  }
+  & :where(ol:not([class])) {
+    list-style: decimal;
+    padding-left: 1.5rem;
+    margin-block: 0 1em;
+  }
+  & :where(ol:not([class]) > li:not([class])) {
+    margin-block: 0.375rem;
+    padding-left: 0.25rem;
+  }
+  & :where(ol:not([class]) > li:not([class]))::marker {
+    color: var(--prose-strong, var(--color-ink));
+    font-weight: 600;
+  }
+  & :where(a:not([class])) {
+    color: var(--prose-strong, var(--color-ink));
+    font-weight: 500;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  & :where(a:not([class])):hover {
+    text-decoration-thickness: 2px;
+  }
+  & :where(strong:not([class])) {
+    color: var(--prose-strong, var(--color-ink));
+    font-weight: 600;
+  }
+  & :where(hr:not([class])) {
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    margin-block: 2em;
+  }
+  & :where(blockquote:not([class])) {
+    border-left: 2px solid var(--prose-strong, var(--color-ink));
+    padding-left: 1.25rem;
+    margin-block: 1.5rem;
+    color: var(--prose-strong, var(--color-ink));
+    font-size: 1.25em;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+  }
+  & :where(h2:not([class]) + :is(h3, h4, h5, h6):not([class])) {
+    margin-top: 0;
+  }
+  & :where(h1, h2, h3, h4, h5, h6, p):first-child {
+    margin-top: 0;
+  }
+  & :where(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote):last-child {
+    margin-bottom: 0;
+  }
+  @media (min-width: 40rem) {
+    font-size: var(--text-md);
+    & :where(h1:not([class])) {
+      font-size: 3rem;
+    }
+    & :where(h2:not([class])) {
+      font-size: 1.875rem;
+    }
+    & :where(:is(h3, h4, h5, h6):not([class])) {
+      font-size: var(--text-xl);
+    }
+  }
+}

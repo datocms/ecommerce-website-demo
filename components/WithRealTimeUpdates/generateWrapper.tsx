@@ -1,62 +1,44 @@
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { TadaDocumentNode } from 'gql.tada';
 import { draftMode } from 'next/headers';
-import { getFallbackLocale } from '@/app/i18n/settings';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
-import queryDatoCMS from '@/utils/queryDatoCMS';
+import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
+import ContentOrRealTime from './ContentOrRealTime';
+import { resolveRoute } from './resolveRoute';
 import type {
   BuildVariablesFn,
   ContentPage,
   RealtimeUpdatesPage,
-  ResolvedPageProps,
 } from './types';
 
+/** Builds a route's server component (page or layout) from its query, Content and RealTime */
 export function generateWrapper<
   PageProps extends GlobalPageProps,
   TResult = unknown,
   TVariables = Record<string, unknown>,
 >(options: {
-  query: TypedDocumentNode<TResult, TVariables>;
+  query: TadaDocumentNode<TResult, TVariables>;
   buildVariables?: BuildVariablesFn<PageProps, TVariables>;
   contentComponent: ContentPage<PageProps, TResult>;
   realtimeComponent: RealtimeUpdatesPage<PageProps, TResult, TVariables>;
 }) {
-  return async function Page(unsanitizedPageProps: PageProps) {
-    const fallbackLocale = await getFallbackLocale();
+  return async function Page(nextPageProps: PageProps) {
     const { isEnabled: isDraft } = await draftMode();
-
-    // Await params since they are now Promises in Next.js 16
-    const resolvedParams = await unsanitizedPageProps.params;
-
-    const { searchParams, params, ...pagePropsWithoutSearchParamsAndParams } =
-      unsanitizedPageProps as PageProps & { searchParams: unknown };
-
-    // Create resolved page props with awaited params
-    const pageProps = {
-      ...pagePropsWithoutSearchParamsAndParams,
-      params: resolvedParams,
-    } as unknown as ResolvedPageProps<PageProps>;
-
-    const variables =
-      options.buildVariables?.({
-        ...pageProps,
-        fallbackLocale,
-      }) || ({} as TVariables);
-
+    const { pageProps, variables } = await resolveRoute(
+      nextPageProps,
+      options.buildVariables,
+    );
     const data = await queryDatoCMS(options.query, variables, isDraft);
 
-    const { realtimeComponent: RealTime, contentComponent: Content } = options;
-
-    return isDraft ? (
-      <RealTime
-        token={process.env.DATOCMS_DRAFT_CONTENT_CDA_TOKEN!}
-        baseEditingUrl={process.env.DATOCMS_BASE_EDITING_URL!}
+    return (
+      <ContentOrRealTime
+        isDraft={isDraft}
         query={options.query}
         variables={variables}
-        initialData={data}
+        data={data}
         pageProps={pageProps}
+        contentComponent={options.contentComponent}
+        realtimeComponent={options.realtimeComponent}
       />
-    ) : (
-      <Content {...pageProps} data={data} />
     );
   };
 }

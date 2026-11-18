@@ -1,17 +1,78 @@
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import SvgRenderer from '@/components/Common/SvgRenderer';
+import { MEDIA } from '@/components/Common/styles';
 import DatoImage from '@/components/DatoImage';
-import { type FragmentType, getFragmentData } from '@/graphql/types';
-import { HeroSectionFragmentDoc } from '@/graphql/types/graphql';
-import type { ResolvedGlobalPageProps } from '@/utils/globalPageProps';
+import type { ResponsiveImageFragment } from '@/components/DatoImage/fragments';
+import DatoStructuredText from '@/components/DatoStructuredText';
+import Rise from '@/components/Motion/Rise';
+import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
+import { productsPath } from '@/lib/routes';
+import { HeroSectionFragment } from './fragments';
+import HeroLinks from './HeroLinks';
 
 type Props = {
-  fragment: FragmentType<typeof HeroSectionFragmentDoc>;
-  globalPageProps: ResolvedGlobalPageProps;
+  fragment: FragmentOf<typeof HeroSectionFragment>;
+  lng: string;
+  /** General interface "Shop now" label; the button links to the catalog */
+  shopNow?: string | null;
+  /** Show the second photo here: only when the page has no divider to carry it */
+  withAdditionalImage?: boolean;
 };
 
-const Hero = ({ fragment, globalPageProps }: Props) => {
+// Heights, not an aspect ratio with a max height: WebKit leaves a gap beside a capped ratio box.
+// Phones keep the photo short so the headline shows on the first screen.
+const PHOTO_COLUMN =
+  '-mx-(--gutter) h-[min(110vw,50svh)] md:h-[min(125vw,62svh)] lg:order-2 lg:col-span-7 lg:mx-0 lg:h-auto lg:bleed-r';
+
+function HeroPhotos({
+  image,
+  additionalImage,
+}: {
+  image: FragmentOf<typeof ResponsiveImageFragment> | null;
+  additionalImage: FragmentOf<typeof ResponsiveImageFragment> | null;
+}) {
+  const mainPhoto = image && (
+    <DatoImage
+      fragment={image}
+      layout="fill"
+      objectFit="cover"
+      objectPosition="50% 8%"
+      sizes={
+        additionalImage
+          ? '(min-width: 1024px) 41vw, 67vw'
+          : '(min-width: 1024px) 62vw, 100vw'
+      }
+      priority
+    />
+  );
+
+  if (!additionalImage) {
+    return <div className={`${MEDIA} settle ${PHOTO_COLUMN}`}>{mainPhoto}</div>;
+  }
+
+  return (
+    <div className={`grid grid-cols-[2fr_1fr] gap-3 lg:gap-4 ${PHOTO_COLUMN}`}>
+      <div className={`${MEDIA} settle h-full`}>{mainPhoto}</div>
+      <div className={`${MEDIA} settle h-full`}>
+        <DatoImage
+          fragment={additionalImage}
+          layout="fill"
+          objectFit="cover"
+          sizes="(min-width: 1024px) 21vw, 33vw"
+        />
+      </div>
+    </div>
+  );
+}
+
+export default function Hero({
+  fragment,
+  lng,
+  shopNow,
+  withAdditionalImage,
+}: Props) {
   const {
+    id,
     heroTitle,
     heroSubtitle,
     heroImage,
@@ -19,78 +80,49 @@ const Hero = ({ fragment, globalPageProps }: Props) => {
     socialLabel,
     featuredCollections,
     socials,
-  } = getFragmentData(HeroSectionFragmentDoc, fragment);
+  } = readFragment(HeroSectionFragment, fragment);
+  const titleId = `${id}-title`;
+
   return (
-    <>
-      <div className="mx-auto max-w-7xl bg-white pb-6 pt-14 sm:pb-8 lg:pb-12">
-        <section className="mx-auto max-w-screen-2xl px-4 md:px-8">
-          <div className="mb-8 flex flex-wrap justify-between md:mb-16">
-            <div className="mb-6 flex w-full flex-col justify-center sm:mb-12 lg:mb-0 lg:w-1/3 lg:pb-24 lg:pt-48">
-              <h1 className="mb-4 text-4xl font-bold text-black sm:text-5xl md:mb-8 md:text-6xl">
-                {heroTitle}
-              </h1>
+    <section aria-labelledby={titleId}>
+      {/* min-h, not h: a long localized title can grow the row past --hero-h */}
+      <div className="shell grid lg:min-h-(--hero-h) lg:grid-cols-12 lg:gap-4">
+        <HeroPhotos
+          image={heroImage.responsiveImage}
+          additionalImage={
+            withAdditionalImage ? additionalImage.responsiveImage : null
+          }
+        />
 
-              <p className="max-w-md leading-relaxed text-gray-500 xl:text-lg">
-                {heroSubtitle}
-              </p>
-            </div>
-            <div className="mb-12 flex w-full md:mb-16 lg:w-2/3">
-              <div className="relative left-12 top-12 z-10 -ml-12 h-[550px] w-[550px] overflow-hidden rounded-lg bg-gray-100 shadow-lg md:left-16 md:top-16 lg:ml-0">
-                <DatoImage
-                  fragment={heroImage.responsiveImage}
-                  className="h-full w-full object-cover object-center"
-                  objectFit="cover"
-                  objectPosition="50% 50%"
-                />
-              </div>
-
-              <div className="h-[550px] w-[550px] overflow-hidden rounded-lg bg-gray-100 shadow-lg">
-                <DatoImage
-                  fragment={additionalImage.responsiveImage}
-                  className="h-full w-full object-cover object-center"
-                  objectFit="cover"
-                  objectPosition="50% 50%"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-            <div className="flex h-12 w-80 divide-x overflow-hidden rounded-lg border">
-              {featuredCollections.map((collection) => (
-                <Link
-                  href={`/${globalPageProps.params.lng}/products?collections=${collection.id}`}
-                  className="flex w-1/3 items-center justify-center text-gray-500 transition duration-100 hover:bg-gray-100 active:bg-gray-200"
-                  key={collection.id}
-                >
-                  {collection.name}
+        <div className="flex flex-col justify-center pt-8 lg:order-1 lg:col-span-5 lg:py-12">
+          <h1 id={titleId} className="title-hero">
+            <Rise>{heroTitle}</Rise>
+          </h1>
+          {/* Right padding only below the title, which may use the whole column */}
+          <div className="enter-stagger lg:pr-10 xl:pr-14 [--delay:200ms]">
+            {heroSubtitle && (
+              <DatoStructuredText
+                data={heroSubtitle}
+                className="mt-5 max-w-[29.375rem] text-base leading-[1.6] text-ink-2 lg:mt-8 lg:text-lg lg:text-pretty"
+              />
+            )}
+            {shopNow && (
+              <div className="mt-8">
+                <Link href={productsPath(lng)} className="btn w-full sm:w-auto">
+                  {shopNow}
+                  <ArrowRightIcon aria-hidden="true" className="stroke-2" />
                 </Link>
-              ))}
-            </div>
-
-            <div className="flex items-center justify-center gap-4 lg:justify-start">
-              <span className="text-sm font-semibold uppercase tracking-widest text-gray-400 sm:text-base">
-                {socialLabel ?? 'SOCIALS'}
-              </span>
-              <span className="h-px w-12 bg-gray-400" />
-
-              <div className="flex gap-4">
-                {socials.map((social) => (
-                  <Link
-                    className="text-gray-400 transition duration-100 hover:text-gray-500 active:text-gray-600"
-                    href={social.url}
-                    key={social.id}
-                  >
-                    <SvgRenderer url={social.icon.url} />
-                  </Link>
-                ))}
               </div>
-            </div>
+            )}
+            <HeroLinks
+              lng={lng}
+              collections={featuredCollections}
+              socials={socials}
+              socialLabel={socialLabel}
+            />
           </div>
-        </section>
+        </div>
       </div>
-    </>
+    </section>
   );
-};
-
-export default Hero;
+}

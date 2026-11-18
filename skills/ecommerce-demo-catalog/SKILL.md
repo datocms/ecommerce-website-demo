@@ -20,37 +20,44 @@ Use this for storefront catalog behavior in the ecommerce starter: products, fil
 Before schema or content operations:
 
 - Expect the DatoCMS skills plugin to be installed. If it is missing, pause and request installation before continuing.
-- Strongly recommend the DatoCMS remote MCP from `/Users/marcelofinamorvieira/datoCMS/dev/remote-mcp`. If catalog schema or content facts are needed and the MCP is not running, pause and request startup.
+- Recommend a DatoCMS MCP server connected to this project. If catalog schema or content facts are needed and none is available, pause and ask for one.
 - Inspect live schema/content through MCP before assuming product, taxonomy, variant, or menu field shapes.
 
 ## Existing catalog structure
 
-- Listing route: `app/[lng]/products/page.tsx`.
-- Listing query: `app/[lng]/products/query.graphql`.
-- Product detail route: `app/[lng]/product/[slug]/`.
-- Product detail query: `app/[lng]/product/[slug]/query.graphql`.
+- Listing route: `app/[lng]/(site)/products/page.tsx`.
+- Listing queries: `productsQuery` and `filterOptionsQuery` in `app/[lng]/(site)/products/meta.ts` (page.tsx runs them per request).
+- Product detail route: `app/[lng]/(site)/product/[slug]/`.
+- Product detail query: `query` in `app/[lng]/(site)/product/[slug]/meta.ts`.
 - Listing filters use collections, brands, and materials.
+- Collections, brands, and materials carry their own `subtitle` (plain text), `description` (Structured Text), and `image`. `FilterOptionsFragment` in `components/ProductListing/fragments.ts` selects them, and a lone selected record gets the `FilterDetail` header.
+- A product is on sale when its `onSale` boolean is true; `salePrice` is set only while it is.
 - URL query params include `page`, `orderBy`, `productName`, `collections`, `brands`, and `materials`.
 - Pagination is listing behavior: preserve active query params and reset or clamp stale `page` values after filter/sort changes.
 - Header category links are built from layout menu records and use `_modelApiKey` plus record ids.
 - Product variants provide colors and available sizes for the product detail UI.
+- Listing UI: `components/ProductListing/`
+- Product card and price: `components/ProductCard/`
+- Product page also emits schema.org Product JSON-LD (`app/[lng]/(site)/product/[slug]/jsonLd.ts`, priced in `generalInterface.currencyCode`); catalog and stores titles come from General Interface labels (`lib/datocms/pageMetadata.ts`).
+- Visible catalog strings (filters, results, empty states, pagination, screen-reader labels) are General Interface labels, not code: add a new one to the singleton and select it in the feature's `fragments.ts` (`ProductListingLabels`, `ProductPageLabels`).
+- Product page UI: `components/ProductDetail/` (labels fragment in `fragments.ts`, description blocks in `Blocks/<Block>/`)
 
 ## Common workflows
 
 ### Add or change a product field on listing cards
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
-2. Add the field to `app/[lng]/products/query.graphql`.
-3. Render it in the listing card while preserving existing sale-price logic and links.
-4. Refresh GraphQL types.
+2. Add the field to all four queries that feed `ProductCard`: `productsQuery` in `app/[lng]/(site)/products/meta.ts`, `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts`, `showcase.newProducts` in `app/[lng]/(site)/showcase/meta.ts` and `product.relatedProducts` in `app/[lng]/(site)/product/[slug]/meta.ts`.
+3. Add an optional prop to `ProductCard` (`components/ProductCard/index.tsx`) and pass it from each call site (`app/[lng]/(site)/products/page.tsx`, `components/Sections/NewArrivals/ProductRail.tsx`, `app/[lng]/(site)/showcase/NewProducts.tsx`, `components/ProductDetail/RelatedProducts.tsx`), preserving the existing sale logic (the `onSale` boolean and `salePrice`) and links (`productPath()`).
+4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 5. Verify pagination, filters, and search still work.
 
 ### Add or change a product field on product detail pages
 
 1. Confirm the field exists through MCP or route schema work to the shared DatoCMS skills.
-2. Add the field to `app/[lng]/product/[slug]/query.graphql` or the relevant component fragment.
+2. Add the field to the `query` in `app/[lng]/(site)/product/[slug]/meta.ts` or the relevant component fragment in its `fragments.ts`.
 3. Render it in the product detail component or related block component.
-4. Refresh GraphQL types.
+4. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`.
 5. Verify static params and draft preview still work.
 
 ### Add or change filter behavior
@@ -59,21 +66,22 @@ Before schema or content operations:
 2. Route modeling decisions to `datocms-content-modeling` before changing schema.
 3. Update listing query variables and filter arguments.
 4. Update URL query param handling without breaking existing params.
-5. Update `SideFilter` or the listing page UI.
-6. Refresh GraphQL types and verify pagination counts.
+5. Update `FilterPanel` (`components/ProductListing/FilterPanel.tsx`; sort options in `sortOptions.ts`) or the listing page UI. A control inside the filters drawer pushes its query with the "filter" transition type (`pushQueryParam` in `PendingQuery.tsx`), so the results update behind the scrim instead of swapping.
+6. Run `npm run generate-schema` if the DatoCMS schema changed, then validate with `npx gql.tada check` and `npm run typecheck`. Verify pagination counts.
 
 ### Add or change sort behavior
 
 1. Confirm the field is sortable in the GraphQL schema.
 2. Add the order value to the listing UI.
-3. Keep `orderBy` query param behavior stable.
-4. Verify generated enum values and default ordering.
+3. Keep `orderBy` query param behavior stable. The CMS `sale` page link (`linkHref()` in `lib/datocms/linkHref.ts`) points at `orderBy=onSale_DESC`: change the two together.
+4. Verify the `ProductModelOrderBy` enum values (typed from `schema.graphql`) and default ordering.
 
 ### Adjust header category dropdowns
 
 1. Inspect layout menu records and linked taxonomy records through MCP.
 2. Keep links in the form `/<locale>/products?<modelApiKey>s=<recordId>` unless changing the listing parser too.
-3. Verify mobile and desktop category menus.
+3. Hrefs come from `productsHref` in `components/Layout/Header/menu.ts`; columns render in `MegaMenuPanel.tsx` (desktop) and `MobileMenu.tsx`, the Trending/New tiles in `FeatureTiles.tsx`; the menu data is the `menu` selection in `app/[lng]/(site)/meta.ts`.
+4. Verify mobile and desktop category menus.
 
 ## Guardrails
 
@@ -89,4 +97,4 @@ Before schema or content operations:
 - Filter counts, pagination links, and pagination range text still work.
 - Check page 1, page 2 or last page, zero-result, and out-of-range `page` states when changing listing filters, sorting, or counts.
 - Product detail pages still generate static params.
-- GraphQL type generation passes after query changes.
+- `npx gql.tada check` and `npm run typecheck` pass after query changes.

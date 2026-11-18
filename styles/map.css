@@ -1,0 +1,61 @@
+/* Leaflet, dressed like the site: square, flat, ink on white. Its own stylesheet loads after this
+   one, so every rule is anchored on both of the map's classes to outrank it. isolation keeps
+   Leaflet's z-indexes (up to 1000) below the header and the drawers. */
+.store-map.leaflet-container {
+  isolation: isolate;
+  font: inherit;
+
+  /* The tiles in the site's greys, so the ink pins stand out */
+  & .leaflet-tile-pane {
+    filter: grayscale(1) contrast(0.92) brightness(1.04);
+  }
+  & .leaflet-bar {
+    border: 1px solid var(--color-ink);
+    border-radius: 0;
+    box-shadow: none;
+  }
+  & .leaflet-bar a {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0;
+    color: var(--color-ink);
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 2.75rem;
+    &:first-child,
+    &:last-child {
+      border-radius: 0;
+    }
+  }
+  & .leaflet-control-attribution {
+    padding: 0.125rem 0.5rem;
+    background: color-mix(in oklab, white 85%, transparent);
+    color: var(--color-mute);
+    font-size: 0.625rem;
+    & a {
+      color: inherit;
+    }
+  }
+
+  /* A store: an ink square, larger for the store on show */
+  & .store-pin {
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+
+    & span {
+      width: 0.75rem;
+      height: 0.75rem;
+      background: var(--color-ink);
+      outline: 2px solid white;
+      transition: scale var(--dur-quick) var(--ease-out);
+    }
+    &:hover span,
+    &:focus-visible span {
+      scale: 1.3;
+    }
+    &[data-current] span {
+      scale: 1.75;
+    }
+  }
+}

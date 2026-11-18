@@ -1,34 +1,49 @@
-import type { Maybe } from 'graphql/jsutils/Maybe';
-import Markdown from 'react-markdown';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { cx } from '@/lib/classNames';
 
-const SectionTitle = ({
-  title,
-  paragraph,
-  width = '570px',
-  center,
-  mb = '100px',
-}: {
-  title: string;
-  paragraph: Maybe<string>;
-  width?: string;
-  center?: boolean;
-  mb?: string;
-}) => {
-  return (
-    <>
-      <div
-        className={` w-full ${center ? 'mx-auto text-center' : ''}`}
-        style={{ maxWidth: width, marginBottom: mb }}
-      >
-        <h2 className="mb-4 text-3xl font-bold !leading-tight text-black dark:text-white sm:text-4xl md:text-[45px]">
-          {title}
-        </h2>
-        <div className="text-base !leading-relaxed text-body-color md:text-lg">
-          <Markdown>{paragraph || ''}</Markdown>
-        </div>
-      </div>
-    </>
-  );
+type Props = {
+  title: ReactNode;
+  /** Heading id, for the section's aria-labelledby */
+  id?: string;
+  /** Right-aligned text link with an arrow, such as "All products" */
+  action?: { label: ReactNode; href: string };
+  /** Extra controls after the action, such as rail arrows */
+  aside?: ReactNode;
+  className?: string;
 };
 
-export default SectionTitle;
+export default function SectionTitle({
+  title,
+  id,
+  action,
+  aside,
+  className,
+}: Props) {
+  return (
+    <div
+      className={cx(
+        'flex flex-wrap items-end justify-between gap-x-10 gap-y-6',
+        className,
+      )}
+    >
+      <div className="max-w-[51.25rem] min-w-0">
+        <h2 id={id} className="title-section">
+          {title}
+        </h2>
+      </div>
+      {(action || aside) && (
+        <div className="flex shrink-0 items-center gap-6">
+          {action && (
+            <Link href={action.href} className="group tlink">
+              {action.label}
+              <ArrowRightIcon aria-hidden="true" className="stroke-2" />
+            </Link>
+          )}
+          {aside}
+        </div>
+      )}
+    </div>
+  );
+}

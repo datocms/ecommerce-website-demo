@@ -1,0 +1,142 @@
+/* Design tokens. `--name-*: initial` drops Tailwind's defaults for that namespace, so only the
+   tokens listed here exist. static: every token is emitted as a CSS variable, used or not, so
+   var(--…) always resolves. */
+@theme static {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  /* The split desktop navigation: the longest locale (es) fits from here */
+  --breakpoint-nav: 68.75rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 90rem;
+
+  /* --font-geist is set on <html> by next/font in app/layout.tsx */
+  --font-*: initial;
+  --font-sans:
+    var(--font-geist), ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-ink: #0a0a0a;
+  --color-ink-2: #3a3a3a;
+  --color-mute: #6b6b6b;
+  --color-line: #e5e5e5;
+  /* 3:1 on white: boundaries of fields, chips and checkboxes */
+  --color-line-strong: #8f8f8f;
+  --color-mist: #f4f4f3;
+  --color-sale: #c4271c;
+  --color-disabled: #a3a3a3;
+  /* The CMS accent (--color-primary, set by CustomColor.tsx) tints text selection only */
+  --color-accent-wash: color-mix(in oklab, var(--color-primary) 50%, #ffffff);
+
+  /* 14px is the floor; body copy is 15-17px */
+  --text-*: initial;
+  --text-xs: 0.875rem;
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  /* Fields stay at 16px whatever --text-base is, so iOS Safari doesn't zoom in on focus */
+  --text-input: 1rem;
+  --text-input--line-height: 1.5rem;
+  --text-md: 1.0625rem;
+  --text-md--line-height: 1.625rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-xl--letter-spacing: -0.01em;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 1.875rem;
+  --text-2xl--letter-spacing: -0.02em;
+
+  /* Square and flat: no radius, shadow or blur tokens */
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --blur-*: initial;
+
+  --ease-*: initial;
+  /* Arrivals, exits and hovers */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Anything that travels: sheets, the mega menu, the product photo */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* A damped spring, about 4% over: presses springing back, animate-pop */
+  --ease-spring: linear(
+    0, 0.141, 0.413, 0.672, 0.863, 0.977, 1.031, 1.046, 1.041, 1.029, 1.016, 1.007, 1.002,
+    0.999, 0.998, 1
+  );
+  /* animate-pop: a tick or count landing; re-key the element to replay it */
+  --animate-*: initial;
+  --animate-pop: pop 360ms var(--ease-spring) backwards;
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@layer base {
+  /* Plain variables rather than @theme tokens, so breakpoints and utilities such as quick can
+     override them. Use them as px-(--gutter) or duration-(--dur-sheet). */
+  :root {
+    /* Fallback: CustomColor.tsx writes the CMS accent in an unlayered rule that wins */
+    --color-primary: #a3a3a3;
+    /* The current surface's colors. surface-ink swaps them, so the btn/chip family inverts on
+       black bands. */
+    --surface-fg: var(--color-ink);
+    --surface-bg: var(--color-white);
+    /* The sticky header's bar plus its 1px hairline */
+    --header-h: calc(4rem + 1px);
+    --gutter: 1.25rem;
+    /* Drawer and dialog padding */
+    --inset: 1.25rem;
+    /* Between page sections; --page-top is the first title block's distance from the header */
+    --section-gap: 6rem;
+    --page-top: 3rem;
+    /* Vertical padding inside black bands */
+    --band-y: 5rem;
+    /* Motion timings and distances (motion.css, view-transitions.css) */
+    --dur-quick: 150ms; /* hovers, color, every exit, the old page leaving */
+    --dur-pop: 220ms; /* popovers, bars, a page or a results list coming in */
+    --dur-sheet: 380ms; /* drawers, search sheet, mega menu, the product photo's flight */
+    --dur-press: 420ms; /* a pressed control springing back */
+    --dur-enter: 640ms; /* enter, enter-stagger */
+    --dur-rise: 700ms; /* a page title's word rising out of its line */
+    --dur-settle: 1000ms; /* a photo coming to rest */
+    --stagger: 50ms; /* between staggered children, and between a title's words */
+    --rise: 0.75rem; /* how far enter and reveal travel up; quick makes it negative (down) */
+    --enter-blur: 4px; /* how blurred enter starts */
+  }
+  @media (min-width: 40rem) {
+    :root {
+      --inset: 2rem;
+    }
+  }
+  @media (min-width: 48rem) {
+    :root {
+      --gutter: 2.5rem;
+    }
+  }
+  @media (min-width: 64rem) {
+    :root {
+      --section-gap: 8rem;
+      --page-top: 5rem;
+      --band-y: 7rem;
+    }
+  }
+  @media (min-width: 68.75rem) {
+    :root {
+      --header-h: calc(4.5rem + 1px);
+    }
+  }
+  @media (prefers-contrast: more) {
+    :root {
+      --color-line: #8f8f8f;
+      --color-line-strong: #3a3a3a;
+      --color-mute: #3a3a3a;
+    }
+  }
+}

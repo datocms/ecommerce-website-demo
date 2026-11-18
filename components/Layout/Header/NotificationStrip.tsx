@@ -1,0 +1,97 @@
+import { ArrowRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { isLink } from 'datocms-structured-text-utils';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { renderNodeRule } from 'react-datocms/structured-text';
+import type { Query as LayoutQuery } from '@/app/[lng]/(site)/meta';
+import DatoStructuredText from '@/components/DatoStructuredText';
+import { markRenderer } from '@/components/DatoStructuredText/markRenderer';
+import { recordHref } from '@/lib/datocms/linkHref';
+import { hideWhenDismissed } from '@/lib/dismissedAnnouncement';
+
+type LayoutNotification = NonNullable<
+  NonNullable<LayoutQuery['layout']>['notification']
+>;
+
+type Props = {
+  /** Fingerprint of the message, which a dismissal is remembered by */
+  id: string;
+  notification: LayoutNotification;
+  onDismiss: () => void;
+  lng: string;
+  dismissLabel: string | undefined;
+};
+
+// The grey marker would be lost on black: marks render as semibold instead
+const renderMarkAsSemibold = markRenderer((key, children) => (
+  <span key={key} className="font-semibold">
+    {children}
+  </span>
+));
+
+// A link in the message: a typed path (`link` node) or a record (`itemLink` node). A record
+// with no page renders as plain text.
+function StripLink({
+  href,
+  children,
+}: {
+  href: string | null;
+  children: ReactNode;
+}) {
+  if (!href) return <>{children}</>;
+
+  return (
+    <Link
+      href={href}
+      className="group inline-flex items-center gap-1 font-semibold whitespace-nowrap underline-offset-4 hover:underline"
+    >
+      {children}
+      <ArrowRightIcon
+        aria-hidden="true"
+        className="size-3.5 shrink-0 stroke-2 transition-transform duration-200 group-hover:translate-x-0.75"
+      />
+    </Link>
+  );
+}
+
+export default function NotificationStrip({
+  id,
+  notification,
+  lng,
+  onDismiss,
+  dismissLabel,
+}: Props) {
+  return (
+    <div data-chrome="strip" className="surface-ink">
+      {/* Hidden before hydration when it was dismissed on an earlier visit */}
+      <style>{hideWhenDismissed(id, '[data-chrome="strip"]')}</style>
+      <div className="shell relative flex min-h-10 items-center justify-center py-2.5 text-center">
+        {/* px-10 keeps the message clear of the dismiss button */}
+        <DatoStructuredText
+          className="min-w-0 px-10 text-xs"
+          data={notification}
+          renderNode={renderMarkAsSemibold}
+          customNodeRules={[
+            renderNodeRule(isLink, ({ node, children, key }) => (
+              <StripLink key={key} href={`/${lng}${node.url}`}>
+                {children}
+              </StripLink>
+            )),
+          ]}
+          renderLinkToRecord={({ record, children }) => (
+            <StripLink href={recordHref(lng, record)}>{children}</StripLink>
+          )}
+        />
+        {/* Lined up with the header's bag icon below */}
+        <button
+          type="button"
+          aria-label={dismissLabel}
+          className="icon-btn absolute top-1/2 right-[calc(var(--gutter)-0.4375rem)] size-10 -translate-y-1/2 focus-visible:outline-offset-[-2px] [&>svg]:size-4 [&>svg]:stroke-2"
+          onClick={onDismiss}
+        >
+          <XMarkIcon aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  );
+}

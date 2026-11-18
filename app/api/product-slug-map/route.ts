@@ -1,8 +1,10 @@
+// Called by the LanguageSelector to link to the same product in another locale (product slugs
+// are localized)
+
 import { draftMode } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
-import getAvailableLocales from '@/app/i18n/settings';
-import type { SiteLocale } from '@/graphql/types/graphql';
-import { resolveProductSlug } from '@/utils/productSlugs';
+import { fallbackLocaleOf, getAvailableLocales } from '@/lib/i18n';
+import { resolveProductSlug } from '@/lib/productSlugs';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -17,17 +19,18 @@ export async function GET(request: NextRequest) {
   }
 
   const locales = await getAvailableLocales();
+  // Narrows the raw param to a SiteLocale
+  const siteLocale = locales.find((available) => available === locale);
 
-  if (!locales.includes(locale as SiteLocale)) {
+  if (!siteLocale) {
     return NextResponse.json({ error: 'Unsupported locale' }, { status: 422 });
   }
 
-  const fallbackLocale = locales[0];
   const { isEnabled: isDraft } = await draftMode();
   const resolved = await resolveProductSlug({
     slug,
-    locale: locale as SiteLocale,
-    fallbackLocale,
+    locale: siteLocale,
+    fallbackLocale: fallbackLocaleOf(locales),
     isDraft,
   });
 

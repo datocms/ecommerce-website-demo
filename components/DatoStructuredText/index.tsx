@@ -1,11 +1,18 @@
-import Highlighter from '@/components/Common/Highlighter';
 import { cloneElement, type ReactElement } from 'react';
 import {
+  type CdaStructuredTextRecord,
   StructuredText,
   type StructuredTextPropTypes,
-  type CdaStructuredTextRecord,
 } from 'react-datocms/structured-text';
+import { renderNodeWithHighlight } from './renderNodeWithHighlight';
 
+/** Added by DatoStructuredText to each block it renders: spread it on the block's root element */
+export type BlockBoundaryProps = {
+  'data-datocms-content-link-boundary'?: boolean;
+};
+
+// Visual editing: the wrapper groups the whole field into one clickable overlay; each embedded
+// block or inline record is a boundary, so clicking it opens that record instead.
 function addBoundaryAttribute(
   result: ReactElement | null,
 ): ReactElement | null {
@@ -19,20 +26,20 @@ export default function DatoStructuredText<
   BlockRecord extends CdaStructuredTextRecord = CdaStructuredTextRecord,
   LinkRecord extends CdaStructuredTextRecord = CdaStructuredTextRecord,
   InlineBlockRecord extends CdaStructuredTextRecord = CdaStructuredTextRecord,
->(props: StructuredTextPropTypes<BlockRecord, LinkRecord, InlineBlockRecord>) {
-  const {
-    renderBlock,
-    renderInlineRecord,
-    renderLinkToRecord,
-    renderNode,
-    ...rest
-  } = props;
+>(
+  props: StructuredTextPropTypes<BlockRecord, LinkRecord, InlineBlockRecord> & {
+    /** Classes for the wrapper div */
+    className?: string;
+  },
+) {
+  const { renderBlock, renderInlineRecord, renderNode, className, ...rest } =
+    props;
 
   return (
-    <div data-datocms-content-link-group>
+    <div data-datocms-content-link-group className={className}>
       <StructuredText
         {...rest}
-        renderNode={renderNode ?? Highlighter}
+        renderNode={renderNode ?? renderNodeWithHighlight}
         renderBlock={
           renderBlock
             ? (ctx) => addBoundaryAttribute(renderBlock(ctx))
@@ -43,7 +50,6 @@ export default function DatoStructuredText<
             ? (ctx) => addBoundaryAttribute(renderInlineRecord(ctx))
             : undefined
         }
-        renderLinkToRecord={renderLinkToRecord}
       />
     </div>
   );

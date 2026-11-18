@@ -1,59 +1,83 @@
+// Redirects URLs without a locale prefix to the visitor's preferred locale, and a bare locale to
+// its home page.
+
 import { match } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 import { type NextRequest, NextResponse } from 'next/server';
-import getAvailableLocales, { getFallbackLocale } from './app/i18n/settings';
-import type { SiteLocale } from './graphql/types/graphql';
+import {
+  fallbackLocaleOf,
+  getAvailableLocales,
+  type SiteLocale,
+  toLanguageTag,
+} from '@/lib/i18n';
+import { homePath } from '@/lib/routes';
 
-async function getLocale(
-  request: Request,
-  locales: SiteLocale[],
-): Promise<string> {
-  const fallbackLng = await getFallbackLocale();
+// Next.js ignores fetch caching inside Proxy, so keep the locales in memory
+// for a minute instead of querying DatoCMS on every request.
+const LOCALES_TTL_MS = 60_000;
+let cachedLocales: { locales: SiteLocale[]; expiresAt: number } | undefined;
+
+async function getCachedLocales(): Promise<SiteLocale[]> {
+  if (!cachedLocales || cachedLocales.expiresAt < Date.now()) {
+    try {
+      cachedLocales = {
+        locales: await getAvailableLocales(),
+        expiresAt: Date.now() + LOCALES_TTL_MS,
+      };
+    } catch (error) {
+      // Keep serving the last known locales while DatoCMS is unreachable
+      if (!cachedLocales) throw error;
+    }
+  }
+  return cachedLocales.locales;
+}
+
+function getPreferredLocale(request: Request, locales: SiteLocale[]): string {
+  // SiteLocale values use '_' (pt_BR) where Accept-Language uses '-' (pt-BR)
   const headers = new Headers(request.headers);
   const acceptLanguage = headers.get('accept-language');
   if (acceptLanguage) {
-    headers.set('accept-language', acceptLanguage.replaceAll('_', '-'));
+    headers.set('accept-language', toLanguageTag(acceptLanguage));
   }
 
-  const reformattedLocales = locales.map((locale) =>
-    locale.replaceAll('_', '-'),
-  );
-  const headersObject = Object.fromEntries(headers.entries());
-  const languages = new Negotiator({ headers: headersObject }).languages(
-    reformattedLocales,
-  );
+  const preferredLanguages = new Negotiator({
+    headers: Object.fromEntries(headers.entries()),
+  }).languages(locales.map(toLanguageTag));
 
-  return match(languages, locales, fallbackLng);
+  return match(preferredLanguages, locales, fallbackLocaleOf(locales));
 }
 
 export default async function proxy(request: NextRequest) {
-  // Check if there is any supported locale in the pathname
   const pathname = request.nextUrl.pathname;
-  const locales = await getAvailableLocales();
+  const locales = await getCachedLocales();
 
-  const pathnameIsMissingLocale = locales.every(
-    (locale) =>
-      !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
-  );
-
-  //go to home in browser language if pathname & locale is missing
+  // / -> /en/home, in the visitor's preferred locale
   if (pathname === '/') {
-    const locale = await getLocale(request, locales);
-    return NextResponse.redirect(new URL(`/${locale}/home`, request.url));
+    const locale = getPreferredLocale(request, locales);
+    return NextResponse.redirect(new URL(homePath(locale), request.url));
   }
 
-  //go to pathname in browser language if locale is missing but pathname is set
-  if (pathnameIsMissingLocale) {
-    const locale = await getLocale(request, locales);
+  // /en -> /en/home, keeping the query string: there is no page at a locale's root
+  if (locales.some((locale) => pathname === `/${locale}`)) {
+    const url = request.nextUrl.clone();
+    url.pathname = `${pathname}/home`;
+    return NextResponse.redirect(url);
+  }
 
-    // e.g. incoming request is /products
-    // The new URL is now /en/products
-    return NextResponse.redirect(
-      new URL(`/${locale}/${pathname}`, request.url),
-    );
+  const hasLocalePrefix = locales.some((locale) =>
+    pathname.startsWith(`/${locale}/`),
+  );
+
+  // /products -> /en/products, keeping the query string
+  if (!hasLocalePrefix) {
+    const locale = getPreferredLocale(request, locales);
+    const url = request.nextUrl.clone();
+    url.pathname = `/${locale}${pathname}`;
+    return NextResponse.redirect(url);
   }
 }
 
+// Skip files with an extension, Next internals and /api routes
 export const config = {
   matcher: ['/((?!.*\\.|_next|api\\/).*)'],
 };

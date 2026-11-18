@@ -1,35 +1,43 @@
 'use client';
 
-import type { URL } from 'node:url';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Props = {
-  url: string | URL;
+  url: string;
 };
 
-const SvgRenderer = ({ url }: Props) => {
+// Inlines a CMS-hosted SVG icon so it inherits currentColor; the parent link carries the name
+export default function SvgRenderer({ url }: Props) {
   const [svgContent, setSvgContent] = useState('');
 
   useEffect(() => {
+    let ignore = false;
+
     const fetchSvg = async () => {
       try {
         const response = await fetch(url);
-        const svgText = await response.text();
-        setSvgContent(svgText);
+        if (!response.ok) return;
+        const svg = await response.text();
+        if (!ignore) {
+          setSvgContent(svg);
+        }
       } catch (error) {
         console.error('Error fetching SVG:', error);
       }
     };
 
     fetchSvg();
+
+    return () => {
+      ignore = true;
+    };
   }, [url]);
 
   return (
-    <div
-      className="fill-current [&>*]:text-gray-400"
+    <span
+      aria-hidden="true"
+      className="inline-flex [&_svg]:size-5 [&_svg]:fill-current"
       dangerouslySetInnerHTML={{ __html: svgContent }}
     />
   );
-};
-
-export default SvgRenderer;
+}

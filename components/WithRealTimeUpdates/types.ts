@@ -1,14 +1,7 @@
-import type { SiteLocale } from '@/graphql/types/graphql';
-import type {
-  GlobalPageProps,
-  ResolvedGlobalPageProps,
-} from '@/utils/globalPageProps';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-
-// Type for resolved page props (after awaiting params)
-export type ResolvedPageProps<T extends GlobalPageProps> = Omit<T, 'params'> & {
-  params: Awaited<T['params']>;
-};
+import type { TadaDocumentNode } from 'gql.tada';
+import type { ReactNode } from 'react';
+import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
+import type { SiteLocale } from '@/lib/i18n';
 
 export type BuildVariablesFn<
   PageProps extends GlobalPageProps,
@@ -19,19 +12,24 @@ export type BuildVariablesFn<
   },
 ) => TVariables;
 
+export type RealtimeUpdatesProps<
+  PageProps extends GlobalPageProps,
+  TResult = unknown,
+  TVariables = Record<string, unknown>,
+> = {
+  initialData: TResult;
+  pageProps: ResolvedPageProps<PageProps>;
+  variables: TVariables;
+  query: TadaDocumentNode<TResult, TVariables>;
+  token: string;
+  baseEditingUrl: string;
+};
+
 export type RealtimeUpdatesPage<
   PageProps extends GlobalPageProps,
   TResult = unknown,
   TVariables = Record<string, unknown>,
-> = (props: {
-  initialData: TResult;
-  pageProps: ResolvedPageProps<PageProps>;
-  variables: TVariables;
-  query: TypedDocumentNode<TResult, TVariables>;
-  token: string;
-  baseEditingUrl: string;
-  children?: React.ReactNode;
-}) => React.ReactNode;
+> = (props: RealtimeUpdatesProps<PageProps, TResult, TVariables>) => ReactNode;
 
 export type ContentPage<
   PageProps extends GlobalPageProps,
@@ -40,7 +38,4 @@ export type ContentPage<
   props: ResolvedPageProps<PageProps> & {
     data: TResult;
   },
-) => React.ReactNode;
-
-// Re-export for convenience
-export type { ResolvedGlobalPageProps };
+) => ReactNode;

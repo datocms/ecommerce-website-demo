@@ -1,0 +1,50 @@
+type Props = {
+  value: number;
+  /** true when the numeric value is printed next to the stars */
+  decorative?: boolean;
+  /** General interface "out of 5" label, spoken after the value */
+  outOfFive?: string;
+};
+
+const STAR =
+  'M12 2.5l2.94 6.06 6.56.92-4.79 4.57 1.17 6.55L12 17.47 6.12 20.6l1.17-6.55L2.5 9.48l6.56-.92z';
+
+// Empty stars are outlines, so a 3 still reads as 3 of 5 on white
+const FILLED = 'fill-ink';
+const EMPTY = 'fill-none stroke-mute';
+
+export default function StarRating({
+  value,
+  decorative = false,
+  outOfFive,
+}: Props) {
+  const filled = Math.round(value);
+  const a11y = decorative
+    ? { 'aria-hidden': true as const }
+    : {
+        role: 'img',
+        'aria-label': `${Math.round(value * 10) / 10} ${outOfFive}`,
+      };
+  return (
+    <span {...a11y} className="inline-flex items-center gap-0.5">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <svg
+          key={i}
+          viewBox="0 0 24 24"
+          width={16}
+          height={16}
+          aria-hidden="true"
+          className={
+            i < filled
+              ? `${FILLED} forced-colors:fill-[CanvasText]`
+              : `${EMPTY} forced-colors:stroke-[CanvasText]`
+          }
+          strokeWidth={i < filled ? 0 : 1.5}
+          strokeLinejoin="round"
+        >
+          <path d={STAR} />
+        </svg>
+      ))}
+    </span>
+  );
+}

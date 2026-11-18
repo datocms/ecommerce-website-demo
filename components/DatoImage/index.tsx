@@ -2,24 +2,26 @@ import {
   type ImagePropTypes,
   Image as ReactDatocmsImage,
 } from 'react-datocms/image';
-import { type FragmentType, getFragmentData } from '@/graphql/types';
-import { DatoImage_ResponsiveImageFragmentDoc } from '@/graphql/types/graphql';
+import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
+import { ResponsiveImageFragment } from './fragments';
 
-type Props =
-  | ImagePropTypes
-  | (Omit<ImagePropTypes, 'data'> & {
-      fragment: FragmentType<typeof DatoImage_ResponsiveImageFragmentDoc>;
-    });
+type Props = Omit<ImagePropTypes, 'data'> & {
+  fragment: FragmentOf<typeof ResponsiveImageFragment>;
+};
 
-export default function DatoImage(props: Props) {
-  if ('fragment' in props) {
-    const { fragment, ...rest } = props;
-    const data = getFragmentData(
-      DatoImage_ResponsiveImageFragmentDoc,
-      fragment,
-    );
-    return <ReactDatocmsImage {...rest} data={data} />;
-  }
-
-  return <ReactDatocmsImage {...props} />;
+export default function DatoImage({ fragment, ...rest }: Props) {
+  const data = readFragment(ResponsiveImageFragment, fragment);
+  // With layout="fill", react-datocms sizes the blur-up placeholder from the image's own ratio,
+  // so in a box with a different ratio it covers only the top. Stretch it to fill the box.
+  const placeholderStyle =
+    rest.layout === 'fill'
+      ? { height: '110%', ...rest.placeholderStyle }
+      : rest.placeholderStyle;
+  return (
+    <ReactDatocmsImage
+      {...rest}
+      placeholderStyle={placeholderStyle}
+      data={data}
+    />
+  );
 }

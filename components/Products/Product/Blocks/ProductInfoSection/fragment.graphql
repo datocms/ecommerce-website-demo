@@ -1,6 +1,0 @@
-fragment ProductInfoSection on ProductFeatureSectionRecord {
-  material
-  occasions
-  style
-  weather
-}

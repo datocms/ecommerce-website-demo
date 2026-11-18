@@ -1,0 +1,99 @@
+import { CollectionCardShowcaseFragment } from '@/components/Sections/CollectionCardShowcase/fragments';
+import { DividerSectionFragment } from '@/components/Sections/DividerSection/fragments';
+import { HeroSectionFragment } from '@/components/Sections/Hero/fragments';
+import { MaterialShowcaseFragment } from '@/components/Sections/MaterialShowcase/fragments';
+import { ProductRailFragment } from '@/components/Sections/NewArrivals/fragments';
+import { TestimonialSectionFragment } from '@/components/Sections/Testimonials/fragments';
+import {
+  graphql,
+  type ResultOf,
+  type VariablesOf,
+} from '@/lib/datocms/graphql';
+import { LinkRecordFragment } from '@/lib/datocms/linkHref';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
+
+export type PageProps = GlobalPageProps;
+
+export const query = graphql(
+  /* GraphQL */ `
+    query Home($locale: SiteLocale, $fallbackLocale: [SiteLocale!]) {
+      generalInterface(locale: $locale, fallbackLocales: $fallbackLocale) {
+        currencySymbol
+        sale
+        shopNow
+        newArrivals
+        salePrice
+        originalPrice
+        previous
+        next
+        pause
+        play
+      }
+      # For the collection card showcases: their group title and catalog link come from the
+      # header menu (see showcaseGroups.ts)
+      layout(locale: $locale, fallbackLocales: $fallbackLocale) {
+        menu {
+          __typename
+          ... on DropdownMenuRecord {
+            id
+            column {
+              id
+              label
+              item {
+                ... on RecordInterface {
+                  id
+                }
+              }
+            }
+          }
+          ... on LinkItemRecord {
+            id
+            label
+            page
+            record {
+              ...LinkRecordFragment
+            }
+          }
+        }
+      }
+      allProducts(
+        first: 8
+        orderBy: _createdAt_DESC
+        locale: $locale
+        fallbackLocales: $fallbackLocale
+      ) {
+        ...ProductRailFragment
+      }
+      home(locale: $locale, fallbackLocales: $fallbackLocale) {
+        seo: _seoMetaTags {
+          attributes
+          content
+          tag
+        }
+        sections {
+          ... on RecordInterface {
+            id
+            __typename
+          }
+          ...HeroSectionFragment
+          ...DividerSectionFragment
+          ...TestimonialSectionFragment
+          ...CollectionCardShowcaseFragment
+          ...MaterialShowcaseFragment
+        }
+      }
+    }
+  `,
+  [
+    HeroSectionFragment,
+    DividerSectionFragment,
+    TestimonialSectionFragment,
+    CollectionCardShowcaseFragment,
+    MaterialShowcaseFragment,
+    ProductRailFragment,
+    LinkRecordFragment,
+  ],
+);
+
+export type Query = ResultOf<typeof query>;
+export type Variables = VariablesOf<typeof query>;

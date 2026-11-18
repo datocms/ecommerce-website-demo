@@ -1,4 +1,4 @@
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { TadaDocumentNode } from 'gql.tada';
 import type { Metadata } from 'next';
 import { draftMode } from 'next/headers';
 import {
@@ -6,46 +6,58 @@ import {
   type TitleMetaLinkTag,
   toNextMetadata,
 } from 'react-datocms/seo';
-import { getFallbackLocale } from '@/app/i18n/settings';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
-import queryDatoCMS from '@/utils/queryDatoCMS';
-import type { BuildVariablesFn, ResolvedPageProps } from './types';
+import { buildAlternates } from '@/lib/alternates';
+import { queryDatoCMS } from '@/lib/datocms/queryDatoCMS';
+import type { GlobalPageProps, ResolvedPageProps } from '@/lib/globalPageProps';
+import { getAvailableLocales, type SiteLocale } from '@/lib/i18n';
+import { resolveRoute } from './resolveRoute';
+import type { BuildVariablesFn } from './types';
 
 export function generateMetadataFn<
   PageProps extends GlobalPageProps,
   TResult = unknown,
   TVariables = Record<string, unknown>,
 >(options: {
-  query: TypedDocumentNode<TResult, TVariables>;
+  query: TadaDocumentNode<TResult, TVariables>;
   buildVariables?: BuildVariablesFn<PageProps, TVariables>;
+  // DatoCMS meta tags (_seoMetaTags, faviconMetaTags), or a Metadata object for anything else
   generate: (
     data: TResult,
-  ) => TitleMetaLinkTag[] | SeoOrFaviconTag[] | undefined;
+  ) => TitleMetaLinkTag[] | SeoOrFaviconTag[] | Metadata | undefined;
+  // The page's path in a locale; adds the canonical and hreflang links
+  alternatePath?: (
+    locale: SiteLocale,
+    route: {
+      data: TResult;
+      params: ResolvedPageProps<PageProps>['params'];
+    },
+  ) => string;
 }) {
   return async function generateMetadata(
-    pageProps: PageProps,
+    nextPageProps: PageProps,
   ): Promise<Metadata> {
-    const fallbackLocale = await getFallbackLocale();
     const { isEnabled: isDraft } = await draftMode();
-
-    // Await params since they are now Promises in Next.js 16
-    const resolvedParams = await pageProps.params;
-
-    const resolvedPageProps = {
-      ...pageProps,
-      params: resolvedParams,
-    } as unknown as ResolvedPageProps<PageProps>;
-
-    const variables =
-      options.buildVariables?.({
-        ...resolvedPageProps,
-        fallbackLocale,
-      }) || ({} as TVariables);
-
+    const { pageProps, variables } = await resolveRoute(
+      nextPageProps,
+      options.buildVariables,
+    );
     const data = await queryDatoCMS(options.query, variables, isDraft);
+    const generated = options.generate(data);
 
-    const tags = options.generate(data);
+    const metadata = Array.isArray(generated)
+      ? toNextMetadata(generated)
+      : (generated ?? {});
+    const { alternatePath } = options;
+    if (!alternatePath) return metadata;
 
-    return tags ? toNextMetadata(tags) : {};
+    return {
+      ...metadata,
+      alternates: buildAlternates({
+        locale: pageProps.params.lng,
+        locales: await getAvailableLocales(),
+        pathFor: (locale) =>
+          alternatePath(locale, { data, params: pageProps.params }),
+      }),
+    };
   };
 }

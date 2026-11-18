@@ -1,0 +1,36 @@
+import DatoStructuredText, {
+  type BlockBoundaryProps,
+} from '@/components/DatoStructuredText';
+import { BUY_BOX_COLUMN } from '@/components/ProductDetail/styles';
+import { type FragmentOf, readFragment } from '@/lib/datocms/graphql';
+import { QuestionsSectionFragment } from './fragments';
+
+type Props = {
+  fragment: FragmentOf<typeof QuestionsSectionFragment>;
+} & BlockBoundaryProps;
+
+export default function QuestionsSection({ fragment, ...rest }: Props) {
+  const { questions } = readFragment(QuestionsSectionFragment, fragment);
+
+  return (
+    <section {...rest}>
+      <dl className="border-b border-line">
+        {questions.map((question) => (
+          <div
+            key={question.id}
+            className="grid gap-2 border-t border-line py-7 lg:grid-cols-12 lg:gap-4 lg:py-8"
+          >
+            <dt className="title-item leading-[1.25] lg:col-span-6 lg:pr-10">
+              {question.question}
+            </dt>
+            <dd
+              className={`text-md leading-[1.6] text-ink-2 [&_p+p]:mt-3 [&_p]:m-0 ${BUY_BOX_COLUMN}`}
+            >
+              <DatoStructuredText data={question.answer} />
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}

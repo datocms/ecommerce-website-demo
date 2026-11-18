@@ -14,7 +14,7 @@ This example showcases a TypeScript Next.js 16 website with App Router (app) —
 
 It uses the official [@datocms/cda-client](https://github.com/datocms/cda-client) for content fetching, which provides TypeScript support, auto-retry on rate limits, and better error handling.
 
-It also uses GraphQL CodeGen to type all of the requests coming from Dato automatically: [See how it works here](https://www.datocms.com/blog/how-to-generate-typescript-types-from-graphql)
+It also uses [gql.tada](https://gql-tada.0no.co/), so every GraphQL query is fully typed and your IDE will help you complete the GraphQL queries.
 
 ## Demo
 
@@ -32,7 +32,7 @@ Have a look at the end result live:
 
 3. Let DatoCMS set everything up for you clicking this button below:
 
-[![Deploy with DatoCMS](https://dashboard.datocms.com/deploy/button.svg)](https://dashboard.datocms.com/deploy?repo=marcelofinamorvieira%2Fecommerce-website-demo%3Amain)
+[![Deploy with DatoCMS](https://dashboard.datocms.com/deploy/button.svg)](https://dashboard.datocms.com/deploy?repo=datocms%2Fecommerce-website-demo%3Amain)
 
 ### Local setup
 
@@ -52,7 +52,9 @@ cp .env.example .env
 
 and set `DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN`, `DATOCMS_DRAFT_CONTENT_CDA_TOKEN`, and `DATOCMS_CMA_TOKEN` with the matching token values.
 
-Then set the three secret tokens that guard the endpoints used for Web Previews, SEO Previews and cache invalidation. Generate a different, cryptographically-secure random string for each of them (`openssl rand -hex 32` is a good way to do it) — never reuse the same value across projects:
+Set `DATOCMS_BASE_EDITING_URL` to your project's admin URL (`https://<project>.admin.datocms.com`) so Visual Editing can open records.
+
+Then set the site URL and the three secret tokens that guard the endpoints used for Web Previews, SEO Previews and cache invalidation. Generate a different, cryptographically-secure random string for each of them (`openssl rand -hex 32` is a good way to do it) — never reuse the same value across projects:
 
 ```
 URL=http://localhost:3000
@@ -70,11 +72,167 @@ npm install
 npm run dev
 ```
 
-Your blog should be up and running on [http://localhost:3000](http://localhost:3000)!
+Your store should be up and running on [http://localhost:3000](http://localhost:3000)!
+
+## Project structure
+
+```
+app/
+  [lng]/                    every page lives under its locale (/en/..., /it/...)
+    layout.tsx              root layout: <html lang>, font, draft-mode toggle and
+                            visual-editing overlay
+    (site)/                 route group for the site pages (not part of the URL)
+      layout.tsx, meta.ts,  the site shell (header and footer), built from the Layout record
+      Content.tsx, RealTime.tsx
+      home/                 home page, served at /<locale>/home (proxy.ts redirects / and
+                            /<locale> there): CMS sections plus the newest products
+      products/             catalog with filters, sorting, search and pagination
+      product/[slug]/       product page, with schema.org Product JSON-LD (jsonLd.ts)
+      showcase/             lookbook: photos, collections, new products and materials
+      stores/               store list with a pager, and the Leaflet map (StoreMap.tsx)
+      legal/[slug]/         legal pages with a section index
+    not-found.tsx           404 page, from the Not Found Page singleton
+    [...rest]/              sends any unmatched path to not-found.tsx
+    error.tsx               error page, in English
+  global-error.tsx          error page for failures in the root layout, in English
+  sitemap.ts, robots.ts     sitemap.xml and robots.txt
+  api/                      draft mode, Web Previews links, cache revalidation,
+                            SEO analysis, post-install setup, product slug map
+components/
+  Common/                   generic building blocks: demo action button, drawer, section
+                            title, social link, optional link (a CMS link that may have no
+                            target), SVG icon, shared class recipes (styles.ts)
+  DatoImage/                DatoCMS responsive image and its ResponsiveImageFragment
+  DatoStructuredText/       Structured Text renderer with visual-editing boundaries
+  DraftMode/                draft-mode toggle, token form, success toast and the Content Link
+                            overlay
+  Layout/                   site shell: Header/, Footer/, language selector, accent color
+    Header/                 nav bar, mega menu (MegaMenuPanel, category links from
+                            Layout.menu via menu.ts), mobile menu, search, cart and the
+                            notification strip (dismissal in announcement.ts)
+  Motion/                   PageTransition (page fades), Rise (word-by-word titles) and
+                            LinkPending (marks a link whose page is loading)
+  ProductCard/              the product card shared by every product list, and Price.tsx
+                            (the price block, also used by the buy box)
+  ProductDetail/            product page: gallery, buy box, description blocks, reviews,
+                            related products
+  ProductListing/           catalog page: FilterDetail header, toolbar, filters, sort, search
+                            chip, empty results, pagination
+  Rail/                     controls, keyboard focus and progress bar for horizontal scrollers
+  Sections/                 home page sections, one folder per CMS block,
+                            plus NewArrivals (the newest products)
+  WithRealTimeUpdates/      generateWrapper() and ContentOrRealTime, which render a route from
+                            published content or live draft content
+lib/
+  datocms/                  gql.tada setup, generated schema types and queryDatoCMS();
+                            linkHref() (the href of a CMS link); pageMetadata.ts (page
+                            titles and the global SEO fragment); for CMA records,
+                            localizedString() (field values) and recordToWebsiteRoute() (a
+                            record's page, for Web Previews, SEO analysis and linkHref())
+  i18n.ts                   site locales, read from DatoCMS
+  requestLocale.ts          the request's locale, for not-found.tsx
+  alternates.ts             canonical and hreflang links
+  dismissedAnnouncement.ts  localStorage key and pre-paint script for the dismissed strip
+  routes.ts                 the URL of every page (homePath(), productsPath(), productPath()…)
+  ...                       small helpers: route prop types, product slugs, price formatting,
+                            class names, color contrast, env and token checks, site URL
+styles/
+  global.css                the entry file: Tailwind and its @source folders, then the files
+                            below in this order
+  tokens.css                Tailwind @theme tokens and the :root layout and motion variables
+  base.css                  element defaults
+  layout.css                shell, rails, black bands, logo
+  typography.css            display type (title-*)
+  actions.css               buttons and text links
+  labels.css                eyebrow, tags, chips
+  forms.css                 form fields
+  prose.css                 prose-dato, for Structured Text output
+  overrides.css             unlayered rules, including the Content Link stega reset
+  motion.css                animation utilities
+  map.css                   the stores map (Leaflet)
+  view-transitions.css      page, results and product-photo view transitions
+proxy.ts                    sends locale-less URLs to the visitor's language
+schema.graphql              DatoCMS schema, regenerated by `npm run generate-schema`
+datocms.json                "Deploy with DatoCMS" settings (env vars, post-install URL)
+skills/                     agent skills that describe how to extend this starter
+```
+
+### How a page is rendered
+
+Most route folders under `app/[lng]/(site)/` contain the same four files:
+
+- `meta.ts` holds the page's GraphQL `query`, written with `graphql()` from `lib/datocms/graphql.ts`, and the `Query` and `Variables` types that gql.tada infers from it.
+- `page.tsx` builds the query variables and passes everything to `generateWrapper()`. It also exports `generateMetadata` for the SEO tags, which override the site-wide defaults from `lib/datocms/pageMetadata.ts`: the favicons and the fallback title and description from the DatoCMS global SEO settings. It also sets the canonical and hreflang links through the `alternatePath` option of `generateMetadataFn`, which uses `lib/alternates.ts`. `app/sitemap.ts` and `app/robots.ts` serve `sitemap.xml` and `robots.txt`, and the product page adds schema.org Product JSON-LD (`product/[slug]/jsonLd.ts`, priced in the General Interface `currencyCode`).
+- `Content.tsx` renders the query result.
+- `RealTime.tsx` wraps `Content.tsx` in a live subscription.
+
+`generateWrapper()` runs the query through `queryDatoCMS()` and passes the result to `ContentOrRealTime`, both in `components/WithRealTimeUpdates/`. Visitors get `Content.tsx` rendered from published content, cached under the `datocms` tag that the `/api/revalidateCache` webhook clears. In draft mode `ContentOrRealTime` renders `RealTime.tsx` instead, which subscribes to the same query and re-renders `Content.tsx` every time an editor saves. Either way it wraps the page in `PageTransition`, so a route change fades but a draft toggle or a live update does not.
+
+Two routes differ from this pattern:
+
+- `products/` depends on search params, so its `page.tsx` runs the queries from `meta.ts` on every request and wraps its output in `PageTransition` itself. There is no `RealTime.tsx`.
+- `product/[slug]/page.tsx` runs its query itself so it can first redirect to the product's slug in the current language, then renders through `ContentOrRealTime`.
+
+The 404 page, `app/[lng]/not-found.tsx`, renders the localized Not Found Page singleton from DatoCMS: a title, a Structured Text description, an image and a Simple Button. `app/[lng]/[...rest]/page.tsx` sends any unmatched path there. `not-found.tsx` receives no params, so it reads the locale from `lib/requestLocale.ts`, which the root layout fills. `app/[lng]/error.tsx` and `app/global-error.tsx` are plain English pages, because they show when the CMS cannot be reached.
+
+The stores page draws its map in `StoreMap.tsx`, a Leaflet map that loads only when it nears the viewport; its look is in `styles/map.css`. The tiles come from OpenStreetMap, set by the two constants at the top of `StoreMap.tsx` (tile URL and attribution). OpenStreetMap's tile servers are meant for light traffic, so a busy site should switch to another tile provider there.
+
+### Draft mode and Visual Editing
+
+Editors reach draft mode in two ways. The Web Previews plugin, which `/api/post-install` installs, asks `/api/draft/preview-links` for a record's links (`recordToWebsiteRoute()` in `lib/datocms/` maps the record to its page) and opens `/api/draft/enable?token=…`. The toggle at the bottom right of every page (`components/DraftMode/DraftModeToggle.tsx`, mounted in `app/[lng]/layout.tsx`) asks for `DRAFT_SECRET_TOKEN` and calls the same route. `/api/draft/enable` and `/api/draft/disable` switch Next.js draft mode on and off.
+
+In draft mode `queryDatoCMS()` uses the draft token, skips the cache and asks for Content Link metadata. `ContentOrRealTime` renders `RealTime.tsx`, and `app/[lng]/layout.tsx` mounts the `ContentLink` overlay, so clicking a piece of text opens its record in DatoCMS. Draft strings carry invisible stega characters for that overlay, so the code calls `stripStega()` before it uses a text value as a URL, a comparison key or an attribute; `linkHref()` (`lib/datocms/linkHref.ts`) does it for a link's `page`. Slug fields never carry stega, so product links (`productPath()` in `lib/routes.ts`) use the slug as is.
+
+### Locales
+
+The locales come from the DatoCMS project settings (`lib/i18n.ts`), and the first one is the fallback that route queries pass as `fallbackLocales`. Every page sits under `app/[lng]/`, and `proxy.ts` sends a URL without a locale to the visitor's best `Accept-Language` match, and a bare `/<locale>` to its home page. Content is localized in DatoCMS, and the interface labels (skip link, menu, search, bag texts, catalog filters, results, empty states and pagination, screen-reader labels, store pager, pause and play) and the currency symbol come from the localized General Interface singleton, so a new visible string goes there, not in the code. Four things stay in English on purpose: the demo notice (`components/Common/DemoActionButton.tsx`), the draft-mode UI (`components/DraftMode/`) and the two error pages, which show when the CMS cannot be reached. Product slugs differ per locale: the product page redirects a slug from another locale to the current one (`lib/productSlugs.ts`), and the language selector asks `/api/product-slug-map` for the slug in the locale it switches to.
+
+### Where data and components live
+
+Reusable CMS blocks keep their GraphQL fragment in a `fragments.ts` next to the component: the home sections in `components/Sections/`, the product-description blocks in `components/ProductDetail/Blocks/`, and `DatoImage`. The route's `meta.ts` spreads the fragment into its query, and the component reads its data back with `readFragment()`. For example, `app/[lng]/(site)/home/meta.ts` spreads every section fragment inside `sections`, and `app/[lng]/(site)/home/Content.tsx` picks the component by `__typename`.
+
+Labels from the General Interface record that a whole feature folder uses sit in that folder's `fragments.ts`, next to the type of the components' `labels` prop (`ProductListingLabels` in `ProductListing/fragments.ts`, `ProductPageLabels` in `ProductDetail/fragments.ts`).
+
+Route-specific UI, such as the site shell in `components/Layout/` and the product page in `components/ProductDetail/`, types its props from the route's `Query` instead. `ProductCard` takes plain props, so any query can feed it. Four queries select its fields today, and each has a call site that maps them to props: `productsQuery` in `app/[lng]/(site)/products/meta.ts` (`products/page.tsx`), `ProductRailFragment` in `components/Sections/NewArrivals/fragments.ts` (`NewArrivals/ProductRail.tsx`), `showcase.newProducts` in `app/[lng]/(site)/showcase/meta.ts` (`showcase/NewProducts.tsx`) and `product.relatedProducts` in `app/[lng]/(site)/product/[slug]/meta.ts` (`ProductDetail/RelatedProducts.tsx`). A new card field goes into all four.
+
+Every link an editor sets in the CMS has the same shape. The Simple Button, Link Item and Footer Item blocks carry a `label`, a `record` (a collection, brand, material, product or legal page) and a `page` (`home`, `products`, `sale`, `showcase` or `stores`), which counts only when there is no record. Their queries select `page` and `record { ...LinkRecordFragment }`, and `linkHref()` in `lib/datocms/linkHref.ts` builds the href, always under the current locale:
+
+| Link | Href |
+| --- | --- |
+| collection, brand or material | `/<locale>/products?collections=<id>` (or `brands=`, `materials=`) |
+| product | `/<locale>/product/<slug>` |
+| legal page | `/<locale>/legal/<slug>` |
+| page `home`, `products`, `showcase`, `stores` | `/<locale>/home`, `/<locale>/products`, `/<locale>/showcase`, `/<locale>/stores` |
+| page `sale` | `/<locale>/products?orderBy=onSale_DESC` (products on sale first) |
+
+A link with neither a record nor a page has no href, and `OptionalLink` (`components/Common/`) renders its label as plain text. Record links inside the notification strip's Structured Text go through the same mapping (`recordHref()`), which is `recordToWebsiteRoute()` applied to a queried record.
+
+Feature areas with several components get a folder in `components/` (`ProductDetail/`, `ProductListing/`), even when one route uses them. Pieces split out of a single route's `Content.tsx`, and small helpers for one route, sit next to that route, like `legal/[slug]/SectionIndex.tsx`, the `showcase/` sections or `home/showcaseGroups.ts`.
+
+Tailwind only scans `app/` and `components/` for class names, so keep class strings in those two folders.
+
+Motion lives in two places, `styles/` and `components/Motion/`:
+
+- The utilities (`enter`, `reveal-stagger`, `press`…) sit in `styles/motion.css`, and the page, results and product-photo view transitions in `styles/view-transitions.css`. The durations and curves they use are tokens in `styles/tokens.css`.
+- `components/Motion/` holds three components: `PageTransition` (page fades), `Rise` (page titles, word by word) and `LinkPending` (marks a link whose page is loading).
+- To add an animation, add its `@keyframes` and an `@utility` to `styles/motion.css`, inside a `prefers-reduced-motion: no-preference` media query like the others, then put the class on the element.
+- A fixed or sticky shell element that stays on screen across pages needs a `data-chrome` attribute and a name in `styles/view-transitions.css`, so pages pass under it during navigation.
+
+## Updating the GraphQL schema
+
+The types of every query come from the DatoCMS schema saved in `schema.graphql`. When you change models or fields in your DatoCMS project, make sure `DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN` is set in your `.env` file and run:
+
+```bash
+npm run generate-schema
+```
+
+Executing this task will automatically update the `schema.graphql` and `lib/datocms/graphql-env.d.ts` files for you.
 
 ## VS Code
 
-It's strongly suggested to install the [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql) extension, to get autocomplete suggestions, validation against schema, and many more niceties when working with your GraphQL queries.
+It is highly recommended to follow [these instructions](https://gql-tada.0no.co/get-started/installation#vscode-setup) for an optimal experience with Visual Studio Code, including features like diagnostics, auto-completions, and type hovers for GraphQL.
+
+Biome formats and lints the code (`npm run format`, `npm run lint`), and `npm run typecheck` checks the types. The workspace settings make the Biome extension the default formatter.
 
 <!--datocms-autoinclude-footer start-->
 

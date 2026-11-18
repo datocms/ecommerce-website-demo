@@ -1,6 +1,9 @@
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+// Client-only (uses a hook): rendered from each route's 'use client' RealTime.tsx via
+// generateRealtimeComponent.
+
 import { useQuerySubscription } from 'react-datocms/use-query-subscription';
-import type { GlobalPageProps } from '@/utils/globalPageProps';
+import type { GlobalPageProps } from '@/lib/globalPageProps';
+import type { ContentPage, RealtimeUpdatesProps } from './types';
 
 export default function WithRealTimeUpdates<
   PageProps extends GlobalPageProps,
@@ -14,18 +17,8 @@ export default function WithRealTimeUpdates<
   children,
   pageProps,
   baseEditingUrl,
-}: {
-  initialData: TResult;
-  variables: TVariables;
-  query: TypedDocumentNode<TResult, TVariables>;
-  children: (
-    props: PageProps & {
-      data: TResult;
-    },
-  ) => React.ReactNode;
-  pageProps: PageProps;
-  token: string;
-  baseEditingUrl: string;
+}: RealtimeUpdatesProps<PageProps, TResult, TVariables> & {
+  children: ContentPage<PageProps, TResult>;
 }) {
   const { data } = useQuerySubscription({
     query,

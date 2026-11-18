@@ -1,7 +1,0 @@
-fragment QuestionSection on FeaturedQuestionsSectionRecord {
-  questions {
-    id
-    question
-    answer
-  }
-}
